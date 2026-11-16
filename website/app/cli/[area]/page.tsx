@@ -3,14 +3,27 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { CliCommandReference } from "@/components/reference/cli-command-reference";
+import { StructuredDataScript } from "@/components/seo/structured-data-script";
 import {
   indexMcpEntryUrls,
   listAreas,
   loadCliReference,
   toNamedLinks,
 } from "@/lib/reference/load-references";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
+import { buildReferencePageStructuredData } from "@/lib/seo/reference-page-structured-data";
 
 type AreaPageProps = { params: Promise<{ area: string }> };
+
+function describeCliAreaPage(areaName: string, area: string) {
+  return {
+    sectionName: "CLI reference",
+    sectionPath: "/cli",
+    title: `${areaName} commands`,
+    description: `The ${areaName} commands of the sendmock CLI, with every flag.`,
+    pagePath: `/cli/${area}`,
+  };
+}
 
 export function generateStaticParams() {
   return listAreas(loadCliReference().commands).map((area) => ({
@@ -25,10 +38,10 @@ export async function generateMetadata({
   const areaName = listAreas(loadCliReference().commands).find(
     (listedArea) => listedArea.slug === area,
   )?.name;
-  return {
-    title: `${areaName ?? "CLI"} commands`,
-    description: `The ${areaName} commands of the sendmock CLI, with every flag.`,
-  };
+  if (areaName === undefined) {
+    notFound();
+  }
+  return buildPageMetadata(describeCliAreaPage(areaName, area));
 }
 
 export default async function CliAreaPage({ params }: AreaPageProps) {
@@ -44,6 +57,11 @@ export default async function CliAreaPage({ params }: AreaPageProps) {
 
   return (
     <main className="mx-auto grid w-full max-w-5xl gap-2 px-4 py-12">
+      <StructuredDataScript
+        structuredData={buildReferencePageStructuredData(
+          describeCliAreaPage(areaName, area),
+        )}
+      />
       <p className="text-sm">
         <Link href="/cli" className="text-fd-muted-foreground hover:underline">
           CLI reference

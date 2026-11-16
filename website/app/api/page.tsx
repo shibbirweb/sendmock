@@ -3,12 +3,14 @@ import Link from "next/link";
 
 import { MethodBadge } from "@/components/api/method-badge";
 import { loadApiReference, toTagSlug } from "@/lib/openapi/load-openapi";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "API reference",
   description:
     "Every SendMock REST endpoint, generated from the frozen OpenAPI 3.1 contract, with a playground on each.",
-};
+  pagePath: "/api",
+});
 
 export default function ApiReferencePage() {
   const { operations, tagNames } = loadApiReference();

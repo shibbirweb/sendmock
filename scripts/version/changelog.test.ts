@@ -5,6 +5,7 @@ import { join } from "node:path";
 import {
   extractReleaseNotes,
   hasUnreleasedEntries,
+  hasUnreleasedUpgradeNotes,
   prepareChangelogForRelease,
   readChangelogSection,
 } from "./changelog";
@@ -100,6 +101,59 @@ describe("preparing the changelog for a release (DS-05.4)", () => {
         "nothing under [Unreleased]",
       );
     }
+  });
+
+  test("WS-14.4 a new major and its betas are refused without upgrade notes", () => {
+    for (const version of ["2.0.0-beta.1", "2.0.0"]) {
+      const prepared = prepareChangelogForRelease(
+        changelogWithUnreleased,
+        version,
+        "2026-11-09",
+      );
+      expect("refusal" in prepared && prepared.refusal, version).toContain(
+        '"### Upgrade notes" group',
+      );
+    }
+  });
+
+  test("WS-14.4 a new major with upgrade notes, and a minor or patch without them, go ahead", () => {
+    const changelogWithUpgradeNotes = changelogWithUnreleased.replace(
+      "### Fixed",
+      "### Upgrade notes\n\n- `--smtp-port` is now `--smtp-listen`.\n\n### Fixed",
+    );
+
+    expect(hasUnreleasedUpgradeNotes(changelogWithUpgradeNotes)).toBe(true);
+    expect(hasUnreleasedUpgradeNotes(changelogWithUnreleased)).toBe(false);
+    expect(
+      "changelog" in
+        prepareChangelogForRelease(
+          changelogWithUpgradeNotes,
+          "2.0.0",
+          "2026-11-09",
+        ),
+    ).toBe(true);
+    for (const version of ["1.0.0", "1.2.0", "1.1.1", "1.2.0-beta.1"]) {
+      expect(
+        "changelog" in
+          prepareChangelogForRelease(
+            changelogWithUnreleased,
+            version,
+            "2026-11-09",
+          ),
+        version,
+      ).toBe(true);
+    }
+  });
+
+  test("WS-14.4 an empty upgrade notes group does not count", () => {
+    expect(
+      hasUnreleasedUpgradeNotes(
+        changelogWithUnreleased.replace(
+          "### Fixed",
+          "### Upgrade notes\n\n### Fixed",
+        ),
+      ),
+    ).toBe(false);
   });
 
   test("DS-05.4 a stable that already has its section is refused", () => {

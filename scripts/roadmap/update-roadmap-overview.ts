@@ -1,5 +1,5 @@
-// Writes the pinned "Roadmap to SendMock 1.0" issue again from the current feature issues
-// (the counts and the by-area lists). Run after sync-issues.ts.
+// Writes the pinned roadmap issue again from the current feature issues (the counts, the
+// 1.0 features by area and each later release). Run after sync-issues.ts.
 import { spawnSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -7,6 +7,12 @@ import { join } from "node:path";
 
 import type { FeatureIssue } from "./build-feature-issues";
 import { generatedIssuesPath } from "./generated-issues-path";
+import {
+  firstBetaMilestone,
+  releasedMilestones,
+  releaseMilestones,
+  waitingOnOthersMilestone,
+} from "./release-milestones";
 
 const folder = import.meta.dir;
 const repository = "shibbirweb/sendmock";
@@ -50,43 +56,48 @@ const areaOrder = [
   "Distribution",
   "Website",
 ];
-const featureIssues = issues.filter((issue) => issue.target === "1.0");
-const backlogIssues = issues.filter((issue) => issue.target === "After 1.0");
-const releaseTargets = [
-  ...new Set(
-    issues
-      .map((issue) => issue.target)
-      .filter((target) => target !== "1.0" && target !== "After 1.0"),
-  ),
-].sort((left, right) => left.localeCompare(right, "en", { numeric: true }));
+// The features that made 1.0, released with the first beta or in 1.0.0, listed by area.
+const oneZeroMilestones = new Set([firstBetaMilestone, "1.0.0"]);
+const oneZeroIssues = issues.filter((issue) =>
+  oneZeroMilestones.has(issue.target),
+);
+const laterMilestones = releaseMilestones.filter(
+  (milestone) => !oneZeroMilestones.has(milestone),
+);
 const countWith = (status: string) =>
-  featureIssues.filter((issue) => issue.status === status).length;
+  issues.filter((issue) => issue.status === status).length;
 const taskLine = (issue: FeatureIssue) =>
   `- [${issue.status === "Done" ? "x" : " "}] #${state[issue.key]?.number}`;
+const describeMilestone = (milestone: string) => {
+  if (milestone === waitingOnOthersMilestone) {
+    return "Work that waits for an outside party; it gets a release once they act.";
+  }
+  return releasedMilestones.has(milestone) ? "Released." : "Planned.";
+};
 
 const overviewBody = [
   "### Summary",
   "",
-  "SendMock's way to 1.0 and what comes after, with one issue per feature. Each feature issue explains what the feature does, lists its acceptance criteria as a checklist (a checked item is proven by a test that passes in CI) and links the tests.",
+  "SendMock's releases, one milestone each, with one issue per feature. Each feature issue explains what the feature does, lists its acceptance criteria as a checklist (a checked item is proven by a test that passes in CI) and links the tests.",
   "",
   "### Where things stand",
   "",
   "| | |",
   "|---|---|",
-  `| **Done** | ${countWith("Done")} of ${featureIssues.length} features for 1.0, built in pull request 48 and released with the first beta |`,
+  `| **Done** | ${countWith("Done")} of ${issues.length} features |`,
   `| **In progress** | ${countWith("In progress")} features, each waiting for something named in its issue |`,
-  `| **Later** | ${countWith("Later")} feature for 1.0 not started yet, and ${backlogIssues.length} ideas for after 1.0 |`,
+  `| **Later** | ${countWith("Later")} features planned for a release and not started yet |`,
   "",
   "### Follow along",
   "",
-  `- Project board: [SendMock roadmap](${projectUrl}) (views: All features, Board, In progress, Later, Done, Target 1.0, After 1.0)`,
-  `- Milestones: [all milestones](${repositoryUrl}/milestones)`,
+  `- Project board: [SendMock roadmap](${projectUrl}); each item's Target is its release milestone`,
+  `- Milestones: [all milestones](${repositoryUrl}/milestones?state=all)`,
   `- Issue searches: ${searchLink("all features", "is:issue label:feature")}, ${searchLink("done", 'is:issue label:feature label:"status: done"')}, ${searchLink("in progress", 'is:issue is:open label:"status: in progress"')}, ${searchLink("later", 'is:issue is:open label:"status: later"')}`,
   "",
-  "### Features for 1.0, by area",
+  "### 1.0: the first beta and 1.0.0, by area",
   "",
   ...areaOrder.flatMap((area) => {
-    const areaIssues = featureIssues.filter((issue) => issue.area === area);
+    const areaIssues = oneZeroIssues.filter((issue) => issue.area === area);
     if (areaIssues.length === 0) {
       return [];
     }
@@ -100,21 +111,22 @@ const overviewBody = [
       "",
     ];
   }),
-  ...releaseTargets.flatMap((releaseTarget) => [
-    `### Planned for ${releaseTarget}`,
-    "",
-    `Everything in this release, features and bug fixes: ${searchLink(`milestone ${releaseTarget}`, `is:issue milestone:"${releaseTarget}"`)}.`,
-    "",
-    ...issues.filter((issue) => issue.target === releaseTarget).map(taskLine),
-    "",
-  ]),
-  "### After 1.0",
-  "",
-  ...backlogIssues.map(taskLine),
-  "",
+  ...laterMilestones.flatMap((milestone) => {
+    const milestoneIssues = issues.filter((issue) => issue.target === milestone);
+    return [
+      `### ${milestone}`,
+      "",
+      `${describeMilestone(milestone)} Everything in it, features and bug fixes: ${searchLink(`milestone ${milestone}`, `is:issue milestone:"${milestone}"`)}.`,
+      "",
+      ...(milestoneIssues.length === 0
+        ? ["No feature issues; bug fixes only."]
+        : milestoneIssues.map(taskLine)),
+      "",
+    ];
+  }),
   "### How this is kept current",
   "",
-  `The plan in [\`docs/plan/PROGRESS.md\`](${repositoryUrl}/blob/develop/docs/plan/PROGRESS.md) and the acceptance criteria in [\`docs/plan/acceptance/\`](${repositoryUrl}/tree/develop/docs/plan/acceptance) are the source of truth. When a pull request ticks criteria, the matching feature issues are updated, and closed once the feature is accepted.`,
+  `The plan in [\`docs/plan/PROGRESS.md\`](${repositoryUrl}/blob/develop/docs/plan/PROGRESS.md) and the acceptance criteria in [\`docs/plan/acceptance/\`](${repositoryUrl}/tree/develop/docs/plan/acceptance) are the source of truth. Each feature's intro names its release. When a pull request ticks criteria, the matching feature issues, their milestones and the project board are updated, and an issue is closed once its feature is accepted.`,
   "",
 ].join("\n");
 
@@ -130,6 +142,8 @@ run("gh", [
   String(overviewNumber),
   "-R",
   repository,
+  "--title",
+  "SendMock roadmap",
   "--body-file",
   bodyPath,
 ]);

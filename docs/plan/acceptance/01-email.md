@@ -182,7 +182,7 @@ UI in U3 (W16), runtime in Phase 4. Plan: [22-configurable-providers.md](../22-c
 
 ## EM-19 Mailpit API compatibility
 
-After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a1-mailpit-api-compatibility-em-19).
+0.1.0-beta.1 (planned as After 1.0), built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a1-mailpit-api-compatibility-em-19).
 
 - [x] EM-19.1 `GET /api/v1/messages` and `GET /api/v1/search` answer Mailpit's `MessagesSummary` (`total`, `unread`, `messages_count`, `messages_unread`, `start`, `tags`, `messages`), newest first, with `start` and `limit`; search reads Mailpit's `from:`, `to:`, `subject:`, `tag:`, `is:read`, `is:unread` and `has:attachment` filters and plain words. (#48)
 - [x] EM-19.2 `GET /api/v1/message/{ID}` (and `latest`) answers Mailpit's `Message` and marks the message read; `/headers`, `/raw`, `/part/{PartID}`, `/view/{ID}.html` and `/view/{ID}.txt` answer as Mailpit does, and a missing message or part answers 404 with a plain text body. (#48)
@@ -193,7 +193,7 @@ After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-aft
 
 ## EM-20 Email clicked events
 
-After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a2-emailclicked-link-click-tracking-em-20).
+0.1.0-beta.1 (planned as After 1.0), built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a2-emailclicked-link-click-tracking-em-20).
 
 - [x] EM-20.1 Clicking a link in an email's preview opens it in a new tab as before and fires `email.clicked` with `source: "ui"`, the URL and the browser's user agent. (#48)
 - [x] EM-20.2 Simulate click (`manual`) and `POST /api/v1/emails/{emailId}/clicks` (`api`) always fire; a URL that is not one of the email's links answers 422 `unknown_link`. (#48)
@@ -204,7 +204,7 @@ After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-aft
 
 ## EM-21 POP3 read access
 
-After 1.0, built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a6-pop3-read-access-em-21).
+0.1.0-beta.1 (planned as After 1.0), built on `feat/phase-0` by owner decision (2026-11-07). Plan: [32-after-1-0.md](../32-after-1-0.md#a6-pop3-read-access-em-21).
 
 - [x] EM-21.1 With `--pop3-addr` (off by default), SendMock answers POP3 on that address: a greeting, CAPA, USER and PASS, STAT, LIST, UIDL, RETR, TOP, NOOP, DELE, RSET and QUIT, with `-ERR` for an unknown command, a command out of turn and a line that is too long. (#48)
 - [x] EM-21.2 `--pop3-auth` accepts any login by default, or only the `user:password` lines of a `file:<path>`; a wrong password answers `-ERR`, and five failed logins close the connection. (#48)

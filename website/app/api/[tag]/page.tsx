@@ -3,9 +3,22 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { OperationReference } from "@/components/api/operation-reference";
+import { StructuredDataScript } from "@/components/seo/structured-data-script";
 import { loadApiReference, toTagSlug } from "@/lib/openapi/load-openapi";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
+import { buildReferencePageStructuredData } from "@/lib/seo/reference-page-structured-data";
 
 type TagPageProps = { params: Promise<{ tag: string }> };
+
+function describeApiTagPage(tagName: string, tag: string) {
+  return {
+    sectionName: "API reference",
+    sectionPath: "/api",
+    title: `${tagName} API`,
+    description: `The ${tagName} endpoints of the SendMock REST API.`,
+    pagePath: `/api/${tag}`,
+  };
+}
 
 export function generateStaticParams() {
   return loadApiReference().tagNames.map((tagName) => ({
@@ -20,10 +33,10 @@ export async function generateMetadata({
   const tagName = loadApiReference().tagNames.find(
     (name) => toTagSlug(name) === tag,
   );
-  return {
-    title: `${tagName ?? "API"} API`,
-    description: `The ${tagName} endpoints of the SendMock REST API.`,
-  };
+  if (tagName === undefined) {
+    notFound();
+  }
+  return buildPageMetadata(describeApiTagPage(tagName, tag));
 }
 
 export default async function ApiTagPage({ params }: TagPageProps) {
@@ -36,6 +49,11 @@ export default async function ApiTagPage({ params }: TagPageProps) {
 
   return (
     <main className="mx-auto grid w-full max-w-5xl gap-2 px-4 py-12">
+      <StructuredDataScript
+        structuredData={buildReferencePageStructuredData(
+          describeApiTagPage(tagName, tag),
+        )}
+      />
       <p className="text-sm">
         <Link href="/api" className="text-fd-muted-foreground hover:underline">
           API reference

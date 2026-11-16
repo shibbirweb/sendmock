@@ -14,6 +14,7 @@ import {
 } from "./acceptance-features";
 import { featureSummaries } from "./feature-summaries";
 import { generatedIssuesPath } from "./generated-issues-path";
+import { readReleaseMilestone } from "./release-milestones";
 
 export type FeatureIssue = {
   key: string;
@@ -61,16 +62,6 @@ function describeIntro(introLines: string[]): {
   return { phase, designLinks };
 }
 
-// A feature's intro starts with when it ships: "After 1.0, ..." for the backlog
-// (acceptance/01-email.md EM-19), a release such as "1.1.0 (A17), ..." once one is chosen,
-// and a phase name for the work that led to 1.0.
-function readTarget(phase: string): string {
-  if (phase.startsWith("After 1.0")) {
-    return "After 1.0";
-  }
-  return phase.match(/^(\d+\.\d+\.\d+)\b/)?.[1] ?? "1.0";
-}
-
 function buildFeatureIssue(
   feature: Feature,
   acceptanceStatus: string,
@@ -93,7 +84,8 @@ function buildFeatureIssue(
     : isStarted
       ? "In progress"
       : "Later";
-  const target = readTarget(intro.phase);
+  // The release milestone it ships in, also the board's Target (release-milestones.ts).
+  const target = readReleaseMilestone(intro.phase, isDone);
   const statusDetail = isDone
     ? "Every criterion is met and proven by automated tests that pass in CI."
     : status === "In progress" && tickedCount === criteriaCount

@@ -8,6 +8,11 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ## [Unreleased]
 
+### Added
+
+- **Website in search and link previews:** every page of https://shibbir.me/sendmock/ has a canonical link, Open Graph and Twitter card tags with a preview image, and structured data, and `sitemap.xml` lists every current page. Older docs versions and `/next/` point search engines to the current pages.
+- **What's new and Upgrade guide in the docs:** under the **Version** menu of every docs version, **What's new** shows that version's release notes and **Upgrade guide** shows how to upgrade on your install channel and what to change, if anything.
+
 ### Fixed
 
 - **`cargo install sendmock`:** each stable release reaches crates.io again. 1.1.0 was released everywhere else but not to crates.io.

@@ -56,7 +56,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 124 / 137 features, 609 / 692 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 126 / 139 features, 621 / 704 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -78,9 +78,9 @@ On top of its own criteria, a feature is done only when:
 | [EM-16](01-email.md#em-16-browser-notifications) | Browser notifications | UI in U1, live in Phase 1 | 2 | Accepted |
 | [EM-17](01-email.md#em-17-simulated-replies-and-inbound-email) | Simulated replies and inbound email | UI in U1, backend Phase 4 | 5 | Accepted |
 | [EM-18](01-email.md#em-18-configurable-email-providers) | Configurable email providers | UI in U3 (W16), runtime Phase 4 | 8 | Accepted |
-| [EM-19](01-email.md#em-19-mailpit-api-compatibility) | Mailpit API compatibility | After 1.0 (A1) | 6 | Accepted |
-| [EM-20](01-email.md#em-20-email-clicked-events) | Email clicked events | After 1.0 (A2) | 6 | Accepted |
-| [EM-21](01-email.md#em-21-pop3-read-access) | POP3 read access | After 1.0 (A6) | 6 | Accepted |
+| [EM-19](01-email.md#em-19-mailpit-api-compatibility) | Mailpit API compatibility | 0.1.0-beta.1 (A1) | 6 | Accepted |
+| [EM-20](01-email.md#em-20-email-clicked-events) | Email clicked events | 0.1.0-beta.1 (A2) | 6 | Accepted |
+| [EM-21](01-email.md#em-21-pop3-read-access) | POP3 read access | 0.1.0-beta.1 (A6) | 6 | Accepted |
 | [EM-22](01-email.md#em-22-where-a-simulated-reply-goes) | Where a simulated reply goes | Phase 5 (W20) | 5 | Accepted |
 | [SM-01](02-sms-verify.md#sm-01-native-sms-api) | Native SMS API | Phase 2 | 5 | Accepted |
 | [SM-02](02-sms-verify.md#sm-02-twilio-messages-api) | Twilio Messages API | Phase 2 | 4 | Accepted |
@@ -98,13 +98,13 @@ On top of its own criteria, a feature is done only when:
 | [SM-14](02-sms-verify.md#sm-14-provider-port) | Provider port | Phase 2 | 3 | Accepted |
 | [SM-15](02-sms-verify.md#sm-15-mms-and-media) | MMS and media | UI in U1, backend Phase 2 and 4 | 5 | Accepted |
 | [SM-16](02-sms-verify.md#sm-16-configurable-sms-providers) | Configurable SMS providers | UI in U3 (W16), runtime Phase 2 (built-ins) and 4 (custom) | 8 | Accepted |
-| [SM-17](02-sms-verify.md#sm-17-more-sms-providers) | More SMS providers | After 1.0 (A3) | 6 | Accepted |
-| [SM-18](02-sms-verify.md#sm-18-whatsapp-business-cloud-api) | WhatsApp Business Cloud API | After 1.0 (A8) | 5 | Accepted |
+| [SM-17](02-sms-verify.md#sm-17-more-sms-providers) | More SMS providers | 0.1.0-beta.1 (A3) | 6 | Accepted |
+| [SM-18](02-sms-verify.md#sm-18-whatsapp-business-cloud-api) | WhatsApp Business Cloud API | 0.1.0-beta.1 (A8) | 5 | Accepted |
 | [VF-01](02-sms-verify.md#vf-01-verify-services) | Verify services | UI in U1, backend Phase 2 | 3 | Accepted |
 | [VF-02](02-sms-verify.md#vf-02-start-a-verification-and-deliver-the-code) | Start a verification and deliver the code | Phase 2 | 5 | Accepted |
 | [VF-03](02-sms-verify.md#vf-03-check-a-verification) | Check a verification | Phase 2 | 4 | Accepted |
 | [VF-04](02-sms-verify.md#vf-04-force-state-and-events) | Force state and events | UI in U1, backend Phase 2 | 4 | Accepted |
-| [VF-05](02-sms-verify.md#vf-05-vonage-verify-v2) | Vonage Verify v2 | After 1.0 (A4) | 4 | Accepted |
+| [VF-05](02-sms-verify.md#vf-05-vonage-verify-v2) | Vonage Verify v2 | 0.1.0-beta.1 (A4) | 4 | Accepted |
 | [WH-01](03-webhooks.md#wh-01-endpoints) | Endpoints | UI in U2, backend Phase 3 | 8 | Accepted |
 | [WH-02](03-webhooks.md#wh-02-rules-and-filters) | Rules and filters | UI in U2, backend Phase 3 | 6 | Accepted |
 | [WH-03](03-webhooks.md#wh-03-delivery-engine-and-retries) | Delivery engine and retries | UI in U2, backend Phase 3 | 9 | Accepted |
@@ -119,7 +119,7 @@ On top of its own criteria, a feature is done only when:
 | [WH-12](03-webhooks.md#wh-12-inbound-routes-mailgun-style) | Inbound routes (Mailgun style) | UI in U2, backend Phase 4 | 7 | Accepted |
 | [WH-13](03-webhooks.md#wh-13-webhooks-shown-and-chosen-on-every-simulation) | Webhooks shown and chosen on every simulation | Phase 5 (W22) | 5 | Accepted |
 | [WH-14](03-webhooks.md#wh-14-webhook-payload-shown-and-edited-before-a-simulation) | Webhook payload shown and edited before a simulation | Phase 5 (W23) | 4 | Accepted |
-| [WH-15](03-webhooks.md#wh-15-webhook-tests-in-cicd-pipelines) | Webhook tests in CI/CD pipelines | After 1.0 (A19) | 9 | Not started |
+| [WH-15](03-webhooks.md#wh-15-webhook-tests-in-cicd-pipelines) | Webhook tests in CI/CD pipelines | 1.4.0 (A19) | 9 | Not started |
 | [HC-01](04-catcher-platform.md#hc-01-capture-requests) | Capture requests | UI in U2, backend Phase 4 | 7 | Accepted |
 | [HC-02](04-catcher-platform.md#hc-02-mock-responses) | Mock responses | UI in U2, backend Phase 4 | 4 | Accepted |
 | [HC-03](04-catcher-platform.md#hc-03-presets) | Presets | Phase 4 (Slack, Discord, Telegram, FCM), Phase 5 (Teams, Google Chat, Expo, OneSignal) | 2 | Accepted |
@@ -132,21 +132,21 @@ On top of its own criteria, a feature is done only when:
 | [PL-07](04-catcher-platform.md#pl-07-configuration) | Configuration | Phase 0 | 3 | Accepted |
 | [PL-08](04-catcher-platform.md#pl-08-retention) | Retention | Phase 1 | 5 | Accepted |
 | [PL-09](04-catcher-platform.md#pl-09-demo-data) | Demo data | Phase 5 | 3 | Accepted |
-| [PL-10](04-catcher-platform.md#pl-10-projects) | Projects (multi-project inboxes) | After 1.0 (A5) | 8 | Accepted |
-| [PL-11](04-catcher-platform.md#pl-11-prometheus-metrics) | Prometheus metrics | After 1.0 (A12a) | 10 | Not started |
-| [PL-12](04-catcher-platform.md#pl-12-opentelemetry-export) | OpenTelemetry export | After 1.0 (A12b) | 7 | Not started |
-| [PL-13](04-catcher-platform.md#pl-13-log-files-and-readiness) | Log files and readiness | After 1.0 (A12c) | 5 | Not started |
-| [PL-14](04-catcher-platform.md#pl-14-accounts-and-login) | Accounts and login | After 1.0 (A13a) | 10 | Not started |
-| [PL-15](04-catcher-platform.md#pl-15-roles-admin-developer-viewer) | Roles: Admin, Developer, Viewer | After 1.0 (A13b) | 7 | Not started |
-| [PL-16](04-catcher-platform.md#pl-16-real-provider-connections) | Real provider connections | After 1.0 (A14a) | 7 | Not started |
-| [PL-17](04-catcher-platform.md#pl-17-forwarding-rules-for-email-and-sms) | Forwarding rules for email and SMS | After 1.0 (A14b) | 8 | Not started |
-| [PL-18](04-catcher-platform.md#pl-18-versioned-setup-export-and-import) | Versioned setup export and import | After 1.0 (A18) | 9 | Not started |
-| [PN-01](09-push.md#pn-01-push-notifications) | Push notifications | After 1.0 (A7) | 6 | Accepted |
+| [PL-10](04-catcher-platform.md#pl-10-projects) | Projects (multi-project inboxes) | 0.1.0-beta.1 (A5) | 8 | Accepted |
+| [PL-11](04-catcher-platform.md#pl-11-prometheus-metrics) | Prometheus metrics | 1.6.0 (A12a) | 10 | Not started |
+| [PL-12](04-catcher-platform.md#pl-12-opentelemetry-export) | OpenTelemetry export | 1.6.0 (A12b) | 7 | Not started |
+| [PL-13](04-catcher-platform.md#pl-13-log-files-and-readiness) | Log files and readiness | 1.6.0 (A12c) | 5 | Not started |
+| [PL-14](04-catcher-platform.md#pl-14-accounts-and-login) | Accounts and login | 2.0.0 (A13a) | 10 | Not started |
+| [PL-15](04-catcher-platform.md#pl-15-roles-admin-developer-viewer) | Roles: Admin, Developer, Viewer | 2.0.0 (A13b) | 7 | Not started |
+| [PL-16](04-catcher-platform.md#pl-16-real-provider-connections) | Real provider connections | 2.0.0 (A14a) | 7 | Not started |
+| [PL-17](04-catcher-platform.md#pl-17-forwarding-rules-for-email-and-sms) | Forwarding rules for email and SMS | 2.0.0 (A14b) | 8 | Not started |
+| [PL-18](04-catcher-platform.md#pl-18-versioned-setup-export-and-import) | Versioned setup export and import | 1.3.0 (A18) | 9 | Not started |
+| [PN-01](09-push.md#pn-01-push-notifications) | Push notifications | 0.1.0-beta.1 (A7) | 6 | Accepted |
 | [AI-01](05-ai.md#ai-01-cli) | CLI | Phase 0 (skeleton), then every phase for its commands | 5 | Accepted |
 | [AI-02](05-ai.md#ai-02-mcp-server-tools) | MCP server tools | Phase 1 onwards | 5 | Accepted |
 | [AI-03](05-ai.md#ai-03-mcp-resources-and-prompts) | MCP resources and prompts | Phase 4 | 3 | Accepted |
 | [AI-04](05-ai.md#ai-04-scenarios) | Scenarios | Phase 4 | 3 | Accepted |
-| [AI-05](05-ai.md#ai-05-agent-skill-and-sendmock-ai-install) | Agent skill and `sendmock ai install` | Phase 4 (skill, install), Phase 5 (plugin, evals, MCP registry listings) | 9 | In progress |
+| [AI-05](05-ai.md#ai-05-agent-skill-and-sendmock-ai-install) | Agent skill and `sendmock ai install` | Waiting on others (left over from 1.0.0: AI-05.8); before: Phase 4 (skill, install), Phase 5 (plugin, evals, MCP registry listings) | 9 | In progress |
 | [AI-06](05-ai.md#ai-06-llmstxt) | llms.txt | Phase 4 | 1 | Accepted |
 | [UI-01](06-ui.md#ui-01-app-shell) | App shell | Phase U0 | 5 | Accepted |
 | [UI-02](06-ui.md#ui-02-mock-layer) | Mock layer | Phase U0 | 5 | Accepted |
@@ -169,13 +169,13 @@ On top of its own criteria, a feature is done only when:
 | [DS-05](07-distribution-website.md#ds-05-version-management) | Version management | Phase 0 | 5 | Accepted |
 | [DS-06](07-distribution-website.md#ds-06-test-harness-integration) | Test harness integration | Phase 1 (`--ready-json`), Phase 2 (Testcontainers) | 2 | Accepted |
 | [DS-07](07-distribution-website.md#ds-07-performance-budgets) | Performance budgets | Phase 5 (enforced in CI) | 2 | Accepted |
-| [DS-08](07-distribution-website.md#ds-08-system-tray-app) | System tray app | After 1.0 (A9) | 5 | Accepted |
-| [DS-09](07-distribution-website.md#ds-09-helm-chart) | Helm chart | After 1.0 (A10) | 5 | Accepted |
-| [DS-10](07-distribution-website.md#ds-10-docker-desktop-extension) | Docker Desktop extension | After 1.0 (A10) | 5 | Accepted |
+| [DS-08](07-distribution-website.md#ds-08-system-tray-app) | System tray app | 0.1.0-beta.1 (A9) | 5 | Accepted |
+| [DS-09](07-distribution-website.md#ds-09-helm-chart) | Helm chart | 1.0.0 (A10) | 5 | Accepted |
+| [DS-10](07-distribution-website.md#ds-10-docker-desktop-extension) | Docker Desktop extension | 1.0.0 (A10) | 5 | Accepted |
 | [DS-11](07-distribution-website.md#ds-11-test-builds-of-every-pull-request) | Test builds of every pull request | Phase 5 (W25) | 5 | Accepted |
 | [WS-01](07-distribution-website.md#ws-01-site-and-deployment) | Site and deployment | Phase U0 | 2 | Accepted |
 | [WS-02](07-distribution-website.md#ws-02-landing-page) | Landing page | Phase U3 | 4 | Accepted |
-| [WS-03](07-distribution-website.md#ws-03-docs-and-versions) | Docs and versions | U3 W17 (versioned builds), Phase 5 (complete, versioned) | 7 | In progress |
+| [WS-03](07-distribution-website.md#ws-03-docs-and-versions) | Docs and versions | 1.2.0 (left over from 1.0.0: WS-03.2's test); before: U3 W17 (versioned builds), Phase 5 (complete, versioned) | 7 | In progress |
 | [WS-04](07-distribution-website.md#ws-04-api-playground-demo-mode) | API playground: Demo mode | Phase U3 | 6 | Accepted |
 | [WS-05](07-distribution-website.md#ws-05-api-playground-local-mode) | API playground: Local mode | Phase 1 | 3 | Accepted |
 | [WS-06](07-distribution-website.md#ws-06-user-guide) | User guide | Phase U3 | 5 | Accepted |
@@ -183,8 +183,10 @@ On top of its own criteria, a feature is done only when:
 | [WS-08](07-distribution-website.md#ws-08-code-examples) | Code examples | Phase U3 (WS-08.5 in Phase 2) | 5 | Accepted |
 | [WS-09](07-distribution-website.md#ws-09-install-with-ai) | Install with AI | Phase U3 | 4 | Accepted |
 | [WS-10](07-distribution-website.md#ws-10-deeper-docs-every-control) | Deeper docs: every control | Phase 5 (screen by screen in Stage B; W24 the Screenshots workflow) | 5 | Accepted |
-| [WS-11](07-distribution-website.md#ws-11-docs-traffic-analytics) | Docs traffic analytics | After 1.0 (A15) | 6 | Not started |
-| [WS-12](07-distribution-website.md#ws-12-code-examples-on-every-page) | Code examples on every page | After 1.0 (A16) | 4 | Not started |
+| [WS-11](07-distribution-website.md#ws-11-docs-traffic-analytics) | Docs traffic analytics | 1.5.0 (A15) | 6 | Not started |
+| [WS-12](07-distribution-website.md#ws-12-code-examples-on-every-page) | Code examples on every page | 1.5.0 (A16) | 4 | Not started |
+| [WS-13](07-distribution-website.md#ws-13-search-engines-and-link-previews) | Search engines and link previews | 1.2.0 (A20) | 8 | Accepted |
+| [WS-14](07-distribution-website.md#ws-14-whats-new-and-upgrade-guide) | What's new and Upgrade guide | 1.2.0 (A21) | 4 | Accepted |
 | [PY-01](08-payments.md#py-01-safety) | Safety | Phase 3P | 4 | Accepted |
 | [PY-02](08-payments.md#py-02-native-payments-api) | Native payments API | Phase 3P | 3 | Accepted |
 | [PY-03](08-payments.md#py-03-hosted-test-checkout-page) | Hosted test checkout page | UI in U2, live in Phase 3P | 4 | Accepted |
