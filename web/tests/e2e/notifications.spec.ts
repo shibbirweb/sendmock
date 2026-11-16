@@ -1,7 +1,12 @@
 import { expect, type Page, test } from "@playwright/test";
 
+/** Live traffic goes off first: its random messages re-render the bell list mid-click. */
 async function sendSampleEmail(page: Page) {
   await page.getByRole("button", { name: "Demo controls" }).click();
+  const liveTraffic = page.getByRole("switch", { name: /Live traffic/ });
+  if ((await liveTraffic.getAttribute("aria-checked")) === "true") {
+    await liveTraffic.click();
+  }
   await page.getByRole("button", { name: "Sample email" }).click();
   await page.keyboard.press("Escape");
 }

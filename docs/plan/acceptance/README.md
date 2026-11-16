@@ -56,7 +56,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 126 / 139 features, 621 / 704 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 127 / 139 features, 621 / 704 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -175,7 +175,7 @@ On top of its own criteria, a feature is done only when:
 | [DS-11](07-distribution-website.md#ds-11-test-builds-of-every-pull-request) | Test builds of every pull request | Phase 5 (W25) | 5 | Accepted |
 | [WS-01](07-distribution-website.md#ws-01-site-and-deployment) | Site and deployment | Phase U0 | 2 | Accepted |
 | [WS-02](07-distribution-website.md#ws-02-landing-page) | Landing page | Phase U3 | 4 | Accepted |
-| [WS-03](07-distribution-website.md#ws-03-docs-and-versions) | Docs and versions | 1.2.0 (left over from 1.0.0: WS-03.2's test); before: U3 W17 (versioned builds), Phase 5 (complete, versioned) | 7 | In progress |
+| [WS-03](07-distribution-website.md#ws-03-docs-and-versions) | Docs and versions | 1.2.0 (left over from 1.0.0: WS-03.2's test); before: U3 W17 (versioned builds), Phase 5 (complete, versioned) | 7 | Accepted |
 | [WS-04](07-distribution-website.md#ws-04-api-playground-demo-mode) | API playground: Demo mode | Phase U3 | 6 | Accepted |
 | [WS-05](07-distribution-website.md#ws-05-api-playground-local-mode) | API playground: Local mode | Phase 1 | 3 | Accepted |
 | [WS-06](07-distribution-website.md#ws-06-user-guide) | User guide | Phase U3 | 5 | Accepted |

@@ -137,7 +137,7 @@ Phase U3.
 
 ## WS-03 Docs and versions
 
-1.2.0 (left over from 1.0.0, moved 2026-11-16: WS-03.2 needs a test that names it). Before that: U3 W17 (versioned builds, switcher and banner, moved from Phase 0 on 2026-10-27, owner feedback F14), Phase 5 (complete, versioned).
+1.2.0 (left over from 1.0.0, moved 2026-11-16: WS-03.2 needed a test that names it; its drift tests name it since #300, accepted 2026-11-17). Before that: U3 W17 (versioned builds, switcher and banner, moved from Phase 0 on 2026-10-27, owner feedback F14), Phase 5 (complete, versioned).
 
 - [x] WS-03.1 `/` serves the latest stable docs, `/next/` the `develop` docs with a beta banner, `/vX.Y/` older minors, with a working version switcher. (#276)
 - [x] WS-03.2 Generated references (CLI, MCP tools, templates, filters, magic numbers, config flags) match the code; CI fails on drift. (#48)
