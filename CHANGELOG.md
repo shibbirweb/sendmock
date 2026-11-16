@@ -8,6 +8,8 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-16
+
 ### Added
 
 - **List actions on every screen:** Mail, SMS, Verify, Push, the HTTP Catcher, webhook deliveries, Payments, Subscriptions and both Logs tabs share one toolbar above the list. Tick rows (or press **x** on the open or focused row) to **Mark read**, **Mark unread** or **Delete** them, and **Delete all** empties the list, or only what the search or filters show, in the picked project, after one confirmation that says what goes and what stays. Webhook deliveries still queued or retrying are kept.
