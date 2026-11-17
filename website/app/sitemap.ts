@@ -1,3 +1,5 @@
+import { join } from "node:path";
+
 import type { MetadataRoute } from "next";
 
 import { loadApiReference, toTagSlug } from "@/lib/openapi/load-openapi";
@@ -6,11 +8,22 @@ import {
   loadCliReference,
   loadMcpReference,
 } from "@/lib/reference/load-references";
-import { listSitemapPagePaths } from "@/lib/seo/sitemap-pages";
+import { listSitemapPages } from "@/lib/seo/sitemap-pages";
 import { buildSiteUrl } from "@/lib/seo/site-url";
+import { findLastCommitDate } from "@/lib/seo/source-last-modified";
 import { source } from "@/lib/source";
 
 export const dynamic = "force-static";
+
+/** The checkout being built: this repository, or a worktree of a released tag. */
+const contentRepositoryRoot = join(process.cwd(), "..");
+/**
+ * A tag's worktree gets today's website code copied over it, so the landing
+ * page's history is read from the current checkout that
+ * scripts/build-docs-versions.ts names.
+ */
+const websiteRepositoryRoot =
+  process.env.WEBSITE_GIT_ROOT ?? contentRepositoryRoot;
 
 /**
  * Served at https://shibbir.me/sendmock/sitemap.xml; the domain's robots.txt
@@ -19,8 +32,11 @@ export const dynamic = "force-static";
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   const mcpReference = loadMcpReference();
-  const pagePaths = listSitemapPagePaths({
-    docsPagePaths: source.getPages().map((docsPage) => docsPage.url),
+  const sitemapPages = listSitemapPages({
+    docsPages: source.getPages().map((docsPage) => ({
+      pagePath: docsPage.url,
+      wikiFilePath: docsPage.path,
+    })),
     apiTagSlugs: loadApiReference().tagNames.map(toTagSlug),
     cliAreaSlugs: listAreas(loadCliReference().commands).map(
       (area) => area.slug,
@@ -31,5 +47,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ]).map((area) => area.slug),
   });
 
-  return pagePaths.map((pagePath) => ({ url: buildSiteUrl(pagePath) }));
+  return sitemapPages.map((sitemapPage) => ({
+    url: buildSiteUrl(sitemapPage.pagePath),
+    lastModified: findLastCommitDate(
+      sitemapPage.sourcePaths,
+      sitemapPage.isWebsiteSource
+        ? websiteRepositoryRoot
+        : contentRepositoryRoot,
+    ),
+  }));
 }
