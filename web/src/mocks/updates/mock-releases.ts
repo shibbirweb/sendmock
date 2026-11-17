@@ -1,5 +1,12 @@
+import changelogMarkdown from "../../../../CHANGELOG.md?raw";
+import webPackageJson from "../../../package.json?raw";
+
 import type { InstallMethod, ReleaseChannel } from "@/lib/api/types";
 import type { OperatingSystem } from "@/mocks/updates/build-upgrade-command";
+import {
+  type ChangelogRelease,
+  parseChangelogReleases,
+} from "@/mocks/updates/changelog-releases";
 import type { PublishedRelease } from "@/mocks/updates/select-offered-release";
 
 /** A pretend install the demo controls can switch between, for the update check. */
@@ -12,12 +19,45 @@ export type MockInstallProfile = {
   operatingSystem: OperatingSystem;
 };
 
-/** The demo's default, so the preview shows an update to install. */
+function readPackageVersion(packageJsonText: string): string {
+  const packageVersion: unknown = (
+    JSON.parse(packageJsonText) as { version?: unknown }
+  ).version;
+
+  return typeof packageVersion === "string" ? packageVersion : "0.0.0-dev";
+}
+
+/** The version this demo was built as: `web/package.json`, which the release workflows bump. */
+export const builtAppVersion = readPackageVersion(webPackageJson);
+
+/** The stable releases the demo's pretend GitHub lists: the dated sections of `CHANGELOG.md`, so they are real. */
+export const mockStableReleases: ChangelogRelease[] =
+  parseChangelogReleases(changelogMarkdown);
+
+const firstStableRelease: ChangelogRelease = {
+  version: "1.0.0",
+  releasedOn: "2026-11-14",
+  notesMarkdown: "",
+};
+const latestStableRelease = mockStableReleases[0] ?? firstStableRelease;
+/** Older installs run the stable before the latest, so the update check has the latest to offer. */
+const previousStableVersion =
+  mockStableReleases[1]?.version ?? latestStableRelease.version;
+/** Every stable goes through a first beta, so this beta exists. */
+const latestStableFirstBetaVersion = `${latestStableRelease.version}-beta.1`;
+
+function toNextMinorEdgeVersion(stableVersion: string): string {
+  const [majorNumber = "1", minorNumber = "0"] = stableVersion.split(".");
+
+  return `${majorNumber}.${Number(minorNumber) + 1}.0-edge.3f2c1ab`;
+}
+
+/** The demo's default: the version it was built as, so the sidebar and About show the real release. */
 const defaultMockInstallProfile: MockInstallProfile = {
-  key: "beta-homebrew",
-  label: "Beta, Homebrew on macOS",
-  version: "0.1.0-beta.2",
-  releaseChannel: "beta",
+  key: "current-homebrew",
+  label: "This version, Homebrew on macOS",
+  version: builtAppVersion,
+  releaseChannel: builtAppVersion.includes("-") ? "beta" : "stable",
   installMethod: "homebrew",
   operatingSystem: "macos",
 };
@@ -25,9 +65,17 @@ const defaultMockInstallProfile: MockInstallProfile = {
 export const mockInstallProfiles: MockInstallProfile[] = [
   defaultMockInstallProfile,
   {
+    key: "beta-homebrew",
+    label: "Beta, Homebrew on macOS",
+    version: latestStableFirstBetaVersion,
+    releaseChannel: "beta",
+    installMethod: "homebrew",
+    operatingSystem: "macos",
+  },
+  {
     key: "stable-docker",
     label: "Stable, Docker",
-    version: "0.1.0",
+    version: previousStableVersion,
     releaseChannel: "stable",
     installMethod: "docker",
     operatingSystem: "linux",
@@ -35,7 +83,7 @@ export const mockInstallProfiles: MockInstallProfile[] = [
   {
     key: "stable-install-script-linux",
     label: "Stable, install script on Linux",
-    version: "0.1.0",
+    version: previousStableVersion,
     releaseChannel: "stable",
     installMethod: "install_script",
     operatingSystem: "linux",
@@ -43,7 +91,7 @@ export const mockInstallProfiles: MockInstallProfile[] = [
   {
     key: "beta-install-script-windows",
     label: "Beta, install script on Windows",
-    version: "0.1.0-beta.2",
+    version: latestStableFirstBetaVersion,
     releaseChannel: "beta",
     installMethod: "install_script",
     operatingSystem: "windows",
@@ -51,7 +99,7 @@ export const mockInstallProfiles: MockInstallProfile[] = [
   {
     key: "stable-scoop",
     label: "Stable, Scoop on Windows",
-    version: "0.1.0",
+    version: previousStableVersion,
     releaseChannel: "stable",
     installMethod: "scoop",
     operatingSystem: "windows",
@@ -59,7 +107,7 @@ export const mockInstallProfiles: MockInstallProfile[] = [
   {
     key: "beta-npm",
     label: "Beta, npm",
-    version: "0.1.0-beta.2",
+    version: latestStableFirstBetaVersion,
     releaseChannel: "beta",
     installMethod: "npm",
     operatingSystem: "linux",
@@ -67,7 +115,7 @@ export const mockInstallProfiles: MockInstallProfile[] = [
   {
     key: "stable-unknown",
     label: "Stable, install method unknown",
-    version: "0.1.0",
+    version: previousStableVersion,
     releaseChannel: "stable",
     installMethod: "unknown",
     operatingSystem: "linux",
@@ -75,7 +123,7 @@ export const mockInstallProfiles: MockInstallProfile[] = [
   {
     key: "stable-latest",
     label: "Stable, already the newest",
-    version: "0.1.1",
+    version: latestStableRelease.version,
     releaseChannel: "stable",
     installMethod: "homebrew",
     operatingSystem: "macos",
@@ -83,7 +131,7 @@ export const mockInstallProfiles: MockInstallProfile[] = [
   {
     key: "edge-docker",
     label: "Edge image from develop",
-    version: "0.2.0-edge.3f2c1ab",
+    version: toNextMinorEdgeVersion(latestStableRelease.version),
     releaseChannel: "edge",
     installMethod: "docker",
     operatingSystem: "linux",
@@ -110,45 +158,13 @@ export function findMockInstallProfile(
   );
 }
 
-/** Pretend GitHub Releases, newest first; the notes are `CHANGELOG.md` sections. */
-export const mockPublishedReleases: PublishedRelease[] = [
-  {
-    version: "0.2.0-beta.1",
-    publishedAt: "2026-10-24T09:30:00Z",
-    isPrerelease: true,
-    releaseNotesMarkdown: [
-      "### Added",
-      "",
-      "- Update checker with Off, Manual and Daily modes (#41)",
-      "- Configurable email and SMS providers (#36)",
-      "",
-      "### Fixed",
-      "",
-      "- Toasts no longer cover the message composer (#32)",
-    ].join("\n"),
-  },
-  {
-    version: "0.1.1",
-    publishedAt: "2026-10-18T14:00:00Z",
+/** Pretend GitHub Releases, newest first; the notes are the `CHANGELOG.md` sections, as on GitHub. */
+export const mockPublishedReleases: PublishedRelease[] = mockStableReleases.map(
+  (stableRelease) => ({
+    version: stableRelease.version,
+    // Midday keeps the release on its own date in every time zone.
+    publishedAt: `${stableRelease.releasedOn}T12:00:00Z`,
     isPrerelease: false,
-    releaseNotesMarkdown: [
-      "### Fixed",
-      "",
-      "- The SMS thread list keeps its scroll position after a reply (#35)",
-      "- Webhook retries honour the Retry-After header (#34)",
-    ].join("\n"),
-  },
-  {
-    version: "0.1.0",
-    publishedAt: "2026-10-10T10:00:00Z",
-    isPrerelease: false,
-    releaseNotesMarkdown: "### Added\n\n- First stable release (#30)",
-  },
-  {
-    version: "0.1.0-beta.2",
-    publishedAt: "2026-10-03T10:00:00Z",
-    isPrerelease: true,
-    releaseNotesMarkdown:
-      "### Fixed\n\n- Seed import keeps provider order (#28)",
-  },
-];
+    releaseNotesMarkdown: stableRelease.notesMarkdown,
+  }),
+);

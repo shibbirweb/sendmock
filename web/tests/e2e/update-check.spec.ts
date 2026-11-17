@@ -1,5 +1,12 @@
 import { expect, type Page, test } from "@playwright/test";
 
+import { demoReleases } from "./support/demo-releases";
+
+const latestStableVersion = demoReleases.latestStableVersion;
+const latestStableAvailable = `SendMock ${latestStableVersion} is available`;
+/** An older beta, so the check has the latest stable to offer. */
+const olderBetaInstall = "Beta, Homebrew on macOS";
+
 /** Picks a pretend install in the demo controls; a reload resets it. */
 async function chooseInstall(page: Page, installLabel: string) {
   await page.getByRole("button", { name: "Demo controls" }).click();
@@ -28,7 +35,9 @@ const bell = (page: Page) =>
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/settings?section=about");
-  await expect(page.getByText("0.1.0-beta.2", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText(demoReleases.builtAppVersion, { exact: true }),
+  ).toBeVisible();
 });
 
 test("PL-05.10 the update check has Off, Manual and Daily modes; Manual checks only on request", async ({
@@ -45,30 +54,29 @@ test("PL-05.10 the update check has Off, Manual and Daily modes; Manual checks o
 
   await saveUpdateCheckMode(page, "Manual");
   await expect(page.getByText(/is available$/)).toHaveCount(0);
+  await chooseInstall(page, olderBetaInstall);
   await checkButton(page).click();
-  await expect(
-    page.getByText("SendMock 0.2.0-beta.1 is available"),
-  ).toBeVisible();
+  await expect(page.getByText(latestStableAvailable)).toBeVisible();
 });
 
 test("PL-05.10 the Daily mode checks without a click", async ({ page }) => {
+  await chooseInstall(page, olderBetaInstall);
   await saveUpdateCheckMode(page, "Daily");
 
-  await expect(
-    page.getByText("SendMock 0.2.0-beta.1 is available").first(),
-  ).toBeVisible();
+  await expect(page.getByText(latestStableAvailable).first()).toBeVisible();
 });
 
 test("PL-05.11 a found version shows its date, release notes and the upgrade command for the install method", async ({
   page,
 }) => {
   await saveUpdateCheckMode(page, "Manual");
+  await chooseInstall(page, olderBetaInstall);
   await checkButton(page).click();
   await expect(page.getByText(/^Released /)).toBeVisible();
   await expect(
-    page.getByText("Update checker with Off, Manual and Daily modes", {
-      exact: false,
-    }),
+    page
+      .getByText(demoReleases.latestStableNotesHeading, { exact: true })
+      .first(),
   ).toBeVisible();
   await expect(
     page.getByText("brew upgrade shibbirweb/tap/sendmock-beta"),
@@ -79,9 +87,11 @@ test("PL-05.11 a found version shows its date, release notes and the upgrade com
 
   await chooseInstall(page, "Stable, Docker");
   await checkButton(page).click();
-  await expect(page.getByText("SendMock 0.1.1 is available")).toBeVisible();
+  await expect(page.getByText(latestStableAvailable)).toBeVisible();
   await expect(
-    page.getByText("docker pull ghcr.io/shibbirweb/sendmock:0.1.1"),
+    page.getByText(
+      `docker pull ghcr.io/shibbirweb/sendmock:${latestStableVersion}`,
+    ),
   ).toBeVisible();
 
   await chooseInstall(page, "Stable, install method unknown");
@@ -93,13 +103,14 @@ test("PL-05.11 a found version shows its date, release notes and the upgrade com
     page.getByRole("link", { name: "Release page" }),
   ).toHaveAttribute(
     "href",
-    "https://github.com/shibbirweb/sendmock/releases/tag/v0.1.1",
+    `https://github.com/shibbirweb/sendmock/releases/tag/v${latestStableVersion}`,
   );
 });
 
 test("PL-05.11 with Daily a new version raises one header notification", async ({
   page,
 }) => {
+  await chooseInstall(page, olderBetaInstall);
   await saveUpdateCheckMode(page, "Daily");
   await expect(bell(page)).toHaveAccessibleName(/^Notifications, 1 unread$/);
   await checkButton(page).click();
@@ -109,10 +120,12 @@ test("PL-05.11 with Daily a new version raises one header notification", async (
   const notificationList = page.getByRole("list", { name: "Notifications" });
   await expect(
     notificationList.getByRole("listitem").filter({
-      hasText: "SendMock 0.2.0-beta.1 is available",
+      hasText: latestStableAvailable,
     }),
   ).toHaveCount(1);
-  await notificationList.getByRole("link", { name: /0\.2\.0-beta\.1/ }).click();
+  await notificationList
+    .getByRole("link", { name: latestStableVersion, exact: false })
+    .click();
   await expect(page).toHaveURL(/\/settings\?section=about$/);
 });
 
@@ -123,12 +136,14 @@ test("PL-05.12 stable installs are offered stables only and edge builds nothing"
 
   await chooseInstall(page, "Stable, install script on Linux");
   await checkButton(page).click();
-  await expect(page.getByText("SendMock 0.1.1 is available")).toBeVisible();
+  await expect(page.getByText(latestStableAvailable)).toBeVisible();
 
   await chooseInstall(page, "Stable, already the newest");
   await checkButton(page).click();
   await expect(
-    page.getByText("You are on the latest stable version (0.1.1)."),
+    page.getByText(
+      `You are on the latest stable version (${latestStableVersion}).`,
+    ),
   ).toBeVisible();
 
   await chooseInstall(page, "Edge image from develop");

@@ -65,9 +65,14 @@ export default defineConfig({
   base: basePath,
   // `VITE_API_MODE=live bun run dev` talks to a local `cargo run`, with hot reload.
   server: {
-    // The mock answers GET /ai/skill with the repository's skill/sendmock/SKILL.md.
+    // The mock answers GET /ai/skill with the repository's skill/sendmock/SKILL.md,
+    // and its update check lists the releases of CHANGELOG.md.
     fs: {
-      allow: [import.meta.dirname, resolve(import.meta.dirname, "../skill")],
+      allow: [
+        import.meta.dirname,
+        resolve(import.meta.dirname, "../skill"),
+        resolve(import.meta.dirname, "../CHANGELOG.md"),
+      ],
     },
     proxy: isMockBuild
       ? undefined

@@ -1,5 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 
+import { demoReleases } from "./support/demo-releases";
+
 const consoleErrorsByPage = new WeakMap<Page, string[]>();
 
 test.beforeEach(async ({ page }) => {
@@ -186,8 +188,10 @@ test("UI-01.4 sidebar shows the live connection status and version", async ({
   page,
 }) => {
   await expect(page.getByRole("status")).toContainText("Live · demo data");
-  // The demo's /info answers as the default mock install profile.
-  await expect(page.getByRole("status")).toContainText("v0.1.0-beta.2");
+  // The demo's /info reports the version it was built as.
+  await expect(page.getByRole("status")).toContainText(
+    `v${demoReleases.builtAppVersion}`,
+  );
 });
 
 test("UI-02.1 every screen renders in mock mode without a backend", async ({
