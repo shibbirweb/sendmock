@@ -246,3 +246,13 @@ Phase 5. Plan: [30-phase-5.md](../30-phase-5.md) (W8).
 - [ ] PL-18.7 Import takes a path, an upload, pasted text or an `https://` URL, capped at 1 MB and 10 seconds with at most 3 redirects to `https`, with an optional `--sha256` that must match and optional headers that are masked wherever shown or logged; plain `http` is accepted only for loopback and private addresses.
 - [ ] PL-18.8 Import first shows, per section, what would be added, changed and removed; Merge upserts by name and keeps the rest, Replace also removes what the file does not have after a confirmation with the count, and an invalid file applies nothing.
 - [ ] PL-18.9 A CI job exports a setup with the previous stable release and imports it with the current build.
+
+## PL-19 Security and quality clean-up
+
+1.3.1 (A22), planned 2026-11-17 by owner request: a patch release after 1.3.0 that clears the repository's Security and quality tab. Plan: [32-after-1-0.md](../32-after-1-0.md#a22-security-and-quality-clean-up-pl-19) (A22).
+
+- [ ] PL-19.1 `main` has no open code scanning alert once 1.3.1 is released (the CodeQL `js/polynomial-redos` alert in `website/lib/seo/site-url.ts` is fixed in 1.3.0 and closed).
+- [ ] PL-19.2 Every Dependabot alert open on 2026-11-17 is fixed by upgrading the package to a patched version, or dismissed on GitHub with a written reason when no fix exists or the vulnerable code is not reachable; each dismissal is listed in the plan.
+- [ ] PL-19.3 Every Dependabot pull request open on 2026-11-17 (#201, #202, #203, #204, #205, #228, #243, #247) is merged into `develop` or closed with a comment saying where its update was made.
+- [ ] PL-19.4 Each upgraded example and Testcontainers module passes its tests in CI against a real `sendmock` (the cross-language matrix and the Testcontainers jobs), and an example whose code changed for an upgrade has its README updated with it.
+- [ ] PL-19.5 `scripts/release-readiness.ts` lists the open code scanning alerts, Dependabot alerts and Dependabot pull requests, and Prepare release for 1.3.1 does not start while any is open.
