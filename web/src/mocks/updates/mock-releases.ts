@@ -1,4 +1,4 @@
-import changelogMarkdown from "../../../../CHANGELOG.md?raw";
+import changelogMarkdown from "virtual:sendmock-changelog";
 import webPackageJson from "../../../package.json?raw";
 
 import type { InstallMethod, ReleaseChannel } from "@/lib/api/types";

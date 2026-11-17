@@ -1,4 +1,4 @@
-import { rmSync, writeFileSync } from "node:fs";
+import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
@@ -23,6 +23,34 @@ function omitMockServiceWorker(): Plugin {
           force: true,
         });
       }
+    },
+  };
+}
+
+const changelogModuleId = "virtual:sendmock-changelog";
+const resolvedChangelogModuleId = `\0${changelogModuleId}`;
+const changelogPath = resolve(import.meta.dirname, "../CHANGELOG.md");
+
+/**
+ * The mock update check lists the releases of the repository's CHANGELOG.md. A `?raw` import of
+ * it is refused: Vite's file check sees the id with `?raw` on it, which only a whole allowed
+ * folder matches, and the repository root is too much to allow. A virtual module skips the check.
+ */
+function serveChangelogModule(): Plugin {
+  return {
+    name: "sendmock:changelog-module",
+    resolveId(moduleId) {
+      return moduleId === changelogModuleId
+        ? resolvedChangelogModuleId
+        : undefined;
+    },
+    load(moduleId) {
+      if (moduleId !== resolvedChangelogModuleId) {
+        return undefined;
+      }
+      this.addWatchFile(changelogPath);
+
+      return `export default ${JSON.stringify(readFileSync(changelogPath, "utf8"))};`;
     },
   };
 }
@@ -65,14 +93,9 @@ export default defineConfig({
   base: basePath,
   // `VITE_API_MODE=live bun run dev` talks to a local `cargo run`, with hot reload.
   server: {
-    // The mock answers GET /ai/skill with the repository's skill/sendmock/SKILL.md,
-    // and its update check lists the releases of CHANGELOG.md.
+    // The mock answers GET /ai/skill with the repository's skill/sendmock/SKILL.md.
     fs: {
-      allow: [
-        import.meta.dirname,
-        resolve(import.meta.dirname, "../skill"),
-        resolve(import.meta.dirname, "../CHANGELOG.md"),
-      ],
+      allow: [import.meta.dirname, resolve(import.meta.dirname, "../skill")],
     },
     proxy: isMockBuild
       ? undefined
@@ -90,6 +113,7 @@ export default defineConfig({
     }),
     react(),
     tailwindcss(),
+    serveChangelogModule(),
     ...(isMockBuild ? [] : [omitMockServiceWorker()]),
     ...(moduleReportPath ? [reportLargestModules(moduleReportPath)] : []),
   ],
