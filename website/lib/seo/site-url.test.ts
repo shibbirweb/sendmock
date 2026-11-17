@@ -35,6 +35,20 @@ describe("site URLs", () => {
     );
   });
 
+  test("WS-13.1 a path made only of slashes, or with a long run of them, trims in linear time", () => {
+    const manySlashes = "/".repeat(100_000);
+    expect(buildAbsolutePageUrl("https://shibbir.me", "/sendmock", "///")).toBe(
+      "https://shibbir.me/sendmock/",
+    );
+    expect(
+      buildAbsolutePageUrl(
+        "https://shibbir.me",
+        "/sendmock",
+        `${manySlashes}docs${manySlashes}x`,
+      ),
+    ).toBe(`https://shibbir.me/sendmock/docs${manySlashes}x/`);
+  });
+
   test("WS-13.4 a file's address is absolute and has no trailing slash", () => {
     expect(
       buildAbsoluteFileUrl(

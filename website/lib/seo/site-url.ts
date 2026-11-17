@@ -35,8 +35,17 @@ export function resolveSiteRootPath(
   return rootVersionHref.replace(/\/$/, "");
 }
 
+/** A loop, not a regular expression: `\/+$` backtracks on a long run of slashes. */
 function trimSlashes(pathText: string): string {
-  return pathText.replace(/^\/+|\/+$/g, "");
+  let startIndex = 0;
+  let endIndex = pathText.length;
+  while (startIndex < endIndex && pathText[startIndex] === "/") {
+    startIndex += 1;
+  }
+  while (endIndex > startIndex && pathText[endIndex - 1] === "/") {
+    endIndex -= 1;
+  }
+  return pathText.slice(startIndex, endIndex);
 }
 
 /** A page's absolute address, always ending in "/" as GitHub Pages serves it. */
