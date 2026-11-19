@@ -35,6 +35,11 @@ const findField = (fieldName: string) => {
   }
   return field;
 };
+// The board's Area options are kept in the GitHub UI: changing them through the API clears
+// every item's Area, so an area the board does not list yet is left empty instead.
+const findAreaOption = (areaName: string): string | null =>
+  findField("Area").options?.find((candidate) => candidate.name === areaName)
+    ?.id ?? null;
 const findOption = (fieldName: string, optionName: string) => {
   const option = findField(fieldName).options?.find(
     (candidate) => candidate.name === optionName,
@@ -113,17 +118,27 @@ for (const issue of issues) {
   }
   if (!entry.isFieldsSet) {
     const featureId = issue.key.startsWith("later-") ? "" : issue.key;
+    const areaOptionId = findAreaOption(issue.area);
+    if (areaOptionId === null) {
+      console.log(
+        `#${entry.number}: the board has no Area option "${issue.area}"; add it in the project settings`,
+      );
+    }
     const updates = [
       [
         "status",
         findField("Status").id,
         `{singleSelectOptionId: "${findOption("Status", issue.status)}"}`,
       ],
-      [
-        "area",
-        findField("Area").id,
-        `{singleSelectOptionId: "${findOption("Area", issue.area)}"}`,
-      ],
+      ...(areaOptionId === null
+        ? []
+        : [
+            [
+              "area",
+              findField("Area").id,
+              `{singleSelectOptionId: "${areaOptionId}"}`,
+            ],
+          ]),
       [
         "target",
         findField("Target").id,

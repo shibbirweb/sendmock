@@ -130,6 +130,12 @@ export const messagingFeatureSummaries: Record<string, FeatureSummary> = {
     outcome:
       "Test your app's inbound mail handler from a simulated reply without first learning how inbound routes work.",
   },
+  "EM-23": {
+    summary:
+      "Mailgun's events API, built from the emails sent through the Mailgun provider and their simulated outcomes, and its complaints API, with complained addresses suppressed on later sends as Mailgun does.",
+    outcome:
+      "Test code that reads Mailgun events or manages complaints, not only the send.",
+  },
   "PN-01": {
     summary:
       "Push notifications as their own area: FCM, Expo and OneSignal answered as the real services, each notification shown as the phone would, with magic tokens that fail on purpose.",
@@ -233,6 +239,24 @@ export const messagingFeatureSummaries: Record<string, FeatureSummary> = {
       "Meta's WhatsApp Business Cloud API answered as Meta does: every message type, read receipts, media, Graph errors, and signed status and reply webhooks to the app's callback URL.",
     outcome:
       "Point an app that calls the Cloud API at SendMock and test WhatsApp sends, statuses and replies without a Meta business account.",
+  },
+  "SM-19": {
+    summary:
+      "Twilio's Accounts API with subaccounts, each with its own auth token: the account fetch answers the token, and every webhook for a message is signed with its account's token.",
+    outcome:
+      "Validate X-Twilio-Signature for apps with one subaccount per customer, the way production does.",
+  },
+  "SM-20": {
+    summary:
+      "Twilio's IncomingPhoneNumbers API and a Messaging Service's PhoneNumbers, over SendMock's virtual numbers and sender pools.",
+    outcome:
+      "Test provisioning a number and attaching it to a Messaging Service, not only sending.",
+  },
+  "SM-21": {
+    summary:
+      "Twilio's Debugger webhook, signed like other Twilio webhooks, sent when a message fails or a callback URL errors.",
+    outcome:
+      "Test an app's handling of Twilio Debugger events without waiting for real failures.",
   },
   "VF-01": {
     summary:

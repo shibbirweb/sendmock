@@ -17,6 +17,7 @@ Phase progress lives in [PROGRESS.md](../PROGRESS.md); this folder tracks featur
 | [07-distribution-website.md](07-distribution-website.md) | Distribution and releases (DS), Website and playground (WS) |
 | [08-payments.md](08-payments.md) | Payment gateway emulation (PY) |
 | [09-push.md](09-push.md) | Push notifications (PN) |
+| [10-storage.md](10-storage.md) | Storage mock: S3-compatible and other storage APIs, image upload vendors, your own storage services (ST) |
 
 ## IDs
 
@@ -56,7 +57,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 127 / 140 features, 622 / 710 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 127 / 153 features, 622 / 785 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -82,6 +83,7 @@ On top of its own criteria, a feature is done only when:
 | [EM-20](01-email.md#em-20-email-clicked-events) | Email clicked events | 0.1.0-beta.1 (A2) | 6 | Accepted |
 | [EM-21](01-email.md#em-21-pop3-read-access) | POP3 read access | 0.1.0-beta.1 (A6) | 6 | Accepted |
 | [EM-22](01-email.md#em-22-where-a-simulated-reply-goes) | Where a simulated reply goes | Phase 5 (W20) | 5 | Accepted |
+| [EM-23](01-email.md#em-23-mailgun-events-and-complaints-apis) | Mailgun events and complaints APIs | 1.4.0 (A23) | 6 | Not started |
 | [SM-01](02-sms-verify.md#sm-01-native-sms-api) | Native SMS API | Phase 2 | 5 | Accepted |
 | [SM-02](02-sms-verify.md#sm-02-twilio-messages-api) | Twilio Messages API | Phase 2 | 4 | Accepted |
 | [SM-03](02-sms-verify.md#sm-03-twilio-messaging-services) | Twilio Messaging Services | UI in U1, backend Phase 2 | 4 | Accepted |
@@ -100,6 +102,9 @@ On top of its own criteria, a feature is done only when:
 | [SM-16](02-sms-verify.md#sm-16-configurable-sms-providers) | Configurable SMS providers | UI in U3 (W16), runtime Phase 2 (built-ins) and 4 (custom) | 8 | Accepted |
 | [SM-17](02-sms-verify.md#sm-17-more-sms-providers) | More SMS providers | 0.1.0-beta.1 (A3) | 6 | Accepted |
 | [SM-18](02-sms-verify.md#sm-18-whatsapp-business-cloud-api) | WhatsApp Business Cloud API | 0.1.0-beta.1 (A8) | 5 | Accepted |
+| [SM-19](02-sms-verify.md#sm-19-twilio-accounts-and-subaccounts) | Twilio accounts and subaccounts | 1.4.0 (A23) | 8 | Not started |
+| [SM-20](02-sms-verify.md#sm-20-twilio-phone-numbers-api) | Twilio phone numbers API | 1.4.0 (A23) | 5 | Not started |
+| [SM-21](02-sms-verify.md#sm-21-twilio-debugger-webhook) | Twilio Debugger webhook | 1.4.0 (A23) | 4 | Not started |
 | [VF-01](02-sms-verify.md#vf-01-verify-services) | Verify services | UI in U1, backend Phase 2 | 3 | Accepted |
 | [VF-02](02-sms-verify.md#vf-02-start-a-verification-and-deliver-the-code) | Start a verification and deliver the code | Phase 2 | 5 | Accepted |
 | [VF-03](02-sms-verify.md#vf-03-check-a-verification) | Check a verification | Phase 2 | 4 | Accepted |
@@ -142,7 +147,16 @@ On top of its own criteria, a feature is done only when:
 | [PL-17](04-catcher-platform.md#pl-17-forwarding-rules-for-email-and-sms) | Forwarding rules for email and SMS | 2.0.0 (A14b) | 8 | Not started |
 | [PL-18](04-catcher-platform.md#pl-18-versioned-setup-export-and-import) | Versioned setup export and import | 1.3.0 (A18) | 9 | Not started |
 | [PL-19](04-catcher-platform.md#pl-19-security-and-quality-clean-up) | Security and quality clean-up | 1.3.1 (A22) | 5 | Not started |
+| [PL-20](04-catcher-platform.md#pl-20-https-on-the-provider-port) | HTTPS on the provider port | 1.4.0 (A23) | 5 | Not started |
+| [PL-21](04-catcher-platform.md#pl-21-http-catcher-bins-on-a-providers-own-url) | HTTP Catcher bins on a provider's own URL | 1.4.0 (A23) | 7 | Not started |
+| [PL-22](04-catcher-platform.md#pl-22-interactive-launcher) | Interactive launcher | 1.4.0 (A24) | 7 | Not started |
 | [PN-01](09-push.md#pn-01-push-notifications) | Push notifications | 0.1.0-beta.1 (A7) | 6 | Accepted |
+| [ST-01](10-storage.md#st-01-s3-compatible-storage-api) | S3-compatible storage API | 2.0.0 (A25) | 7 | Not started |
+| [ST-02](10-storage.md#st-02-storage-screen-and-every-surface) | Storage screen and every surface | 2.0.0 (A25) | 6 | Not started |
+| [ST-03](10-storage.md#st-03-where-uploaded-files-are-kept) | Where uploaded files are kept | 2.0.0 (A25) | 5 | Not started |
+| [ST-04](10-storage.md#st-04-google-cloud-storage-and-azure-blob-storage) | Google Cloud Storage and Azure Blob Storage | 2.0.0 (A25) | 4 | Not started |
+| [ST-05](10-storage.md#st-05-image-upload-vendors) | Image upload vendors | 2.0.0 (A25) | 6 | Not started |
+| [ST-06](10-storage.md#st-06-your-own-storage-service) | Your own storage service | 2.0.0 (A25) | 5 | Not started |
 | [AI-01](05-ai.md#ai-01-cli) | CLI | Phase 0 (skeleton), then every phase for its commands | 5 | Accepted |
 | [AI-02](05-ai.md#ai-02-mcp-server-tools) | MCP server tools | Phase 1 onwards | 5 | Accepted |
 | [AI-03](05-ai.md#ai-03-mcp-resources-and-prompts) | MCP resources and prompts | Phase 4 | 3 | Accepted |
