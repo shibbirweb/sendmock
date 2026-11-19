@@ -465,4 +465,10 @@ export const messagingFeatureSummaries: Record<string, FeatureSummary> = {
     outcome:
       "Move or share a working SendMock setup in one step, without rebuilding it by hand or worrying which version wrote it.",
   },
+  "PL-19": {
+    summary:
+      "A patch release, 1.3.1, that clears the repository's Security and quality tab: every open code scanning and Dependabot alert fixed by an upgrade (or dismissed with a written reason), every Dependabot pull request merged or closed, and release readiness listing what is still open.",
+    outcome:
+      "SendMock, its examples and its Testcontainers modules run on dependencies with no known vulnerabilities, and the next feature release starts from a clean Security tab.",
+  },
 };

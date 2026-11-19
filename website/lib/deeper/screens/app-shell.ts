@@ -112,7 +112,7 @@ export const appShellPage: DeeperPage = {
       does: "Opens the SendMock repository on GitHub in a new tab.",
     },
     {
-      control: "status: Live · demo data, version #.#.#-beta.#",
+      control: "status: Live · demo data, version #.#.#",
       does: "Shows whether the app is connected to SendMock's realtime stream (Live, Connecting, or Offline, retrying), where the data comes from (the server, or demo data on the website demo) and the app's version.",
       source:
         "The connection state of the realtime stream, and the version the running server reports in `GET /api/v1/info`; the demo shows its own.",

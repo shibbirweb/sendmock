@@ -8,6 +8,10 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ## [Unreleased]
 
+### Fixed
+
+- **Demo version:** the demo at https://shibbir.me/sendmock/demo/ shows the version it was built from (the newest release on the main site) instead of an old beta. Its update check, in **Settings > About** with an older install picked in **Demo controls**, offers the real releases with their real release notes.
+
 ## [1.2.0] - 2026-11-16
 
 ### Added

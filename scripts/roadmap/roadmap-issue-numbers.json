@@ -625,7 +625,8 @@
     "number": 139,
     "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhGvFvs",
     "isFieldsSet": true,
-    "isMilestoneSet": true
+    "isMilestoneSet": true,
+    "isClosed": true
   },
   "WS-04": {
     "number": 140,
@@ -938,10 +939,19 @@
   },
   "WS-13": {
     "number": 293,
-    "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhJLwhk"
+    "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhJLwhk",
+    "isFieldsSet": true,
+    "isClosed": true
   },
   "WS-14": {
     "number": 295,
-    "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhJM7bk"
+    "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhJM7bk",
+    "isFieldsSet": true,
+    "isClosed": true
+  },
+  "PL-19": {
+    "number": 308,
+    "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhJYEcs",
+    "isFieldsSet": true
   }
 }

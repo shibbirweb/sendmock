@@ -18,13 +18,7 @@
  */
 
 import { execFileSync } from "node:child_process";
-import {
-  cpSync,
-  mkdirSync,
-  mkdtempSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -100,6 +94,7 @@ function buildDocsVersion(
     docsVersionKey: docsVersion.key,
     docsVersionsJson,
     rootPagePathsFile,
+    websiteGitRoot: repositoryRoot,
   });
   if (docsVersion.path !== "") {
     rmSync(join(outputDirectory, "sitemap.xml"), { force: true });

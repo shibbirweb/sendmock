@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { demoReleases } from "./support/demo-releases";
+
 test("PL-05.3 a section saves only when changed, and Discard restores it", async ({
   page,
 }) => {
@@ -214,8 +216,12 @@ test("PL-05.6 About shows the version and channel, and the update check stays of
   page,
 }) => {
   await page.goto("/settings?section=about");
-  await expect(page.getByText("0.1.0-beta.2", { exact: true })).toBeVisible();
-  await expect(page.getByText("(beta)")).toBeVisible();
+  await expect(
+    page.getByText(demoReleases.builtAppVersion, { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(`(${demoReleases.builtAppChannel})`),
+  ).toBeVisible();
   const checkButton = page.getByRole("button", { name: "Check for updates" });
   await expect(checkButton).toBeDisabled();
 
@@ -225,7 +231,9 @@ test("PL-05.6 About shows the version and channel, and the update check stays of
   await updatesForm.getByRole("button", { name: "Save changes" }).click();
   await checkButton.click();
   await expect(
-    page.getByText("SendMock 0.2.0-beta.1 is available"),
+    page.getByText(
+      `You are on the latest ${demoReleases.builtAppChannel} version (${demoReleases.builtAppVersion}).`,
+    ),
   ).toBeVisible();
 });
 

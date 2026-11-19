@@ -56,7 +56,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 127 / 139 features, 621 / 704 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 127 / 140 features, 622 / 710 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -141,6 +141,7 @@ On top of its own criteria, a feature is done only when:
 | [PL-16](04-catcher-platform.md#pl-16-real-provider-connections) | Real provider connections | 2.0.0 (A14a) | 7 | Not started |
 | [PL-17](04-catcher-platform.md#pl-17-forwarding-rules-for-email-and-sms) | Forwarding rules for email and SMS | 2.0.0 (A14b) | 8 | Not started |
 | [PL-18](04-catcher-platform.md#pl-18-versioned-setup-export-and-import) | Versioned setup export and import | 1.3.0 (A18) | 9 | Not started |
+| [PL-19](04-catcher-platform.md#pl-19-security-and-quality-clean-up) | Security and quality clean-up | 1.3.1 (A22) | 5 | Not started |
 | [PN-01](09-push.md#pn-01-push-notifications) | Push notifications | 0.1.0-beta.1 (A7) | 6 | Accepted |
 | [AI-01](05-ai.md#ai-01-cli) | CLI | Phase 0 (skeleton), then every phase for its commands | 5 | Accepted |
 | [AI-02](05-ai.md#ai-02-mcp-server-tools) | MCP server tools | Phase 1 onwards | 5 | Accepted |
@@ -185,7 +186,7 @@ On top of its own criteria, a feature is done only when:
 | [WS-10](07-distribution-website.md#ws-10-deeper-docs-every-control) | Deeper docs: every control | Phase 5 (screen by screen in Stage B; W24 the Screenshots workflow) | 5 | Accepted |
 | [WS-11](07-distribution-website.md#ws-11-docs-traffic-analytics) | Docs traffic analytics | 1.5.0 (A15) | 6 | Not started |
 | [WS-12](07-distribution-website.md#ws-12-code-examples-on-every-page) | Code examples on every page | 1.5.0 (A16) | 4 | Not started |
-| [WS-13](07-distribution-website.md#ws-13-search-engines-and-link-previews) | Search engines and link previews | 1.2.0 (A20) | 8 | Accepted |
+| [WS-13](07-distribution-website.md#ws-13-search-engines-and-link-previews) | Search engines and link previews | 1.2.0 (A20) | 9 | Accepted |
 | [WS-14](07-distribution-website.md#ws-14-whats-new-and-upgrade-guide) | What's new and Upgrade guide | 1.2.0 (A21) | 4 | Accepted |
 | [PY-01](08-payments.md#py-01-safety) | Safety | Phase 3P | 4 | Accepted |
 | [PY-02](08-payments.md#py-02-native-payments-api) | Native payments API | Phase 3P | 3 | Accepted |
