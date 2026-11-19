@@ -42,6 +42,7 @@ const areaByPrefix: Record<string, string> = {
   WS: "Website",
   PY: "Payments",
   PN: "Push",
+  ST: "Storage",
 };
 
 const notAcceptedReasons: Record<string, string> = {
@@ -183,6 +184,7 @@ const acceptanceFiles = [
   "07-distribution-website.md",
   "08-payments.md",
   "09-push.md",
+  "10-storage.md",
 ];
 const statuses = readStatuses();
 const featureIssues = acceptanceFiles
