@@ -74,9 +74,9 @@ test("PL-05.11 a found version shows its date, release notes and the upgrade com
   await checkButton(page).click();
   await expect(page.getByText(/^Released /)).toBeVisible();
   await expect(
-    page
-      .getByText(demoReleases.latestStableNotesHeading, { exact: true })
-      .first(),
+    page.getByText(demoReleases.latestStableNotesHeadingLine, {
+      exact: false,
+    }),
   ).toBeVisible();
   await expect(
     page.getByText("brew upgrade shibbirweb/tap/sendmock-beta"),

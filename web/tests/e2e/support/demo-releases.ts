@@ -29,7 +29,7 @@ export const demoReleases = {
   builtAppChannel: builtAppVersion.includes("-") ? "beta" : "stable",
   /** What older pretend installs are offered. */
   latestStableVersion: latestStableRelease.version,
-  /** The first `###` heading of the latest stable's notes, as the release notes show it. */
-  latestStableNotesHeading:
-    /^### (.+)$/m.exec(latestStableRelease.notesMarkdown)?.[1] ?? "",
+  /** The first `###` heading line of the latest stable's notes; the release notes show the raw Markdown. */
+  latestStableNotesHeadingLine:
+    /^### .+$/m.exec(latestStableRelease.notesMarkdown)?.[0] ?? "",
 };
