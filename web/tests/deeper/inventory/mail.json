@@ -47,7 +47,9 @@
       "radio: Tablet width",
       "radio: Mobile width",
       "button: Load remote images",
-      "button: Screenshot"
+      "button: Screenshot",
+      "heading: # attachment",
+      "link: Download hero.png"
     ],
     "An email with a code is open": [
       "heading: Your verification code",
@@ -55,8 +57,7 @@
       "button: Copy code #"
     ],
     "Attachments tab": [
-      "img: hero.png",
-      "link: Download hero.png"
+      "img: hero.png"
     ],
     "MIME tab": [
       "each item, link: Download part …"

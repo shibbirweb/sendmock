@@ -38,7 +38,7 @@ pub fn build_setup_json_schema() -> Value {
             section_schema,
         );
     }
-    json!({
+    let mut setup_schema = json!({
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "$id": setup_json_schema_url(CURRENT_FORMAT_VERSION),
         "title": format!("SendMock setup file, format {CURRENT_FORMAT_VERSION}"),
@@ -48,7 +48,57 @@ pub fn build_setup_json_schema() -> Value {
         "properties": section_properties,
         "additionalProperties": false,
         "$defs": schema_generator.take_definitions(true),
-    })
+    });
+    release_nullable_keys(&mut setup_schema);
+    setup_schema
+}
+
+/// TOML has no null, so a setup leaves a key that may be null out instead; the API's
+/// "always present, maybe null" keys are therefore never required in a setup.
+fn release_nullable_keys(schema_part: &mut Value) {
+    if let Some(schema_object) = schema_part.as_object_mut() {
+        let nullable_keys: Vec<String> = schema_object
+            .get("properties")
+            .and_then(Value::as_object)
+            .map(|properties| {
+                properties
+                    .iter()
+                    .filter(|(_, property_schema)| accepts_null(property_schema))
+                    .map(|(key, _)| key.clone())
+                    .collect()
+            })
+            .unwrap_or_default();
+        if let Some(required_keys) = schema_object
+            .get_mut("required")
+            .and_then(Value::as_array_mut)
+        {
+            required_keys.retain(|required_key| {
+                !nullable_keys
+                    .iter()
+                    .any(|nullable_key| required_key.as_str() == Some(nullable_key))
+            });
+        }
+    }
+    match schema_part {
+        Value::Object(schema_object) => schema_object.values_mut().for_each(release_nullable_keys),
+        Value::Array(schema_items) => schema_items.iter_mut().for_each(release_nullable_keys),
+        _ => {}
+    }
+}
+
+fn accepts_null(property_schema: &Value) -> bool {
+    let is_null_type = |type_value: &Value| match type_value {
+        Value::String(type_name) => type_name == "null",
+        Value::Array(type_names) => type_names.iter().any(|type_name| type_name == "null"),
+        _ => false,
+    };
+    property_schema.get("type").is_some_and(is_null_type)
+        || ["anyOf", "oneOf"].iter().any(|combinator| {
+            property_schema
+                .get(*combinator)
+                .and_then(Value::as_array)
+                .is_some_and(|alternatives| alternatives.iter().any(accepts_null))
+        })
 }
 
 fn describe_header() -> Value {
@@ -110,6 +160,24 @@ mod tests {
             }
             None => &setup_schema["properties"][section_path],
         }
+    }
+
+    // AC: PL-18.5
+    #[test]
+    fn a_key_that_may_be_null_is_never_required() {
+        let mut item_schema = json!({
+            "type": "object",
+            "required": ["name", "method", "filter"],
+            "properties": {
+                "name": { "type": "string" },
+                "method": { "type": ["string", "null"] },
+                "filter": { "anyOf": [{ "$ref": "#/$defs/RuleFilter" }, { "type": "null" }] },
+            },
+        });
+
+        release_nullable_keys(&mut item_schema);
+
+        assert_eq!(item_schema["required"], json!(["name"]));
     }
 
     // AC: PL-18.5

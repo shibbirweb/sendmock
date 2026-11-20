@@ -128,6 +128,113 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock setup export",
+    "usage": "sendmock setup export",
+    "aliases": [],
+    "summary": "The configuration as a versioned setup file in TOML, JSON or YAML.",
+    "arguments": [],
+    "flags": [
+      "--except",
+      "--format",
+      "--include-secrets",
+      "--only",
+      "--passphrase"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/setup/export",
+        "operation_id": "postSetupExport",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_setup_export"
+    ]
+  },
+  {
+    "command": "sendmock setup validate",
+    "usage": "sendmock setup validate <file>",
+    "aliases": [],
+    "summary": "Check a setup without applying it, with what an import would add, change and remove.",
+    "arguments": [
+      "file"
+    ],
+    "flags": [
+      "--confirm-removed-count",
+      "--format",
+      "--header",
+      "--mode",
+      "--passphrase",
+      "--sha256",
+      "--url"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/setup/validate",
+        "operation_id": "postSetupValidate",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_setup_validate"
+    ]
+  },
+  {
+    "command": "sendmock setup import",
+    "usage": "sendmock setup import <file> --yes",
+    "aliases": [],
+    "summary": "Apply a setup from its text or a URL, merging or replacing; 422 with the errors and nothing applied when it is invalid.",
+    "arguments": [
+      "file"
+    ],
+    "flags": [
+      "--confirm-removed-count",
+      "--format",
+      "--header",
+      "--mode",
+      "--passphrase",
+      "--sha256",
+      "--url"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/setup/import",
+        "operation_id": "postSetupImport",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_setup_import"
+    ]
+  },
+  {
+    "command": "sendmock setup migrate",
+    "usage": "sendmock setup migrate <file>",
+    "aliases": [],
+    "summary": "A setup file upgraded to this build's format version, without applying it.",
+    "arguments": [
+      "file"
+    ],
+    "flags": [
+      "--format",
+      "--to-format"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/setup/migrate",
+        "operation_id": "postSetupMigrate",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_setup_migrate"
+    ]
+  },
+  {
     "command": "sendmock stats",
     "usage": "sendmock stats",
     "aliases": [],

@@ -57,163 +57,169 @@ Heading.
 
 - **What it does:** The Seed operations; each opens to show its parameters, body, answer and a curl command.
 
-### 8. Logs
+### 8. Setup
+
+Heading.
+
+- **What it does:** The Setup operations; each opens to show its parameters, body, answer and a curl command.
+
+### 9. Logs
 
 Heading.
 
 - **What it does:** The Logs operations; each opens to show its parameters, body, answer and a curl command.
 
-### 9. Test helpers
+### 10. Test helpers
 
 Heading.
 
 - **What it does:** The Test helpers operations; each opens to show its parameters, body, answer and a curl command.
 
-### 10. Automation
+### 11. Automation
 
 Heading.
 
 - **What it does:** The Automation operations; each opens to show its parameters, body, answer and a curl command.
 
-### 11. Email
+### 12. Email
 
 Heading.
 
 - **What it does:** The Email operations; each opens to show its parameters, body, answer and a curl command.
 
-### 12. Inbound routes
+### 13. Inbound routes
 
 Heading.
 
 - **What it does:** The Inbound routes operations; each opens to show its parameters, body, answer and a curl command.
 
-### 13. Tag rules
+### 14. Tag rules
 
 Heading.
 
 - **What it does:** The Tag rules operations; each opens to show its parameters, body, answer and a curl command.
 
-### 14. Forward rules
+### 15. Forward rules
 
 Heading.
 
 - **What it does:** The Forward rules operations; each opens to show its parameters, body, answer and a curl command.
 
-### 15. SMS
+### 16. SMS
 
 Heading.
 
 - **What it does:** The SMS operations; each opens to show its parameters, body, answer and a curl command.
 
-### 16. Outcome rules
+### 17. Outcome rules
 
 Heading.
 
 - **What it does:** The Outcome rules operations; each opens to show its parameters, body, answer and a curl command.
 
-### 17. Verify
+### 18. Verify
 
 Heading.
 
 - **What it does:** The Verify operations; each opens to show its parameters, body, answer and a curl command.
 
-### 18. Numbers
+### 19. Numbers
 
 Heading.
 
 - **What it does:** The Numbers operations; each opens to show its parameters, body, answer and a curl command.
 
-### 19. Email providers
+### 20. Email providers
 
 Heading.
 
 - **What it does:** The Email providers operations; each opens to show its parameters, body, answer and a curl command.
 
-### 20. SMS providers
+### 21. SMS providers
 
 Heading.
 
 - **What it does:** The SMS providers operations; each opens to show its parameters, body, answer and a curl command.
 
-### 21. HTTP Catcher
+### 22. HTTP Catcher
 
 Heading.
 
 - **What it does:** The HTTP Catcher operations; each opens to show its parameters, body, answer and a curl command.
 
-### 22. Payments
+### 23. Payments
 
 Heading.
 
 - **What it does:** The Payments operations; each opens to show its parameters, body, answer and a curl command.
 
-### 23. Checkout
+### 24. Checkout
 
 Heading.
 
 - **What it does:** The Checkout operations; each opens to show its parameters, body, answer and a curl command.
 
-### 24. Payment flows
+### 25. Payment flows
 
 Heading.
 
 - **What it does:** The Payment flows operations; each opens to show its parameters, body, answer and a curl command.
 
-### 25. Payment gateways
+### 26. Payment gateways
 
 Heading.
 
 - **What it does:** The Payment gateways operations; each opens to show its parameters, body, answer and a curl command.
 
-### 26. Payment methods
+### 27. Payment methods
 
 Heading.
 
 - **What it does:** The Payment methods operations; each opens to show its parameters, body, answer and a curl command.
 
-### 27. Webhook endpoints
+### 28. Webhook endpoints
 
 Heading.
 
 - **What it does:** The Webhook endpoints operations; each opens to show its parameters, body, answer and a curl command.
 
-### 28. Webhook rules
+### 29. Webhook rules
 
 Heading.
 
 - **What it does:** The Webhook rules operations; each opens to show its parameters, body, answer and a curl command.
 
-### 29. Webhook deliveries
+### 30. Webhook deliveries
 
 Heading.
 
 - **What it does:** The Webhook deliveries operations; each opens to show its parameters, body, answer and a curl command.
 
-### 30. Saved deliveries
+### 31. Saved deliveries
 
 Heading.
 
 - **What it does:** The Saved deliveries operations; each opens to show its parameters, body, answer and a curl command.
 
-### 31. Webhook templates
+### 32. Webhook templates
 
 Heading.
 
 - **What it does:** The Webhook templates operations; each opens to show its parameters, body, answer and a curl command.
 
-### 32. Webhook variables
+### 33. Webhook variables
 
 Heading.
 
 - **What it does:** The Webhook variables operations; each opens to show its parameters, body, answer and a curl command.
 
-### 33. Projects
+### 34. Projects
 
 Heading.
 
 - **What it does:** The Projects operations; each opens to show its parameters, body, answer and a curl command.
 
-### 34. Push
+### 35. Push
 
 Heading.
 
@@ -221,20 +227,20 @@ Heading.
 
 ## When the data cannot load
 
-### 35. Could not load the API reference. Try again
+### 36. Could not load the API reference. Try again
 
 Message.
 
 - **What it does:** Shown when the OpenAPI document could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 36. Could not load the API reference.
+### 37. Could not load the API reference.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 37. Try again
+### 38. Try again
 
 Button.
 

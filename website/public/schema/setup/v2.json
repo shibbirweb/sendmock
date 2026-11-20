@@ -1,0 +1,1571 @@
+{
+  "$defs": {
+    "AppSettingsUpdate": {
+      "additionalProperties": false,
+      "description": "Only the changed keys; every other setting keeps its value.",
+      "properties": {
+        "chaos_smtp_command_latency_ms": {
+          "description": "Delay added to every SMTP command, in milliseconds.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "chaos_smtp_reject_code": {
+          "description": "The SMTP code used for rejected messages: 421, 450, 550 or 552.",
+          "format": "uint16",
+          "maximum": 65535,
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "chaos_smtp_reject_next_count": {
+          "description": "Rejects the next N SMTP messages, to test your app's retries.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "chaos_smtp_reject_recipient_pattern": {
+          "default": null,
+          "description": "Glob; matching recipients get `550 No such user`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "email_outcome_bounce_rate_percent": {
+          "description": "Used by the `realistic` outcome profile.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "email_outcome_complaint_rate_percent": {
+          "description": "Complaints in the `realistic` outcome profile, 0 to 100.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "email_outcome_profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EmailOutcomeProfile"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fire_opened_events_on_view": {
+          "description": "Fires `email.opened` and `sms.opened` when you open a message in the UI.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "inbound_email_domains": {
+          "description": "Mail for these domains is incoming; offered as Forward suggestions.",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "is_chaos_smtp_drop_during_data_enabled": {
+          "description": "Drops the connection during `DATA`, to test half-sent messages.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "is_magic_addresses_enabled": {
+          "description": "Off: the built-in magic addresses behave like any address.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "is_magic_numbers_enabled": {
+          "description": "Off: the built-in Twilio and SendMock numbers behave like any number.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "is_plus_address_tagging_enabled": {
+          "description": "Tags `user+invoice@app.test` with `invoice`.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "is_strict_twilio_test_mode": {
+          "description": "Rejects numbers that are not Twilio test numbers with error 21606, like real test credentials.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "max_age_days": {
+          "default": null,
+          "description": "Null keeps traffic until the count limits prune it.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "max_emails": {
+          "description": "The most emails kept; the oldest are deleted past it.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "max_sms": {
+          "description": "The most SMS kept; the oldest are deleted past it.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "opened_event_mode": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OpenedEventMode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "otp_patterns": {
+          "description": "Ordered; the first capture group of the first match is the code.",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "payment_default_currency": {
+          "description": "For hosted checkouts created without a currency.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "payment_merchant_name": {
+          "description": "Shown on checkout pages and as `{merchant}` in step labels.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "payment_outcome_profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PaymentOutcomeProfile"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "payment_random_success_rate_percent": {
+          "description": "Used by the `random` outcome profile.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "relay_recipient_allowlist": {
+          "description": "Glob patterns; release stays off while this is empty.",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "relay_smtp_url": {
+          "default": null,
+          "description": "Relay for release and auto-forward; the password is always masked.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sms_failure_rate_percent": {
+          "description": "The share of SMS that fail at random, 0 to 100.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "sms_simulation_profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SmsSimulationProfile"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "spamassassin_address": {
+          "default": null,
+          "description": "`host:port` of a SpamAssassin `spamd`; null turns the spam check off.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "update_check_mode": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UpdateCheckMode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "verify_default_code_length": {
+          "description": "Digits in each code of a Verify service made without its own code length, 4 to 10.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "verify_default_ttl_seconds": {
+          "description": "How long a code stays valid, in seconds, for a Verify service made without its own TTL.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "verify_fixed_code": {
+          "default": null,
+          "description": "Sent by every Verify service without its own fixed code; null for random codes.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "EmailOutcomeProfile": {
+      "description": "`off` sends no delivery events, `auto-delivered` marks every email delivered after a\nshort delay, `realistic` adds bounces and complaints at the configured rates.",
+      "enum": [
+        "off",
+        "auto-delivered",
+        "realistic"
+      ],
+      "type": "string"
+    },
+    "HeaderForms": {
+      "anyOf": [
+        {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      ],
+      "description": "Headers as a table, or as `\"Name: value\"` lines as the demo exports them."
+    },
+    "HttpBinPreset": {
+      "description": "The service a bin stands in for; its default reply mimics the real one.",
+      "enum": [
+        "slack",
+        "discord",
+        "teams",
+        "google_chat",
+        "telegram",
+        "fcm",
+        "expo",
+        "onesignal",
+        "generic"
+      ],
+      "type": "string"
+    },
+    "HttpMockResponse": {
+      "description": "What a bin or rule answers.",
+      "properties": {
+        "body": {
+          "description": "A template that can echo the request.",
+          "type": "string"
+        },
+        "headers": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "description": "Optional in a hand-written setup file, where most responses set no header.",
+          "type": "object"
+        },
+        "status_code": {
+          "format": "uint16",
+          "maximum": 65535,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "status_code",
+        "body"
+      ],
+      "type": "object"
+    },
+    "HttpResponseRule": {
+      "description": "A reply for the requests that match its method, path glob and conditions.",
+      "properties": {
+        "delay_max_ms": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "delay_min_ms": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "failure_rate_percent": {
+          "description": "How often, out of 100, the rule answers `failure_status_code` instead.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "failure_status_code": {
+          "format": "uint16",
+          "maximum": 65535,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "filter": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RuleFilter"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Header and body conditions; null matches every request."
+        },
+        "id": {
+          "type": "string"
+        },
+        "is_enabled": {
+          "type": "boolean"
+        },
+        "method": {
+          "description": "`GET`, `POST`, ...; null matches any method.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "path_glob": {
+          "description": "A glob on the path inside the bin, e.g. `/v1/*`; empty matches every path.",
+          "type": "string"
+        },
+        "response": {
+          "$ref": "#/$defs/HttpMockResponse"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "is_enabled",
+        "path_glob",
+        "response",
+        "delay_min_ms",
+        "delay_max_ms",
+        "failure_rate_percent",
+        "failure_status_code"
+      ],
+      "type": "object"
+    },
+    "InboundRouteAction": {
+      "description": "What a route does with a matching email, in order.",
+      "oneOf": [
+        {
+          "description": "POSTs the parsed email to a URL in Mailgun's format.",
+          "properties": {
+            "kind": {
+              "const": "forward_url",
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "url"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Forwards to a real address, only through the release allowlist.",
+          "properties": {
+            "address": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "forward_email",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "address"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Keeps the message and can POST a notification with its `message-url`.",
+          "properties": {
+            "kind": {
+              "const": "store",
+              "type": "string"
+            },
+            "notify_url": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Skips the routes with a higher priority number.",
+          "properties": {
+            "kind": {
+              "const": "stop",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "InboundRouteFilter": {
+      "description": "Which incoming emails a route takes (Mailgun's filters).",
+      "oneOf": [
+        {
+          "description": "A regular expression on each recipient; named groups can be used in actions as\n`\\g<name>`.",
+          "properties": {
+            "kind": {
+              "const": "match_recipient",
+              "type": "string"
+            },
+            "pattern": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "pattern"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "A regular expression on a header, e.g. `subject`.",
+          "properties": {
+            "header_name": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "match_header",
+              "type": "string"
+            },
+            "pattern": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "header_name",
+            "pattern"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Every incoming email.",
+          "properties": {
+            "kind": {
+              "const": "catch_all",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "OpenedEventMode": {
+      "description": "`first_open` fires on the first view only, `every_open` on each view.",
+      "enum": [
+        "first_open",
+        "every_open"
+      ],
+      "type": "string"
+    },
+    "PaymentOutcomeProfile": {
+      "description": "What a new hosted checkout does: wait for the page, or settle at once.",
+      "enum": [
+        "interactive",
+        "auto_success",
+        "auto_decline",
+        "random"
+      ],
+      "type": "string"
+    },
+    "RuleCondition": {
+      "description": "One condition: a field, an operator and a value (ignored by `exists`).",
+      "properties": {
+        "field": {
+          "description": "`from`, `to`, `cc`, `subject`, `body`, `header:<name>`, `has_attachment`, `tag`,\n`status`, `api`, `open_count`, `first_open` or `source`.",
+          "type": "string"
+        },
+        "operator": {
+          "$ref": "#/$defs/RuleFilterOperator"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "field",
+        "operator",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RuleFilter": {
+      "anyOf": [
+        {
+          "properties": {
+            "all": {
+              "items": {
+                "$ref": "#/$defs/RuleFilter"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "all"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "any": {
+              "items": {
+                "$ref": "#/$defs/RuleFilter"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "any"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "not": {
+              "$ref": "#/$defs/RuleFilter"
+            }
+          },
+          "required": [
+            "not"
+          ],
+          "type": "object"
+        },
+        {
+          "$ref": "#/$defs/RuleCondition"
+        }
+      ],
+      "description": "A filter as the API sends it: a condition, or `all`, `any` or `not` around more filters."
+    },
+    "RuleFilterOperator": {
+      "enum": [
+        "equals",
+        "contains",
+        "starts_with",
+        "matches",
+        "regex",
+        "exists"
+      ],
+      "type": "string"
+    },
+    "SeedEmailOutcomeRule": {
+      "additionalProperties": false,
+      "description": "`[[email.outcome_rules]]`, matched by `pattern`; new rules go to the bottom of the list in\nfile order.",
+      "properties": {
+        "diagnostic": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "enabled": {
+          "default": true,
+          "type": "boolean"
+        },
+        "note": {
+          "type": "string"
+        },
+        "outcome": {
+          "type": "string"
+        },
+        "pattern": {
+          "type": "string"
+        },
+        "smtp_code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "pattern",
+        "outcome"
+      ],
+      "type": "object"
+    },
+    "SeedEmailTemplate": {
+      "additionalProperties": false,
+      "description": "`[[email.templates]]`, matched by `id`: the provider's template id (SendGrid's `d-...`,\nPostmark's number or alias), with a subject and a text or HTML body rendered from the send's\ntemplate data.",
+      "properties": {
+        "html": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "subject": {
+          "default": "",
+          "type": "string"
+        },
+        "text": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "SeedForwardRule": {
+      "additionalProperties": false,
+      "description": "`[[email.forward_rules]]`, matched by `name`, in the order they run.",
+      "properties": {
+        "enabled": {
+          "default": true,
+          "type": "boolean"
+        },
+        "filter": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RuleFilter"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "to": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "to"
+      ],
+      "type": "object"
+    },
+    "SeedHttpBin": {
+      "additionalProperties": false,
+      "description": "`[[http.bins]]`, matched by `name`: the bin, its default reply when it differs from its\npreset's, and its response rules as `PUT /http/bins/{binId}/responses` takes them.",
+      "properties": {
+        "default_response": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HttpMockResponse"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "preset": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HttpBinPreset"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "responses": {
+          "items": {
+            "$ref": "#/$defs/HttpResponseRule"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "SeedInboundRoute": {
+      "additionalProperties": false,
+      "description": "`[[email.inbound_routes]]`, matched by `description`, with the filter and actions in the\nshape `POST /inbound-routes` takes.",
+      "properties": {
+        "actions": {
+          "items": {
+            "$ref": "#/$defs/InboundRouteAction"
+          },
+          "type": "array"
+        },
+        "description": {
+          "type": "string"
+        },
+        "filter": {
+          "$ref": "#/$defs/InboundRouteFilter"
+        },
+        "priority": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "description",
+        "priority",
+        "filter",
+        "actions"
+      ],
+      "type": "object"
+    },
+    "SeedMessageProvider": {
+      "additionalProperties": false,
+      "description": "`[[sms.providers]]` and `[[email.providers]]`, matched by `key`: an edited or removed\nbuilt-in, or a custom provider, with its definition as JSON and secret credentials as\n`${ENV_VAR}` references or encrypted.",
+      "properties": {
+        "definition": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "edits_builtin": {
+          "default": false,
+          "type": "boolean"
+        },
+        "key": {
+          "type": "string"
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "removed": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "key"
+      ],
+      "type": "object"
+    },
+    "SeedMessagingService": {
+      "additionalProperties": false,
+      "description": "`[[messaging_services]]`, matched by `sid`. Numbers join a service through their own\n`messaging_service` field, so the pool is not listed here.",
+      "properties": {
+        "inbound_fallback_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "inbound_mode": {
+          "default": "defer_to_sender",
+          "type": "string"
+        },
+        "inbound_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "sid": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sid",
+        "name"
+      ],
+      "type": "object"
+    },
+    "SeedPaymentDefinition": {
+      "additionalProperties": false,
+      "description": "A `[[payments.flows]]`, `[[payments.methods]]` or `[[payments.gateways]]` item, matched by\n`key`: a custom definition, or a built-in's edits, with the definition as JSON as the API\ntakes it.",
+      "properties": {
+        "definition": {
+          "type": "string"
+        },
+        "edits_builtin": {
+          "default": false,
+          "type": "boolean"
+        },
+        "key": {
+          "type": "string"
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "notification_endpoint": {
+          "description": "The gateway's notification endpoint by name, as endpoint ids differ between instances.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "key",
+        "definition"
+      ],
+      "type": "object"
+    },
+    "SeedProject": {
+      "additionalProperties": false,
+      "description": "`[[projects]]`, matched by `key`. `default` always exists, so it is never written.",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "name"
+      ],
+      "type": "object"
+    },
+    "SeedSavedDelivery": {
+      "additionalProperties": false,
+      "description": "`[[webhook.saved]]`, matched by `name`: the request as saved, without signature headers,\nwhich are made on every send. Saved deliveries survive reset, as they do in the UI.",
+      "properties": {
+        "body": {
+          "default": "",
+          "type": "string"
+        },
+        "endpoint": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "event": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "headers": {
+          "$ref": "#/$defs/HeaderForms",
+          "default": {}
+        },
+        "method": {
+          "default": "POST",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "template": {
+          "default": "native",
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "url"
+      ],
+      "type": "object"
+    },
+    "SeedSmsOutcomeRule": {
+      "additionalProperties": false,
+      "description": "`[[sms.outcome_rules]]`, matched by `match` and `pattern`; new rules go to the bottom of\nthe list in file order.",
+      "properties": {
+        "delay_seconds": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "enabled": {
+          "default": true,
+          "type": "boolean"
+        },
+        "error_code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "match": {
+          "default": "to",
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "outcome": {
+          "type": "string"
+        },
+        "pattern": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "pattern",
+        "outcome"
+      ],
+      "type": "object"
+    },
+    "SeedTagRule": {
+      "additionalProperties": false,
+      "description": "`[[email.tag_rules]]`, matched by `name`, in the order they run.",
+      "properties": {
+        "enabled": {
+          "default": true,
+          "type": "boolean"
+        },
+        "filter": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RuleFilter"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "tag"
+      ],
+      "type": "object"
+    },
+    "SeedVerifyService": {
+      "additionalProperties": false,
+      "description": "`[[verify.services]]`, matched by `sid`.",
+      "properties": {
+        "code_length": {
+          "default": 6,
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "fixed_code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "sid": {
+          "type": "string"
+        },
+        "ttl_seconds": {
+          "default": 600,
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "sid",
+        "name"
+      ],
+      "type": "object"
+    },
+    "SeedVirtualNumber": {
+      "additionalProperties": false,
+      "description": "`[[numbers]]`, matched by `number`; applied after the Messaging Services it joins.",
+      "properties": {
+        "channels": {
+          "default": [
+            "sms"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "inbound_fallback_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "inbound_method": {
+          "default": "POST",
+          "type": "string"
+        },
+        "inbound_template": {
+          "description": "The inbound format, a webhook template ID such as `twilio.inbound_sms`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "inbound_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "label": {
+          "type": "string"
+        },
+        "messaging_service": {
+          "description": "The SID of the Messaging Service whose pool the number is in.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "number": {
+          "type": "string"
+        },
+        "status_callback": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "number",
+        "label"
+      ],
+      "type": "object"
+    },
+    "SeedWebhookEndpoint": {
+      "additionalProperties": true,
+      "description": "`[[webhook.endpoints]]`, matched by `name`. The request settings a file leaves out keep the\ndefaults a new endpoint gets in the UI; export writes only the ones that differ.",
+      "properties": {
+        "enabled": {
+          "default": true,
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "secret": {
+          "description": "An `${ENV_VAR}` reference to a `whsec_` secret, or the secret encrypted with the\nexport's passphrase; none or empty keeps or generates one.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "template": {
+          "default": "native",
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "url"
+      ],
+      "type": "object"
+    },
+    "SeedWebhookRule": {
+      "additionalProperties": false,
+      "description": "`[[webhook.rules]]`, matched by `name`; `endpoint` is the endpoint's name and `filter` takes\nthe same shape as the API.",
+      "properties": {
+        "enabled": {
+          "default": true,
+          "type": "boolean"
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "events": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "filter": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RuleFilter"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "endpoint",
+        "events"
+      ],
+      "type": "object"
+    },
+    "SeedWebhookVariable": {
+      "additionalProperties": false,
+      "description": "`[[webhook.variables]]`, matched by `endpoint` (left out for a global one) and `name`. A\nsecret's `value` must be an `${ENV_VAR}` reference or encrypted; export writes one of them.",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "endpoint": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "random_mode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "value": {
+          "default": "",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "kind"
+      ],
+      "type": "object"
+    },
+    "SmsSimulationProfile": {
+      "description": "`instant` delivers at once, `realistic` goes queued, sent, then delivered over a few\nseconds, `manual` stays sent until a status is picked.",
+      "enum": [
+        "instant",
+        "realistic",
+        "manual"
+      ],
+      "type": "string"
+    },
+    "UpdateCheckMode": {
+      "description": "When SendMock looks for a newer release: `off` never calls out, `manual` only on\nrequest, `daily` on start and once a day.",
+      "enum": [
+        "off",
+        "manual",
+        "daily"
+      ],
+      "type": "string"
+    }
+  },
+  "$id": "https://shibbir.me/sendmock/schema/setup/v2.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A SendMock setup: configuration to share or move between instances, in TOML, JSON or YAML. Strings may be ${ENV_VAR} references.",
+  "properties": {
+    "email": {
+      "additionalProperties": false,
+      "properties": {
+        "forward_rules": {
+          "items": {
+            "$ref": "#/$defs/SeedForwardRule"
+          },
+          "type": "array"
+        },
+        "inbound_routes": {
+          "items": {
+            "$ref": "#/$defs/SeedInboundRoute"
+          },
+          "type": "array"
+        },
+        "outcome_rules": {
+          "items": {
+            "$ref": "#/$defs/SeedEmailOutcomeRule"
+          },
+          "type": "array"
+        },
+        "providers": {
+          "items": {
+            "$ref": "#/$defs/SeedMessageProvider"
+          },
+          "type": "array"
+        },
+        "tag_rules": {
+          "items": {
+            "$ref": "#/$defs/SeedTagRule"
+          },
+          "type": "array"
+        },
+        "templates": {
+          "items": {
+            "$ref": "#/$defs/SeedEmailTemplate"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "http": {
+      "additionalProperties": false,
+      "properties": {
+        "bins": {
+          "items": {
+            "$ref": "#/$defs/SeedHttpBin"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "messaging_services": {
+      "items": {
+        "$ref": "#/$defs/SeedMessagingService"
+      },
+      "type": "array"
+    },
+    "numbers": {
+      "items": {
+        "$ref": "#/$defs/SeedVirtualNumber"
+      },
+      "type": "array"
+    },
+    "payments": {
+      "additionalProperties": false,
+      "properties": {
+        "flows": {
+          "items": {
+            "$ref": "#/$defs/SeedPaymentDefinition"
+          },
+          "type": "array"
+        },
+        "gateways": {
+          "items": {
+            "$ref": "#/$defs/SeedPaymentDefinition"
+          },
+          "type": "array"
+        },
+        "methods": {
+          "items": {
+            "$ref": "#/$defs/SeedPaymentDefinition"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "projects": {
+      "items": {
+        "$ref": "#/$defs/SeedProject"
+      },
+      "type": "array"
+    },
+    "scenarios": {
+      "items": {
+        "description": "A saved scenario: the scenario file's own keys with an optional description, matched by name.",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "steps": {
+            "items": {
+              "properties": {
+                "run": {
+                  "description": "The operation, such as `email.list`, or `http`, `assert` or `sleep`.",
+                  "type": "string"
+                },
+                "save": {
+                  "description": "The name later steps read this step's output by.",
+                  "type": "string"
+                },
+                "with": {
+                  "type": "object"
+                }
+              },
+              "required": [
+                "run"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "steps"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "sendmock": {
+      "additionalProperties": false,
+      "description": "Names the format and the format version, which changes only when a section or key changes shape.",
+      "properties": {
+        "exported_at": {
+          "description": "When the file was written, in RFC 3339.",
+          "type": "string"
+        },
+        "exported_by": {
+          "description": "The SendMock release that wrote the file.",
+          "type": "string"
+        },
+        "format": {
+          "const": "sendmock.setup"
+        },
+        "format_version": {
+          "const": 2
+        }
+      },
+      "required": [
+        "format",
+        "format_version"
+      ],
+      "type": "object"
+    },
+    "settings": {
+      "$ref": "#/$defs/AppSettingsUpdate"
+    },
+    "sms": {
+      "additionalProperties": false,
+      "properties": {
+        "outcome_rules": {
+          "items": {
+            "$ref": "#/$defs/SeedSmsOutcomeRule"
+          },
+          "type": "array"
+        },
+        "providers": {
+          "items": {
+            "$ref": "#/$defs/SeedMessageProvider"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "verify": {
+      "additionalProperties": false,
+      "properties": {
+        "services": {
+          "items": {
+            "$ref": "#/$defs/SeedVerifyService"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "webhook": {
+      "additionalProperties": false,
+      "properties": {
+        "endpoints": {
+          "items": {
+            "$ref": "#/$defs/SeedWebhookEndpoint"
+          },
+          "type": "array"
+        },
+        "rules": {
+          "items": {
+            "$ref": "#/$defs/SeedWebhookRule"
+          },
+          "type": "array"
+        },
+        "saved": {
+          "items": {
+            "$ref": "#/$defs/SeedSavedDelivery"
+          },
+          "type": "array"
+        },
+        "templates": {
+          "items": {
+            "description": "A custom webhook template or an edited built-in, matched by id, in the template file format.",
+            "properties": {
+              "edits_builtin": {
+                "type": "boolean"
+              },
+              "events": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "request": {
+                "properties": {
+                  "body": {
+                    "type": "string"
+                  },
+                  "content_type": {
+                    "type": "string"
+                  },
+                  "headers": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  },
+                  "method": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "service": {
+                "type": "string"
+              },
+              "variables": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "variables": {
+          "items": {
+            "$ref": "#/$defs/SeedWebhookVariable"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "required": [
+    "sendmock"
+  ],
+  "title": "SendMock setup file, format 2",
+  "type": "object"
+}

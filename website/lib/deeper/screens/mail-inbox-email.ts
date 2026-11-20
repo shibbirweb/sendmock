@@ -135,13 +135,18 @@ export const mailInboxEmailEntries: DeeperEntry[] = [
     does: "Saves the HTML preview, at the chosen width, as a PNG file.",
   },
   {
+    control: "heading: # attachment",
+    does: "Under the HTML and Text views, counts the email's attachments and lists each with its name, size, an inline mark for inline parts and a download link, so you see them without opening the Attachments tab. An email without attachments shows no list.",
+    source: "The email's attachments, as `GET /api/v1/emails/{emailId}` lists them.",
+  },
+  {
     control: "img: hero.png",
     does: "A preview of an image attachment.",
     operationIds: ["getEmailsByEmailIdPartsByAttachmentIndexThumbnail"],
   },
   {
     control: "link: Download hero.png",
-    does: "Downloads the attachment.",
+    does: "Downloads the attachment, from the list under the message or from the Attachments tab.",
     operationIds: ["getEmailsByEmailIdAttachmentsByAttachmentIndex"],
   },
   {

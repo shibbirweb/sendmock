@@ -46,6 +46,7 @@ const overviewEntries: DeeperEntry[] = [
 const apiTagNames = [
   "System",
   "Seed",
+  "Setup",
   "Logs",
   "Test helpers",
   "Automation",
