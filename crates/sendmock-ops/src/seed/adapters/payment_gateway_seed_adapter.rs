@@ -6,8 +6,8 @@ use super::payment_definition_seed::{
 };
 use crate::payments::{
     CreatePaymentGatewayOperation, DeletePaymentGatewayOperation, GetPaymentGatewayOperation,
-    ListPaymentGatewaysOperation, PaymentGatewayDefinition, ResetPaymentGatewayOperation,
-    UpdatePaymentGatewayOperation,
+    ListPaymentGatewaysOperation, PaymentGatewayDefinition, PaymentGatewayRecord,
+    ResetPaymentGatewayOperation, UpdatePaymentGatewayOperation, load_payment_gateways,
 };
 use crate::seed::seed_section_adapter::{SeedItem, impl_seed_section_adapter, to_api_input};
 use crate::seed::seed_sections::PAYMENT_GATEWAYS_SECTION;
@@ -48,6 +48,21 @@ fn write_gateway_item(
         payment_gateway.is_builtin,
         notification_endpoint,
     )
+}
+
+/// The listed gateway masks its secrets; the secret writer needs the stored values, since an
+/// encrypted export carries them to another instance.
+fn restore_stored_credentials(
+    mut payment_gateway: PaymentGatewayDefinition,
+    stored_gateways: &[PaymentGatewayRecord],
+) -> PaymentGatewayDefinition {
+    if let Some(stored_gateway) = stored_gateways
+        .iter()
+        .find(|stored_gateway| stored_gateway.fields.key == payment_gateway.fields.key)
+    {
+        payment_gateway.fields.credentials = stored_gateway.fields.credentials.clone();
+    }
+    payment_gateway
 }
 
 /// A secret left empty (an unset `${ENV_VAR}`) is sent back masked, which keeps the stored one.
@@ -119,11 +134,14 @@ impl PaymentGatewaySeedAdapter {
         let payment_gateways = ListPaymentGatewaysOperation
             .execute(operation_context, NoInput {})
             .await?;
+        let stored_gateways = load_payment_gateways(operation_context).await?;
         payment_gateways
-            .iter()
+            .into_iter()
             .filter(|payment_gateway| !payment_gateway.is_builtin || payment_gateway.is_modified)
             .map(|payment_gateway| {
-                write_gateway_item(payment_gateway, &endpoint_names, secret_writer)
+                let unmasked_gateway =
+                    restore_stored_credentials(payment_gateway, &stored_gateways);
+                write_gateway_item(&unmasked_gateway, &endpoint_names, secret_writer)
             })
             .collect()
     }

@@ -58,10 +58,12 @@ test("PL-18.6 an export with encrypted secrets needs a passphrase of 8 character
   });
 
   await exportCard.getByText("Encrypted with a passphrase").click();
-  await exportCard.getByLabel("Passphrase").fill("short");
+  await exportCard.getByLabel("Passphrase", { exact: true }).fill("short");
   await expect(exportButton).toBeDisabled();
 
-  await exportCard.getByLabel("Passphrase").fill("correct horse battery");
+  await exportCard
+    .getByLabel("Passphrase", { exact: true })
+    .fill("correct horse battery");
   const encryptedExport = await readDownload(page, () => exportButton.click());
   expect(encryptedExport.fileText).toContain("encrypted:v1:");
   expect(encryptedExport.fileText).not.toContain("${");

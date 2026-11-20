@@ -29,6 +29,7 @@ const stageBPhases = [
   "A7",
   "A8",
   "A17",
+  "A18",
 ];
 
 describe("surface catalogue", () => {

@@ -225,7 +225,7 @@ public class ScenariosTests
 | read one | [`sendmock scenario show <scenarioId>`](/cli/automation/#scenario-show) | [`GET /api/v1/scenarios/{scenarioId}`](/api/automation/#getScenariosByScenarioId) | [`sendmock_scenario_get`](/mcp/automation/#sendmock_scenario_get) |
 | change or rename one | [`sendmock scenario update <scenarioId>`](/cli/automation/#scenario-update) | [`PATCH /api/v1/scenarios/{scenarioId}`](/api/automation/#patchScenariosByScenarioId) | [`sendmock_scenario_update`](/mcp/automation/#sendmock_scenario_update) |
 | delete one | [`sendmock scenario delete <scenarioId>`](/cli/automation/#scenario-delete) | [`DELETE /api/v1/scenarios/{scenarioId}`](/api/automation/#deleteScenariosByScenarioId) | [`sendmock_scenario_delete`](/mcp/automation/#sendmock_scenario_delete) |
-| run a saved one by id or name | [`sendmock scenario run-saved <scenarioId>`](/cli/automation/#scenario-run-saved) | [`POST /api/v1/scenarios/{scenarioId}/run`](/api/automation/#postScenariosByScenarioIdRun) | [`sendmock_scenario_run`](/mcp/automation/#sendmock_scenario_run) with `scenario_id` |
+| run a saved one by id or name (the MCP tool takes `scenario_id`) | [`sendmock scenario run-saved <scenarioId>`](/cli/automation/#scenario-run-saved) | [`POST /api/v1/scenarios/{scenarioId}/run`](/api/automation/#postScenariosByScenarioIdRun) | [`sendmock_scenario_run`](/mcp/automation/#sendmock_scenario_run) |
 
 ## Related
 
