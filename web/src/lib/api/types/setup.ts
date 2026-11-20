@@ -18,11 +18,20 @@ export type SetupExportRequest = {
    * @example ["webhook", "numbers"]
    */
   only?: string[];
-  /** Every section but these. */
+  /**
+   * Every section but these.
+   * @example []
+   */
   except?: string[];
-  /** Write secrets encrypted with `passphrase` instead of as `${ENV_VAR}` references, to move the setup to your own machine. */
+  /**
+   * Write secrets encrypted with `passphrase` instead of as `${ENV_VAR}` references, to move the setup to your own machine.
+   * @example false
+   */
   include_secrets?: boolean;
-  /** The passphrase for `include_secrets`, 8 characters or more. The CLI reads `SENDMOCK_SETUP_PASSPHRASE` when the flag is not given. */
+  /**
+   * The passphrase for `include_secrets`, 8 characters or more. The CLI reads `SENDMOCK_SETUP_PASSPHRASE` when the flag is not given.
+   * @example null
+   */
   passphrase?: string | null;
 };
 
@@ -33,19 +42,40 @@ export type SetupImportRequest = {
    * @example "[[numbers]]\nnumber = \"+15550001111\"\nlabel = \"Support line\""
    */
   setup_text?: string | null;
-  /** Download the setup from this `https://` URL (plain `http://` only for loopback and private addresses): at most 1 MB, 10 seconds and 3 redirects, all to `https://`. */
+  /**
+   * Download the setup from this `https://` URL (plain `http://` only for loopback and private addresses): at most 1 MB, 10 seconds and 3 redirects, all to `https://`.
+   * @example null
+   */
   url?: string | null;
-  /** The SHA-256 the download must have, as 64 hexadecimal digits. */
+  /**
+   * The SHA-256 the download must have, as 64 hexadecimal digits.
+   * @example null
+   */
   sha256?: string | null;
-  /** Headers for a private URL, each as `Name: value`; never shown or logged. */
+  /**
+   * Headers for a private URL, each as `Name: value`; never shown or logged.
+   * @example []
+   */
   headers?: string[];
-  /** `toml`, `json` or `yaml`, when the URL or the text does not say. */
+  /**
+   * `toml`, `json` or `yaml`, when the URL or the text does not say.
+   * @example "toml"
+   */
   format?: SetupFileFormat | null;
-  /** `merge` (the default) or `replace`. */
+  /**
+   * `merge` (the default) or `replace`.
+   * @example "merge"
+   */
   mode?: SetupImportMode;
-  /** Opens the file's encrypted secrets. The CLI reads `SENDMOCK_SETUP_PASSPHRASE` when the flag is not given. */
+  /**
+   * Opens the file's encrypted secrets. The CLI reads `SENDMOCK_SETUP_PASSPHRASE` when the flag is not given.
+   * @example null
+   */
   passphrase?: string | null;
-  /** For `replace` imports: how many items the validation said would be removed; the import is refused when it differs. */
+  /**
+   * For `replace` imports: how many items the validation said would be removed; the import is refused when it differs.
+   * @example null
+   */
   confirm_removed_count?: number | null;
 };
 
@@ -56,9 +86,15 @@ export type SetupMigrateRequest = {
    * @example "[[numbers]]\nnumber = \"+15550001111\"\nlabel = \"Support line\""
    */
   setup_text: string;
-  /** The format of `setup_text`, when the text does not say. */
+  /**
+   * The format of `setup_text`, when the text does not say.
+   * @example "toml"
+   */
   format?: SetupFileFormat | null;
-  /** The format to write the upgraded copy in; the same as the file's by default. */
+  /**
+   * The format to write the upgraded copy in; the same as the file's by default.
+   * @example "json"
+   */
   to_format?: SetupFileFormat | null;
 };
 

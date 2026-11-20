@@ -77,6 +77,10 @@ export type SavedScenarioInput = {
    * @example "otp-login"
    */
   name: string;
+  /**
+   * What the scenario checks, shown in the Saved list.
+   * @example "Signs in with an SMS code"
+   */
   description?: string;
   /**
    * The scenario file's text, in TOML; checked as `scenario validate` does.

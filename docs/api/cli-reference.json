@@ -13413,11 +13413,11 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "",
-          "example": ""
+          "description": "What the scenario checks, shown in the Saved list.",
+          "example": "Signs in with an SMS code"
         }
       ],
-      "example": "sendmock scenario save otp-login.toml --name otp-login --description ''",
+      "example": "sendmock scenario save otp-login.toml --name otp-login --description 'Signs in with an SMS code'",
       "output": "SavedScenario",
       "exit_codes": [
         0,
@@ -13539,8 +13539,8 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "",
-          "example": ""
+          "description": "What the scenario checks, shown in the Saved list.",
+          "example": "Signs in with an SMS code"
         },
         {
           "flag": "--scenario",
@@ -13558,7 +13558,7 @@
           "example": "[[steps]]\nrun = \"sample.send\"\nwith = { kind = \"sms\" }"
         }
       ],
-      "example": "sendmock scenario update otp-login --name otp-login --description ''",
+      "example": "sendmock scenario update otp-login --name otp-login --description 'Signs in with an SMS code'",
       "output": "SavedScenario",
       "exit_codes": [
         0,
@@ -14487,9 +14487,7 @@
           "takes_json": false,
           "allowed_values": null,
           "description": "Every section but these.",
-          "example": [
-            ""
-          ]
+          "example": []
         },
         {
           "flag": "--include-secrets",
@@ -14519,7 +14517,7 @@
           "takes_json": false,
           "allowed_values": null,
           "description": "The passphrase for `include_secrets`, 8 characters or more. The CLI reads `SENDMOCK_SETUP_PASSPHRASE` when the flag is not given.",
-          "example": ""
+          "example": null
         }
       ],
       "example": "sendmock setup export --format toml --only webhook --only numbers",
@@ -14594,7 +14592,7 @@
           "takes_json": false,
           "allowed_values": null,
           "description": "Download the setup from this `https://` URL (plain `http://` only for loopback and private addresses): at most 1 MB, 10 seconds and 3 redirects, all to `https://`.",
-          "example": ""
+          "example": null
         },
         {
           "flag": "--sha256",
@@ -14609,7 +14607,7 @@
           "takes_json": false,
           "allowed_values": null,
           "description": "The SHA-256 the download must have, as 64 hexadecimal digits.",
-          "example": ""
+          "example": null
         },
         {
           "flag": "--header",
@@ -14624,9 +14622,7 @@
           "takes_json": false,
           "allowed_values": null,
           "description": "Headers for a private URL, each as `Name: value`; never shown or logged.",
-          "example": [
-            ""
-          ]
+          "example": []
         },
         {
           "flag": "--format",
@@ -14678,7 +14674,7 @@
           "takes_json": false,
           "allowed_values": null,
           "description": "Opens the file's encrypted secrets. The CLI reads `SENDMOCK_SETUP_PASSPHRASE` when the flag is not given.",
-          "example": ""
+          "example": null
         },
         {
           "flag": "--confirm-removed-count",
@@ -14693,10 +14689,10 @@
           "takes_json": false,
           "allowed_values": null,
           "description": "For `replace` imports: how many items the validation said would be removed; the import is refused when it differs.",
-          "example": 0
+          "example": null
         }
       ],
-      "example": "sendmock setup import input.txt --yes --url '' --sha256 ''",
+      "example": "sendmock setup import input.txt --yes --url null --sha256 null",
       "output": "SetupValidation",
       "exit_codes": [
         0,
@@ -14779,10 +14775,10 @@
             "yaml"
           ],
           "description": "The format to write the upgraded copy in; the same as the file's by default.",
-          "example": "toml"
+          "example": "json"
         }
       ],
-      "example": "sendmock setup migrate input.txt --format toml --to-format toml",
+      "example": "sendmock setup migrate input.txt --format toml --to-format json",
       "output": "file (text/plain)",
       "exit_codes": [
         0,
@@ -14842,7 +14838,7 @@
           "takes_json": false,
           "allowed_values": null,
           "description": "Download the setup from this `https://` URL (plain `http://` only for loopback and private addresses): at most 1 MB, 10 seconds and 3 redirects, all to `https://`.",
-          "example": ""
+          "example": null
         },
         {
           "flag": "--sha256",
@@ -14857,7 +14853,7 @@
           "takes_json": false,
           "allowed_values": null,
           "description": "The SHA-256 the download must have, as 64 hexadecimal digits.",
-          "example": ""
+          "example": null
         },
         {
           "flag": "--header",
@@ -14872,9 +14868,7 @@
           "takes_json": false,
           "allowed_values": null,
           "description": "Headers for a private URL, each as `Name: value`; never shown or logged.",
-          "example": [
-            ""
-          ]
+          "example": []
         },
         {
           "flag": "--format",
@@ -14926,7 +14920,7 @@
           "takes_json": false,
           "allowed_values": null,
           "description": "Opens the file's encrypted secrets. The CLI reads `SENDMOCK_SETUP_PASSPHRASE` when the flag is not given.",
-          "example": ""
+          "example": null
         },
         {
           "flag": "--confirm-removed-count",
@@ -14941,10 +14935,10 @@
           "takes_json": false,
           "allowed_values": null,
           "description": "For `replace` imports: how many items the validation said would be removed; the import is refused when it differs.",
-          "example": 0
+          "example": null
         }
       ],
-      "example": "sendmock setup validate input.txt --url '' --sha256 ''",
+      "example": "sendmock setup validate input.txt --url null --sha256 null",
       "output": "SetupValidation",
       "exit_codes": [
         0,

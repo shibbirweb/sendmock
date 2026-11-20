@@ -14821,6 +14821,9 @@ components:
             - otp-login
         description:
           type: string
+          description: What the scenario checks, shown in the Saved list.
+          examples:
+            - Signs in with an SMS code
         scenario:
           type: string
           description: The scenario file's text, in TOML; checked as `scenario validate` does.
@@ -14843,6 +14846,9 @@ components:
             - otp-login
         description:
           type: string
+          description: What the scenario checks, shown in the Saved list.
+          examples:
+            - Signs in with an SMS code
         scenario:
           type: string
           description: The scenario file's text, in TOML; checked as `scenario validate` does.
@@ -15078,14 +15084,20 @@ components:
           items:
             type: string
           description: Every section but these.
+          examples:
+            - []
         include_secrets:
           type: boolean
           description: Write secrets encrypted with `passphrase` instead of as `${ENV_VAR}` references, to move the setup to your own machine.
+          examples:
+            - false
         passphrase:
           type:
             - string
             - "null"
           description: The passphrase for `include_secrets`, 8 characters or more. The CLI reads `SENDMOCK_SETUP_PASSPHRASE` when the flag is not given.
+          examples:
+            - null
       description: Body of POST /api/v1/setup/export.
     SetupFileFormat:
       type: string
@@ -15118,34 +15130,48 @@ components:
             - string
             - "null"
           description: "Download the setup from this `https://` URL (plain `http://` only for loopback and private addresses): at most 1 MB, 10 seconds and 3 redirects, all to `https://`."
+          examples:
+            - null
         sha256:
           type:
             - string
             - "null"
           description: The SHA-256 the download must have, as 64 hexadecimal digits.
+          examples:
+            - null
         headers:
           type: array
           items:
             type: string
           description: "Headers for a private URL, each as `Name: value`; never shown or logged."
+          examples:
+            - []
         format:
           anyOf:
             - $ref: "#/components/schemas/SetupFileFormat"
             - type: "null"
           description: "`toml`, `json` or `yaml`, when the URL or the text does not say."
+          examples:
+            - toml
         mode:
           $ref: "#/components/schemas/SetupImportMode"
           description: "`merge` (the default) or `replace`."
+          examples:
+            - merge
         passphrase:
           type:
             - string
             - "null"
           description: Opens the file's encrypted secrets. The CLI reads `SENDMOCK_SETUP_PASSPHRASE` when the flag is not given.
+          examples:
+            - null
         confirm_removed_count:
           type:
             - number
             - "null"
           description: "For `replace` imports: how many items the validation said would be removed; the import is refused when it differs."
+          examples:
+            - null
       description: "Body of POST /api/v1/setup/validate and /setup/import: the file's text, or a URL to download it from."
     SetupMigrateRequest:
       type: object
@@ -15163,11 +15189,15 @@ components:
             - $ref: "#/components/schemas/SetupFileFormat"
             - type: "null"
           description: The format of `setup_text`, when the text does not say.
+          examples:
+            - toml
         to_format:
           anyOf:
             - $ref: "#/components/schemas/SetupFileFormat"
             - type: "null"
           description: The format to write the upgraded copy in; the same as the file's by default.
+          examples:
+            - json
       required:
         - setup_text
       description: Body of POST /api/v1/setup/migrate.

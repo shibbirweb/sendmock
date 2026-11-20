@@ -19050,8 +19050,8 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "",
-          "example": ""
+          "description": "What the scenario checks, shown in the Saved list.",
+          "example": "Signs in with an SMS code"
         },
         {
           "name": "scenario",
@@ -19078,9 +19078,9 @@
           },
           "description": {
             "type": "string",
-            "description": "",
+            "description": "What the scenario checks, shown in the Saved list.",
             "examples": [
-              ""
+              "Signs in with an SMS code"
             ]
           },
           "scenario": {
@@ -19099,7 +19099,7 @@
       "example_arguments": {
         "name": "otp-login",
         "scenario": "[[steps]]\nrun = \"sample.send\"\nwith = { kind = \"sms\" }",
-        "description": ""
+        "description": "Signs in with an SMS code"
       },
       "output": "SavedScenario",
       "cli": [
@@ -19165,8 +19165,8 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "",
-          "example": ""
+          "description": "What the scenario checks, shown in the Saved list.",
+          "example": "Signs in with an SMS code"
         },
         {
           "name": "scenario",
@@ -19200,9 +19200,9 @@
           },
           "description": {
             "type": "string",
-            "description": "",
+            "description": "What the scenario checks, shown in the Saved list.",
             "examples": [
-              ""
+              "Signs in with an SMS code"
             ]
           },
           "scenario": {
@@ -19220,7 +19220,7 @@
       "example_arguments": {
         "scenario_id": "otp-login",
         "name": "otp-login",
-        "description": ""
+        "description": "Signs in with an SMS code"
       },
       "output": "SavedScenario",
       "cli": [
@@ -20351,9 +20351,7 @@
           "is_required": false,
           "allowed_values": null,
           "description": "Every section but these.",
-          "example": [
-            ""
-          ]
+          "example": []
         },
         {
           "name": "include_secrets",
@@ -20377,7 +20375,7 @@
           "is_required": false,
           "allowed_values": null,
           "description": "The passphrase for `include_secrets`, 8 characters or more. The CLI reads `SENDMOCK_SETUP_PASSPHRASE` when the flag is not given.",
-          "example": ""
+          "example": null
         }
       ],
       "input_schema": {
@@ -20417,9 +20415,7 @@
             },
             "description": "Every section but these.",
             "examples": [
-              [
-                ""
-              ]
+              []
             ]
           },
           "include_secrets": {
@@ -20436,7 +20432,7 @@
             ],
             "description": "The passphrase for `include_secrets`, 8 characters or more. The CLI reads `SENDMOCK_SETUP_PASSPHRASE` when the flag is not given.",
             "examples": [
-              ""
+              null
             ]
           }
         },
@@ -20512,7 +20508,7 @@
           "is_required": false,
           "allowed_values": null,
           "description": "Download the setup from this `https://` URL (plain `http://` only for loopback and private addresses): at most 1 MB, 10 seconds and 3 redirects, all to `https://`.",
-          "example": ""
+          "example": null
         },
         {
           "name": "sha256",
@@ -20524,7 +20520,7 @@
           "is_required": false,
           "allowed_values": null,
           "description": "The SHA-256 the download must have, as 64 hexadecimal digits.",
-          "example": ""
+          "example": null
         },
         {
           "name": "headers",
@@ -20536,9 +20532,7 @@
           "is_required": false,
           "allowed_values": null,
           "description": "Headers for a private URL, each as `Name: value`; never shown or logged.",
-          "example": [
-            ""
-          ]
+          "example": []
         },
         {
           "name": "format",
@@ -20581,7 +20575,7 @@
           "is_required": false,
           "allowed_values": null,
           "description": "Opens the file's encrypted secrets. The CLI reads `SENDMOCK_SETUP_PASSPHRASE` when the flag is not given.",
-          "example": ""
+          "example": null
         },
         {
           "name": "confirm_removed_count",
@@ -20593,7 +20587,7 @@
           "is_required": false,
           "allowed_values": null,
           "description": "For `replace` imports: how many items the validation said would be removed; the import is refused when it differs.",
-          "example": 0
+          "example": null
         }
       ],
       "input_schema": {
@@ -20616,7 +20610,7 @@
             ],
             "description": "Download the setup from this `https://` URL (plain `http://` only for loopback and private addresses): at most 1 MB, 10 seconds and 3 redirects, all to `https://`.",
             "examples": [
-              ""
+              null
             ]
           },
           "sha256": {
@@ -20626,7 +20620,7 @@
             ],
             "description": "The SHA-256 the download must have, as 64 hexadecimal digits.",
             "examples": [
-              ""
+              null
             ]
           },
           "headers": {
@@ -20636,9 +20630,7 @@
             },
             "description": "Headers for a private URL, each as `Name: value`; never shown or logged.",
             "examples": [
-              [
-                ""
-              ]
+              []
             ]
           },
           "format": {
@@ -20669,7 +20661,7 @@
             ],
             "description": "Opens the file's encrypted secrets. The CLI reads `SENDMOCK_SETUP_PASSPHRASE` when the flag is not given.",
             "examples": [
-              ""
+              null
             ]
           },
           "confirm_removed_count": {
@@ -20679,7 +20671,7 @@
             ],
             "description": "For `replace` imports: how many items the validation said would be removed; the import is refused when it differs.",
             "examples": [
-              0
+              null
             ]
           }
         },
@@ -20705,7 +20697,7 @@
       },
       "example_arguments": {
         "setup_text": "[[numbers]]\nnumber = \"+15550001111\"\nlabel = \"Support line\"",
-        "url": ""
+        "url": null
       },
       "output": "SetupValidation",
       "cli": [
@@ -20780,7 +20772,7 @@
             "yaml"
           ],
           "description": "The format to write the upgraded copy in; the same as the file's by default.",
-          "example": "toml"
+          "example": "json"
         }
       ],
       "input_schema": {
@@ -20818,7 +20810,7 @@
             ],
             "description": "The format to write the upgraded copy in; the same as the file's by default.",
             "examples": [
-              "toml"
+              "json"
             ]
           }
         },
@@ -20840,7 +20832,7 @@
       "example_arguments": {
         "setup_text": "[[numbers]]\nnumber = \"+15550001111\"\nlabel = \"Support line\"",
         "format": "toml",
-        "to_format": "toml"
+        "to_format": "json"
       },
       "output": "file (text/plain)",
       "cli": [
@@ -20895,7 +20887,7 @@
           "is_required": false,
           "allowed_values": null,
           "description": "Download the setup from this `https://` URL (plain `http://` only for loopback and private addresses): at most 1 MB, 10 seconds and 3 redirects, all to `https://`.",
-          "example": ""
+          "example": null
         },
         {
           "name": "sha256",
@@ -20907,7 +20899,7 @@
           "is_required": false,
           "allowed_values": null,
           "description": "The SHA-256 the download must have, as 64 hexadecimal digits.",
-          "example": ""
+          "example": null
         },
         {
           "name": "headers",
@@ -20919,9 +20911,7 @@
           "is_required": false,
           "allowed_values": null,
           "description": "Headers for a private URL, each as `Name: value`; never shown or logged.",
-          "example": [
-            ""
-          ]
+          "example": []
         },
         {
           "name": "format",
@@ -20964,7 +20954,7 @@
           "is_required": false,
           "allowed_values": null,
           "description": "Opens the file's encrypted secrets. The CLI reads `SENDMOCK_SETUP_PASSPHRASE` when the flag is not given.",
-          "example": ""
+          "example": null
         },
         {
           "name": "confirm_removed_count",
@@ -20976,7 +20966,7 @@
           "is_required": false,
           "allowed_values": null,
           "description": "For `replace` imports: how many items the validation said would be removed; the import is refused when it differs.",
-          "example": 0
+          "example": null
         }
       ],
       "input_schema": {
@@ -20999,7 +20989,7 @@
             ],
             "description": "Download the setup from this `https://` URL (plain `http://` only for loopback and private addresses): at most 1 MB, 10 seconds and 3 redirects, all to `https://`.",
             "examples": [
-              ""
+              null
             ]
           },
           "sha256": {
@@ -21009,7 +20999,7 @@
             ],
             "description": "The SHA-256 the download must have, as 64 hexadecimal digits.",
             "examples": [
-              ""
+              null
             ]
           },
           "headers": {
@@ -21019,9 +21009,7 @@
             },
             "description": "Headers for a private URL, each as `Name: value`; never shown or logged.",
             "examples": [
-              [
-                ""
-              ]
+              []
             ]
           },
           "format": {
@@ -21052,7 +21040,7 @@
             ],
             "description": "Opens the file's encrypted secrets. The CLI reads `SENDMOCK_SETUP_PASSPHRASE` when the flag is not given.",
             "examples": [
-              ""
+              null
             ]
           },
           "confirm_removed_count": {
@@ -21062,7 +21050,7 @@
             ],
             "description": "For `replace` imports: how many items the validation said would be removed; the import is refused when it differs.",
             "examples": [
-              0
+              null
             ]
           }
         },
@@ -21088,7 +21076,7 @@
       },
       "example_arguments": {
         "setup_text": "[[numbers]]\nnumber = \"+15550001111\"\nlabel = \"Support line\"",
-        "url": ""
+        "url": null
       },
       "output": "SetupValidation",
       "cli": [
