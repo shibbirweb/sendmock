@@ -561,7 +561,7 @@ Read state follows Mail's: new items arrive unread, opening one marks it read, a
 
 **Not in this part:** syncing setups between running instances, hosting shared setups on a SendMock service, a diff view between two files beyond the import preview, and exporting traffic.
 
-**Format versions:** format 1 is the seed file as it was before A18, with no header. Format 2 is the first versioned format: the `[sendmock]` header, and the sections that had no adapter before (`[[http.bins]]` with their mock responses, `[[email.tag_rules]]`, `[[email.forward_rules]]`, `[[inbound_routes]]`, `[[scenarios]]`). The migration from 1 to 2 adds the header and keeps every section as it is, so every format 1 file still applies.
+**Format versions:** format 1 is the seed file as it was before A18, with no header. Format 2 is the first versioned format: the `[sendmock]` header, and the sections that had no adapter before (`[[http.bins]]` with their mock responses, `[[email.tag_rules]]`, `[[email.forward_rules]]`, `[[email.inbound_routes]]`, `[[scenarios]]`). The migration from 1 to 2 adds the header and keeps every section as it is, so every format 1 file still applies.
 
 ### Saved scenarios (AI-07)
 
@@ -570,7 +570,7 @@ Read state follows Mail's: new items arrive unread, opening one marks it read, a
 **The design:**
 
 - **A saved scenario** is a name (unique, like an endpoint's), an optional description and the scenario file itself, checked as `scenario validate` does when it is saved; an invalid file is refused with its errors, by step. It belongs to the instance, like webhook templates, not to a project. `created_by` is recorded as for every configuration item (AI-05.4).
-- **REST:** `GET /scenarios`, `POST /scenarios`, `GET`, `PATCH` and `DELETE /scenarios/{scenarioId}`, and `POST /scenarios/{scenarioId}/run`, which answers the same report as `POST /scenarios/run`. **CLI:** `sendmock scenario list|show|save|update|delete`, and `sendmock scenario run <file|name>` runs a saved scenario when no file of that name exists. **MCP:** `sendmock_scenario_list`, `sendmock_scenario_get`, `sendmock_scenario_save`, `sendmock_scenario_update`, `sendmock_scenario_delete`, and `sendmock_scenario_run` takes `scenario_id` as well as `scenario_toml`.
+- **REST:** `GET /scenarios`, `POST /scenarios`, `GET`, `PATCH` and `DELETE /scenarios/{scenarioId}`, and `POST /scenarios/{scenarioId}/run`, which answers the same report as `POST /scenarios/run`. **CLI:** `sendmock scenario list|show|save|update|delete` and `sendmock scenario run-saved <scenarioId>`; `{scenarioId}` takes the id or the name everywhere. (`sendmock scenario run <file>` stays for files: the generated CLI reads a `<file>` argument as a file, so a saved scenario has its own command.) **MCP:** `sendmock_scenario_list`, `sendmock_scenario_get`, `sendmock_scenario_save`, `sendmock_scenario_update`, `sendmock_scenario_delete`, and `sendmock_scenario_run` takes `scenario_id` as well as `scenario_toml`.
 - **UI:** the Scenarios screen gets a saved list beside the editor: **Save** (and **Save as**), open one into the editor, rename, delete with a confirmation, and an "Unsaved changes" mark while the editor differs from the saved file; **Run** runs what is in the editor, as today.
 - **In a setup:** `[[scenarios]]` with `name`, `description` and the scenario file's own keys (`[[scenarios.steps]]` with `run`, `with` and `save`), so a scenario reads the same in a setup as in its own file and converts between TOML, JSON and YAML; import matches by name.
 

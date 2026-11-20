@@ -11,6 +11,7 @@ pub use forward_rule_operations::{
     CreateForwardRuleOperation, DeleteForwardRuleOperation, ListForwardRulesOperation,
     MoveForwardRuleOperation, UpdateForwardRuleOperation,
 };
+pub(crate) use message_rule_checks::{build_new_rule, check_message_rule, clean_addresses};
 pub(crate) use message_rule_runner::{apply_tag_rules, start_forward_rules};
 pub use message_rule_views::{ForwardRule, TagRule};
 pub use tag_rule_operations::{

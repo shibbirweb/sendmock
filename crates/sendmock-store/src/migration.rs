@@ -166,4 +166,8 @@ pub const EMBEDDED_MIGRATIONS: &[Migration] = &[
         schema_version: 39,
         sql: include_str!("../migrations/0039_read_state.sql"),
     },
+    Migration {
+        schema_version: 40,
+        sql: include_str!("../migrations/0040_saved_scenarios.sql"),
+    },
 ];

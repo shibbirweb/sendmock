@@ -6,7 +6,7 @@ use super::offered_release::{PublishedRelease, is_channel_checked, select_offere
 use super::release_source::ReleaseSource;
 use super::update_check_result::{AvailableRelease, UpdateCheckResult};
 use super::upgrade_command::{InstallMethod, build_upgrade_command};
-use crate::{OperationContext, OperationError, UpdateCheckMode};
+use crate::{OperationContext, OperationError, ReleaseChannel, UpdateCheckMode};
 
 /// A successful check is reused this long before GitHub is asked again (PL-05.12).
 const CACHE_DURATION_MS: i64 = 24 * 60 * 60 * 1000;
@@ -40,6 +40,21 @@ impl UpdateChecker {
             operating_system,
             cached_check: Arc::default(),
         }
+    }
+
+    /// The command that updates this install to `offered_version`, when its install method
+    /// has one; a setup file from a newer release names it.
+    pub fn build_upgrade_command_to(
+        &self,
+        release_channel: ReleaseChannel,
+        offered_version: &str,
+    ) -> Option<String> {
+        build_upgrade_command(
+            self.install_method,
+            self.operating_system,
+            release_channel,
+            offered_version,
+        )
     }
 
     pub async fn check(

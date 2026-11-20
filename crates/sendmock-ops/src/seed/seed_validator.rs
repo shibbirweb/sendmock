@@ -9,6 +9,10 @@ use super::seed_sections::{
 };
 use super::seed_string_rules::check_seed_string;
 use super::{SeedItemCount, SeedValidation, SeedValidationError};
+use crate::setup::{HEADER_KEY, SetupHeader, SetupVersionPolicy, check_setup_header};
+
+/// The release this build is, for the message about a file it cannot read.
+const THIS_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// Collects problems with their line numbers, and counts the items per kind.
 struct SeedValidationReport {
@@ -17,8 +21,9 @@ struct SeedValidationReport {
     item_counts: BTreeMap<&'static str, usize>,
 }
 
-/// Checks a seed file without applying anything: TOML syntax, known sections, the shape of
-/// each section, and `${ENV_VAR}` references and secrets in every string.
+/// Checks a seed file without applying anything: TOML syntax, the `[sendmock]` header and its
+/// format version, known sections, the shape of each section, and `${ENV_VAR}` references and
+/// secrets in every string.
 pub fn validate_seed_toml(seed_toml: &str) -> SeedValidation {
     let mut report = SeedValidationReport {
         line_index: SeedLineIndex::new(seed_toml),
@@ -31,6 +36,10 @@ pub fn validate_seed_toml(seed_toml: &str) -> SeedValidation {
         report.add_error(byte_offset, syntax_error.message().to_owned());
     }
     for (section_key, section_value) in seed_document.get_ref() {
+        if section_key.get_ref().as_ref() == HEADER_KEY {
+            report.check_header(seed_toml, section_key.span().start);
+            continue;
+        }
         report.check_top_level_entry(section_key, section_value);
     }
     report.finish()
@@ -42,6 +51,34 @@ impl SeedValidationReport {
             line: self.line_index.line_of(byte_offset),
             message,
         });
+    }
+
+    /// The header's keys, and whether this build reads the format version it names.
+    fn check_header(&mut self, seed_toml: &str, byte_offset: usize) {
+        let Ok(setup_document) = seed_toml.parse::<toml::Table>() else {
+            return;
+        };
+        let Some(header_table) = setup_document
+            .get(HEADER_KEY)
+            .and_then(toml::Value::as_table)
+        else {
+            self.add_error(byte_offset, format!("Write the header as [{HEADER_KEY}]"));
+            return;
+        };
+        let mut header_problems: Vec<String> = header_table
+            .iter()
+            .filter_map(|(header_key, header_value)| check_setup_header(header_key, header_value))
+            .collect();
+        let version_policy = SetupVersionPolicy::default();
+        let version_decision = version_policy.decide(&SetupHeader::read(&setup_document));
+        header_problems.extend(version_policy.describe_refusal(
+            &version_decision,
+            THIS_VERSION,
+            None,
+        ));
+        for header_problem in header_problems {
+            self.add_error(byte_offset, header_problem);
+        }
     }
 
     fn check_top_level_entry(
@@ -273,6 +310,48 @@ name = "Signup"
         );
 
         assert_eq!(error_lines(&seed_validation), [4]);
+    }
+
+    // AC: PL-18.1
+    #[test]
+    fn accepts_the_header_an_export_writes_without_counting_it() {
+        let seed_validation = validate_seed_toml(
+            "[sendmock]\nformat = \"sendmock.setup\"\nformat_version = 2\nexported_by = \"1.3.0\"\nexported_at = \"2026-11-20T10:00:00Z\"\n\n[[numbers]]\nnumber = \"+15550001111\"\n",
+        );
+
+        assert!(seed_validation.is_valid, "{:?}", seed_validation.errors);
+        assert_eq!(seed_validation.summary.len(), 1);
+    }
+
+    // AC: PL-18.4
+    #[test]
+    fn reports_a_format_newer_than_this_build_reads_on_the_header_line() {
+        let seed_validation = validate_seed_toml(
+            "[[numbers]]\nnumber = \"+15550001111\"\n\n[sendmock]\nformat = \"sendmock.setup\"\nformat_version = 99\nexported_by = \"9.0.0\"\n",
+        );
+
+        assert_eq!(error_lines(&seed_validation), [4]);
+        assert!(
+            seed_validation.errors[0]
+                .message
+                .contains("exported by SendMock 9.0.0 (format 99)"),
+            "{:?}",
+            seed_validation.errors
+        );
+    }
+
+    #[test]
+    fn reports_an_unknown_header_key() {
+        let seed_validation = validate_seed_toml(
+            "[sendmock]\nformat = \"sendmock.setup\"\nformat_version = 2\nversion = 2\n",
+        );
+
+        assert!(!seed_validation.is_valid);
+        assert!(
+            seed_validation.errors[0]
+                .message
+                .starts_with("Unknown key version")
+        );
     }
 
     #[test]

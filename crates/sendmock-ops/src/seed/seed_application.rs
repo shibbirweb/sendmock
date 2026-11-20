@@ -9,6 +9,7 @@ use super::seed_document::{list_unsupported_sections, read_section_items};
 use super::seed_section_adapter::SeedSectionAdapter;
 use super::seed_sections::format_section_header;
 use super::{SeedValidation, validate_seed_toml};
+use crate::setup::prepare_setup_document;
 use crate::{OperationContext, OperationError};
 
 /// One item of the configuration as the seed state keeps it, to tell what changed since.
@@ -25,13 +26,18 @@ pub struct AppliedSeedItem {
 type AppliedKeys = BTreeMap<&'static str, Vec<String>>;
 
 /// Checks the file, applies every section it holds through the API's own checks, and keeps it
-/// as the seed state, so reset restores it and seed status compares against it. An invalid
-/// file changes nothing; an item the API refuses stops the apply with its section and number.
+/// as the seed state, so reset restores it and seed status compares against it. A file of a
+/// format this build cannot read, or an invalid one, changes nothing; an item the API refuses
+/// stops the apply with its section and number.
 pub async fn apply_seed_toml(
     operation_context: &OperationContext,
     seed_toml: &str,
     source_path: Option<String>,
 ) -> Result<SeedValidation, OperationError> {
+    let is_parsable = seed_toml.parse::<toml::Table>().is_ok();
+    if is_parsable {
+        prepare_setup_document(operation_context, seed_toml)?;
+    }
     let seed_validation = validate_seed_toml(seed_toml);
     if !seed_validation.is_valid {
         return Err(describe_invalid_seed(&seed_validation));
@@ -102,11 +108,8 @@ async fn apply_seed_document(
     operation_context: &OperationContext,
     seed_toml: &str,
 ) -> Result<AppliedKeys, OperationError> {
-    let mut seed_value: toml::Value =
-        toml::from_str(seed_toml).map_err(|parse_error| OperationError::Unprocessable {
-            code: "invalid_seed",
-            message: parse_error.message().to_owned(),
-        })?;
+    let prepared_setup = prepare_setup_document(operation_context, seed_toml)?;
+    let mut seed_value = toml::Value::Table(prepared_setup.setup_document);
     let mut missing_variables = Vec::new();
     resolve_environment_references(
         &mut seed_value,

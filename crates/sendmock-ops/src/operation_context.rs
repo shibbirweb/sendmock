@@ -9,12 +9,12 @@ use sendmock_store::{
     MessageProviderRepository, MessageRuleKind, MessageRuleRepository, MessagingServiceRepository,
     PaymentDefinitionRepository, PaymentProviderObjectRepository, PaymentRepository,
     PaymentSubscriptionRepository, ProjectRepository, PushNotificationRepository,
-    SavedWebhookDeliveryRepository, SeedStateRepository, SettingsRepository,
-    SmsCallbackAttemptRepository, SmsOutcomeRuleRepository, SmsReplyWebhookRepository,
-    SmsRepository, SmtpSessionRepository, TrafficPruner, VerificationRepository,
-    VerifyServiceRepository, VirtualNumberRepository, WebhookDeliveryRepository,
-    WebhookEndpointRepository, WebhookRuleRepository, WebhookTemplateRepository,
-    WebhookVariableRepository,
+    SavedScenarioRepository, SavedWebhookDeliveryRepository, SeedStateRepository,
+    SettingsRepository, SmsCallbackAttemptRepository, SmsOutcomeRuleRepository,
+    SmsReplyWebhookRepository, SmsRepository, SmtpSessionRepository, TrafficPruner,
+    VerificationRepository, VerifyServiceRepository, VirtualNumberRepository,
+    WebhookDeliveryRepository, WebhookEndpointRepository, WebhookRuleRepository,
+    WebhookTemplateRepository, WebhookVariableRepository,
 };
 
 use crate::{
@@ -80,6 +80,8 @@ pub struct OperationContext {
     pub reply_webhook_sender: Option<Arc<dyn ReplyWebhookSender>>,
     /// The seed file applied last, for reset and seed status.
     pub seed_state_repository: SeedStateRepository,
+    /// Scenarios saved by name (AI-07).
+    pub saved_scenarios: SavedScenarioRepository,
     /// Edited built-in and custom payment flows, methods and gateways.
     pub payment_definition_repository: PaymentDefinitionRepository,
     pub payment_repository: PaymentRepository,
@@ -199,6 +201,7 @@ impl OperationContext {
             push_notifications: PushNotificationRepository::new(share_database()),
             sms_repository: SmsRepository::new(share_database()),
             seed_state_repository: SeedStateRepository::new(share_database()),
+            saved_scenarios: SavedScenarioRepository::new(share_database()),
             payment_definition_repository: PaymentDefinitionRepository::new(share_database()),
             payment_repository: PaymentRepository::new(share_database()),
             payment_stores: PaymentStores::new(&database),

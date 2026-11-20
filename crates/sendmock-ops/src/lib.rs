@@ -41,6 +41,7 @@ mod samples;
 mod scenarios;
 mod seed;
 mod settings;
+mod setup;
 mod sms;
 mod sms_replies;
 mod smtp_chaos;
@@ -128,6 +129,10 @@ pub use settings::{
     AppSettings, AppSettingsStore, AppSettingsUpdate, EmailOutcomeProfile, SmsSimulationProfile,
     UpdateCheckMode, build_ingest_options, list_unbounded_traffic, prune_traffic,
     read_ingest_options,
+};
+pub use setup::{
+    CURRENT_FORMAT_VERSION, SETUP_FORMAT_NAME, SetupHeader, SetupVersionDecision,
+    SetupVersionPolicy,
 };
 pub use sms::{
     FetchedMedia, HttpCallResult, IncomingSms, MediaFetcher, RecordedHttpRequest,

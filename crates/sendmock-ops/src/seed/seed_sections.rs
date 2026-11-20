@@ -42,9 +42,14 @@ pub const SMS_PROVIDERS_SECTION: SeedSection = item_list("sms.providers", "SMS p
 pub const PAYMENT_FLOWS_SECTION: SeedSection = item_list("payments.flows", "Payment flow");
 pub const PAYMENT_METHODS_SECTION: SeedSection = item_list("payments.methods", "Payment method");
 pub const PAYMENT_GATEWAYS_SECTION: SeedSection = item_list("payments.gateways", "Payment gateway");
+pub const HTTP_BINS_SECTION: SeedSection = item_list("http.bins", "HTTP bin");
+pub const TAG_RULES_SECTION: SeedSection = item_list("email.tag_rules", "Tag rule");
+pub const FORWARD_RULES_SECTION: SeedSection = item_list("email.forward_rules", "Forward rule");
+pub const INBOUND_ROUTES_SECTION: SeedSection = item_list("email.inbound_routes", "Inbound route");
+pub const SCENARIOS_SECTION: SeedSection = item_list("scenarios", "Saved scenario");
 
 /// Every section a seed file may hold, in the order the summary lists them.
-pub const SEED_SECTIONS: [SeedSection; 21] = [
+pub const SEED_SECTIONS: [SeedSection; 23] = [
     SETTINGS_SECTION,
     PROJECTS_SECTION,
     WEBHOOK_ENDPOINTS_SECTION,
@@ -55,9 +60,10 @@ pub const SEED_SECTIONS: [SeedSection; 21] = [
     VERIFY_SERVICES_SECTION,
     NUMBERS_SECTION,
     MESSAGING_SERVICES_SECTION,
-    item_list("http.bins", "HTTP bin"),
-    item_list("email.tag_rules", "Tag rule"),
-    item_list("email.forward_rules", "Forward rule"),
+    HTTP_BINS_SECTION,
+    TAG_RULES_SECTION,
+    FORWARD_RULES_SECTION,
+    INBOUND_ROUTES_SECTION,
     SMS_OUTCOME_RULES_SECTION,
     EMAIL_OUTCOME_RULES_SECTION,
     EMAIL_PROVIDERS_SECTION,
@@ -66,6 +72,7 @@ pub const SEED_SECTIONS: [SeedSection; 21] = [
     PAYMENT_FLOWS_SECTION,
     PAYMENT_METHODS_SECTION,
     PAYMENT_GATEWAYS_SECTION,
+    SCENARIOS_SECTION,
 ];
 
 pub fn find_seed_section(section_path: &str) -> Option<&'static SeedSection> {

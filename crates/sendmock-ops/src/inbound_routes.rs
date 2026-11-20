@@ -22,8 +22,10 @@ pub use route_operations::{
     CreateInboundRouteOperation, DeleteInboundRouteOperation, ListInboundRoutesOperation,
     UpdateInboundRouteOperation,
 };
+pub(crate) use route_records::{build_route_record, read_route_actions, read_route_filter};
 pub(crate) use route_runner::start_inbound_routes;
 pub use route_test_operation::TestInboundRouteOperation;
+pub(crate) use route_validation::check_inbound_route;
 pub use route_wire::{InboundRoute, InboundRouteAction, InboundRouteFilter};
 
 use crate::OperationRegistry;

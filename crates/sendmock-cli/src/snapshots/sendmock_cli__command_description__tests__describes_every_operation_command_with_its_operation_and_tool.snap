@@ -3382,7 +3382,144 @@ expression: command_descriptions
         "method": "POST",
         "path": "/api/v1/scenarios/run",
         "operation_id": "postScenariosRun",
+        "selector": {
+          "input": "scenario_id",
+          "isGiven": false
+        }
+      }
+    ],
+    "mcp": [
+      "sendmock_scenario_run"
+    ]
+  },
+  {
+    "command": "sendmock scenario list",
+    "usage": "sendmock scenario list",
+    "aliases": [],
+    "summary": "The saved scenarios, by name.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/scenarios",
+        "operation_id": "getScenarios",
         "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_scenario_list"
+    ]
+  },
+  {
+    "command": "sendmock scenario show",
+    "usage": "sendmock scenario show <scenarioId>",
+    "aliases": [],
+    "summary": "One saved scenario, by id or name.",
+    "arguments": [
+      "scenarioId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/scenarios/{scenarioId}",
+        "operation_id": "getScenariosByScenarioId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_scenario_get"
+    ]
+  },
+  {
+    "command": "sendmock scenario save",
+    "usage": "sendmock scenario save <file>",
+    "aliases": [],
+    "summary": "Save a scenario by name; 422 with its problems when it is not valid.",
+    "arguments": [
+      "file"
+    ],
+    "flags": [
+      "--description",
+      "--name"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/scenarios",
+        "operation_id": "postScenarios",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_scenario_save"
+    ]
+  },
+  {
+    "command": "sendmock scenario update",
+    "usage": "sendmock scenario update <scenarioId>",
+    "aliases": [],
+    "summary": "Rename a saved scenario or change its description or file.",
+    "arguments": [
+      "scenarioId"
+    ],
+    "flags": [
+      "--description",
+      "--name",
+      "--scenario"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/scenarios/{scenarioId}",
+        "operation_id": "patchScenariosByScenarioId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_scenario_update"
+    ]
+  },
+  {
+    "command": "sendmock scenario delete",
+    "usage": "sendmock scenario delete <scenarioId>",
+    "aliases": [],
+    "summary": "Delete a saved scenario.",
+    "arguments": [
+      "scenarioId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/scenarios/{scenarioId}",
+        "operation_id": "deleteScenariosByScenarioId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_scenario_delete"
+    ]
+  },
+  {
+    "command": "sendmock scenario run-saved",
+    "usage": "sendmock scenario run-saved <scenarioId>",
+    "aliases": [],
+    "summary": "Run a saved scenario step by step and report each step.",
+    "arguments": [
+      "scenarioId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/scenarios/{scenarioId}/run",
+        "operation_id": "postScenariosByScenarioIdRun",
+        "selector": {
+          "input": "scenario_id",
+          "isGiven": true
+        }
       }
     ],
     "mcp": [
