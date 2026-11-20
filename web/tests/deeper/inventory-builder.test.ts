@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import { parseAriaSnapshot } from "./aria-snapshot-parser";
-import { buildInventory } from "./inventory-builder";
+import { buildInventory, normalizeName } from "./inventory-builder";
 
 const mailSnapshot = `- region "Email list":
   - textbox "Search emails":
@@ -113,6 +113,16 @@ describe("the Deeper inventory crawl (WS-10.3)", () => {
         { isRecordingParagraphs: true },
       ).map((control) => control.name),
     ).toEqual(["Month #, #, #:# from #.#.#.#"]);
+  });
+
+  test("WS-10.3 a beta version reads the same as a stable one, so a release branch crawls the same", () => {
+    expect(normalizeName("Live · demo data, version 1.3.0-beta.1")).toBe(
+      "Live · demo data, version #.#.#",
+    );
+    expect(normalizeName("Live · demo data, version 1.2.0")).toBe(
+      "Live · demo data, version #.#.#",
+    );
+    expect(normalizeName("from 127.0.0.1")).toBe("from #.#.#.#");
   });
 
   test("WS-10.3 a word that starts like a month stays as it is", () => {
