@@ -57,7 +57,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 127 / 153 features, 622 / 785 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 127 / 154 features, 622 / 789 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -163,6 +163,7 @@ On top of its own criteria, a feature is done only when:
 | [AI-04](05-ai.md#ai-04-scenarios) | Scenarios | Phase 4 | 3 | Accepted |
 | [AI-05](05-ai.md#ai-05-agent-skill-and-sendmock-ai-install) | Agent skill and `sendmock ai install` | Waiting on others (left over from 1.0.0: AI-05.8); before: Phase 4 (skill, install), Phase 5 (plugin, evals, MCP registry listings) | 9 | In progress |
 | [AI-06](05-ai.md#ai-06-llmstxt) | llms.txt | Phase 4 | 1 | Accepted |
+| [AI-07](05-ai.md#ai-07-saved-scenarios) | Saved scenarios | 1.3.0 (A18) | 4 | Not started |
 | [UI-01](06-ui.md#ui-01-app-shell) | App shell | Phase U0 | 5 | Accepted |
 | [UI-02](06-ui.md#ui-02-mock-layer) | Mock layer | Phase U0 | 5 | Accepted |
 | [UI-03](06-ui.md#ui-03-overview-dashboard) | Overview dashboard | Phase U1 | 5 | Accepted |

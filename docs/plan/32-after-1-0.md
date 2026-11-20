@@ -25,7 +25,7 @@ Smallest change with the most users first; items that need an outside party (a d
 | A15 | Docs traffic analytics with Google Analytics | #186 | WS-11 (new) | 1.5.0 |
 | A16 | Code examples on every docs page, for every task | #197 | WS-12 (new) | 1.5.0 |
 | A17 | List actions on every traffic screen: select, mark read or unread, delete, delete all | #277 | UI-14 (new) | 1.1.0 |
-| A18 | Share and move a setup: versioned export and import, from a file or a URL | #287 | PL-18 (new) | 1.3.0 |
+| A18 | Share and move a setup: versioned export and import, from a file or a URL; saved scenarios (owner decision 2026-11-20) | #287 | PL-18, AI-07 (new) | 1.3.0 |
 | A19 | SendMock in CI/CD pipelines for webhook tests, set up from a JSON or YAML file at a URL | #286 | WH-15 (new) | 1.4.0 |
 | A20 | Search engines and link previews for the website | #293 | WS-13 (new) | 1.2.0 |
 | A21 | What's new and Upgrade guide links in the docs sidebar | #295 | WS-14 (new) | 1.2.0 |
@@ -549,7 +549,7 @@ Read state follows Mail's: new items arrive unread, opening one marks it read, a
   - Older than the oldest migration this build keeps: refused, naming the last SendMock release that reads it. Every release reads every format version written since 1.0.
   - Newer than this build understands: refused before anything is applied, with "This setup was exported by SendMock 1.6.0 (format 4); this is 1.4.0 (format 2). Update SendMock to import it.", the update command for the way it was installed (from `GET /info`), and nothing half-applied.
   - A newer `exported_by` with the same format version is fine and only noted. An unknown section or key in a known format version is an error with its line number, as `seed validate` does today.
-- **What a setup holds:** all configuration, the seed's sections plus every Settings section, projects, providers, HTTP Catcher bins and their mock responses, and scenarios. Never traffic (emails, SMS, deliveries, payments, logs) or the server's own runtime options (`sendmock.toml`: ports, database path, auth), which belong to each machine. `--project <key>` exports one project's items; `--only` and `--except` take section names.
+- **What a setup holds:** all configuration, the seed's sections plus every Settings section, projects, providers, HTTP Catcher bins and their mock responses, tag, forward and inbound routing rules, and saved scenarios (AI-07, below). Never traffic (emails, SMS, deliveries, payments, logs) or the server's own runtime options (`sendmock.toml`: ports, database path, auth), which belong to each machine. `--project <key>` exports one project's items; `--only` and `--except` take section names.
 - **Formats:** TOML (the default, as today), JSON and YAML, chosen by the file extension or `--format`, with one structure, so a file converts losslessly between them. A JSON Schema per format version is generated from the types and published on the website (`/schema/setup/v2.json`) and submitted to SchemaStore, so editors and AI agents validate a file as it is written. YAML reuses `serde_yaml_ng`, already a workspace dependency.
 - **Secrets:** exported as `${ENV_VAR}` references by default, as today, so a shared file holds none. For moving to your own machine, `--include-secrets` asks for a passphrase and writes each secret encrypted (AES-256-GCM, key from PBKDF2-HMAC-SHA256 with a random salt, both from `ring`, already a dependency), marked `{ encrypted = "..." }`; import asks for the passphrase (the UI field, a CLI prompt or `SENDMOCK_SETUP_PASSPHRASE`). A secret is never written in plain text, in line with the safe defaults.
 - **Import from a file or a URL:** a path, an upload, pasted text or an `https://` URL (a raw file in a repository, a gist, an internal server). The fetch is capped at 1 MB and 10 seconds, follows at most 3 redirects and only to `https`, takes an optional `--sha256` that must match, and sends optional headers for a private URL (`--header "Authorization: Bearer ..."`, masked wherever it is shown or logged). Plain `http` is allowed only for loopback and private addresses, for a file served inside the CI network.
@@ -560,6 +560,33 @@ Read state follows Mail's: new items arrive unread, opening one marks it read, a
 **Proof:** a round trip on every surface (export, import into a fresh instance, export again: the two files are equal); a fixture file for every older format version, upgraded and applied; a file from a newer format refused with nothing applied; encrypted secrets that import with the passphrase and fail cleanly without it; URL import against a local test server (size cap, timeout, redirect rules, `--sha256`, headers masked); and a CI job that exports with the previous stable release and imports with the current build.
 
 **Not in this part:** syncing setups between running instances, hosting shared setups on a SendMock service, a diff view between two files beyond the import preview, and exporting traffic.
+
+**Format versions:** format 1 is the seed file as it was before A18, with no header. Format 2 is the first versioned format: the `[sendmock]` header, and the sections that had no adapter before (`[[http.bins]]` with their mock responses, `[[email.tag_rules]]`, `[[email.forward_rules]]`, `[[inbound_routes]]`, `[[scenarios]]`). The migration from 1 to 2 adds the header and keeps every section as it is, so every format 1 file still applies.
+
+### Saved scenarios (AI-07)
+
+**Why (owner decision, 2026-11-20):** a setup is meant to hold scenarios, but the Scenarios screen and `POST /scenarios/run` only run a file and store nothing ([14](14-ai-integration.md#scenarios)), so there was nothing to export. The owner chose to store them rather than leave them out.
+
+**The design:**
+
+- **A saved scenario** is a name (unique, like an endpoint's), an optional description and the scenario file itself, checked as `scenario validate` does when it is saved; an invalid file is refused with its errors, by step. It belongs to the instance, like webhook templates, not to a project. `created_by` is recorded as for every configuration item (AI-05.4).
+- **REST:** `GET /scenarios`, `POST /scenarios`, `GET`, `PATCH` and `DELETE /scenarios/{scenarioId}`, and `POST /scenarios/{scenarioId}/run`, which answers the same report as `POST /scenarios/run`. **CLI:** `sendmock scenario list|show|save|update|delete`, and `sendmock scenario run <file|name>` runs a saved scenario when no file of that name exists. **MCP:** `sendmock_scenario_list`, `sendmock_scenario_get`, `sendmock_scenario_save`, `sendmock_scenario_update`, `sendmock_scenario_delete`, and `sendmock_scenario_run` takes `scenario_id` as well as `scenario_toml`.
+- **UI:** the Scenarios screen gets a saved list beside the editor: **Save** (and **Save as**), open one into the editor, rename, delete with a confirmation, and an "Unsaved changes" mark while the editor differs from the saved file; **Run** runs what is in the editor, as today.
+- **In a setup:** `[[scenarios]]` with `name`, `description` and the scenario file's own keys (`[[scenarios.steps]]` with `run`, `with` and `save`), so a scenario reads the same in a setup as in its own file and converts between TOML, JSON and YAML; import matches by name.
+
+**Proof:** CRUD and run on every surface, an invalid scenario refused on save, the screen's save, open and unsaved mark, and a scenario that survives an export and import.
+
+### Build steps
+
+A18 and AI-07 are built on one branch and one pull request into `develop`, one commit per step, and the owner's go-ahead between steps:
+
+1. The plan: these steps, AI-07 and its criteria, and the API rows in [06](06-api.md).
+2. The setup format: the `[sendmock]` header, `SetupVersionPolicy` and the migration registry with the format 1 fixture, and adapters for the sections that had none (HTTP bins and responses, tag, forward and inbound rules). The saved scenarios table, repository and operations come here too, with their `[[scenarios]]` adapter.
+3. TOML, JSON and YAML with one structure, and the JSON Schema per format version generated from the types.
+4. Encrypted secrets with a passphrase.
+5. Import from a URL, with the fetch limits.
+6. The import preview, Merge and Replace, and the setup operations on REST, CLI and MCP (`/seed/*` and `sendmock seed` kept as aliases), with the registry, types, regenerated spec and mock handlers.
+7. Settings > Setup and the saved scenarios on the Scenarios screen, the docs (recipe, configuration reference, Versions page, the schema on the website), and the CI job that exports with the previous stable release and imports with this build.
 
 ## A19. SendMock in CI/CD pipelines for webhook tests (WH-15)
 

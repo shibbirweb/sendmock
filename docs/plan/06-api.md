@@ -181,13 +181,20 @@ These make SendMock useful from any test framework without polling loops:
 | GET | `/events/recent?since=&type=&limit=` | the latest events, newest first: the polling twin of the realtime stream |
 | GET | `/integrations/{stack}?channel=&host=` | copy-ready settings for a stack (Laravel, Django, Express, ...), as Settings > Connection shows them |
 | POST | `/scenarios/validate`, `/scenarios/run` | check or run a scenario file ([14](14-ai-integration.md#scenarios)); the run answers a step-by-step report |
+| GET/POST | `/scenarios` | list the saved scenarios, or save one (name, optional description, the scenario file); saving validates the file and answers 422 with its errors by step (AI-07, [32](32-after-1-0.md#saved-scenarios-ai-07)) |
+| GET/PATCH/DELETE | `/scenarios/{scenarioId}` | one saved scenario: read it, rename it or change its description or file (validated as on save), or delete it |
+| POST | `/scenarios/{scenarioId}/run` | run a saved scenario; answers the same report as `/scenarios/run` |
 | GET | `/ai/agents`, `/ai/skill` | per AI agent the install command and MCP configuration, for the installed binary and through npx (`npx_install_command`, `npx_mcp_config`, added 2026-11-07 for AI-05.9); the agent skill as Markdown ([14](14-ai-integration.md#agent-skill)) |
 | POST | `/samples/{kind}` | create a sample through the normal path: `email` (sent over SMTP to SendMock itself, so an SMTP session is logged; optional `to`, `subject`, `html`), `sms` (native send), `verification` (started on the first Verify service, or a new "Sample" service), `http` (a Slack notification to the `slack` bin); returns `{ "kind": ..., "id": ... }`. CLI `sendmock sample <kind>`, MCP `sendmock_sample_send` |
 | POST | `/reset` | wipe traffic and restore the seed state (between test runs) |
 | DELETE | `/traffic` | delete every captured item in every project (emails, SMS, verifications, push notifications, HTTP requests, finished webhook deliveries, payments, subscriptions and both logs) and keep every setting and configuration list; publishes one `traffic.cleared` (A17, UI-14) |
-| POST | `/seed/apply`, GET `/seed/export` | apply or export the seed file ([02-architecture.md](02-architecture.md#configuration-and-seed-file)) |
-| POST | `/seed/validate` | check a seed file without applying it: errors with line numbers and a summary of what would change |
-| GET | `/seed/status` | seed file path, when it was applied, and items added or changed since |
+| GET | `/setup/export?format=&project=&only=&except=` | the configuration as a versioned setup file (A18, [32](32-after-1-0.md#a18-share-and-move-a-setup-versioned-export-and-import-pl-18)): `format` is `toml` (the default), `json` or `yaml`; `project` keeps one project's items; `only` and `except` take comma-separated section names. Secrets are `${ENV_VAR}` references; `POST /setup/export` with `{ "passphrase": ... }` and the same options instead writes them encrypted, so the passphrase never travels in a URL |
+| POST | `/setup/validate` | check a setup without applying it: the format version and whether it is upgraded, errors with line numbers, and per section what would be added, changed and removed (`mode` is `merge` or `replace`) |
+| POST | `/setup/import` | apply a setup: the file's text, or a `url` with optional `sha256` and `headers` (fetched with the A18 limits), `format` when the text does not say, `mode` (`merge`, the default, or `replace`), `passphrase` for encrypted secrets, and for `replace` the `confirm_removed_count` the preview showed; 422 with the errors and nothing applied when the file is invalid, too new or too old |
+| POST | `/setup/migrate` | the file upgraded to this build's format version, in the same or another `format`, without applying it |
+| POST | `/seed/apply`, GET `/seed/export` | aliases of `/setup/import` (Merge, TOML) and `/setup/export` (TOML), kept so existing scripts work ([02-architecture.md](02-architecture.md#configuration-and-seed-file)) |
+| POST | `/seed/validate` | alias of `/setup/validate` for a TOML file |
+| GET | `/seed/status` | seed file path, when it was applied, and items added or changed since; Settings > Setup shows it as the status card |
 | GET | `/stats` | totals and today's counts, 24 hourly activity buckets (emails, SMS, HTTP requests, deliveries), per-endpoint webhook metrics (deliveries, success rate, p50 / p95 latency, retries, top failure codes) and recent failed deliveries |
 
 `wait` endpoints only match messages received after an optional `since` timestamp (defaults to "now minus 30 s") to avoid matching stale messages. In Demo mode the mock gives up after at most 3 s, so the playground stays quick.
