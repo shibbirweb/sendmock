@@ -26,6 +26,16 @@ describe("Deeper screenshot markers (WS-10.2)", () => {
     expect(namePattern.test("Copy the SendGrid base URL now")).toBe(false);
   });
 
+  test("WS-10.2 a release version matches a stable and a beta build", () => {
+    const namePattern = toNamePattern("Live · demo data, version #.#.#");
+
+    expect(namePattern.test("Live · demo data, version 1.2.0")).toBe(true);
+    expect(namePattern.test("Live · demo data, version 1.3.0-beta.1")).toBe(
+      true,
+    );
+    expect(namePattern.test("Live · demo data, version 1.3")).toBe(false);
+  });
+
   test("WS-10.2 regular expression characters in a name are matched as they are", () => {
     expect(toNamePattern("Rule (#) [x]").test("Rule (3) [x]")).toBe(true);
     expect(toNamePattern("a.b").test("axb")).toBe(false);
