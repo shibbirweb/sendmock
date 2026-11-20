@@ -151,11 +151,13 @@ impl HttpCatcherStores {
 }
 
 /// What a setup file holds beside the configuration items: the seed file applied last, for
-/// reset and seed status, and the scenarios saved by name.
+/// reset and seed status, and the scenarios saved by name; and the downloader for setup URLs.
 #[derive(Clone)]
 pub struct SetupStores {
     pub seed_state: SeedStateRepository,
     pub saved_scenarios: SavedScenarioRepository,
+    /// Downloads setups from URLs; set by the binary, which owns the HTTP client.
+    pub fetcher: Option<Arc<dyn crate::setup::SetupFetcher>>,
 }
 
 impl SetupStores {
@@ -163,6 +165,7 @@ impl SetupStores {
         Self {
             seed_state: SeedStateRepository::new(Arc::clone(database)),
             saved_scenarios: SavedScenarioRepository::new(Arc::clone(database)),
+            fetcher: None,
         }
     }
 }
@@ -320,6 +323,14 @@ impl OperationContext {
 
     pub fn with_media_fetcher(mut self, media_fetcher: Arc<dyn MediaFetcher>) -> Self {
         self.media_fetcher = Some(media_fetcher);
+        self
+    }
+
+    pub fn with_setup_fetcher(
+        mut self,
+        setup_fetcher: Arc<dyn crate::setup::SetupFetcher>,
+    ) -> Self {
+        self.setup_stores.fetcher = Some(setup_fetcher);
         self
     }
 

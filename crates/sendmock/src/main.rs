@@ -14,6 +14,7 @@ mod http_call_sender;
 mod http_link_checker;
 mod http_media_fetcher;
 mod http_response_recording;
+mod http_setup_fetcher;
 mod http_webhook_sender;
 mod instance_details_builder;
 mod listener_binding;

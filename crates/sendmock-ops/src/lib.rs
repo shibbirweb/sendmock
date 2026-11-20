@@ -132,9 +132,11 @@ pub use settings::{
     read_ingest_options,
 };
 pub use setup::{
-    CURRENT_FORMAT_VERSION, ENCRYPTED_SECRET_PREFIX, EncryptedSecretWriter, SETUP_FORMAT_NAME,
-    SecretReferenceWriter, SetupFileFormat, SetupHeader, SetupProblem, SetupSecretError,
-    SetupSecretWriter, SetupVersionDecision, SetupVersionPolicy, build_setup_json_schema,
+    CURRENT_FORMAT_VERSION, DownloadedSetup, ENCRYPTED_SECRET_PREFIX, EncryptedSecretWriter,
+    FetchedSetupFile, SETUP_FORMAT_NAME, SecretReferenceWriter, SetupFetchError, SetupFetchFuture,
+    SetupFetchLimits, SetupFetchRequest, SetupFetcher, SetupFileFormat, SetupHeader, SetupProblem,
+    SetupRequestHeader, SetupSecretError, SetupSecretWriter, SetupUrlSource, SetupVersionDecision,
+    SetupVersionPolicy, build_setup_json_schema, download_setup, is_plain_http_address_allowed,
     read_setup_document, setup_json_schema_url, write_setup_document,
 };
 pub use sms::{
