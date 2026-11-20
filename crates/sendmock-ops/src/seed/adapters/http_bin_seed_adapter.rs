@@ -1,3 +1,4 @@
+use schemars::JsonSchema;
 use sendmock_store::HttpBinRecord;
 use serde::{Deserialize, Serialize};
 
@@ -13,7 +14,7 @@ use crate::{OperationContext, OperationError};
 
 /// `[[http.bins]]`, matched by `name`: the bin, its default reply when it differs from its
 /// preset's, and its response rules as `PUT /http/bins/{binId}/responses` takes them.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 struct SeedHttpBin {
     name: String,
@@ -128,4 +129,4 @@ impl HttpBinSeedAdapter {
     }
 }
 
-impl_seed_section_adapter!(HttpBinSeedAdapter, HTTP_BINS_SECTION);
+impl_seed_section_adapter!(HttpBinSeedAdapter, HTTP_BINS_SECTION, SeedHttpBin);

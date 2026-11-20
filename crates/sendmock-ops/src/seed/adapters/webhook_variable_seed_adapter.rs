@@ -1,3 +1,4 @@
+use schemars::JsonSchema;
 use sendmock_store::WebhookVariableRecord;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -15,7 +16,7 @@ const SECRET_KIND: &str = "secret";
 
 /// `[[webhook.variables]]`, matched by `endpoint` (left out for a global one) and `name`. A
 /// secret's `value` must be an `${ENV_VAR}` reference; export writes one.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 struct SeedWebhookVariable {
     name: String,
@@ -198,4 +199,8 @@ async fn build_seeded_variable(
     })
 }
 
-impl_seed_section_adapter!(WebhookVariableSeedAdapter, WEBHOOK_VARIABLES_SECTION);
+impl_seed_section_adapter!(
+    WebhookVariableSeedAdapter,
+    WEBHOOK_VARIABLES_SECTION,
+    SeedWebhookVariable
+);

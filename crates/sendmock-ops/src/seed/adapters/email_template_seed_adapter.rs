@@ -1,3 +1,4 @@
+use schemars::JsonSchema;
 use sendmock_store::EmailLocalTemplateRecord;
 use serde::{Deserialize, Serialize};
 
@@ -10,7 +11,7 @@ use crate::{OperationContext, OperationError};
 /// `[[email.templates]]`, matched by `id`: the provider's template id (SendGrid's `d-...`,
 /// Postmark's number or alias), with a subject and a text or HTML body rendered from the send's
 /// template data.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 struct SeedEmailTemplate {
     id: String,
@@ -102,4 +103,8 @@ impl EmailTemplateSeedAdapter {
     }
 }
 
-impl_seed_section_adapter!(EmailTemplateSeedAdapter, EMAIL_TEMPLATES_SECTION);
+impl_seed_section_adapter!(
+    EmailTemplateSeedAdapter,
+    EMAIL_TEMPLATES_SECTION,
+    SeedEmailTemplate
+);

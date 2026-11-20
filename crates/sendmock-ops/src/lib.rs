@@ -122,8 +122,9 @@ pub use samples::{CreateSampleOperation, CreatedSample, SampleEmail, SampleEmail
 pub use seed::{
     ApplySeedOperation, EnvironmentReader, ExportSeedOperation, FixedEnvironment,
     GetSeedStatusOperation, ProcessEnvironment, SeedChangedItem, SeedFileRequest, SeedItemChange,
-    SeedItemCount, SeedStatus, SeedValidation, SeedValidationError, ValidateSeedOperation,
-    apply_seed_toml, restore_seed_state, validate_seed_toml,
+    SeedItemCount, SeedStatus, SeedValidation, SeedValidationError, SetupCheck,
+    ValidateSeedOperation, apply_seed_toml, apply_setup_text, check_setup_text, restore_seed_state,
+    validate_seed_toml, write_setup_text,
 };
 pub use settings::{
     AppSettings, AppSettingsStore, AppSettingsUpdate, EmailOutcomeProfile, SmsSimulationProfile,
@@ -131,8 +132,9 @@ pub use settings::{
     read_ingest_options,
 };
 pub use setup::{
-    CURRENT_FORMAT_VERSION, SETUP_FORMAT_NAME, SetupHeader, SetupVersionDecision,
-    SetupVersionPolicy,
+    CURRENT_FORMAT_VERSION, SETUP_FORMAT_NAME, SetupFileFormat, SetupHeader, SetupProblem,
+    SetupVersionDecision, SetupVersionPolicy, build_setup_json_schema, read_setup_document,
+    setup_json_schema_url, write_setup_document,
 };
 pub use sms::{
     FetchedMedia, HttpCallResult, IncomingSms, MediaFetcher, RecordedHttpRequest,

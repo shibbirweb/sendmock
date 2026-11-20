@@ -78,10 +78,7 @@ pub struct OperationContext {
     pub status_callback_sender: Option<Arc<dyn StatusCallbackSender>>,
     /// Calls reply webhook URLs and fetches TwiML; set by the binary, which owns the HTTP client.
     pub reply_webhook_sender: Option<Arc<dyn ReplyWebhookSender>>,
-    /// The seed file applied last, for reset and seed status.
-    pub seed_state_repository: SeedStateRepository,
-    /// Scenarios saved by name (AI-07).
-    pub saved_scenarios: SavedScenarioRepository,
+    pub setup_stores: SetupStores,
     /// Edited built-in and custom payment flows, methods and gateways.
     pub payment_definition_repository: PaymentDefinitionRepository,
     pub payment_repository: PaymentRepository,
@@ -153,6 +150,23 @@ impl HttpCatcherStores {
     }
 }
 
+/// What a setup file holds beside the configuration items: the seed file applied last, for
+/// reset and seed status, and the scenarios saved by name.
+#[derive(Clone)]
+pub struct SetupStores {
+    pub seed_state: SeedStateRepository,
+    pub saved_scenarios: SavedScenarioRepository,
+}
+
+impl SetupStores {
+    fn new(database: &Arc<Database>) -> Self {
+        Self {
+            seed_state: SeedStateRepository::new(Arc::clone(database)),
+            saved_scenarios: SavedScenarioRepository::new(Arc::clone(database)),
+        }
+    }
+}
+
 /// What emails keep beside the messages: each send as its provider knows it, the seed file's
 /// local stand-ins for provider templates, the tag and forward rules run on arrival, and the
 /// links between simulated replies and their originals.
@@ -200,8 +214,7 @@ impl OperationContext {
             logs: LogStores::new(&database),
             push_notifications: PushNotificationRepository::new(share_database()),
             sms_repository: SmsRepository::new(share_database()),
-            seed_state_repository: SeedStateRepository::new(share_database()),
-            saved_scenarios: SavedScenarioRepository::new(share_database()),
+            setup_stores: SetupStores::new(&database),
             payment_definition_repository: PaymentDefinitionRepository::new(share_database()),
             payment_repository: PaymentRepository::new(share_database()),
             payment_stores: PaymentStores::new(&database),

@@ -89,4 +89,8 @@ impl PaymentMethodSeedAdapter {
     }
 }
 
-impl_seed_section_adapter!(PaymentMethodSeedAdapter, PAYMENT_METHODS_SECTION);
+impl_seed_section_adapter!(
+    PaymentMethodSeedAdapter,
+    PAYMENT_METHODS_SECTION,
+    SeedPaymentDefinition
+);

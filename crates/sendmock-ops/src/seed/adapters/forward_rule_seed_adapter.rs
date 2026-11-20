@@ -1,3 +1,4 @@
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use super::message_rule_seed::{
@@ -12,7 +13,7 @@ use crate::webhooks::RuleFilter;
 use crate::{OperationContext, OperationError};
 
 /// `[[email.forward_rules]]`, matched by `name`, in the order they run.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 struct SeedForwardRule {
     name: String,
@@ -88,4 +89,8 @@ impl ForwardRuleSeedAdapter {
     }
 }
 
-impl_seed_section_adapter!(ForwardRuleSeedAdapter, FORWARD_RULES_SECTION);
+impl_seed_section_adapter!(
+    ForwardRuleSeedAdapter,
+    FORWARD_RULES_SECTION,
+    SeedForwardRule
+);

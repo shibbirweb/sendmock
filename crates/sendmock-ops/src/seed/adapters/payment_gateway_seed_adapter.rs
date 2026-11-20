@@ -151,4 +151,8 @@ impl PaymentGatewaySeedAdapter {
     }
 }
 
-impl_seed_section_adapter!(PaymentGatewaySeedAdapter, PAYMENT_GATEWAYS_SECTION);
+impl_seed_section_adapter!(
+    PaymentGatewaySeedAdapter,
+    PAYMENT_GATEWAYS_SECTION,
+    SeedPaymentDefinition
+);

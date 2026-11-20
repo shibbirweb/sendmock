@@ -1,3 +1,4 @@
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::inbound_routes::{
@@ -12,7 +13,7 @@ use crate::{OperationContext, OperationError};
 
 /// `[[email.inbound_routes]]`, matched by `description`, with the filter and actions in the
 /// shape `POST /inbound-routes` takes.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 struct SeedInboundRoute {
     description: String,
@@ -98,4 +99,8 @@ impl InboundRouteSeedAdapter {
     }
 }
 
-impl_seed_section_adapter!(InboundRouteSeedAdapter, INBOUND_ROUTES_SECTION);
+impl_seed_section_adapter!(
+    InboundRouteSeedAdapter,
+    INBOUND_ROUTES_SECTION,
+    SeedInboundRoute
+);

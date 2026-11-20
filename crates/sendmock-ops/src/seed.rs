@@ -14,10 +14,17 @@ mod seed_validation;
 mod seed_validator;
 mod validate_seed_operation;
 
+pub(crate) use adapters::seed_section_adapters;
 pub use environment_reader::{EnvironmentReader, FixedEnvironment, ProcessEnvironment};
-pub use seed_application::{apply_seed_toml, restore_seed_state};
+pub use seed_application::{apply_seed_toml, apply_setup_text, restore_seed_state};
+pub(crate) use seed_document::write_section_toml;
+pub use seed_export::write_setup_text;
+pub(crate) use seed_line_index::SeedLineIndex;
 pub use seed_operations::{ApplySeedOperation, ExportSeedOperation, GetSeedStatusOperation};
+pub(crate) use seed_sections::SeedSection;
+#[cfg(test)]
+pub(crate) use seed_sections::{NUMBERS_SECTION, SETTINGS_SECTION, VERIFY_SERVICES_SECTION};
 pub use seed_status::{SeedChangedItem, SeedItemChange, SeedStatus};
 pub use seed_validation::{SeedFileRequest, SeedItemCount, SeedValidation, SeedValidationError};
-pub use seed_validator::validate_seed_toml;
+pub use seed_validator::{SetupCheck, check_setup_text, validate_seed_toml};
 pub use validate_seed_operation::ValidateSeedOperation;

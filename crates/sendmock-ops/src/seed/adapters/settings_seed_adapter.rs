@@ -71,7 +71,7 @@ fn write_changed_settings(current_settings: &AppSettings) -> Result<toml::Table,
     )
 }
 
-impl_seed_section_adapter!(SettingsSeedAdapter, SETTINGS_SECTION);
+impl_seed_section_adapter!(SettingsSeedAdapter, SETTINGS_SECTION, AppSettingsUpdate);
 
 #[cfg(test)]
 mod tests {

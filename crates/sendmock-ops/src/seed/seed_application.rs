@@ -3,13 +3,16 @@ use std::collections::BTreeMap;
 use sendmock_store::SeedStateRecord;
 use serde::{Deserialize, Serialize};
 
+use super::SeedValidation;
 use super::adapters::seed_section_adapters;
 use super::environment_references::resolve_environment_references;
 use super::seed_document::{list_unsupported_sections, read_section_items};
 use super::seed_section_adapter::SeedSectionAdapter;
 use super::seed_sections::format_section_header;
-use super::{SeedValidation, validate_seed_toml};
-use crate::setup::prepare_setup_document;
+use super::seed_validator::{SetupCheck, check_setup_text};
+use crate::setup::{
+    SetupFileFormat, prepare_setup_document, read_setup_document, write_setup_document,
+};
 use crate::{OperationContext, OperationError};
 
 /// One item of the configuration as the seed state keeps it, to tell what changed since.
@@ -25,26 +28,48 @@ pub struct AppliedSeedItem {
 /// The item keys each section's apply touched, by section path.
 type AppliedKeys = BTreeMap<&'static str, Vec<String>>;
 
-/// Checks the file, applies every section it holds through the API's own checks, and keeps it
-/// as the seed state, so reset restores it and seed status compares against it. A file of a
-/// format this build cannot read, or an invalid one, changes nothing; an item the API refuses
-/// stops the apply with its section and number.
+/// Checks a TOML seed file, applies it and keeps it as the seed state (see `apply_setup_text`).
 pub async fn apply_seed_toml(
     operation_context: &OperationContext,
     seed_toml: &str,
     source_path: Option<String>,
 ) -> Result<SeedValidation, OperationError> {
-    let is_parsable = seed_toml.parse::<toml::Table>().is_ok();
-    if is_parsable {
-        prepare_setup_document(operation_context, seed_toml)?;
+    apply_setup_text(
+        operation_context,
+        seed_toml,
+        SetupFileFormat::Toml,
+        source_path,
+    )
+    .await
+}
+
+/// Checks the file, applies every section it holds through the API's own checks, and keeps it
+/// as the seed state (in TOML, whatever format it came in), so reset restores it and seed
+/// status compares against it. A file of a format version this build cannot read, or an
+/// invalid one, changes nothing; an item the API refuses stops the apply with its section and
+/// number.
+pub async fn apply_setup_text(
+    operation_context: &OperationContext,
+    setup_text: &str,
+    setup_format: SetupFileFormat,
+    source_path: Option<String>,
+) -> Result<SeedValidation, OperationError> {
+    let parsed_document = read_setup_document(setup_text, setup_format).ok();
+    if let Some(setup_document) = &parsed_document {
+        prepare_setup_document(operation_context, setup_document.clone())?;
     }
-    let seed_validation = validate_seed_toml(seed_toml);
-    if !seed_validation.is_valid {
-        return Err(describe_invalid_seed(&seed_validation));
+    let setup_check = check_setup_text(setup_text, setup_format);
+    if !setup_check.is_valid() {
+        return Err(describe_invalid_setup(&setup_check));
     }
-    apply_seed_document(operation_context, seed_toml).await?;
-    save_seed_state(operation_context, seed_toml.to_owned(), source_path).await?;
-    Ok(seed_validation)
+    let seed_toml = match (setup_format, parsed_document) {
+        (SetupFileFormat::Toml, _) => setup_text.to_owned(),
+        (_, Some(setup_document)) => write_setup_document(&setup_document, SetupFileFormat::Toml)?,
+        (_, None) => return Err(describe_invalid_setup(&setup_check)),
+    };
+    apply_seed_document(operation_context, &seed_toml).await?;
+    save_seed_state(operation_context, seed_toml, source_path).await?;
+    Ok(setup_check.into_seed_validation())
 }
 
 /// Applies the seed applied last again and deletes the configuration it does not hold, as
@@ -52,7 +77,12 @@ pub async fn apply_seed_toml(
 pub async fn restore_seed_state(
     operation_context: &OperationContext,
 ) -> Result<(), OperationError> {
-    let Some(seed_state) = operation_context.seed_state_repository.find_state().await? else {
+    let Some(seed_state) = operation_context
+        .setup_stores
+        .seed_state
+        .find_state()
+        .await?
+    else {
         return Ok(());
     };
     let applied_keys = apply_seed_document(operation_context, &seed_state.seed_toml).await?;
@@ -91,16 +121,13 @@ pub async fn export_seed_items(
     Ok(exported_items)
 }
 
-fn describe_invalid_seed(seed_validation: &SeedValidation) -> OperationError {
-    let problems = seed_validation
-        .errors
-        .iter()
-        .map(|seed_error| format!("line {}: {}", seed_error.line, seed_error.message))
-        .collect::<Vec<_>>()
-        .join("; ");
+fn describe_invalid_setup(setup_check: &SetupCheck) -> OperationError {
     OperationError::Unprocessable {
         code: "invalid_seed",
-        message: format!("The seed file is not valid: {problems}"),
+        message: format!(
+            "The seed file is not valid: {}",
+            setup_check.describe_problems()
+        ),
     }
 }
 
@@ -108,7 +135,14 @@ async fn apply_seed_document(
     operation_context: &OperationContext,
     seed_toml: &str,
 ) -> Result<AppliedKeys, OperationError> {
-    let prepared_setup = prepare_setup_document(operation_context, seed_toml)?;
+    let setup_document =
+        read_setup_document(seed_toml, SetupFileFormat::Toml).map_err(|read_problem| {
+            OperationError::Unprocessable {
+                code: "invalid_seed",
+                message: read_problem.describe(),
+            }
+        })?;
+    let prepared_setup = prepare_setup_document(operation_context, setup_document)?;
     let mut seed_value = toml::Value::Table(prepared_setup.setup_document);
     let mut missing_variables = Vec::new();
     resolve_environment_references(
@@ -211,7 +245,8 @@ async fn save_seed_state(
     let applied_items_json = serde_json::to_string(&applied_items)
         .map_err(|write_error| OperationError::Internal(write_error.to_string()))?;
     operation_context
-        .seed_state_repository
+        .setup_stores
+        .seed_state
         .save_state(SeedStateRecord {
             seed_toml,
             source_path,

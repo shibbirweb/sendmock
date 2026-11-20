@@ -1,6 +1,7 @@
 use std::future::Future;
 use std::pin::Pin;
 
+use schemars::{Schema, SchemaGenerator};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 
@@ -48,6 +49,9 @@ pub trait SeedSectionAdapter: Send + Sync {
         operation_context: &'step OperationContext,
         kept_item_keys: &'step [String],
     ) -> SeedFuture<'step, ()>;
+
+    /// The JSON Schema of one item, for the setup file's published schema.
+    fn describe_item_schema(&self, schema_generator: &mut SchemaGenerator) -> Schema;
 }
 
 /// Reads a seed table into the section's item type, with the field named on failure.
@@ -115,9 +119,25 @@ pub fn write_changed_fields(
 }
 
 /// Implements `SeedSectionAdapter` for an adapter whose inherent async functions `export`,
-/// `apply` and `remove_unlisted` do the work, so each adapter file holds only its section.
+/// `apply` and `remove_unlisted` do the work, so each adapter file holds only its section. The
+/// third argument is the item's type, whose JSON Schema the setup schema uses, or
+/// `schema = <function>` for a section read without one.
 macro_rules! impl_seed_section_adapter {
-    ($adapter:ty, $section:expr) => {
+    ($adapter:ty, $section:expr, schema = $describe_item_schema:path) => {
+        $crate::seed::seed_section_adapter::impl_seed_section_adapter!(
+            @adapter $adapter, $section, $describe_item_schema
+        );
+    };
+    ($adapter:ty, $section:expr, $item_type:ty) => {
+        $crate::seed::seed_section_adapter::impl_seed_section_adapter!(
+            @adapter $adapter,
+            $section,
+            |schema_generator: &mut ::schemars::SchemaGenerator| {
+                schema_generator.subschema_for::<$item_type>()
+            }
+        );
+    };
+    (@adapter $adapter:ty, $section:expr, $describe_item_schema:expr) => {
         impl $crate::seed::seed_section_adapter::SeedSectionAdapter for $adapter {
             fn section(&self) -> &'static $crate::seed::seed_sections::SeedSection {
                 &$section
@@ -147,6 +167,13 @@ macro_rules! impl_seed_section_adapter {
                 kept_item_keys: &'step [String],
             ) -> $crate::seed::seed_section_adapter::SeedFuture<'step, ()> {
                 Box::pin(Self::remove_unlisted(operation_context, kept_item_keys))
+            }
+
+            fn describe_item_schema(
+                &self,
+                schema_generator: &mut ::schemars::SchemaGenerator,
+            ) -> ::schemars::Schema {
+                ($describe_item_schema)(schema_generator)
             }
         }
     };

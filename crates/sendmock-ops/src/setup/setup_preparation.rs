@@ -10,19 +10,12 @@ pub struct PreparedSetup {
     pub version_decision: SetupVersionDecision,
 }
 
-/// Parses the file, refuses a format this build cannot read before anything is applied, and
-/// upgrades an older format in memory; the user's file is never changed.
+/// Refuses a format this build cannot read before anything is applied, and upgrades an older
+/// format in memory; the user's file is never changed.
 pub fn prepare_setup_document(
     operation_context: &OperationContext,
-    setup_toml: &str,
+    mut setup_document: toml::Table,
 ) -> Result<PreparedSetup, OperationError> {
-    let mut setup_document: toml::Table =
-        setup_toml.parse().map_err(|parse_error: toml::de::Error| {
-            OperationError::Unprocessable {
-                code: "invalid_seed",
-                message: parse_error.message().to_owned(),
-            }
-        })?;
     let version_policy = SetupVersionPolicy::default();
     let setup_header = SetupHeader::read(&setup_document);
     let version_decision = version_policy.decide(&setup_header);

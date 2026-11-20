@@ -93,10 +93,10 @@ fn read_header_value(setup_toml: &str, header_key: &str) -> Option<String> {
         .skip(1)
         .take_while(|line| !line.trim_start().starts_with('['));
     for header_line in header_lines {
-        if let Some((line_key, line_value)) = header_line.split_once('=') {
-            if line_key.trim() == header_key {
-                return Some(line_value.trim().trim_matches('"').to_owned());
-            }
+        if let Some((line_key, line_value)) = header_line.split_once('=')
+            && line_key.trim() == header_key
+        {
+            return Some(line_value.trim().trim_matches('"').to_owned());
         }
     }
     None

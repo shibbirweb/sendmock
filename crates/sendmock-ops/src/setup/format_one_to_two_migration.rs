@@ -6,7 +6,7 @@ use super::setup_migration::SetupMigration;
 pub struct FormatOneToTwoMigration;
 
 impl SetupMigration for FormatOneToTwoMigration {
-    fn from_format_version(&self) -> i64 {
+    fn source_format_version(&self) -> i64 {
         1
     }
 

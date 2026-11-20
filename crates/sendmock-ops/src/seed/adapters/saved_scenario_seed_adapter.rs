@@ -1,3 +1,4 @@
+use schemars::{Schema, SchemaGenerator, json_schema};
 use sendmock_store::SavedScenarioRecord;
 
 use crate::scenarios::check_scenario_file;
@@ -31,6 +32,37 @@ fn read_text_field(item_table: &toml::Table, field_name: &str) -> String {
         .unwrap_or_default()
 }
 
+/// A saved scenario's shape: a scenario file (`name`, `[[steps]]`) with a `description`.
+fn describe_scenario_item_schema(_schema_generator: &mut SchemaGenerator) -> Schema {
+    json_schema!({
+        "description": "A saved scenario: the scenario file's own keys with an optional description, matched by name.",
+        "type": "object",
+        "required": ["name", "steps"],
+        "properties": {
+            "name": { "type": "string" },
+            "description": { "type": "string" },
+            "steps": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "required": ["run"],
+                    "properties": {
+                        "run": {
+                            "description": "The operation, such as `email.list`, or `http`, `assert` or `sleep`.",
+                            "type": "string"
+                        },
+                        "with": { "type": "object" },
+                        "save": {
+                            "description": "The name later steps read this step's output by.",
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    })
+}
+
 impl SavedScenarioSeedAdapter {
     async fn apply(
         operation_context: &OperationContext,
@@ -46,7 +78,7 @@ impl SavedScenarioSeedAdapter {
         let description = read_text_field(&item_table, DESCRIPTION_KEY);
         let scenario_toml = write_scenario_file(&scenario_name, item_table)?;
         check_scenario_file(&scenario_toml)?;
-        let saved_scenarios = &operation_context.saved_scenarios;
+        let saved_scenarios = &operation_context.setup_stores.saved_scenarios;
         let now_unix_ms = operation_context.clock.now_unix_ms();
         let seeded_scenario = match saved_scenarios
             .find_scenario_by_name(&scenario_name)
@@ -73,7 +105,11 @@ impl SavedScenarioSeedAdapter {
     }
 
     async fn export(operation_context: &OperationContext) -> Result<Vec<SeedItem>, OperationError> {
-        let stored_scenarios = operation_context.saved_scenarios.list_scenarios().await?;
+        let stored_scenarios = operation_context
+            .setup_stores
+            .saved_scenarios
+            .list_scenarios()
+            .await?;
         stored_scenarios
             .into_iter()
             .map(|stored_scenario| {
@@ -103,7 +139,7 @@ impl SavedScenarioSeedAdapter {
         operation_context: &OperationContext,
         kept_item_keys: &[String],
     ) -> Result<(), OperationError> {
-        let saved_scenarios = &operation_context.saved_scenarios;
+        let saved_scenarios = &operation_context.setup_stores.saved_scenarios;
         for stored_scenario in saved_scenarios.list_scenarios().await? {
             if !kept_item_keys.contains(&stored_scenario.name) {
                 saved_scenarios
@@ -115,4 +151,8 @@ impl SavedScenarioSeedAdapter {
     }
 }
 
-impl_seed_section_adapter!(SavedScenarioSeedAdapter, SCENARIOS_SECTION);
+impl_seed_section_adapter!(
+    SavedScenarioSeedAdapter,
+    SCENARIOS_SECTION,
+    schema = describe_scenario_item_schema
+);

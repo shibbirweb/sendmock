@@ -33,7 +33,11 @@ impl Operation for ListSavedScenariosOperation {
         operation_context: &OperationContext,
         _input: NoInput,
     ) -> Result<Vec<SavedScenario>, OperationError> {
-        let stored_scenarios = operation_context.saved_scenarios.list_scenarios().await?;
+        let stored_scenarios = operation_context
+            .setup_stores
+            .saved_scenarios
+            .list_scenarios()
+            .await?;
         Ok(stored_scenarios
             .into_iter()
             .map(SavedScenario::from)
@@ -114,6 +118,7 @@ impl Operation for SaveScenarioOperation {
             updated_at_unix_ms: now_unix_ms,
         };
         operation_context
+            .setup_stores
             .saved_scenarios
             .save_scenario(new_scenario.clone())
             .await?;
@@ -171,6 +176,7 @@ impl Operation for UpdateSavedScenarioOperation {
             ..stored_scenario
         };
         operation_context
+            .setup_stores
             .saved_scenarios
             .save_scenario(changed_scenario.clone())
             .await?;
@@ -205,6 +211,7 @@ impl Operation for DeleteSavedScenarioOperation {
     ) -> Result<NoContent, OperationError> {
         let stored_scenario = find_saved_scenario(operation_context, &input.scenario_id).await?;
         operation_context
+            .setup_stores
             .saved_scenarios
             .delete_scenario(&stored_scenario.scenario_id)
             .await?;

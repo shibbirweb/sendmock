@@ -9,7 +9,7 @@ pub async fn find_saved_scenario(
     operation_context: &OperationContext,
     scenario_id_or_name: &str,
 ) -> Result<SavedScenarioRecord, OperationError> {
-    let saved_scenarios = &operation_context.saved_scenarios;
+    let saved_scenarios = &operation_context.setup_stores.saved_scenarios;
     if let Some(stored_scenario) = saved_scenarios.find_scenario(scenario_id_or_name).await? {
         return Ok(stored_scenario);
     }
@@ -34,6 +34,7 @@ pub async fn check_scenario_name(
         });
     }
     let same_name_scenario = operation_context
+        .setup_stores
         .saved_scenarios
         .find_scenario_by_name(scenario_name)
         .await?;

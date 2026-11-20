@@ -1,3 +1,4 @@
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -19,7 +20,7 @@ use crate::{OperationContext, OperationError};
 /// `[[sms.providers]]` and `[[email.providers]]`, matched by `key`: an edited or removed
 /// built-in, or a custom provider, with its definition as JSON and secret credentials as
 /// `${ENV_VAR}` references.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 struct SeedMessageProvider {
     key: String,
@@ -221,5 +222,13 @@ fn read_provider_update(
     to_api_input(definition_fields)
 }
 
-impl_seed_section_adapter!(SmsProviderSeedAdapter, SMS_PROVIDERS_SECTION);
-impl_seed_section_adapter!(EmailProviderSeedAdapter, EMAIL_PROVIDERS_SECTION);
+impl_seed_section_adapter!(
+    SmsProviderSeedAdapter,
+    SMS_PROVIDERS_SECTION,
+    SeedMessageProvider
+);
+impl_seed_section_adapter!(
+    EmailProviderSeedAdapter,
+    EMAIL_PROVIDERS_SECTION,
+    SeedMessageProvider
+);

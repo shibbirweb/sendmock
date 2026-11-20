@@ -1,3 +1,4 @@
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use super::message_rule_seed::{
@@ -12,7 +13,7 @@ use crate::webhooks::RuleFilter;
 use crate::{OperationContext, OperationError};
 
 /// `[[email.tag_rules]]`, matched by `name`, in the order they run.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 struct SeedTagRule {
     name: String,
@@ -78,4 +79,4 @@ impl TagRuleSeedAdapter {
     }
 }
 
-impl_seed_section_adapter!(TagRuleSeedAdapter, TAG_RULES_SECTION);
+impl_seed_section_adapter!(TagRuleSeedAdapter, TAG_RULES_SECTION, SeedTagRule);
