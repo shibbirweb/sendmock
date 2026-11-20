@@ -8,6 +8,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { EmailAttachmentStrip } from "@/features/mail/detail/email-attachment-strip";
 import { ExtractedDataPanel } from "@/features/mail/detail/extracted-data-panel";
 import { MailDetailHeader } from "@/features/mail/detail/mail-detail-header";
 import { EmailHtmlPreview } from "@/features/mail/detail/preview/email-html-preview";
@@ -135,9 +136,11 @@ export function MailDetail({ emailId }: { emailId: string }) {
         </TabsList>
         <TabsContent value="html">
           <EmailHtmlPreview email={email} />
+          <EmailAttachmentStrip attachments={email.attachments} />
         </TabsContent>
         <TabsContent value="text">
           <EmailTextTab email={email} />
+          <EmailAttachmentStrip attachments={email.attachments} />
         </TabsContent>
         <TabsContent value="source">
           <EmailSourceTab email={email} />

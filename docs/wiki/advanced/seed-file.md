@@ -3,14 +3,14 @@ title: Seed file
 description: Keep your SendMock setup in your repository. Export, commit, validate, apply, reset before tests, and keep secrets out.
 ---
 
-> In your install today: settings, webhook endpoints, rules, templates, variables and saved deliveries, Verify services, Messaging Services, numbers, custom outcome numbers and addresses, edited or removed SMS providers, and payment flows, methods and gateways (custom ones and edited built-ins) are applied, exported and restored. HTTP bins, tag and forward rules, email providers and custom SMS providers come with their features; until then those sections are checked and skipped with a warning. Try the full flow in the [demo](/demo/settings?section=seed).
+> Every section is applied, exported and restored: settings, projects, webhook endpoints, rules, templates, variables and saved deliveries, Verify services, Messaging Services, numbers, custom outcome numbers and addresses, email templates, tag, forward and inbound rules, email and SMS providers, payment flows, methods and gateways, HTTP Catcher bins and saved scenarios. Try the full flow in the [demo](/demo/settings?section=setup).
 
 `sendmock.seed.toml` is the configuration SendMock starts from and resets to. Commit it next to your app's code, and everyone (teammates, CI, an AI agent) gets the same endpoints, rules, templates, variables, numbers, Messaging Services, Verify services, outcome rules, bins, saved deliveries, payment setup and settings.
 
 ## Export what you built
 
 1. Build your setup in the UI.
-2. In **Settings > Seed**, press **Export sendmock.seed.toml**. The card also lists what changed since the seed was applied.
+2. In **Settings > Setup**, press **Export sendmock.seed.toml**. The card also lists what changed since the seed was applied.
 3. Commit the file.
 
 ## Load it
@@ -23,7 +23,7 @@ Endpoints are matched by name; rules, variables and saved deliveries refer to th
 
 ## Apply a changed file
 
-In **Settings > Seed**, **Apply a seed file**: upload or paste it, press **Validate** (errors come with line numbers, and a summary lists what would change), then apply and confirm. Or `sendmock seed validate` and `sendmock seed apply`.
+In **Settings > Setup**, **Import a setup**: upload or paste it, press **Preview** (errors come with line numbers, and the preview lists what would be added, changed and removed), then import and confirm. Or `sendmock seed validate` and `sendmock seed apply`, or `sendmock setup validate` and `sendmock setup import` for JSON, YAML, a URL, encrypted secrets and **Replace**. See [Recipe: share your setup](../recipes/share-your-setup.md).
 
 ## Reset before every test run
 

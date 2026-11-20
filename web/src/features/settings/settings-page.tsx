@@ -11,10 +11,10 @@ import { EmailSection } from "@/features/settings/sections/email-section";
 import { GeneralSection } from "@/features/settings/sections/general-section";
 import { OpenedEventsSection } from "@/features/settings/sections/opened-events-section";
 import { OtpPatternsSection } from "@/features/settings/sections/otp-patterns-section";
-import { SeedSection } from "@/features/settings/sections/seed-section";
 import { NotificationsSection } from "@/features/settings/sections/notifications-section";
 import { PaymentsSection } from "@/features/settings/sections/payments-section";
 import { ProjectsSection } from "@/features/settings/sections/projects-section";
+import { SetupSection } from "@/features/settings/sections/setup/setup-section";
 import { SmsSection } from "@/features/settings/sections/sms-section";
 import { SettingsNav } from "@/features/settings/settings-nav";
 import {
@@ -34,8 +34,8 @@ function SelectedSection({
   switch (sectionId) {
     case "general":
       return <GeneralSection appSettings={appSettings} />;
-    case "seed":
-      return <SeedSection />;
+    case "setup":
+      return <SetupSection />;
     case "projects":
       return <ProjectsSection />;
     case "email":
@@ -79,8 +79,8 @@ export function SettingsPage() {
         <header className="grid gap-1">
           <h2 className="text-xl font-semibold">Settings</h2>
           <p className="text-sm text-muted-foreground">
-            Changes apply at once, without a restart. Export them to the seed
-            file to keep them across resets.
+            Changes apply at once, without a restart. Export them as a setup to
+            keep them across resets or carry them to another machine.
           </p>
         </header>
         <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[12rem_minmax(0,1fr)]">

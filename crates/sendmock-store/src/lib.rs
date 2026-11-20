@@ -22,6 +22,7 @@ mod payment_subscription;
 mod project;
 mod push;
 mod retention;
+mod saved_scenario;
 mod saved_webhook_delivery;
 mod seed_state;
 mod settings;
@@ -82,6 +83,7 @@ pub use push::{
     PushNotificationRepository,
 };
 pub use retention::{PrunableTable, TrafficPruner};
+pub use saved_scenario::{SavedScenarioRecord, SavedScenarioRepository};
 pub use saved_webhook_delivery::{SavedWebhookDeliveryRecord, SavedWebhookDeliveryRepository};
 pub use seed_state::{SeedStateRecord, SeedStateRepository};
 pub use settings::SettingsRepository;

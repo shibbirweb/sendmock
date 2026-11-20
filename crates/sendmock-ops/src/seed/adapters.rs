@@ -1,7 +1,11 @@
 mod email_outcome_rule_seed_adapter;
 mod email_template_seed_adapter;
 mod endpoint_names;
+mod forward_rule_seed_adapter;
+mod http_bin_seed_adapter;
+mod inbound_route_seed_adapter;
 mod message_provider_seed_adapter;
+mod message_rule_seed;
 mod messaging_service_seed_adapter;
 mod payment_definition_seed;
 mod payment_flow_seed_adapter;
@@ -9,8 +13,10 @@ mod payment_gateway_seed_adapter;
 mod payment_method_seed_adapter;
 mod project_seed_adapter;
 mod saved_delivery_seed_adapter;
+mod saved_scenario_seed_adapter;
 mod settings_seed_adapter;
 mod sms_outcome_rule_seed_adapter;
+mod tag_rule_seed_adapter;
 mod verify_service_seed_adapter;
 mod virtual_number_seed_adapter;
 mod webhook_endpoint_seed_adapter;
@@ -20,6 +26,9 @@ mod webhook_variable_seed_adapter;
 
 use email_outcome_rule_seed_adapter::EmailOutcomeRuleSeedAdapter;
 use email_template_seed_adapter::EmailTemplateSeedAdapter;
+use forward_rule_seed_adapter::ForwardRuleSeedAdapter;
+use http_bin_seed_adapter::HttpBinSeedAdapter;
+use inbound_route_seed_adapter::InboundRouteSeedAdapter;
 use message_provider_seed_adapter::{EmailProviderSeedAdapter, SmsProviderSeedAdapter};
 use messaging_service_seed_adapter::MessagingServiceSeedAdapter;
 use payment_flow_seed_adapter::PaymentFlowSeedAdapter;
@@ -27,8 +36,10 @@ use payment_gateway_seed_adapter::PaymentGatewaySeedAdapter;
 use payment_method_seed_adapter::PaymentMethodSeedAdapter;
 use project_seed_adapter::ProjectSeedAdapter;
 use saved_delivery_seed_adapter::SavedDeliverySeedAdapter;
+use saved_scenario_seed_adapter::SavedScenarioSeedAdapter;
 use settings_seed_adapter::SettingsSeedAdapter;
 use sms_outcome_rule_seed_adapter::SmsOutcomeRuleSeedAdapter;
+use tag_rule_seed_adapter::TagRuleSeedAdapter;
 use verify_service_seed_adapter::VerifyServiceSeedAdapter;
 use virtual_number_seed_adapter::VirtualNumberSeedAdapter;
 use webhook_endpoint_seed_adapter::WebhookEndpointSeedAdapter;
@@ -42,8 +53,8 @@ use super::seed_section_adapter::SeedSectionAdapter;
 /// before the numbers that join it, and a template before the endpoints that render it, which
 /// exist before their variables, rules and saved deliveries; a payment flow exists before the
 /// methods that run it, which exist before the gateways that offer them, after the endpoints
-/// gateways notify. Sections without an adapter (HTTP
-/// bins, tag and forward rules) are reported and skipped.
+/// gateways notify. HTTP bins, email tag, forward and inbound rules and saved scenarios refer to
+/// nothing else, so they come last.
 pub fn seed_section_adapters() -> Vec<Box<dyn SeedSectionAdapter>> {
     vec![
         Box::new(SettingsSeedAdapter),
@@ -64,5 +75,10 @@ pub fn seed_section_adapters() -> Vec<Box<dyn SeedSectionAdapter>> {
         Box::new(PaymentFlowSeedAdapter),
         Box::new(PaymentMethodSeedAdapter),
         Box::new(PaymentGatewaySeedAdapter),
+        Box::new(HttpBinSeedAdapter),
+        Box::new(TagRuleSeedAdapter),
+        Box::new(ForwardRuleSeedAdapter),
+        Box::new(InboundRouteSeedAdapter),
+        Box::new(SavedScenarioSeedAdapter),
     ]
 }

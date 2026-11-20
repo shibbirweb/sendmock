@@ -1,0 +1,17 @@
+# A seed file as SendMock wrote it before setup files had versions (format 1): no
+# [sendmock] header. Kept unchanged so every release proves it still upgrades and applies.
+[settings]
+sms_simulation_profile = "manual"
+
+[[verify.services]]
+sid = "VA00000000000000000000000000000001"
+name = "Login"
+fixed_code = "123456"
+
+[[numbers]]
+number = "+15550001111"
+label = "Support line"
+
+[[email.outcome_rules]]
+pattern = "*@bounce.qa.test"
+outcome = "hard_bounce"

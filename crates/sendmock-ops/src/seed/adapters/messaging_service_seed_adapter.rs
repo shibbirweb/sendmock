@@ -1,3 +1,4 @@
+use schemars::JsonSchema;
 use sendmock_store::MessagingServiceRecord;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -12,7 +13,7 @@ use crate::{OperationContext, OperationError};
 
 /// `[[messaging_services]]`, matched by `sid`. Numbers join a service through their own
 /// `messaging_service` field, so the pool is not listed here.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 struct SeedMessagingService {
     sid: String,
@@ -123,4 +124,8 @@ impl MessagingServiceSeedAdapter {
     }
 }
 
-impl_seed_section_adapter!(MessagingServiceSeedAdapter, MESSAGING_SERVICES_SECTION);
+impl_seed_section_adapter!(
+    MessagingServiceSeedAdapter,
+    MESSAGING_SERVICES_SECTION,
+    SeedMessagingService
+);

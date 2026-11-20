@@ -7,6 +7,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct HttpMockResponse {
     pub status_code: u16,
+    /// Optional in a hand-written setup file, where most responses set no header.
+    #[serde(default)]
     pub headers: BTreeMap<String, String>,
     /// A template that can echo the request.
     pub body: String,

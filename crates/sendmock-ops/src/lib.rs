@@ -41,6 +41,7 @@ mod samples;
 mod scenarios;
 mod seed;
 mod settings;
+mod setup;
 mod sms;
 mod sms_replies;
 mod smtp_chaos;
@@ -121,13 +122,25 @@ pub use samples::{CreateSampleOperation, CreatedSample, SampleEmail, SampleEmail
 pub use seed::{
     ApplySeedOperation, EnvironmentReader, ExportSeedOperation, FixedEnvironment,
     GetSeedStatusOperation, ProcessEnvironment, SeedChangedItem, SeedFileRequest, SeedItemChange,
-    SeedItemCount, SeedStatus, SeedValidation, SeedValidationError, ValidateSeedOperation,
-    apply_seed_toml, restore_seed_state, validate_seed_toml,
+    SeedItemCount, SeedStatus, SeedValidation, SeedValidationError, SetupCheck, SetupImportOptions,
+    ValidateSeedOperation, apply_seed_toml, apply_setup_text, check_setup_text, restore_seed_state,
+    validate_seed_toml, write_setup_text,
 };
 pub use settings::{
     AppSettings, AppSettingsStore, AppSettingsUpdate, EmailOutcomeProfile, SmsSimulationProfile,
     UpdateCheckMode, build_ingest_options, list_unbounded_traffic, prune_traffic,
     read_ingest_options,
+};
+pub use setup::{
+    CURRENT_FORMAT_VERSION, DownloadedSetup, ENCRYPTED_SECRET_PREFIX, EncryptedSecretWriter,
+    ExportSetupOperation, FetchedSetupFile, ImportSetupOperation, MigrateSetupOperation,
+    SETUP_FORMAT_NAME, SecretReferenceWriter, SetupExportRequest, SetupFetchError,
+    SetupFetchFuture, SetupFetchLimits, SetupFetchRequest, SetupFetcher, SetupFileFormat,
+    SetupHeader, SetupImportMode, SetupImportRequest, SetupMigrateRequest, SetupProblem,
+    SetupRequestHeader, SetupSecretError, SetupSecretWriter, SetupSectionChange, SetupUrlSource,
+    SetupValidation, SetupValidationError, SetupVersionDecision, SetupVersionPolicy,
+    ValidateSetupOperation, build_setup_json_schema, download_setup, is_plain_http_address_allowed,
+    read_setup_document, setup_json_schema_url, write_setup_document,
 };
 pub use sms::{
     FetchedMedia, HttpCallResult, IncomingSms, MediaFetcher, RecordedHttpRequest,
@@ -175,6 +188,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     operation_registry.register(ExportSeedOperation);
     operation_registry.register(ValidateSeedOperation);
     operation_registry.register(ApplySeedOperation);
+    setup::register_setup_operations(&mut operation_registry);
     operation_registry.register(GetStatsOperation);
     email::register_email_operations(&mut operation_registry);
     events::register_event_operations(&mut operation_registry);

@@ -57,7 +57,7 @@ pub use payment_flow_step_operations::{
     RemovePaymentFlowStepOperation, UpdatePaymentFlowStepOperation,
 };
 pub use payment_flow_views::{PaymentFlowDefinition, PaymentFlowStep};
-pub(crate) use payment_gateway_catalogue::find_payment_gateway;
+pub(crate) use payment_gateway_catalogue::{find_payment_gateway, load_payment_gateways};
 pub use payment_gateway_maintenance_operations::{
     DeletePaymentGatewayOperation, ResetPaymentGatewayOperation, RevealGatewayCredentialOperation,
 };
@@ -68,6 +68,7 @@ pub use payment_gateway_operations::{
 pub use payment_gateway_preview_operation::PreviewPaymentGatewayOperation;
 pub use payment_gateway_views::PaymentGatewayDefinition;
 pub(crate) use payment_gateway_views::PaymentGatewayFields;
+pub(crate) use payment_gateway_views::PaymentGatewayRecord;
 pub(crate) use payment_method_catalogue::find_payment_method;
 pub use payment_method_operations::{
     CreatePaymentMethodOperation, DeletePaymentMethodOperation, GetPaymentMethodOperation,

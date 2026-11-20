@@ -101,25 +101,27 @@ test("PL-04.6 the seed can be exported, validated and applied", async ({
   const seedDownload = await downloadPromise;
   expect(seedDownload.suggestedFilename()).toBe("sendmock.seed.toml");
 
-  const seedField = page.getByLabel("Seed file (TOML)");
-  await seedField.fill('[[numbers]]\nnumber = "+15550007777\nlabel = Sales');
-  await page.getByRole("button", { name: "Validate" }).click();
-  await expect(page.getByRole("list", { name: "Seed errors" })).toContainText(
+  const setupField = page.getByLabel("Setup file", { exact: true });
+  await setupField.fill('[[numbers]]\nnumber = "+15550007777\nlabel = Sales');
+  await page.getByRole("button", { name: "Preview" }).click();
+  await expect(page.getByRole("list", { name: "Setup errors" })).toContainText(
     "Line 2: A string is missing its closing quote",
   );
-  await expect(page.getByRole("button", { name: "Apply" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Import" })).toBeDisabled();
 
-  await seedField.fill('[[numbers]]\nnumber = "+15550007777"\nlabel = "Sales"');
-  await page.getByRole("button", { name: "Validate" }).click();
-  await expect(page.getByRole("list", { name: "Seed summary" })).toContainText(
+  await setupField.fill(
+    '[[numbers]]\nnumber = "+15550007777"\nlabel = "Sales"',
+  );
+  await page.getByRole("button", { name: "Preview" }).click();
+  await expect(page.getByRole("list", { name: "Setup summary" })).toContainText(
     "1 x Virtual number",
   );
-  await page.getByRole("button", { name: "Apply", exact: true }).click();
+  await page.getByRole("button", { name: "Import", exact: true }).click();
   await page
     .getByRole("alertdialog")
-    .getByRole("button", { name: "Apply" })
+    .getByRole("button", { name: "Import" })
     .click();
-  await expect(page.getByText("Seed file applied")).toBeVisible();
+  await expect(page.getByText("Setup imported")).toBeVisible();
 });
 
 test("EM-05.5 the OTP tester shows the matching pattern and invalid patterns are flagged", async ({

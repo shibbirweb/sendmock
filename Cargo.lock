@@ -3204,6 +3204,7 @@ version = "1.2.0"
 dependencies = [
  "base64 0.23.1",
  "hmac",
+ "ring",
  "schemars",
  "sendmock-core",
  "sendmock-mail",
@@ -3214,6 +3215,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_urlencoded",
+ "serde_yaml_ng",
  "sha1 0.11.0",
  "sha2",
  "tempfile",

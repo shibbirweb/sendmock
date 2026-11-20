@@ -19,6 +19,7 @@ use crate::demo_startup::load_demo_data_at_startup;
 use crate::email_network_clients::with_email_network_clients;
 use crate::http_call_sender::{HttpCallSender, REPLY_WEBHOOK_TIMEOUT, STATUS_CALLBACK_TIMEOUT};
 use crate::http_media_fetcher::HttpMediaFetcher;
+use crate::http_setup_fetcher::HttpSetupFetcher;
 use crate::http_webhook_sender::HttpWebhookSender;
 use crate::instance_details_builder::build_instance_details;
 use crate::listener_binding::bind_listener;
@@ -272,7 +273,8 @@ fn build_operation_context(database: Database, listeners: &BoundListeners) -> Op
     .with_sample_email_sender(Arc::new(SmtpSubmissionClient::new(reachable_address(
         listeners.addresses.smtp_addr,
     ))))
-    .with_update_checker(build_update_checker());
+    .with_update_checker(build_update_checker())
+    .with_setup_fetcher(Arc::new(HttpSetupFetcher));
     let operation_context = with_email_network_clients(operation_context);
     let operation_context = match HttpMediaFetcher::new() {
         Some(media_fetcher) => operation_context.with_media_fetcher(Arc::new(media_fetcher)),

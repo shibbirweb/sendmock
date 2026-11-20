@@ -1,3 +1,4 @@
+use schemars::JsonSchema;
 use sendmock_store::WebhookRuleRecord;
 use serde::{Deserialize, Serialize};
 
@@ -11,7 +12,7 @@ use crate::{OperationContext, OperationError};
 
 /// `[[webhook.rules]]`, matched by `name`; `endpoint` is the endpoint's name and `filter` takes
 /// the same shape as the API.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 struct SeedWebhookRule {
     name: String,
@@ -151,4 +152,8 @@ async fn save_seeded_rule(
     Ok(())
 }
 
-impl_seed_section_adapter!(WebhookRuleSeedAdapter, WEBHOOK_RULES_SECTION);
+impl_seed_section_adapter!(
+    WebhookRuleSeedAdapter,
+    WEBHOOK_RULES_SECTION,
+    SeedWebhookRule
+);

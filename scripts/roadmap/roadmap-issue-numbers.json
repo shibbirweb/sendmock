@@ -935,7 +935,8 @@
   "PL-18": {
     "number": 287,
     "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhJIk-w",
-    "isFieldsSet": true
+    "isFieldsSet": true,
+    "isClosed": true
   },
   "WS-13": {
     "number": 293,
@@ -1018,5 +1019,11 @@
     "number": 322,
     "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhKP3dI",
     "isFieldsSet": true
+  },
+  "AI-07": {
+    "number": 325,
+    "itemId": "PVTI_lAHOAiP0Xc4BqkKVzhKcbD8",
+    "isFieldsSet": true,
+    "isClosed": true
   }
 }

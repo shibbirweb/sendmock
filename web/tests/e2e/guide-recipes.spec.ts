@@ -227,7 +227,7 @@ test("WS-06.4 recipe replay a failed webhook: Replay as-is makes a replay delive
 test("WS-06.4 recipe share your setup: the seed file downloads", async ({
   page,
 }) => {
-  await page.goto("/settings?section=seed");
+  await page.goto("/settings?section=setup");
   const seedDownload = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export sendmock.seed.toml" }).click();
   expect((await seedDownload).suggestedFilename()).toBe("sendmock.seed.toml");

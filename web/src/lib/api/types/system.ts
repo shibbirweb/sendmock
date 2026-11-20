@@ -393,12 +393,15 @@ export type SeedValidationError = {
   message: string;
 };
 
+/** How many items of one kind a setup file holds. */
+export type SeedItemCount = { item_kind: string; item_count: number };
+
 /** Result of POST /api/v1/seed/validate (and of apply when invalid). */
 export type SeedValidation = {
   is_valid: boolean;
   errors: SeedValidationError[];
   /** How many items of each kind the file would create or update. */
-  summary: { item_kind: string; item_count: number }[];
+  summary: SeedItemCount[];
 };
 
 /** Body of POST /api/v1/seed/validate and /seed/apply. */

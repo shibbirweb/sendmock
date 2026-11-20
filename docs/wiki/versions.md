@@ -38,6 +38,17 @@ Under the **Version** menu, every version has two links of its own:
 
 The app does this for you: the guide links in its header and the Help menu open the docs of its own version.
 
+## Setup file format versions
+
+A setup file names its format version in its `[sendmock]` header ([Configuration](./configuration.md#setup-files-toml-json-or-yaml-with-a-version)). The format version is not the SendMock version: it changes only when a section or key changes shape, in a minor or major release. Every release reads every format version written since 1.0, upgrading older ones for the import.
+
+| Format version | Introduced in | What changed | JSON Schema |
+| --- | --- | --- | --- |
+| 1 | 1.0.0 | the seed file, with no `[sendmock]` header | none |
+| 2 | 1.3.0 | the `[sendmock]` header; JSON and YAML; encrypted secrets; `[[http.bins]]`, `[[email.tag_rules]]`, `[[email.forward_rules]]`, `[[email.inbound_routes]]` and `[[scenarios]]` | [`/schema/setup/v2.json`](/schema/setup/v2.json) |
+
+A file from a newer format version than your SendMock reads is refused with the version to update to; update SendMock the way you installed it ([Install](./install.md)).
+
 ## Related
 
 - [Install](./install.md): stable and beta builds for every system

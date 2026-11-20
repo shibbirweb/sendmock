@@ -34,6 +34,12 @@ export const toolFeatureSummaries: Record<string, FeatureSummary> = {
       "`llms.txt` and `llms-full.txt` describing SendMock and every docs page for language models.",
     outcome: "Agents and LLM tools find accurate, current documentation.",
   },
+  "AI-07": {
+    summary:
+      "Save scenarios by name, then list, open, edit, rename, delete and run them from the Scenarios screen, REST, CLI and MCP; saved scenarios travel in a setup file.",
+    outcome:
+      "Keep the end-to-end checks you rely on in SendMock and share them with the rest of your setup.",
+  },
   "UI-01": {
     summary:
       "The app shell: sidebar navigation, command palette, keyboard shortcuts, themes and a responsive layout.",

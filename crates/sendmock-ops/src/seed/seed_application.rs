@@ -3,13 +3,18 @@ use std::collections::BTreeMap;
 use sendmock_store::SeedStateRecord;
 use serde::{Deserialize, Serialize};
 
+use super::SeedValidation;
 use super::adapters::seed_section_adapters;
-use super::environment_references::resolve_environment_references;
 use super::seed_document::{list_unsupported_sections, read_section_items};
+use super::seed_preparation::prepare_seed_for_apply;
 use super::seed_section_adapter::SeedSectionAdapter;
 use super::seed_sections::format_section_header;
-use super::{SeedValidation, validate_seed_toml};
-use crate::{OperationContext, OperationError};
+use super::seed_validator::{SetupCheck, check_setup_text};
+use crate::setup::{
+    SecretReferenceWriter, SetupFileFormat, SetupImportMode, blank_encrypted_secrets,
+    prepare_setup_document, read_setup_document, write_setup_document,
+};
+use crate::{AppSettings, OperationContext, OperationError};
 
 /// One item of the configuration as the seed state keeps it, to tell what changed since.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -24,21 +29,72 @@ pub struct AppliedSeedItem {
 /// The item keys each section's apply touched, by section path.
 type AppliedKeys = BTreeMap<&'static str, Vec<String>>;
 
-/// Checks the file, applies every section it holds through the API's own checks, and keeps it
-/// as the seed state, so reset restores it and seed status compares against it. An invalid
-/// file changes nothing; an item the API refuses stops the apply with its section and number.
+/// How a setup is imported: where it came from, for the seed status, the passphrase that
+/// opens its encrypted secrets, and whether it merges or replaces.
+#[derive(Clone, Default)]
+pub struct SetupImportOptions {
+    pub source_path: Option<String>,
+    pub passphrase: Option<String>,
+    pub import_mode: SetupImportMode,
+}
+
+/// Checks a TOML seed file, applies it and keeps it as the seed state (see `apply_setup_text`).
 pub async fn apply_seed_toml(
     operation_context: &OperationContext,
     seed_toml: &str,
     source_path: Option<String>,
 ) -> Result<SeedValidation, OperationError> {
-    let seed_validation = validate_seed_toml(seed_toml);
-    if !seed_validation.is_valid {
-        return Err(describe_invalid_seed(&seed_validation));
+    apply_setup_text(
+        operation_context,
+        seed_toml,
+        SetupFileFormat::Toml,
+        SetupImportOptions {
+            source_path,
+            ..SetupImportOptions::default()
+        },
+    )
+    .await
+}
+
+/// Checks the file, applies every section it holds through the API's own checks, and keeps it
+/// as the seed state (in TOML, whatever format it came in), so reset restores it and seed
+/// status compares against it. A file of a format version this build cannot read, an invalid
+/// one, or one whose encrypted secrets the passphrase does not open, changes nothing; an item
+/// the API refuses stops the apply with its section and number. The seed state keeps the
+/// encrypted secrets emptied, never in plain text.
+pub async fn apply_setup_text(
+    operation_context: &OperationContext,
+    setup_text: &str,
+    setup_format: SetupFileFormat,
+    import_options: SetupImportOptions,
+) -> Result<SeedValidation, OperationError> {
+    let parsed_document = read_setup_document(setup_text, setup_format).ok();
+    if let Some(setup_document) = &parsed_document {
+        prepare_setup_document(operation_context, setup_document.clone())?;
     }
-    apply_seed_document(operation_context, seed_toml).await?;
-    save_seed_state(operation_context, seed_toml.to_owned(), source_path).await?;
-    Ok(seed_validation)
+    let setup_check = check_setup_text(setup_text, setup_format);
+    if !setup_check.is_valid() {
+        return Err(describe_invalid_setup(&setup_check));
+    }
+    let seed_toml = match (setup_format, parsed_document) {
+        (SetupFileFormat::Toml, _) => setup_text.to_owned(),
+        (_, Some(setup_document)) => write_setup_document(&setup_document, SetupFileFormat::Toml)?,
+        (_, None) => return Err(describe_invalid_setup(&setup_check)),
+    };
+    apply_seed_document(
+        operation_context,
+        &seed_toml,
+        import_options.passphrase.as_deref(),
+        import_options.import_mode,
+    )
+    .await?;
+    save_seed_state(
+        operation_context,
+        blank_encrypted_secrets(&seed_toml),
+        import_options.source_path,
+    )
+    .await?;
+    Ok(setup_check.into_seed_validation())
 }
 
 /// Applies the seed applied last again and deletes the configuration it does not hold, as
@@ -46,17 +102,21 @@ pub async fn apply_seed_toml(
 pub async fn restore_seed_state(
     operation_context: &OperationContext,
 ) -> Result<(), OperationError> {
-    let Some(seed_state) = operation_context.seed_state_repository.find_state().await? else {
+    let Some(seed_state) = operation_context
+        .setup_stores
+        .seed_state
+        .find_state()
+        .await?
+    else {
         return Ok(());
     };
-    let applied_keys = apply_seed_document(operation_context, &seed_state.seed_toml).await?;
-    for section_adapter in seed_section_adapters() {
-        let section_path = section_adapter.section().section_path;
-        let kept_item_keys = applied_keys.get(section_path).cloned().unwrap_or_default();
-        section_adapter
-            .remove_items_except(operation_context, &kept_item_keys)
-            .await?;
-    }
+    apply_seed_document(
+        operation_context,
+        &seed_state.seed_toml,
+        None,
+        SetupImportMode::Replace,
+    )
+    .await?;
     save_seed_state(
         operation_context,
         seed_state.seed_toml,
@@ -72,7 +132,10 @@ pub async fn export_seed_items(
     let mut exported_items = Vec::new();
     for section_adapter in seed_section_adapters() {
         let seed_section = section_adapter.section();
-        for seed_item in section_adapter.export_items(operation_context).await? {
+        for seed_item in section_adapter
+            .export_items(operation_context, &SecretReferenceWriter)
+            .await?
+        {
             exported_items.push(AppliedSeedItem {
                 section_path: seed_section.section_path.to_owned(),
                 item_kind: seed_section.item_kind.to_owned(),
@@ -85,56 +148,55 @@ pub async fn export_seed_items(
     Ok(exported_items)
 }
 
-fn describe_invalid_seed(seed_validation: &SeedValidation) -> OperationError {
-    let problems = seed_validation
-        .errors
-        .iter()
-        .map(|seed_error| format!("line {}: {}", seed_error.line, seed_error.message))
-        .collect::<Vec<_>>()
-        .join("; ");
+fn describe_invalid_setup(setup_check: &SetupCheck) -> OperationError {
     OperationError::Unprocessable {
         code: "invalid_seed",
-        message: format!("The seed file is not valid: {problems}"),
+        message: format!(
+            "The seed file is not valid: {}",
+            setup_check.describe_problems()
+        ),
     }
 }
 
+/// Applies every section in order. Replace first puts the settings back to their defaults and
+/// afterwards removes the items the file does not hold, as reset does.
 async fn apply_seed_document(
     operation_context: &OperationContext,
     seed_toml: &str,
+    passphrase: Option<&str>,
+    import_mode: SetupImportMode,
 ) -> Result<AppliedKeys, OperationError> {
-    let mut seed_value: toml::Value =
-        toml::from_str(seed_toml).map_err(|parse_error| OperationError::Unprocessable {
-            code: "invalid_seed",
-            message: parse_error.message().to_owned(),
-        })?;
-    let mut missing_variables = Vec::new();
-    resolve_environment_references(
-        &mut seed_value,
-        operation_context.environment_reader.as_ref(),
-        &mut missing_variables,
-    );
-    if !missing_variables.is_empty() {
-        tracing::warn!(
-            ?missing_variables,
-            "seed file references unset environment variables"
-        );
-    }
-    let toml::Value::Table(seed_document) = seed_value else {
-        return Ok(AppliedKeys::new());
-    };
+    let prepared_seed = prepare_seed_for_apply(operation_context, seed_toml, passphrase)?;
     let section_adapters = seed_section_adapters();
-    warn_about_unsupported_sections(&seed_document, &section_adapters);
+    warn_about_unsupported_sections(&prepared_seed.seed_document, &section_adapters);
+    if import_mode == SetupImportMode::Replace {
+        operation_context
+            .settings_store
+            .save(
+                AppSettings::default(),
+                operation_context.clock.now_unix_ms(),
+            )
+            .await?;
+    }
     let mut applied_keys = AppliedKeys::new();
     for section_adapter in &section_adapters {
-        let seed_section = section_adapter.section();
         let item_keys = apply_section(
             operation_context,
             section_adapter.as_ref(),
-            &seed_document,
-            &missing_variables,
+            &prepared_seed.seed_document,
+            &prepared_seed.missing_variables,
         )
         .await?;
-        applied_keys.insert(seed_section.section_path, item_keys);
+        applied_keys.insert(section_adapter.section().section_path, item_keys);
+    }
+    if import_mode == SetupImportMode::Replace {
+        for section_adapter in &section_adapters {
+            let section_path = section_adapter.section().section_path;
+            let kept_item_keys = applied_keys.get(section_path).cloned().unwrap_or_default();
+            section_adapter
+                .remove_items_except(operation_context, &kept_item_keys)
+                .await?;
+        }
     }
     Ok(applied_keys)
 }
@@ -208,7 +270,8 @@ async fn save_seed_state(
     let applied_items_json = serde_json::to_string(&applied_items)
         .map_err(|write_error| OperationError::Internal(write_error.to_string()))?;
     operation_context
-        .seed_state_repository
+        .setup_stores
+        .seed_state
         .save_state(SeedStateRecord {
             seed_toml,
             source_path,

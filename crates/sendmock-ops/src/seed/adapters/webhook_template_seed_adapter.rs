@@ -1,3 +1,6 @@
+use schemars::{Schema, SchemaGenerator, json_schema};
+use serde_json::json;
+
 use crate::seed::seed_section_adapter::{SeedItem, impl_seed_section_adapter};
 use crate::seed::seed_sections::WEBHOOK_TEMPLATES_SECTION;
 use crate::webhooks::{
@@ -13,6 +16,37 @@ const REQUEST_KEYS: [&str; 4] = ["method", "content_type", "body", "headers"];
 /// `[[webhook.templates]]`: custom templates and edited built-ins, matched by `id`, in the
 /// template file format (Webhooks > Templates > Export) with the request under `request`.
 pub struct WebhookTemplateSeedAdapter;
+
+/// A template's shape: the template file format, with the request under `request` (or its
+/// keys at the top, as a demo export writes them).
+fn describe_template_item_schema(_schema_generator: &mut SchemaGenerator) -> Schema {
+    let request_properties = json!({
+        "method": { "type": "string" },
+        "content_type": { "type": "string" },
+        "body": { "type": "string" },
+        "headers": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+        }
+    });
+    json_schema!({
+        "description": "A custom webhook template or an edited built-in, matched by id, in the template file format.",
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+            "id": { "type": "string" },
+            "name": { "type": "string" },
+            "service": { "type": "string" },
+            "events": { "type": "array", "items": { "type": "string" } },
+            "variables": { "type": "array", "items": { "type": "string" } },
+            "edits_builtin": { "type": "boolean" },
+            "request": {
+                "type": "object",
+                "properties": request_properties
+            }
+        }
+    })
+}
 
 impl WebhookTemplateSeedAdapter {
     async fn apply(
@@ -155,7 +189,11 @@ async fn create_seeded_template(
     Ok(())
 }
 
-impl_seed_section_adapter!(WebhookTemplateSeedAdapter, WEBHOOK_TEMPLATES_SECTION);
+impl_seed_section_adapter!(
+    WebhookTemplateSeedAdapter,
+    WEBHOOK_TEMPLATES_SECTION,
+    schema = describe_template_item_schema
+);
 
 #[cfg(test)]
 mod tests {

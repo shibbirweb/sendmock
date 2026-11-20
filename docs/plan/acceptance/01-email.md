@@ -45,6 +45,7 @@ UI in U1, live in Phase 1. Docs: [Viewing features](../03-email.md#viewing-featu
 - [x] EM-04.6 The MIME tab shows the full multipart tree with type, encoding, charset and size per part, and each part can be downloaded. (#48)
 - [x] EM-04.7 "Screenshot" saves a PNG of the rendered HTML. (#48)
 - [x] EM-04.8 Broken HTML, missing charsets and non-English content (Bangla, Arabic, Japanese) render without errors. (#48)
+- [x] EM-04.9 The HTML and Text views list the email's attachments under the message, each with its name, size, an inline mark for inline parts and a download link; an email without attachments shows no list. (owner request, 2026-11-20)
 
 ## EM-05 OTP and link extraction
 

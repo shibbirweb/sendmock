@@ -117,6 +117,23 @@ export async function requestApiText(
   return response.text();
 }
 
+/** Sends a JSON request to an endpoint that answers with a file's text, such as a setup export. */
+export async function requestApiTextWithBody(
+  apiPath: string,
+  requestOptions: ApiRequestOptions,
+): Promise<string> {
+  const response = await fetch(
+    buildRequestUrl(apiPath, requestOptions.queryParameters),
+    buildRequestInit(requestOptions),
+  );
+
+  if (!response.ok) {
+    throw new ApiError(response.status, await readErrorBody(response));
+  }
+
+  return response.text();
+}
+
 /** Absolute URL for links the browser opens directly (downloads, images). */
 export function buildApiUrl(apiPath: string): string {
   return buildRequestUrl(apiPath);

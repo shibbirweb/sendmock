@@ -1,3 +1,4 @@
+use schemars::JsonSchema;
 use sendmock_store::VerifyServiceRecord;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -11,7 +12,7 @@ use crate::verify::{VerifyServiceInput, build_verify_service};
 use crate::{OperationContext, OperationError};
 
 /// `[[verify.services]]`, matched by `sid`.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 struct SeedVerifyService {
     sid: String,
@@ -122,4 +123,8 @@ impl VerifyServiceSeedAdapter {
     }
 }
 
-impl_seed_section_adapter!(VerifyServiceSeedAdapter, VERIFY_SERVICES_SECTION);
+impl_seed_section_adapter!(
+    VerifyServiceSeedAdapter,
+    VERIFY_SERVICES_SECTION,
+    SeedVerifyService
+);

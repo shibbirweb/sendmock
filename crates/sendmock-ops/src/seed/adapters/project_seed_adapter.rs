@@ -1,3 +1,4 @@
+use schemars::JsonSchema;
 use sendmock_store::{DEFAULT_PROJECT_KEY, ProjectRecord};
 use serde::{Deserialize, Serialize};
 
@@ -9,7 +10,7 @@ use crate::seed::seed_sections::PROJECTS_SECTION;
 use crate::{OperationContext, OperationError};
 
 /// `[[projects]]`, matched by `key`. `default` always exists, so it is never written.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 struct SeedProject {
     key: String,
@@ -81,4 +82,4 @@ impl ProjectSeedAdapter {
     }
 }
 
-impl_seed_section_adapter!(ProjectSeedAdapter, PROJECTS_SECTION);
+impl_seed_section_adapter!(ProjectSeedAdapter, PROJECTS_SECTION, SeedProject);

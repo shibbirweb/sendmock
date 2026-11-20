@@ -90,6 +90,27 @@ const scenarioEntries: DeeperEntry[] = [
     does: "Explains scenarios.",
     links: "[Advanced: scenarios](../../advanced/scenarios.md).",
   },
+  {
+    control: "heading: Saved",
+    does: "Heads the saved scenarios beside the editor. Click one to open it in the editor; its menu renames or deletes it (after a confirmation).",
+    source: "The saved scenarios, which a setup export carries as `[[scenarios]]`.",
+    operationIds: ["getScenarios"],
+  },
+  {
+    control: "paragraph: Nothing saved yet. Save the editor's scenario to run it again by name and keep it in a setup.",
+    does: "Shown while no scenario is saved.",
+  },
+  {
+    control: "paragraph: Not saved",
+    does: "The name of the saved scenario in the editor; Not saved while the editor holds one that is not saved. An Unsaved changes mark follows while the editor differs from the saved file.",
+  },
+  {
+    control: "button: Save",
+    does: "Saves the editor's scenario: asks for a unique name the first time, then updates the opened one. Save as appears once a scenario is opened and saves a copy under a new name.",
+    changes: "Stores the scenario, so it runs by name with `sendmock scenario run-saved` and travels in a setup.",
+    errors: "An invalid scenario is refused with its errors by step, as Validate lists them; a name already taken is refused.",
+    operationIds: ["postScenarios", "patchScenariosByScenarioId"],
+  },
   { control: "button: Load example", does: "Puts an example scenario in the editor." },
   { control: "button: Upload", does: "Reads a scenario file from your computer." },
   { control: "link: Download", does: "Saves the scenario in the editor as a file." },

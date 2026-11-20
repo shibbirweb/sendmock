@@ -9,12 +9,12 @@ use sendmock_store::{
     MessageProviderRepository, MessageRuleKind, MessageRuleRepository, MessagingServiceRepository,
     PaymentDefinitionRepository, PaymentProviderObjectRepository, PaymentRepository,
     PaymentSubscriptionRepository, ProjectRepository, PushNotificationRepository,
-    SavedWebhookDeliveryRepository, SeedStateRepository, SettingsRepository,
-    SmsCallbackAttemptRepository, SmsOutcomeRuleRepository, SmsReplyWebhookRepository,
-    SmsRepository, SmtpSessionRepository, TrafficPruner, VerificationRepository,
-    VerifyServiceRepository, VirtualNumberRepository, WebhookDeliveryRepository,
-    WebhookEndpointRepository, WebhookRuleRepository, WebhookTemplateRepository,
-    WebhookVariableRepository,
+    SavedScenarioRepository, SavedWebhookDeliveryRepository, SeedStateRepository,
+    SettingsRepository, SmsCallbackAttemptRepository, SmsOutcomeRuleRepository,
+    SmsReplyWebhookRepository, SmsRepository, SmtpSessionRepository, TrafficPruner,
+    VerificationRepository, VerifyServiceRepository, VirtualNumberRepository,
+    WebhookDeliveryRepository, WebhookEndpointRepository, WebhookRuleRepository,
+    WebhookTemplateRepository, WebhookVariableRepository,
 };
 
 use crate::{
@@ -78,8 +78,7 @@ pub struct OperationContext {
     pub status_callback_sender: Option<Arc<dyn StatusCallbackSender>>,
     /// Calls reply webhook URLs and fetches TwiML; set by the binary, which owns the HTTP client.
     pub reply_webhook_sender: Option<Arc<dyn ReplyWebhookSender>>,
-    /// The seed file applied last, for reset and seed status.
-    pub seed_state_repository: SeedStateRepository,
+    pub setup_stores: SetupStores,
     /// Edited built-in and custom payment flows, methods and gateways.
     pub payment_definition_repository: PaymentDefinitionRepository,
     pub payment_repository: PaymentRepository,
@@ -151,6 +150,26 @@ impl HttpCatcherStores {
     }
 }
 
+/// What a setup file holds beside the configuration items: the seed file applied last, for
+/// reset and seed status, and the scenarios saved by name; and the downloader for setup URLs.
+#[derive(Clone)]
+pub struct SetupStores {
+    pub seed_state: SeedStateRepository,
+    pub saved_scenarios: SavedScenarioRepository,
+    /// Downloads setups from URLs; set by the binary, which owns the HTTP client.
+    pub fetcher: Option<Arc<dyn crate::setup::SetupFetcher>>,
+}
+
+impl SetupStores {
+    fn new(database: &Arc<Database>) -> Self {
+        Self {
+            seed_state: SeedStateRepository::new(Arc::clone(database)),
+            saved_scenarios: SavedScenarioRepository::new(Arc::clone(database)),
+            fetcher: None,
+        }
+    }
+}
+
 /// What emails keep beside the messages: each send as its provider knows it, the seed file's
 /// local stand-ins for provider templates, the tag and forward rules run on arrival, and the
 /// links between simulated replies and their originals.
@@ -198,7 +217,7 @@ impl OperationContext {
             logs: LogStores::new(&database),
             push_notifications: PushNotificationRepository::new(share_database()),
             sms_repository: SmsRepository::new(share_database()),
-            seed_state_repository: SeedStateRepository::new(share_database()),
+            setup_stores: SetupStores::new(&database),
             payment_definition_repository: PaymentDefinitionRepository::new(share_database()),
             payment_repository: PaymentRepository::new(share_database()),
             payment_stores: PaymentStores::new(&database),
@@ -304,6 +323,14 @@ impl OperationContext {
 
     pub fn with_media_fetcher(mut self, media_fetcher: Arc<dyn MediaFetcher>) -> Self {
         self.media_fetcher = Some(media_fetcher);
+        self
+    }
+
+    pub fn with_setup_fetcher(
+        mut self,
+        setup_fetcher: Arc<dyn crate::setup::SetupFetcher>,
+    ) -> Self {
+        self.setup_stores.fetcher = Some(setup_fetcher);
         self
     }
 

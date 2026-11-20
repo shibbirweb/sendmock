@@ -1,13 +1,15 @@
+use schemars::JsonSchema;
 use sendmock_store::WebhookEndpointRecord;
 use sendmock_webhooks::WebhookSecret;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
 use crate::seed::seed_section_adapter::{
-    CREATED_BY_SEED, SeedItem, impl_seed_section_adapter, read_seed_table, to_secret_reference,
-    write_changed_fields, write_seed_table,
+    CREATED_BY_SEED, SeedItem, impl_seed_section_adapter, read_seed_table, write_changed_fields,
+    write_seed_table,
 };
 use crate::seed::seed_sections::WEBHOOK_ENDPOINTS_SECTION;
+use crate::setup::SetupSecretWriter;
 use crate::webhooks::{
     DeleteWebhookEndpointOperation, EndpointRequestSettings, WebhookEndpointInput,
     WebhookEndpointReference, choose_detached_template, read_request_settings,
@@ -17,7 +19,7 @@ use crate::{Operation, OperationContext, OperationError};
 
 /// `[[webhook.endpoints]]`, matched by `name`. The request settings a file leaves out keep the
 /// defaults a new endpoint gets in the UI; export writes only the ones that differ.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 struct SeedWebhookEndpoint {
     name: String,
     url: String,
@@ -25,10 +27,14 @@ struct SeedWebhookEndpoint {
     enabled: bool,
     #[serde(default = "default_template")]
     template: String,
-    /// An `${ENV_VAR}` reference to a `whsec_` secret; none or empty keeps or generates one.
+    /// An `${ENV_VAR}` reference to a `whsec_` secret, or the secret encrypted with the
+    /// export's passphrase; none or empty keeps or generates one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     secret: Option<String>,
+    /// The endpoint's other request settings (`method`, `headers`, `timeout_ms`, ...), as the
+    /// endpoints API names them.
     #[serde(flatten)]
+    #[schemars(with = "serde_json::Map<String, Value>")]
     request_settings: toml::Table,
 }
 
@@ -146,7 +152,10 @@ impl WebhookEndpointSeedAdapter {
         Ok(endpoint_name)
     }
 
-    async fn export(operation_context: &OperationContext) -> Result<Vec<SeedItem>, OperationError> {
+    async fn export(
+        operation_context: &OperationContext,
+        secret_writer: &dyn SetupSecretWriter,
+    ) -> Result<Vec<SeedItem>, OperationError> {
         let stored_endpoints = operation_context
             .webhook_endpoint_repository
             .list_endpoints()
@@ -160,7 +169,10 @@ impl WebhookEndpointSeedAdapter {
                 item_key: stored_endpoint.name.clone(),
                 item_name: stored_endpoint.name.clone(),
                 table: write_seed_table(&SeedWebhookEndpoint {
-                    secret: Some(to_secret_reference(&stored_endpoint.name)),
+                    secret: Some(
+                        secret_writer
+                            .write_secret(&stored_endpoint.name, &stored_endpoint.signing_secret)?,
+                    ),
                     name: stored_endpoint.name,
                     url: stored_endpoint.url,
                     enabled: stored_endpoint.is_enabled,
@@ -267,4 +279,9 @@ async fn insert_seeded_endpoint(
     Ok(())
 }
 
-impl_seed_section_adapter!(WebhookEndpointSeedAdapter, WEBHOOK_ENDPOINTS_SECTION);
+impl_seed_section_adapter!(
+    WebhookEndpointSeedAdapter,
+    WEBHOOK_ENDPOINTS_SECTION,
+    SeedWebhookEndpoint,
+    writes_secrets
+);

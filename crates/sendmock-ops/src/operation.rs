@@ -59,12 +59,14 @@ impl OperationSelector {
 }
 
 /// A `<placeholder>` in a CLI usage and the input it fills; `reads_file` sends the named
-/// file's text instead of the path.
+/// file's text instead of the path, and `is_optional` lets the command run without it, when
+/// a flag can give the input another way (`--url` instead of a file).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CliArgument {
     pub placeholder: &'static str,
     pub input_name: &'static str,
     pub reads_file: bool,
+    pub is_optional: bool,
 }
 
 /// The HTTP status of a successful answer.
@@ -122,6 +124,10 @@ pub struct OperationDefinition {
     pub cli_arguments: &'static [CliArgument],
     /// Flags the naming rules get wrong, by input, e.g. `("timeout", "wait")` for `--wait`.
     pub cli_flag_names: &'static [(&'static str, &'static str)],
+    /// Inputs the CLI reads from an environment variable when the flag is not given, by
+    /// input, e.g. `("passphrase", "SENDMOCK_SETUP_PASSPHRASE")`, so a secret stays out of the
+    /// shell history.
+    pub cli_environment_inputs: &'static [(&'static str, &'static str)],
     /// A boolean output field that must be true for the CLI to exit 0, such as `is_valid`.
     pub success_flag_field: Option<&'static str>,
     pub success_status: SuccessStatus,
@@ -156,6 +162,7 @@ impl OperationDefinition {
         selector: None,
         cli_arguments: &[],
         cli_flag_names: &[],
+        cli_environment_inputs: &[],
         success_flag_field: None,
         success_status: SuccessStatus::Ok,
         answer_kind: AnswerKind::Json,

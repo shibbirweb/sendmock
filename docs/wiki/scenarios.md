@@ -35,6 +35,15 @@ A scenario is a short TOML file: set things up, make your app do something, wait
 
 The scenario's text, with **Load example** (read the code of an SMS, reply to an email as its recipient, pay a Stripe checkout with a test card), **Upload** a `.toml` file and **Download** the current text.
 
+### Saved scenarios
+
+The **Saved** list beside the editor keeps scenarios by name, so they run again by that name and travel in a [setup](./recipes/share-your-setup.md).
+
+- **Save** asks for a unique name the first time; after that it saves the editor's text over the opened scenario. **Save as** saves a copy under a new name.
+- Press a saved scenario to open it in the editor. **Unsaved changes** shows while the editor differs from the saved file.
+- **...** next to a scenario: **Rename**, or **Delete** after a confirmation.
+- Saving checks the file as **Validate** does and refuses an invalid one with its problems by step. **Load example** and **Upload** start a new, unsaved scenario.
+
 ### Steps
 
 Each `[[steps]]` table has:
@@ -49,7 +58,7 @@ Each `[[steps]]` table has:
 
 ### The report
 
-The summary ("Passed: 5 of 5 steps in 120 ms", or "Failed at step 2: ..."), then each step with its status, time, the value it saved, and **Input and answer** to open. Nothing is stored: the report stays until the next run.
+The summary ("Passed: 5 of 5 steps in 120 ms", or "Failed at step 2: ..."), then each step with its status, time, the value it saved, and **Input and answer** to open. The report is not stored: it stays until the next run.
 
 
 Every control and text, one by one: [Scenarios in depth](./deeper/scenarios.md).
@@ -211,6 +220,12 @@ public class ScenariosTests
 | --- | --- | --- | --- |
 | check a scenario file | [`sendmock scenario validate <file>`](/cli/automation/#scenario-validate) | [`POST /api/v1/scenarios/validate`](/api/automation/#postScenariosValidate) | [`sendmock_scenario_validate`](/mcp/automation/#sendmock_scenario_validate) |
 | run it | [`sendmock scenario run <file>`](/cli/automation/#scenario-run) | [`POST /api/v1/scenarios/run`](/api/automation/#postScenariosRun) | [`sendmock_scenario_run`](/mcp/automation/#sendmock_scenario_run) |
+| list the saved scenarios | [`sendmock scenario list`](/cli/automation/#scenario-list) | [`GET /api/v1/scenarios`](/api/automation/#getScenarios) | [`sendmock_scenario_list`](/mcp/automation/#sendmock_scenario_list) |
+| save one by name | [`sendmock scenario save <file>`](/cli/automation/#scenario-save) | [`POST /api/v1/scenarios`](/api/automation/#postScenarios) | [`sendmock_scenario_save`](/mcp/automation/#sendmock_scenario_save) |
+| read one | [`sendmock scenario show <scenarioId>`](/cli/automation/#scenario-show) | [`GET /api/v1/scenarios/{scenarioId}`](/api/automation/#getScenariosByScenarioId) | [`sendmock_scenario_get`](/mcp/automation/#sendmock_scenario_get) |
+| change or rename one | [`sendmock scenario update <scenarioId>`](/cli/automation/#scenario-update) | [`PATCH /api/v1/scenarios/{scenarioId}`](/api/automation/#patchScenariosByScenarioId) | [`sendmock_scenario_update`](/mcp/automation/#sendmock_scenario_update) |
+| delete one | [`sendmock scenario delete <scenarioId>`](/cli/automation/#scenario-delete) | [`DELETE /api/v1/scenarios/{scenarioId}`](/api/automation/#deleteScenariosByScenarioId) | [`sendmock_scenario_delete`](/mcp/automation/#sendmock_scenario_delete) |
+| run a saved one by id or name (the MCP tool takes `scenario_id`) | [`sendmock scenario run-saved <scenarioId>`](/cli/automation/#scenario-run-saved) | [`POST /api/v1/scenarios/{scenarioId}/run`](/api/automation/#postScenariosByScenarioIdRun) | [`sendmock_scenario_run`](/mcp/automation/#sendmock_scenario_run) |
 
 ## Related
 

@@ -310,6 +310,31 @@ jobs:
           path: web/playwright-report
           retention-days: 7
 
+  # A setup exported by the previous stable release imports into this build (PL-18.9).
+  setup-compatibility:
+    name: Setup from the previous stable release
+    needs: binary-smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: sendmock-linux
+          path: sendmock-binary
+
+      - name: Install the latest stable release
+        env:
+          SENDMOCK_INSTALL_DIR: ${{ runner.temp }}/previous-release
+        run: sh scripts/install/install.sh --no-modify-path
+
+      - name: Export with it, import with this build
+        run: |
+          chmod +x sendmock-binary/sendmock
+          bun scripts/setup-compatibility-test.ts "$RUNNER_TEMP/previous-release/sendmock" sendmock-binary/sendmock
+
   # The Claude Code plugin installs from this repository's marketplace with the skill the
   # binary serves and the MCP server (AI-05.5). No API key is needed to validate or install.
   claude-plugin:
@@ -386,7 +411,7 @@ jobs:
   rust-result:
     name: Rust
     if: always()
-    needs: [rust, rust-coverage, binary-smoke, web-live, claude-plugin]
+    needs: [rust, rust-coverage, binary-smoke, web-live, setup-compatibility, claude-plugin]
     runs-on: ubuntu-latest
     steps:
       - name: Every Rust job passed
@@ -395,6 +420,7 @@ jobs:
           test "${{ needs.rust-coverage.result }}" = "success"
           test "${{ needs.binary-smoke.result }}" = "success"
           test "${{ needs.web-live.result }}" = "success"
+          test "${{ needs.setup-compatibility.result }}" = "success"
           test "${{ needs.claude-plugin.result }}" = "success"
 
   acceptance:

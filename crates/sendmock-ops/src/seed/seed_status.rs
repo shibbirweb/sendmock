@@ -35,7 +35,12 @@ pub struct SeedChangedItem {
 pub async fn load_seed_status(
     operation_context: &OperationContext,
 ) -> Result<SeedStatus, OperationError> {
-    let Some(seed_state) = operation_context.seed_state_repository.find_state().await? else {
+    let Some(seed_state) = operation_context
+        .setup_stores
+        .seed_state
+        .find_state()
+        .await?
+    else {
         return Ok(SeedStatus {
             source_path: None,
             applied_at: None,

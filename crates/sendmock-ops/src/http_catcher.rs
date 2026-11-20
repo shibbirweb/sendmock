@@ -31,6 +31,12 @@ pub use http_rule_operations::{
 };
 pub use http_wait_operation::WaitForHttpRequestOperation;
 
+pub(crate) use http_bin_operations::check_bin_name;
+pub(crate) use http_bin_presets::preset_default_response;
+pub(crate) use http_catcher_wire::HttpBinPreset;
+pub(crate) use http_response_rules::{HttpResponseRule, check_response_rule};
+pub(crate) use http_rule_operations::read_bin_rules;
+
 use crate::OperationRegistry;
 
 pub fn register_http_catcher_operations(operation_registry: &mut OperationRegistry) {

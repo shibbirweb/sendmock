@@ -151,7 +151,7 @@ Each event flows through webhook rules in native or provider format (SendGrid Ev
 ## Viewing features (UI and API)
 
 - HTML preview (sandboxed), plain text, raw source, headers table.
-- Attachments: list, download, inline image rendering via CID rewriting.
+- Attachments: list, download, inline image rendering via CID rewriting. The HTML and Text views also list the attachments under the message (name, size, inline mark, download), so an email's attachments show without opening their tab (owner request, 2026-11-20).
 - Responsive preview: desktop / tablet / mobile widths.
 - Browser notifications for new emails (opt-in, per-tab permission), with optional filter (e.g. only `to:*@my-feature.test`).
 - Remote images blocked by default, one-click load.

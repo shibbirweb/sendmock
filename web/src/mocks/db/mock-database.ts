@@ -1,6 +1,7 @@
 import type {
   ApiRequestLogEntry,
   AppSettings,
+  SavedScenario,
   CapturedHttpRequest,
   EmailDetail,
   EmailTimelineEntry,
@@ -148,6 +149,8 @@ export type MockDatabase = {
   inboundRoutes: InboundRouteRecord[];
   /** Projects, `default` first (PL-10). */
   projects: ProjectRecord[];
+  /** Scenarios saved by name (AI-07), oldest first. */
+  savedScenarios: SavedScenario[];
   /** Push notifications, newest first (PN-01). */
   pushNotifications: PushNotification[];
   httpBins: HttpBin[];
@@ -198,6 +201,7 @@ function buildConfiguration() {
     paymentSubscriptions: [],
     inboundRoutes: buildInboundRouteFixtures(),
     projects: buildProjectFixtures(),
+    savedScenarios: [],
     messageProviders: [
       ...buildBuiltinEmailProviders(),
       ...buildBuiltinSmsProviders(),

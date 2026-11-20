@@ -20,6 +20,8 @@ pub struct PositionalInput {
     pub placeholder: String,
     pub input_name: String,
     pub reads_file: bool,
+    /// The command runs without it, when a flag gives the input another way.
+    pub is_optional: bool,
 }
 
 /// One flag and the input it fills.
@@ -29,6 +31,8 @@ pub struct FlagInput {
     pub flag_name: String,
     pub input_shape: InputShape,
     pub is_required: bool,
+    /// Read from this environment variable when the flag is not given.
+    pub environment_variable: Option<&'static str>,
 }
 
 /// How a command's command line maps to its operation's input.
@@ -94,6 +98,7 @@ fn describe_positional_inputs(definition: &OperationDefinition) -> Vec<Positiona
                     |argument| argument.input_name.to_owned(),
                 ),
                 reads_file: file_argument.is_some_and(|argument| argument.reads_file),
+                is_optional: file_argument.is_some_and(|argument| argument.is_optional),
             }
         })
         .collect()
@@ -111,8 +116,14 @@ fn describe_flag_input(
         .iter()
         .find(|(renamed_input, _)| *renamed_input == input_name)
         .map(|(_, flag_name)| (*flag_name).to_owned());
+    let environment_variable = definition
+        .cli_environment_inputs
+        .iter()
+        .find(|(environment_input, _)| *environment_input == input_name)
+        .map(|(_, variable_name)| *variable_name);
     FlagInput {
         input_name: input_name.to_owned(),
+        environment_variable,
         flag_name: renamed_flag.unwrap_or_else(|| build_flag_name(input_name, input_shape)),
         input_shape,
         is_required: !accepts_null(property_schema)
@@ -135,7 +146,7 @@ pub fn add_operation_arguments(mut command: Command, operation: &dyn ErasedOpera
         command = command.arg(
             Arg::new(positional_input.input_name.clone())
                 .value_name(positional_input.placeholder.clone())
-                .required(true),
+                .required(!positional_input.is_optional),
         );
     }
     for flag_input in &command_inputs.flag_inputs {
@@ -266,11 +277,15 @@ fn add_flag(command: Command, flag_input: &FlagInput, help_text: String) -> Comm
                 .action(ArgAction::Append)
                 .help(help_text),
         ),
-        InputShape::Scalar(_) | InputShape::Object => command.arg(
-            Arg::new(flag_input.input_name.clone())
+        InputShape::Scalar(_) | InputShape::Object => {
+            let mut flag_argument = Arg::new(flag_input.input_name.clone())
                 .long(flag_input.flag_name.clone())
                 .required(flag_input.is_required)
-                .help(help_text),
-        ),
+                .help(help_text);
+            if let Some(variable_name) = flag_input.environment_variable {
+                flag_argument = flag_argument.env(variable_name).hide_env_values(true);
+            }
+            command.arg(flag_argument)
+        }
     }
 }

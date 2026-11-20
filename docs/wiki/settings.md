@@ -14,7 +14,7 @@ Settings decide how every capture menu behaves. They take effect at once, withou
 | Section | Solves |
 | --- | --- |
 | [General](#general) | the database growing forever; starting clean |
-| [Seed](#seed) | the same setup for every teammate and every CI run |
+| [Setup](#setup) | the same setup for every teammate, every CI run and your other machine |
 | [Projects](#projects) | several apps or developers sharing one SendMock without reading each other's mail, SMS and codes |
 | [Email](#email) | bounce and complaint tests, reply domains, safe release to real SMTP |
 | [SMS](#sms) | failure and delay tests, matching Twilio's test credentials |
@@ -55,9 +55,15 @@ Settings decide how every capture menu behaves. They take effect at once, withou
 
 **Danger zone:** **Delete all traffic** (every email, SMS, verification, push notification, captured HTTP request, finished webhook delivery, payment, subscription and log entry, in every project, while settings and configuration stay), **Delete all emails**, **Delete all SMS** and **Reset to seed** (deletes all traffic and restores the seed file), each asking first.
 
-### Seed
+### Setup
 
-The seed file (`sendmock.seed.toml`) is the configuration SendMock starts from and resets to, kept in your repository. The card shows its path, when it was applied, and what changed since. **Export** downloads the current configuration (secrets written as `${ENV_VAR}` references, never in plain text). **Apply a seed file** takes an upload or pasted text; **Validate** lists errors with line numbers and a summary of the changes before you confirm. See [Advanced: seed file](./advanced/seed-file.md).
+Everything you configured, without traffic, as one file to commit, share or carry to another machine. Old links to **Settings > Seed** open this section.
+
+- **Seed file:** the seed file (`sendmock.seed.toml`) is the configuration SendMock starts from and resets to, kept in your repository. The card shows its path, when it was applied, and what changed since. **Export sendmock.seed.toml** downloads the current configuration.
+- **Export a setup:** pick TOML, JSON or YAML and the sections, and how secrets are written: as `${ENV_VAR}` references (to share; the file holds no secret) or encrypted with a passphrase of 8 characters or more (for your own machine). A secret is never written in plain text.
+- **Import a setup:** upload or paste a file, or give an `https://` URL (with an optional SHA-256 and headers for a private address). Choose **Merge** (add and update what the file holds by name, keep the rest) or **Replace** (also remove what the file does not hold), type the passphrase when the file holds encrypted secrets, and press **Preview**: errors come with their line or key, and the preview lists per section what would be added, changed and removed. **Import** asks first, naming how many items a replace removes. An invalid file changes nothing. A file from an older SendMock is upgraded for the import, and **Download the upgraded copy** keeps it.
+
+See [Recipe: share your setup](./recipes/share-your-setup.md) and [Advanced: seed file](./advanced/seed-file.md).
 
 ### Projects
 
@@ -267,6 +273,10 @@ public class SettingsTests
 | export the seed | [`sendmock seed export`](/cli/seed/#seed-export) | [`GET /api/v1/seed/export`](/api/seed/#getSeedExport) | [`sendmock_seed_export`](/mcp/seed/#sendmock_seed_export) |
 | validate a seed file | [`sendmock seed validate <file>`](/cli/seed/#seed-validate) | [`POST /api/v1/seed/validate`](/api/seed/#postSeedValidate) | [`sendmock_seed_validate`](/mcp/seed/#sendmock_seed_validate) |
 | apply a seed file | [`sendmock seed apply <file>`](/cli/seed/#seed-apply) | [`POST /api/v1/seed/apply`](/api/seed/#postSeedApply) | [`sendmock_seed_apply`](/mcp/seed/#sendmock_seed_apply) |
+| export a setup | [`sendmock setup export`](/cli/setup/#setup-export) | [`POST /api/v1/setup/export`](/api/setup/#postSetupExport) | [`sendmock_setup_export`](/mcp/setup/#sendmock_setup_export) |
+| preview a setup's import | [`sendmock setup validate <file>`](/cli/setup/#setup-validate) | [`POST /api/v1/setup/validate`](/api/setup/#postSetupValidate) | [`sendmock_setup_validate`](/mcp/setup/#sendmock_setup_validate) |
+| import a setup | [`sendmock setup import <file> --yes`](/cli/setup/#setup-import) | [`POST /api/v1/setup/import`](/api/setup/#postSetupImport) | [`sendmock_setup_import`](/mcp/setup/#sendmock_setup_import) |
+| upgrade an older setup file | [`sendmock setup migrate <file>`](/cli/setup/#setup-migrate) | [`POST /api/v1/setup/migrate`](/api/setup/#postSetupMigrate) | [`sendmock_setup_migrate`](/mcp/setup/#sendmock_setup_migrate) |
 | list projects | [`sendmock projects list`](/cli/projects/#projects-list) | [`GET /api/v1/projects`](/api/projects/#getProjects) | [`sendmock_project_list`](/mcp/projects/#sendmock_project_list) |
 | add a project | [`sendmock projects create`](/cli/projects/#projects-create) | [`POST /api/v1/projects`](/api/projects/#postProjects) | [`sendmock_project_create`](/mcp/projects/#sendmock_project_create) |
 | rename a project | [`sendmock projects update <projectKey>`](/cli/projects/#projects-update) | [`PATCH /api/v1/projects/{projectKey}`](/api/projects/#patchProjectsByProjectKey) | [`sendmock_project_update`](/mcp/projects/#sendmock_project_update) |

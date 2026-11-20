@@ -84,4 +84,8 @@ impl PaymentFlowSeedAdapter {
     }
 }
 
-impl_seed_section_adapter!(PaymentFlowSeedAdapter, PAYMENT_FLOWS_SECTION);
+impl_seed_section_adapter!(
+    PaymentFlowSeedAdapter,
+    PAYMENT_FLOWS_SECTION,
+    SeedPaymentDefinition
+);
