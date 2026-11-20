@@ -4,7 +4,7 @@ import { expect, test } from "@playwright/test";
 const tinyPngBase64 =
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
-test("EM-07.4 attachments sent to /send are stored, downloadable and shown inline", async ({
+test("EM-07.4 EM-04.9 attachments sent to /send are stored, listed under the message, downloadable and shown inline", async ({
   page,
 }) => {
   await page.goto("/mail");
@@ -40,6 +40,17 @@ test("EM-07.4 attachments sent to /send are stored, downloadable and shown inlin
     .locator("section[aria-label='Email list']")
     .getByText("Invoice with attachments")
     .click();
+  const attachmentList = page.getByRole("region", { name: "Attachments" });
+  await expect(attachmentList).toContainText("2 attachments");
+  await expect(
+    attachmentList.getByRole("link", { name: "Download invoice.pdf" }),
+  ).toBeVisible();
+  await expect(
+    attachmentList.getByRole("link", { name: "Download logo.png" }),
+  ).toContainText("inline");
+  await page.getByRole("tab", { name: "Text" }).click();
+  await expect(attachmentList).toContainText("2 attachments");
+
   await page.getByRole("tab", { name: "Attachments (2)" }).click();
   await expect(page.getByRole("tabpanel")).toContainText("invoice.pdf");
   await expect(page.getByRole("tabpanel")).toContainText("logo.png");

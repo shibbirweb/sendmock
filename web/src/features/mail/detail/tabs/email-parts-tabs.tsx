@@ -11,7 +11,8 @@ import type {
 } from "@/lib/api/types";
 import { formatBytes, formatDateTime } from "@/lib/format/format-values";
 
-function toAppUrl(apiUrl: string): string {
+/** An API path the server answers, such as an attachment's download URL, as an app URL. */
+export function toAppUrl(apiUrl: string): string {
   return buildApiUrl(apiUrl.replace(/^\/api\/v1/, ""));
 }
 
