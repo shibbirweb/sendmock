@@ -3,7 +3,7 @@ use sendmock_core::format_rfc3339;
 use super::adapters::seed_section_adapters;
 use crate::setup::{
     CURRENT_FORMAT_VERSION, ExportedSection, SecretReferenceWriter, SetupFileFormat,
-    SetupSecretWriter, build_setup_header, write_setup_export,
+    SetupSecretWriter, SetupSectionFilter, build_setup_header, write_setup_export,
 };
 use crate::{OperationContext, OperationError};
 
@@ -28,6 +28,22 @@ pub async fn write_setup_text(
     setup_format: SetupFileFormat,
     secret_writer: &dyn SetupSecretWriter,
 ) -> Result<String, OperationError> {
+    write_selected_setup_text(
+        operation_context,
+        setup_format,
+        secret_writer,
+        &SetupSectionFilter::default(),
+    )
+    .await
+}
+
+/// Like `write_setup_text`, with only the sections the filter keeps.
+pub async fn write_selected_setup_text(
+    operation_context: &OperationContext,
+    setup_format: SetupFileFormat,
+    secret_writer: &dyn SetupSecretWriter,
+    section_filter: &SetupSectionFilter,
+) -> Result<String, OperationError> {
     let exported_at = format_rfc3339(operation_context.clock.now_unix_ms());
     let setup_header = build_setup_header(
         CURRENT_FORMAT_VERSION,
@@ -36,6 +52,9 @@ pub async fn write_setup_text(
     );
     let mut exported_sections = Vec::new();
     for section_adapter in seed_section_adapters() {
+        if !section_filter.includes(section_adapter.section()) {
+            continue;
+        }
         let section_tables: Vec<toml::Table> = section_adapter
             .export_items(operation_context, secret_writer)
             .await?

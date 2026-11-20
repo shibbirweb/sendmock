@@ -5,16 +5,16 @@ use serde::{Deserialize, Serialize};
 
 use super::SeedValidation;
 use super::adapters::seed_section_adapters;
-use super::environment_references::resolve_environment_references;
 use super::seed_document::{list_unsupported_sections, read_section_items};
+use super::seed_preparation::prepare_seed_for_apply;
 use super::seed_section_adapter::SeedSectionAdapter;
 use super::seed_sections::format_section_header;
 use super::seed_validator::{SetupCheck, check_setup_text};
 use crate::setup::{
-    SecretReferenceWriter, SetupFileFormat, SetupSecretOpener, blank_encrypted_secrets,
+    SecretReferenceWriter, SetupFileFormat, SetupImportMode, blank_encrypted_secrets,
     prepare_setup_document, read_setup_document, write_setup_document,
 };
-use crate::{OperationContext, OperationError};
+use crate::{AppSettings, OperationContext, OperationError};
 
 /// One item of the configuration as the seed state keeps it, to tell what changed since.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -29,12 +29,13 @@ pub struct AppliedSeedItem {
 /// The item keys each section's apply touched, by section path.
 type AppliedKeys = BTreeMap<&'static str, Vec<String>>;
 
-/// How a setup is imported: where it came from, for the seed status, and the passphrase that
-/// opens its encrypted secrets.
+/// How a setup is imported: where it came from, for the seed status, the passphrase that
+/// opens its encrypted secrets, and whether it merges or replaces.
 #[derive(Clone, Default)]
 pub struct SetupImportOptions {
     pub source_path: Option<String>,
     pub passphrase: Option<String>,
+    pub import_mode: SetupImportMode,
 }
 
 /// Checks a TOML seed file, applies it and keeps it as the seed state (see `apply_setup_text`).
@@ -49,7 +50,7 @@ pub async fn apply_seed_toml(
         SetupFileFormat::Toml,
         SetupImportOptions {
             source_path,
-            passphrase: None,
+            ..SetupImportOptions::default()
         },
     )
     .await
@@ -84,6 +85,7 @@ pub async fn apply_setup_text(
         operation_context,
         &seed_toml,
         import_options.passphrase.as_deref(),
+        import_options.import_mode,
     )
     .await?;
     save_seed_state(
@@ -108,14 +110,13 @@ pub async fn restore_seed_state(
     else {
         return Ok(());
     };
-    let applied_keys = apply_seed_document(operation_context, &seed_state.seed_toml, None).await?;
-    for section_adapter in seed_section_adapters() {
-        let section_path = section_adapter.section().section_path;
-        let kept_item_keys = applied_keys.get(section_path).cloned().unwrap_or_default();
-        section_adapter
-            .remove_items_except(operation_context, &kept_item_keys)
-            .await?;
-    }
+    apply_seed_document(
+        operation_context,
+        &seed_state.seed_toml,
+        None,
+        SetupImportMode::Replace,
+    )
+    .await?;
     save_seed_state(
         operation_context,
         seed_state.seed_toml,
@@ -157,51 +158,45 @@ fn describe_invalid_setup(setup_check: &SetupCheck) -> OperationError {
     }
 }
 
-/// Environment references are resolved before the secrets are opened, so a `${` inside a
-/// secret is kept as written.
+/// Applies every section in order. Replace first puts the settings back to their defaults and
+/// afterwards removes the items the file does not hold, as reset does.
 async fn apply_seed_document(
     operation_context: &OperationContext,
     seed_toml: &str,
     passphrase: Option<&str>,
+    import_mode: SetupImportMode,
 ) -> Result<AppliedKeys, OperationError> {
-    let setup_document =
-        read_setup_document(seed_toml, SetupFileFormat::Toml).map_err(|read_problem| {
-            OperationError::Unprocessable {
-                code: "invalid_seed",
-                message: read_problem.describe(),
-            }
-        })?;
-    let prepared_setup = prepare_setup_document(operation_context, setup_document)?;
-    let mut seed_value = toml::Value::Table(prepared_setup.setup_document);
-    let mut missing_variables = Vec::new();
-    resolve_environment_references(
-        &mut seed_value,
-        operation_context.environment_reader.as_ref(),
-        &mut missing_variables,
-    );
-    if !missing_variables.is_empty() {
-        tracing::warn!(
-            ?missing_variables,
-            "seed file references unset environment variables"
-        );
-    }
-    SetupSecretOpener::new(passphrase).open_secrets(&mut seed_value)?;
-    let toml::Value::Table(seed_document) = seed_value else {
-        return Ok(AppliedKeys::new());
-    };
+    let prepared_seed = prepare_seed_for_apply(operation_context, seed_toml, passphrase)?;
     let section_adapters = seed_section_adapters();
-    warn_about_unsupported_sections(&seed_document, &section_adapters);
+    warn_about_unsupported_sections(&prepared_seed.seed_document, &section_adapters);
+    if import_mode == SetupImportMode::Replace {
+        operation_context
+            .settings_store
+            .save(
+                AppSettings::default(),
+                operation_context.clock.now_unix_ms(),
+            )
+            .await?;
+    }
     let mut applied_keys = AppliedKeys::new();
     for section_adapter in &section_adapters {
-        let seed_section = section_adapter.section();
         let item_keys = apply_section(
             operation_context,
             section_adapter.as_ref(),
-            &seed_document,
-            &missing_variables,
+            &prepared_seed.seed_document,
+            &prepared_seed.missing_variables,
         )
         .await?;
-        applied_keys.insert(seed_section.section_path, item_keys);
+        applied_keys.insert(section_adapter.section().section_path, item_keys);
+    }
+    if import_mode == SetupImportMode::Replace {
+        for section_adapter in &section_adapters {
+            let section_path = section_adapter.section().section_path;
+            let kept_item_keys = applied_keys.get(section_path).cloned().unwrap_or_default();
+            section_adapter
+                .remove_items_except(operation_context, &kept_item_keys)
+                .await?;
+        }
     }
     Ok(applied_keys)
 }

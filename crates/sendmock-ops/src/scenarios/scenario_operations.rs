@@ -12,6 +12,7 @@ const SCENARIO_FILE_ARGUMENT: &[CliArgument] = &[CliArgument {
     placeholder: "file",
     input_name: "scenario",
     reads_file: true,
+    is_optional: false,
 }];
 
 pub struct ValidateScenarioOperation;

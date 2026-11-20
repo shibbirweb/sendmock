@@ -28,7 +28,9 @@ import { paymentFlowHandlers } from "@/mocks/handlers/payment-flow-handlers";
 import { paymentGatewayHandlers } from "@/mocks/handlers/payment-gateway-handlers";
 import { paymentMethodHandlers } from "@/mocks/handlers/payment-method-handlers";
 import { samplesHandlers } from "@/mocks/handlers/samples-handlers";
+import { savedScenarioHandlers } from "@/mocks/handlers/saved-scenario-handlers";
 import { settingsHandlers } from "@/mocks/handlers/settings-handlers";
+import { setupHandlers } from "@/mocks/handlers/setup-handlers";
 import { simulatedErrorHandler } from "@/mocks/handlers/simulated-error-handler";
 import { smsHandlers } from "@/mocks/handlers/sms-handlers";
 import { smsThreadHandlers } from "@/mocks/handlers/sms-thread-handlers";
@@ -50,8 +52,10 @@ export const mockHandlers = [
   simulatedErrorHandler,
   ...systemHandlers,
   ...settingsHandlers,
+  ...setupHandlers,
   ...waitHandlers,
   ...automationHandlers,
+  ...savedScenarioHandlers,
   // Before the `:emailId`, `:paymentId` and `:ruleId` routes they would collide with.
   ...emailImportHandlers,
   ...paymentTestValueHandlers,

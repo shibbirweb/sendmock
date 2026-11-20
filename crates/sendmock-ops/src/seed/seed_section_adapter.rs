@@ -55,6 +55,20 @@ pub trait SeedSectionAdapter: Send + Sync {
 
     /// The JSON Schema of one item, for the setup file's published schema.
     fn describe_item_schema(&self, schema_generator: &mut SchemaGenerator) -> Schema;
+
+    /// The item as an export would write it, with the defaults a file may leave out filled
+    /// in, so an import preview compares like with like.
+    fn normalize_item(&self, item_table: &toml::Table) -> toml::Table;
+}
+
+/// Reads a file item into the section's type and writes it back; an item the type cannot
+/// read stays as written, and the apply names its problem.
+pub fn normalize_seed_table<SeedFields: Serialize + DeserializeOwned>(
+    item_table: &toml::Table,
+) -> toml::Table {
+    read_seed_table::<SeedFields>(item_table.clone())
+        .and_then(|seed_fields| write_seed_table(&seed_fields))
+        .unwrap_or_else(|_| item_table.clone())
 }
 
 /// Reads a seed table into the section's item type, with the field named on failure.
@@ -112,14 +126,17 @@ pub fn write_changed_fields(
 /// Implements `SeedSectionAdapter` for an adapter whose inherent async functions `export`,
 /// `apply` and `remove_unlisted` do the work, so each adapter file holds only its section. The
 /// third argument is the item's type, whose JSON Schema the setup schema uses, or
-/// `schema = <function>` for a section read without one. A section that holds secrets adds
-/// `writes_secrets`, and its `export` also takes the `SetupSecretWriter`.
+/// `schema = <function>` for a section read without one (its items are compared as written).
+/// A section that holds secrets adds `writes_secrets`, and its `export` also takes the
+/// `SetupSecretWriter`; one whose file items hold only what they change, such as the
+/// settings, adds `compared_as_written`.
 macro_rules! impl_seed_section_adapter {
     ($adapter:ty, $section:expr, schema = $describe_item_schema:path) => {
         $crate::seed::seed_section_adapter::impl_seed_section_adapter!(
             @adapter $adapter,
             $section,
             $describe_item_schema,
+            |item_table: &toml::Table| item_table.clone(),
             |operation_context, _secret_writer| Self::export(operation_context)
         );
     };
@@ -130,7 +147,19 @@ macro_rules! impl_seed_section_adapter {
             |schema_generator: &mut ::schemars::SchemaGenerator| {
                 schema_generator.subschema_for::<$item_type>()
             },
+            $crate::seed::seed_section_adapter::normalize_seed_table::<$item_type>,
             |operation_context, secret_writer| Self::export(operation_context, secret_writer)
+        );
+    };
+    ($adapter:ty, $section:expr, $item_type:ty, compared_as_written) => {
+        $crate::seed::seed_section_adapter::impl_seed_section_adapter!(
+            @adapter $adapter,
+            $section,
+            |schema_generator: &mut ::schemars::SchemaGenerator| {
+                schema_generator.subschema_for::<$item_type>()
+            },
+            |item_table: &toml::Table| item_table.clone(),
+            |operation_context, _secret_writer| Self::export(operation_context)
         );
     };
     ($adapter:ty, $section:expr, $item_type:ty) => {
@@ -140,6 +169,7 @@ macro_rules! impl_seed_section_adapter {
             |schema_generator: &mut ::schemars::SchemaGenerator| {
                 schema_generator.subschema_for::<$item_type>()
             },
+            $crate::seed::seed_section_adapter::normalize_seed_table::<$item_type>,
             |operation_context, _secret_writer| Self::export(operation_context)
         );
     };
@@ -147,6 +177,7 @@ macro_rules! impl_seed_section_adapter {
         @adapter $adapter:ty,
         $section:expr,
         $describe_item_schema:expr,
+        $normalize_item:expr,
         |$export_context:ident, $secret_writer:ident| $export_call:expr
     ) => {
         impl $crate::seed::seed_section_adapter::SeedSectionAdapter for $adapter {
@@ -186,6 +217,10 @@ macro_rules! impl_seed_section_adapter {
                 schema_generator: &mut ::schemars::SchemaGenerator,
             ) -> ::schemars::Schema {
                 ($describe_item_schema)(schema_generator)
+            }
+
+            fn normalize_item(&self, item_table: &toml::Table) -> toml::Table {
+                ($normalize_item)(item_table)
             }
         }
     };

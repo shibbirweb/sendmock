@@ -1,12 +1,9 @@
 use crate::seed::seed_section_adapter::{
     SeedItem, impl_seed_section_adapter, write_changed_fields,
 };
-use crate::seed::seed_sections::SETTINGS_SECTION;
+use crate::seed::seed_sections::{SETTINGS_ITEM_KEY, SETTINGS_SECTION};
 use crate::settings::validate_settings_update;
 use crate::{AppSettings, AppSettingsUpdate, OperationContext, OperationError};
-
-/// The settings section has one item.
-const SETTINGS_ITEM_KEY: &str = "settings";
 
 /// Settings that hold a secret and so never go into a seed file.
 const SECRET_SETTINGS: [&str; 1] = ["relay_smtp_url"];
@@ -71,7 +68,12 @@ fn write_changed_settings(current_settings: &AppSettings) -> Result<toml::Table,
     )
 }
 
-impl_seed_section_adapter!(SettingsSeedAdapter, SETTINGS_SECTION, AppSettingsUpdate);
+impl_seed_section_adapter!(
+    SettingsSeedAdapter,
+    SETTINGS_SECTION,
+    AppSettingsUpdate,
+    compared_as_written
+);
 
 #[cfg(test)]
 mod tests {

@@ -158,6 +158,7 @@ impl Operation for ForceVerificationOperation {
                 placeholder: "status",
                 input_name: "state",
                 reads_file: false,
+                is_optional: false,
             }],
             mcp_tool: "sendmock_verify_force",
             ..OperationDefinition::DEFAULTS

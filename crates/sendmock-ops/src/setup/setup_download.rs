@@ -132,7 +132,7 @@ fn read_format_from_content_type(content_type: &str) -> Option<SetupFileFormat> 
 }
 
 /// The URL without its user, password and query, which may carry a token.
-fn describe_url_for_log(url: &str) -> String {
+pub(crate) fn describe_url_for_log(url: &str) -> String {
     let without_query = url.split(['?', '#']).next().unwrap_or(url);
     let Some((scheme, after_scheme)) = without_query.split_once("://") else {
         return without_query.to_owned();

@@ -20,6 +20,7 @@ servers:
 tags:
   - name: System
   - name: Seed
+  - name: Setup
   - name: Logs
   - name: Test helpers
   - name: Automation
@@ -316,6 +317,118 @@ paths:
       x-sendmock-cli: sendmock seed apply <file>
       x-sendmock-mcp: sendmock_seed_apply
       x-sendmock-ui: Settings > Seed > Apply a seed file
+  /api/v1/setup/export:
+    post:
+      operationId: postSetupExport
+      summary: The configuration as a versioned setup file in TOML, JSON or YAML.
+      tags:
+        - Setup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetupExportRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: binary
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock setup export
+      x-sendmock-mcp: sendmock_setup_export
+      x-sendmock-ui: Settings > Setup > Export
+  /api/v1/setup/validate:
+    post:
+      operationId: postSetupValidate
+      summary: Check a setup without applying it, with what an import would add, change and remove.
+      tags:
+        - Setup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetupImportRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SetupValidation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock setup validate <file>
+      x-sendmock-mcp: sendmock_setup_validate
+      x-sendmock-ui: Settings > Setup > Import > preview
+  /api/v1/setup/import:
+    post:
+      operationId: postSetupImport
+      summary: Apply a setup from its text or a URL, merging or replacing; 422 with the errors and nothing applied when it is invalid.
+      tags:
+        - Setup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetupImportRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SetupValidation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock setup import <file> --yes
+      x-sendmock-mcp: sendmock_setup_import
+      x-sendmock-ui: Settings > Setup > Import
+  /api/v1/setup/migrate:
+    post:
+      operationId: postSetupMigrate
+      summary: A setup file upgraded to this build's format version, without applying it.
+      tags:
+        - Setup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetupMigrateRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: binary
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock setup migrate <file>
+      x-sendmock-mcp: sendmock_setup_migrate
+      x-sendmock-ui: Settings > Setup > Upgrade a file
   /api/v1/logs/smtp:
     get:
       operationId: getLogsSmtp
@@ -1080,6 +1193,173 @@ paths:
       x-sendmock-cli: sendmock scenario run <file>
       x-sendmock-mcp: sendmock_scenario_run
       x-sendmock-ui: Scenarios > Run
+  /api/v1/scenarios:
+    get:
+      operationId: getScenarios
+      summary: The saved scenarios, by name.
+      tags:
+        - Automation
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SavedScenario"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock scenario list
+      x-sendmock-mcp: sendmock_scenario_list
+      x-sendmock-ui: Scenarios > Saved
+    post:
+      operationId: postScenarios
+      summary: Save a scenario by name; 422 with its problems when it is not valid.
+      tags:
+        - Automation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SavedScenarioInput"
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SavedScenario"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock scenario save <file>
+      x-sendmock-mcp: sendmock_scenario_save
+      x-sendmock-ui: Scenarios > Save
+  /api/v1/scenarios/{scenarioId}:
+    get:
+      operationId: getScenariosByScenarioId
+      summary: One saved scenario, by id or name.
+      tags:
+        - Automation
+      parameters:
+        - name: scenarioId
+          in: path
+          required: true
+          description: The saved scenario's ID or name, from `GET /api/v1/scenarios`.
+          schema:
+            type: string
+          example: otp-login
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SavedScenario"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock scenario show <scenarioId>
+      x-sendmock-mcp: sendmock_scenario_get
+      x-sendmock-ui: Scenarios > Saved > open a scenario
+    patch:
+      operationId: patchScenariosByScenarioId
+      summary: Rename a saved scenario or change its description or file.
+      tags:
+        - Automation
+      parameters:
+        - name: scenarioId
+          in: path
+          required: true
+          description: The saved scenario's ID or name, from `GET /api/v1/scenarios`.
+          schema:
+            type: string
+          example: otp-login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SavedScenarioInputPatch"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SavedScenario"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock scenario update <scenarioId>
+      x-sendmock-mcp: sendmock_scenario_update
+      x-sendmock-ui: Scenarios > Saved > Rename, or Save over it
+    delete:
+      operationId: deleteScenariosByScenarioId
+      summary: Delete a saved scenario.
+      tags:
+        - Automation
+      parameters:
+        - name: scenarioId
+          in: path
+          required: true
+          description: The saved scenario's ID or name, from `GET /api/v1/scenarios`.
+          schema:
+            type: string
+          example: otp-login
+      responses:
+        "204":
+          description: No content.
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock scenario delete <scenarioId>
+      x-sendmock-mcp: sendmock_scenario_delete
+      x-sendmock-ui: Scenarios > Saved > Delete
+  /api/v1/scenarios/{scenarioId}/run:
+    post:
+      operationId: postScenariosByScenarioIdRun
+      summary: Run a saved scenario step by step and report each step.
+      tags:
+        - Automation
+      parameters:
+        - name: scenarioId
+          in: path
+          required: true
+          description: The saved scenario's ID or name, from `GET /api/v1/scenarios`.
+          schema:
+            type: string
+          example: otp-login
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScenarioReport"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock scenario run-saved <scenarioId>
+      x-sendmock-mcp: sendmock_scenario_run
+      x-sendmock-ui: Scenarios > Saved > open a scenario > Run
   /api/v1/ai/agents:
     get:
       operationId: getAiAgents
@@ -14504,6 +14784,73 @@ components:
         - endpoint_id
         - rerender
       description: Body of POST /api/v1/webhooks/saved/{savedId}/send.
+    SavedScenario:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        scenario:
+          type: string
+          description: The scenario file's text, in TOML.
+        created_by:
+          type: string
+        created_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+        updated_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+      required:
+        - id
+        - name
+        - description
+        - scenario
+        - created_by
+        - created_at
+        - updated_at
+      description: A scenario saved by name, with its file.
+    SavedScenarioInput:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Unique among saved scenarios.
+          examples:
+            - otp-login
+        description:
+          type: string
+        scenario:
+          type: string
+          description: The scenario file's text, in TOML; checked as `scenario validate` does.
+          examples:
+            - |-
+              [[steps]]
+              run = "sample.send"
+              with = { kind = "sms" }
+      required:
+        - name
+        - scenario
+      description: Body of POST /api/v1/scenarios; PATCH /api/v1/scenarios/{scenarioId} takes only the changed keys.
+    SavedScenarioInputPatch:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Unique among saved scenarios.
+          examples:
+            - otp-login
+        description:
+          type: string
+        scenario:
+          type: string
+          description: The scenario file's text, in TOML; checked as `scenario validate` does.
+          examples:
+            - |-
+              [[steps]]
+              run = "sample.send"
+              with = { kind = "sms" }
     ScenarioProblem:
       type: object
       properties:
@@ -14647,6 +14994,17 @@ components:
       required:
         - seed_toml
       description: Body of POST /api/v1/seed/validate and /seed/apply.
+    SeedItemCount:
+      type: object
+      properties:
+        item_kind:
+          type: string
+        item_count:
+          type: number
+      required:
+        - item_kind
+        - item_count
+      description: How many items of one kind a setup file holds.
     SeedStatus:
       type: object
       properties:
@@ -14680,15 +15038,7 @@ components:
         summary:
           type: array
           items:
-            type: object
-            properties:
-              item_kind:
-                type: string
-              item_count:
-                type: number
-            required:
-              - item_kind
-              - item_count
+            $ref: "#/components/schemas/SeedItemCount"
           description: How many items of each kind the file would create or update.
       required:
         - is_valid
@@ -14705,6 +15055,215 @@ components:
       required:
         - line
         - message
+    SetupExportRequest:
+      type: object
+      properties:
+        format:
+          anyOf:
+            - $ref: "#/components/schemas/SetupFileFormat"
+            - type: "null"
+          description: "`toml` (the default), `json` or `yaml`."
+          examples:
+            - toml
+        only:
+          type: array
+          items:
+            type: string
+          description: Only these sections, such as `webhook.endpoints`, or groups, such as `webhook`; every section when empty.
+          examples:
+            - - webhook
+              - numbers
+        except:
+          type: array
+          items:
+            type: string
+          description: Every section but these.
+        include_secrets:
+          type: boolean
+          description: Write secrets encrypted with `passphrase` instead of as `${ENV_VAR}` references, to move the setup to your own machine.
+        passphrase:
+          type:
+            - string
+            - "null"
+          description: The passphrase for `include_secrets`, 8 characters or more. The CLI reads `SENDMOCK_SETUP_PASSPHRASE` when the flag is not given.
+      description: Body of POST /api/v1/setup/export.
+    SetupFileFormat:
+      type: string
+      enum:
+        - toml
+        - json
+        - yaml
+      description: The text formats a setup file can be written in; all three hold the same structure.
+    SetupImportMode:
+      type: string
+      enum:
+        - merge
+        - replace
+      description: How an import treats the configuration the file does not hold.
+    SetupImportRequest:
+      type: object
+      properties:
+        setup_text:
+          type:
+            - string
+            - "null"
+          description: The setup file's text, in TOML, JSON or YAML; or give `url`.
+          examples:
+            - |-
+              [[numbers]]
+              number = "+15550001111"
+              label = "Support line"
+        url:
+          type:
+            - string
+            - "null"
+          description: "Download the setup from this `https://` URL (plain `http://` only for loopback and private addresses): at most 1 MB, 10 seconds and 3 redirects, all to `https://`."
+        sha256:
+          type:
+            - string
+            - "null"
+          description: The SHA-256 the download must have, as 64 hexadecimal digits.
+        headers:
+          type: array
+          items:
+            type: string
+          description: "Headers for a private URL, each as `Name: value`; never shown or logged."
+        format:
+          anyOf:
+            - $ref: "#/components/schemas/SetupFileFormat"
+            - type: "null"
+          description: "`toml`, `json` or `yaml`, when the URL or the text does not say."
+        mode:
+          $ref: "#/components/schemas/SetupImportMode"
+          description: "`merge` (the default) or `replace`."
+        passphrase:
+          type:
+            - string
+            - "null"
+          description: Opens the file's encrypted secrets. The CLI reads `SENDMOCK_SETUP_PASSPHRASE` when the flag is not given.
+        confirm_removed_count:
+          type:
+            - number
+            - "null"
+          description: "For `replace` imports: how many items the validation said would be removed; the import is refused when it differs."
+      description: "Body of POST /api/v1/setup/validate and /setup/import: the file's text, or a URL to download it from."
+    SetupMigrateRequest:
+      type: object
+      properties:
+        setup_text:
+          type: string
+          description: The setup file's text.
+          examples:
+            - |-
+              [[numbers]]
+              number = "+15550001111"
+              label = "Support line"
+        format:
+          anyOf:
+            - $ref: "#/components/schemas/SetupFileFormat"
+            - type: "null"
+          description: The format of `setup_text`, when the text does not say.
+        to_format:
+          anyOf:
+            - $ref: "#/components/schemas/SetupFileFormat"
+            - type: "null"
+          description: The format to write the upgraded copy in; the same as the file's by default.
+      required:
+        - setup_text
+      description: Body of POST /api/v1/setup/migrate.
+    SetupSectionChange:
+      type: object
+      properties:
+        section:
+          type: string
+          description: The section, such as `webhook.endpoints`.
+        item_kind:
+          type: string
+        added:
+          type: array
+          items:
+            type: string
+        changed:
+          type: array
+          items:
+            type: string
+        removed:
+          type: array
+          items:
+            type: string
+      required:
+        - section
+        - item_kind
+        - added
+        - changed
+        - removed
+      description: One section's changes, items named as the UI lists them.
+    SetupValidation:
+      type: object
+      properties:
+        is_valid:
+          type: boolean
+        format:
+          $ref: "#/components/schemas/SetupFileFormat"
+          description: The format the file was read as.
+        format_version:
+          type: number
+          description: The file's format version (1 for a file without the `[sendmock]` header).
+        upgraded_from_format_version:
+          type:
+            - number
+            - "null"
+          description: The format version an older file is upgraded from, in memory; null when it is current.
+        has_encrypted_secrets:
+          type: boolean
+          description: Whether the file holds encrypted secrets, so the import needs the passphrase.
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/SetupValidationError"
+        summary:
+          type: array
+          items:
+            $ref: "#/components/schemas/SeedItemCount"
+          description: How many items of each kind the file holds.
+        changes:
+          type: array
+          items:
+            $ref: "#/components/schemas/SetupSectionChange"
+          description: Per section, the items the import adds, changes and removes; only sections with any.
+        removed_count:
+          type: number
+          description: How many items a `replace` import removes, for `confirm_removed_count`.
+      required:
+        - is_valid
+        - format
+        - format_version
+        - upgraded_from_format_version
+        - has_encrypted_secrets
+        - errors
+        - summary
+        - changes
+        - removed_count
+      description: What validating or importing a setup found, and per section what it adds, changes and removes.
+    SetupValidationError:
+      type: object
+      properties:
+        line:
+          type:
+            - number
+            - "null"
+        location:
+          type:
+            - string
+            - "null"
+          description: The key path, such as `webhook.endpoints[0].secret`.
+        message:
+          type: string
+      required:
+        - line
+        - location
+        - message
+      description: A problem in a setup, by line when the format keeps one and by key path otherwise.
     SimulatedEmailOutcome:
       type: object
       properties:

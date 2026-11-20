@@ -3,7 +3,7 @@ pub const DEFAULT_TOOLSETS: [&str; 6] = ["core", "email", "sms", "verify", "extr
 
 /// The toolset of each tool, by name prefix, as `mcp-toolsets.ts` gives them; the first
 /// matching prefix wins, so longer prefixes come first.
-const TOOLSET_PREFIXES: [(&str, &str); 28] = [
+const TOOLSET_PREFIXES: [(&str, &str); 29] = [
     // Creating an endpoint needs a template id, so listing them comes with the endpoints.
     ("sendmock_webhook_template_list", "webhooks"),
     ("sendmock_webhook_template_", "templates"),
@@ -30,6 +30,7 @@ const TOOLSET_PREFIXES: [(&str, &str); 28] = [
     ("sendmock_reset", "admin"),
     ("sendmock_traffic_", "admin"),
     ("sendmock_seed_", "admin"),
+    ("sendmock_setup_", "admin"),
     ("sendmock_sample_", "admin"),
     ("sendmock_update_", "admin"),
     ("sendmock_", "core"),

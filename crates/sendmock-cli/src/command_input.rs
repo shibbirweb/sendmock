@@ -27,8 +27,12 @@ pub fn build_command_input(
                     .ok()
                     .flatten()
                     .cloned()
-            })
-            .unwrap_or_default();
+            });
+        let Some(argument_value) =
+            argument_value.or_else(|| (!positional_input.is_optional).then(String::new))
+        else {
+            continue;
+        };
         if positional_input.reads_file {
             input.insert(
                 positional_input.input_name.clone(),

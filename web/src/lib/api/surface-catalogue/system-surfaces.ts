@@ -94,6 +94,33 @@ export const systemSurfaces: SurfaceCatalogue = {
     ui: "Settings > Seed > Apply a seed file",
     cliArguments: { file: "seed_toml" },
   },
+  "POST /api/v1/setup/export": {
+    phase: "A18",
+    cli: "sendmock setup export",
+    mcp: "sendmock_setup_export",
+    ui: "Settings > Setup > Export",
+  },
+  "POST /api/v1/setup/validate": {
+    phase: "A18",
+    cli: "sendmock setup validate <file>",
+    mcp: "sendmock_setup_validate",
+    ui: "Settings > Setup > Import > preview",
+    cliArguments: { file: "setup_text" },
+  },
+  "POST /api/v1/setup/import": {
+    phase: "A18",
+    cli: "sendmock setup import <file> --yes",
+    mcp: "sendmock_setup_import",
+    ui: "Settings > Setup > Import",
+    cliArguments: { file: "setup_text" },
+  },
+  "POST /api/v1/setup/migrate": {
+    phase: "A18",
+    cli: "sendmock setup migrate <file>",
+    mcp: "sendmock_setup_migrate",
+    ui: "Settings > Setup > Upgrade a file",
+    cliArguments: { file: "setup_text" },
+  },
   "GET /api/v1/logs/smtp": {
     phase: "1",
     cli: "sendmock logs smtp",

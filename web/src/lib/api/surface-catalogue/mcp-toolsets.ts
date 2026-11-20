@@ -29,6 +29,7 @@ const toolsetPrefixes: [string, string][] = [
   ["sendmock_reset", "admin"],
   ["sendmock_traffic_", "admin"],
   ["sendmock_seed_", "admin"],
+  ["sendmock_setup_", "admin"],
   ["sendmock_sample_", "admin"],
   ["sendmock_update_", "admin"],
   ["sendmock_", "core"],

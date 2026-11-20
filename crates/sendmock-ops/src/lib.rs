@@ -133,10 +133,13 @@ pub use settings::{
 };
 pub use setup::{
     CURRENT_FORMAT_VERSION, DownloadedSetup, ENCRYPTED_SECRET_PREFIX, EncryptedSecretWriter,
-    FetchedSetupFile, SETUP_FORMAT_NAME, SecretReferenceWriter, SetupFetchError, SetupFetchFuture,
-    SetupFetchLimits, SetupFetchRequest, SetupFetcher, SetupFileFormat, SetupHeader, SetupProblem,
-    SetupRequestHeader, SetupSecretError, SetupSecretWriter, SetupUrlSource, SetupVersionDecision,
-    SetupVersionPolicy, build_setup_json_schema, download_setup, is_plain_http_address_allowed,
+    ExportSetupOperation, FetchedSetupFile, ImportSetupOperation, MigrateSetupOperation,
+    SETUP_FORMAT_NAME, SecretReferenceWriter, SetupExportRequest, SetupFetchError,
+    SetupFetchFuture, SetupFetchLimits, SetupFetchRequest, SetupFetcher, SetupFileFormat,
+    SetupHeader, SetupImportMode, SetupImportRequest, SetupMigrateRequest, SetupProblem,
+    SetupRequestHeader, SetupSecretError, SetupSecretWriter, SetupSectionChange, SetupUrlSource,
+    SetupValidation, SetupValidationError, SetupVersionDecision, SetupVersionPolicy,
+    ValidateSetupOperation, build_setup_json_schema, download_setup, is_plain_http_address_allowed,
     read_setup_document, setup_json_schema_url, write_setup_document,
 };
 pub use sms::{
@@ -185,6 +188,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     operation_registry.register(ExportSeedOperation);
     operation_registry.register(ValidateSeedOperation);
     operation_registry.register(ApplySeedOperation);
+    setup::register_setup_operations(&mut operation_registry);
     operation_registry.register(GetStatsOperation);
     email::register_email_operations(&mut operation_registry);
     events::register_event_operations(&mut operation_registry);

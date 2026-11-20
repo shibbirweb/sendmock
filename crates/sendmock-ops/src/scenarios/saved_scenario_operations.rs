@@ -93,6 +93,7 @@ impl Operation for SaveScenarioOperation {
                 placeholder: "file",
                 input_name: "scenario",
                 reads_file: true,
+                is_optional: false,
             }],
             success_status: SuccessStatus::Created,
             ..OperationDefinition::DEFAULTS

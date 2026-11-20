@@ -102,8 +102,8 @@ async fn import_setup(
         setup_text,
         setup_format,
         SetupImportOptions {
-            source_path: None,
             passphrase: passphrase.map(str::to_owned),
+            ..SetupImportOptions::default()
         },
     )
     .await
