@@ -247,7 +247,7 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock seed status
       x-sendmock-mcp: sendmock_seed_status
-      x-sendmock-ui: Settings > Seed
+      x-sendmock-ui: Settings > Setup > Seed file
   /api/v1/seed/export:
     get:
       operationId: getSeedExport
@@ -266,7 +266,7 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock seed export
       x-sendmock-mcp: sendmock_seed_export
-      x-sendmock-ui: Settings > Seed > Export sendmock.seed.toml
+      x-sendmock-ui: Settings > Setup > Export sendmock.seed.toml
   /api/v1/seed/validate:
     post:
       operationId: postSeedValidate
@@ -290,7 +290,7 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock seed validate <file>
       x-sendmock-mcp: sendmock_seed_validate
-      x-sendmock-ui: Settings > Seed > Validate
+      x-sendmock-ui: Settings > Setup > Import a setup > Preview
   /api/v1/seed/apply:
     post:
       operationId: postSeedApply
@@ -316,7 +316,7 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock seed apply <file>
       x-sendmock-mcp: sendmock_seed_apply
-      x-sendmock-ui: Settings > Seed > Apply a seed file
+      x-sendmock-ui: Settings > Setup > Import a setup
   /api/v1/setup/export:
     post:
       operationId: postSetupExport
@@ -343,7 +343,7 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock setup export
       x-sendmock-mcp: sendmock_setup_export
-      x-sendmock-ui: Settings > Setup > Export
+      x-sendmock-ui: Settings > Setup > Export a setup
   /api/v1/setup/validate:
     post:
       operationId: postSetupValidate
@@ -371,7 +371,7 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock setup validate <file>
       x-sendmock-mcp: sendmock_setup_validate
-      x-sendmock-ui: Settings > Setup > Import > preview
+      x-sendmock-ui: Settings > Setup > Import a setup > Preview
   /api/v1/setup/import:
     post:
       operationId: postSetupImport
@@ -399,7 +399,7 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock setup import <file> --yes
       x-sendmock-mcp: sendmock_setup_import
-      x-sendmock-ui: Settings > Setup > Import
+      x-sendmock-ui: Settings > Setup > Import a setup
   /api/v1/setup/migrate:
     post:
       operationId: postSetupMigrate
@@ -428,7 +428,7 @@ paths:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock setup migrate <file>
       x-sendmock-mcp: sendmock_setup_migrate
-      x-sendmock-ui: Settings > Setup > Upgrade a file
+      x-sendmock-ui: Settings > Setup > Import a setup > Download the upgraded copy
   /api/v1/logs/smtp:
     get:
       operationId: getLogsSmtp

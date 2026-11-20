@@ -1,16 +1,15 @@
 import { DownloadIcon, FileCode2Icon } from "lucide-react";
-import { FeatureAvailabilityGate } from "@/features/availability/feature-availability-gate";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SeedApplyCard } from "@/features/settings/sections/seed-apply-card";
 import { SettingsSectionCard } from "@/features/settings/settings-section-card";
 import { useExportSeed, useSeedStatus } from "@/lib/api/hooks/use-seed-queries";
 import { downloadTextFile } from "@/lib/files/download-text-file";
 import { formatDateTime } from "@/lib/format/format-values";
 
-function SeedStatusCard() {
+/** What the seed file set up and what changed since, with its TOML export (PL-04.6). */
+export function SeedStatusCard() {
   const seedStatusQuery = useSeedStatus();
   const exportSeed = useExportSeed();
   const seedStatus = seedStatusQuery.data;
@@ -85,21 +84,5 @@ function SeedStatusCard() {
         </Button>
       </div>
     </SettingsSectionCard>
-  );
-}
-
-/** Seed status, export, and validate-then-apply (PL-04.6). */
-export function SeedSection() {
-  return (
-    <div className="grid gap-4">
-      <FeatureAvailabilityGate
-        operationKey="GET /api/v1/seed/status"
-        featureName="Seed status and export"
-        description="What the seed file set up, what changed since, and an export of the current setup."
-      >
-        <SeedStatusCard />
-      </FeatureAvailabilityGate>
-      <SeedApplyCard />
-    </div>
   );
 }

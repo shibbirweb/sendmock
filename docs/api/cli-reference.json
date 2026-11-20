@@ -13664,7 +13664,7 @@
         "sendmock_seed_apply"
       ],
       "ui": [
-        "Settings > Seed > Apply a seed file"
+        "Settings > Setup > Import a setup"
       ]
     },
     {
@@ -13698,7 +13698,7 @@
         "sendmock_seed_export"
       ],
       "ui": [
-        "Settings > Seed > Export sendmock.seed.toml"
+        "Settings > Setup > Export sendmock.seed.toml"
       ]
     },
     {
@@ -13732,7 +13732,7 @@
         "sendmock_seed_status"
       ],
       "ui": [
-        "Settings > Seed"
+        "Settings > Setup > Seed file"
       ]
     },
     {
@@ -13779,7 +13779,7 @@
         "sendmock_seed_validate"
       ],
       "ui": [
-        "Settings > Seed > Validate"
+        "Settings > Setup > Import a setup > Preview"
       ]
     },
     {
@@ -14533,7 +14533,7 @@
         "sendmock_setup_export"
       ],
       "ui": [
-        "Settings > Setup > Export"
+        "Settings > Setup > Export a setup"
       ]
     },
     {
@@ -14707,7 +14707,7 @@
         "sendmock_setup_import"
       ],
       "ui": [
-        "Settings > Setup > Import"
+        "Settings > Setup > Import a setup"
       ]
     },
     {
@@ -14793,7 +14793,7 @@
         "sendmock_setup_migrate"
       ],
       "ui": [
-        "Settings > Setup > Upgrade a file"
+        "Settings > Setup > Import a setup > Download the upgraded copy"
       ]
     },
     {
@@ -14955,7 +14955,7 @@
         "sendmock_setup_validate"
       ],
       "ui": [
-        "Settings > Setup > Import > preview"
+        "Settings > Setup > Import a setup > Preview"
       ]
     },
     {

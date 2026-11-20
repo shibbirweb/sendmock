@@ -3,6 +3,7 @@ import type {
   SetupImportMode,
   SetupSectionChange,
   SetupValidation,
+  SetupValidationError,
 } from "@/lib/api/types";
 import type { MockDatabase } from "@/mocks/db/mock-database";
 import { validateSeedToml } from "@/mocks/fixtures/seed-toml";
@@ -126,6 +127,27 @@ function readFormatVersion(setupDocument: SetupDocument): number {
     : 1;
 }
 
+/** A TOML file's problems by line, as the seed check words them, or the parser's own message. */
+function describeReadProblem(
+  setupText: string,
+  setupFormat: SetupFileFormat,
+  readProblem: { problem: string; line: number | null },
+): SetupValidationError[] {
+  const seedErrors =
+    setupFormat === "toml" ? validateSeedToml(setupText).errors : [];
+  if (seedErrors.length > 0) {
+    return seedErrors.map((seedError) => ({
+      line: seedError.line,
+      location: null,
+      message: seedError.message,
+    }));
+  }
+
+  return [
+    { line: readProblem.line, location: null, message: readProblem.problem },
+  ];
+}
+
 /** The mock's answer to validate and import: problems, the format version and the changes. */
 export function validateMockSetup(
   setupText: string,
@@ -146,11 +168,11 @@ export function validateMockSetup(
   };
   const readResult = readSetupText(setupText, setupFormat);
   if ("problem" in readResult) {
-    setupValidation.errors.push({
-      line: readResult.line,
-      location: null,
-      message: readResult.problem,
-    });
+    setupValidation.errors = describeReadProblem(
+      setupText,
+      setupFormat,
+      readResult,
+    );
 
     return setupValidation;
   }

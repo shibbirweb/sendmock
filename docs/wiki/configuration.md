@@ -3,7 +3,7 @@ title: Configuration and seed file
 description: sendmock.toml, environment variables and the sendmock.seed.toml seed file.
 ---
 
-> Settings > General and Settings > Seed in the [live demo](/demo/) show the screens.
+> Settings > General and Settings > Setup in the [live demo](/demo/) show the screens.
 
 ## How SendMock runs: `sendmock.toml`
 
@@ -25,6 +25,52 @@ Endpoints, rules, templates, variables, numbers, Messaging Services, Verify serv
 - **Apply** replaces the configuration with the file.
 
 Secrets are never written to an export in plain text.
+
+## Setup files: TOML, JSON or YAML, with a version
+
+A setup file is a seed file with a `[sendmock]` header, written by **Settings > Setup > Export a setup** or `sendmock setup export`. SendMock reads it anywhere it reads a seed file, in any of the three formats, which hold the same structure:
+
+```toml
+[sendmock]
+format = "sendmock.setup"
+format_version = 2
+exported_by = "1.3.0"
+exported_at = "2026-11-20T10:00:00Z"
+```
+
+| Key | What it says |
+| --- | --- |
+| `format` | always `sendmock.setup` |
+| `format_version` | the shape of the file; it changes only when a section or key changes, never in a patch release |
+| `exported_by` | the SendMock version that wrote the file; a newer one with the same `format_version` is fine |
+| `exported_at` | when it was written |
+
+A file without the header is format 1, a seed file from before setups had versions, and still applies. An older format is upgraded for the import (your file stays as it is; `sendmock setup migrate` writes the upgraded copy), and a newer one is refused before anything changes. The versions are listed on [Docs versions](./versions.md#setup-file-format-versions).
+
+The sections, each a list of items unless noted:
+
+| Section | Holds | Items are matched by |
+| --- | --- | --- |
+| `[settings]` (a table) | the settings you changed from the defaults | |
+| `[[projects]]` | projects | `key` |
+| `[[webhook.endpoints]]`, `[[webhook.rules]]`, `[[webhook.saved]]` | webhook endpoints, rules and saved deliveries | `name` |
+| `[[webhook.templates]]` | custom and edited webhook templates | `id` |
+| `[[webhook.variables]]` | webhook variables | `endpoint` and `name` |
+| `[[verify.services]]`, `[[messaging_services]]` | Verify services and Messaging Services | `sid` |
+| `[[numbers]]` | virtual numbers | `number` |
+| `[[sms.outcome_rules]]` | custom outcome numbers | `match` and `pattern` |
+| `[[email.outcome_rules]]` | custom outcome addresses | `pattern` |
+| `[[email.templates]]` | email template stand-ins | `id` |
+| `[[email.tag_rules]]`, `[[email.forward_rules]]` | tag and forward rules | `name` |
+| `[[email.inbound_routes]]` | inbound routes | `description` |
+| `[[email.providers]]`, `[[sms.providers]]` | custom and edited providers | `key` |
+| `[[payments.flows]]`, `[[payments.methods]]`, `[[payments.gateways]]` | payment flows, methods and gateways | `key` |
+| `[[http.bins]]` | HTTP Catcher bins with their mock responses | `name` |
+| `[[scenarios]]` | saved scenarios, with their `[[scenarios.steps]]` | `name` |
+
+The JSON Schema of each format version is published at [`/schema/setup/v2.json`](/schema/setup/v2.json), so an editor checks a file as you write it. In JSON and YAML the sections nest under their group (`{"webhook": {"endpoints": [...]}}`).
+
+Secrets are `${ENV_VAR}` references, read from the environment on import, or, with `--include-secrets`, text starting `encrypted:v1:` that only the export's passphrase opens. A setup never holds traffic or the options in `sendmock.toml` (ports, database path, auth), which belong to each machine.
 
 ## How much is kept: `--max-emails`, `--max-sms` and `--max-age`
 

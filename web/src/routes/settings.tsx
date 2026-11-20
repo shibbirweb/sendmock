@@ -17,13 +17,18 @@ function isSettingsSectionId(
   return settingsSectionIds.includes(searchValue as SettingsSectionId);
 }
 
+/** Settings > Seed became Settings > Setup; old links still open it. */
+const renamedSectionIds: Record<string, SettingsSectionId> = {
+  seed: "setup",
+};
+
 export const Route = createFileRoute("/settings")({
   validateSearch: (
     searchParams: Record<string, unknown>,
   ): SettingsSearchParams => ({
     section: isSettingsSectionId(searchParams.section)
       ? searchParams.section
-      : undefined,
+      : renamedSectionIds[String(searchParams.section)],
   }),
   component: SettingsPage,
 });

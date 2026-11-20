@@ -8,6 +8,11 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ## [Unreleased]
 
+### Added
+
+- **Share and move a setup:** **Settings > Setup** (formerly **Settings > Seed**) exports everything you configured, without traffic, as one file in TOML, JSON or YAML, all sections or only some. Secrets come out as `${ENV_VAR}` references, or encrypted with a passphrase to carry your own setup to another machine. **Import a setup** takes a file, pasted text or an `https://` URL (with an optional SHA-256 and headers for a private address), previews what it would add, change and remove, then merges it or replaces your configuration after a confirmation that names how many items go. A file from an older SendMock is upgraded for the import, and one from a newer SendMock is refused with the version to update to. The same from the command line with `sendmock setup export|validate|import|migrate`, the REST API under `/api/v1/setup/` and the `sendmock_setup_*` MCP tools.
+- **Saved scenarios:** the **Scenarios** screen keeps scenarios by name in a **Saved** list beside the editor: save, save as, open, rename and delete them, with an **Unsaved changes** mark while the editor differs. A saved scenario runs by its name with `sendmock scenario run-saved <name>` and travels in a setup.
+
 ### Fixed
 
 - **Demo version:** the demo at https://shibbir.me/sendmock/demo/ shows the version it was built from (the newest release on the main site) instead of an old beta. Its update check, in **Settings > About** with an older install picked in **Demo controls**, offers the real releases with their real release notes.
