@@ -6,16 +6,17 @@ use serde_json::json;
 use super::endpoint_names::EndpointNames;
 use crate::seed::seed_section_adapter::{
     CREATED_BY_SEED, SeedItem, impl_seed_section_adapter, read_seed_table, to_api_input,
-    to_secret_reference, write_seed_table,
+    write_seed_table,
 };
 use crate::seed::seed_sections::WEBHOOK_VARIABLES_SECTION;
+use crate::setup::SetupSecretWriter;
 use crate::webhooks::{WebhookVariableInput, generate_fixed_value, validate_variable};
 use crate::{OperationContext, OperationError};
 
 const SECRET_KIND: &str = "secret";
 
 /// `[[webhook.variables]]`, matched by `endpoint` (left out for a global one) and `name`. A
-/// secret's `value` must be an `${ENV_VAR}` reference; export writes one.
+/// secret's `value` must be an `${ENV_VAR}` reference or encrypted; export writes one of them.
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 struct SeedWebhookVariable {
@@ -91,7 +92,10 @@ impl WebhookVariableSeedAdapter {
         Ok(item_key)
     }
 
-    async fn export(operation_context: &OperationContext) -> Result<Vec<SeedItem>, OperationError> {
+    async fn export(
+        operation_context: &OperationContext,
+        secret_writer: &dyn SetupSecretWriter,
+    ) -> Result<Vec<SeedItem>, OperationError> {
         let endpoint_names = EndpointNames::load(operation_context).await?;
         let stored_variables = operation_context
             .webhook_variable_repository
@@ -105,7 +109,7 @@ impl WebhookVariableSeedAdapter {
                     .as_deref()
                     .and_then(|endpoint_id| endpoint_names.find_name(endpoint_id));
                 let value = if stored_variable.kind == SECRET_KIND {
-                    to_secret_reference(&stored_variable.name)
+                    secret_writer.write_secret(&stored_variable.name, &stored_variable.value)?
                 } else {
                     stored_variable.value
                 };
@@ -202,5 +206,6 @@ async fn build_seeded_variable(
 impl_seed_section_adapter!(
     WebhookVariableSeedAdapter,
     WEBHOOK_VARIABLES_SECTION,
-    SeedWebhookVariable
+    SeedWebhookVariable,
+    writes_secrets
 );

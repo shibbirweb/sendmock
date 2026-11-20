@@ -7,8 +7,9 @@ use std::fs;
 use std::path::PathBuf;
 
 use sendmock_ops::{
-    CURRENT_FORMAT_VERSION, OperationContext, SetupFileFormat, apply_setup_text,
-    build_setup_json_schema, check_setup_text, read_setup_document, write_setup_text,
+    CURRENT_FORMAT_VERSION, OperationContext, SecretReferenceWriter, SetupFileFormat,
+    SetupImportOptions, apply_setup_text, build_setup_json_schema, check_setup_text,
+    read_setup_document, write_setup_text,
 };
 use serde_json::Value;
 use support::test_app::build_test_app;
@@ -75,13 +76,18 @@ async fn apply_in(
     setup_text: &str,
     setup_format: SetupFileFormat,
 ) {
-    apply_setup_text(operation_context, setup_text, setup_format, None)
-        .await
-        .unwrap_or_else(|error| panic!("{setup_format:?} applies: {error}\n{setup_text}"));
+    apply_setup_text(
+        operation_context,
+        setup_text,
+        setup_format,
+        SetupImportOptions::default(),
+    )
+    .await
+    .unwrap_or_else(|error| panic!("{setup_format:?} applies: {error}\n{setup_text}"));
 }
 
 async fn export_in(operation_context: &OperationContext, setup_format: SetupFileFormat) -> String {
-    write_setup_text(operation_context, setup_format)
+    write_setup_text(operation_context, setup_format, &SecretReferenceWriter)
         .await
         .unwrap_or_else(|error| panic!("{setup_format:?} exports: {error}"))
 }
@@ -144,8 +150,13 @@ async fn a_json_or_yaml_file_is_checked_by_the_same_rules_and_applies_nothing_wh
     let broken_yaml = "numbers:\n  - number: \"+15550001111\"\n    label: Support\nwebhook:\n  endpoint:\n    - name: typo\n";
 
     let setup_check = check_setup_text(broken_yaml, SetupFileFormat::Yaml);
-    let apply_result =
-        apply_setup_text(&operation_context, broken_yaml, SetupFileFormat::Yaml, None).await;
+    let apply_result = apply_setup_text(
+        &operation_context,
+        broken_yaml,
+        SetupFileFormat::Yaml,
+        SetupImportOptions::default(),
+    )
+    .await;
 
     assert!(!setup_check.is_valid());
     assert_eq!(

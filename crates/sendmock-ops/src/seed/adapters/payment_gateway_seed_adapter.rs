@@ -9,30 +9,32 @@ use crate::payments::{
     ListPaymentGatewaysOperation, PaymentGatewayDefinition, ResetPaymentGatewayOperation,
     UpdatePaymentGatewayOperation,
 };
-use crate::seed::seed_section_adapter::{
-    SeedItem, impl_seed_section_adapter, to_api_input, to_secret_reference,
-};
+use crate::seed::seed_section_adapter::{SeedItem, impl_seed_section_adapter, to_api_input};
 use crate::seed::seed_sections::PAYMENT_GATEWAYS_SECTION;
+use crate::setup::SetupSecretWriter;
 use crate::{NoInput, Operation, OperationContext, OperationError};
 
 /// `[[payments.gateways]]`, matched by `key`: a custom gateway, or a built-in's edits, with
-/// secret credentials as `${ENV_VAR}` references and the notification endpoint by name.
+/// secret credentials as `${ENV_VAR}` references or encrypted, and the notification endpoint
+/// by name.
 pub struct PaymentGatewaySeedAdapter;
 
-/// The gateway as a seed item: each secret credential becomes its reference.
+/// The gateway as a seed item: each secret credential is written by the secret writer.
 fn write_gateway_item(
     payment_gateway: &PaymentGatewayDefinition,
     endpoint_names: &EndpointNames,
+    secret_writer: &dyn SetupSecretWriter,
 ) -> Result<SeedItem, OperationError> {
     let mut gateway_fields = to_json_value(payment_gateway)?;
     if let Some(credentials) = gateway_fields["credentials"].as_array_mut() {
         for credential in credentials {
             if credential["is_secret"] == Value::Bool(true) {
                 let credential_name = credential["name"].as_str().unwrap_or_default();
-                credential["value"] = Value::from(to_secret_reference(&format!(
-                    "{}_{credential_name}",
-                    payment_gateway.fields.key
-                )));
+                let credential_value = credential["value"].as_str().unwrap_or_default();
+                credential["value"] = Value::from(secret_writer.write_secret(
+                    &format!("{}_{credential_name}", payment_gateway.fields.key),
+                    credential_value,
+                )?);
             }
         }
     }
@@ -109,7 +111,10 @@ impl PaymentGatewaySeedAdapter {
         Ok(seed_gateway.key)
     }
 
-    async fn export(operation_context: &OperationContext) -> Result<Vec<SeedItem>, OperationError> {
+    async fn export(
+        operation_context: &OperationContext,
+        secret_writer: &dyn SetupSecretWriter,
+    ) -> Result<Vec<SeedItem>, OperationError> {
         let endpoint_names = EndpointNames::load(operation_context).await?;
         let payment_gateways = ListPaymentGatewaysOperation
             .execute(operation_context, NoInput {})
@@ -117,7 +122,9 @@ impl PaymentGatewaySeedAdapter {
         payment_gateways
             .iter()
             .filter(|payment_gateway| !payment_gateway.is_builtin || payment_gateway.is_modified)
-            .map(|payment_gateway| write_gateway_item(payment_gateway, &endpoint_names))
+            .map(|payment_gateway| {
+                write_gateway_item(payment_gateway, &endpoint_names, secret_writer)
+            })
             .collect()
     }
 
@@ -154,5 +161,6 @@ impl PaymentGatewaySeedAdapter {
 impl_seed_section_adapter!(
     PaymentGatewaySeedAdapter,
     PAYMENT_GATEWAYS_SECTION,
-    SeedPaymentDefinition
+    SeedPaymentDefinition,
+    writes_secrets
 );

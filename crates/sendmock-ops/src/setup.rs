@@ -1,5 +1,6 @@
-//! The versioned setup file (A18): the seed file with a `[sendmock]` header, the rules for
-//! files written by older and newer SendMock releases, and the migrations between formats.
+//! The versioned setup file: the seed file with a `[sendmock]` header, the rules for files
+//! written by older and newer SendMock releases, the migrations between formats, and secrets
+//! encrypted with a passphrase.
 
 mod format_one_to_two_migration;
 mod setup_document_reader;
@@ -11,6 +12,10 @@ mod setup_json_schema;
 mod setup_migration;
 mod setup_preparation;
 mod setup_problem;
+mod setup_secret_cipher;
+mod setup_secret_error;
+mod setup_secret_opener;
+mod setup_secret_writer;
 mod setup_version_policy;
 mod toml_key_lines;
 
@@ -24,5 +29,10 @@ pub use setup_json_schema::{build_setup_json_schema, setup_json_schema_url};
 pub(crate) use setup_preparation::prepare_setup_document;
 pub use setup_problem::SetupProblem;
 pub(crate) use setup_problem::join_location;
+pub use setup_secret_cipher::{ENCRYPTED_SECRET_PREFIX, EncryptedSecret};
+pub use setup_secret_error::SetupSecretError;
+pub(crate) use setup_secret_opener::find_encrypted_secret_spans;
+pub use setup_secret_opener::{SetupSecretOpener, blank_encrypted_secrets};
+pub use setup_secret_writer::{EncryptedSecretWriter, SecretReferenceWriter, SetupSecretWriter};
 pub use setup_version_policy::{SetupVersionDecision, SetupVersionPolicy};
 pub(crate) use toml_key_lines::TomlKeyLines;
