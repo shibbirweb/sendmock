@@ -36,7 +36,7 @@ gh secret set SECRET_NAME --repo shibbirweb/sendmock
 
 | Secret | What it is | Without it |
 |--------|------------|------------|
-| `RELEASE_TOKEN` | A fine-grained token with contents and pull request write on this repository | The release and promote pull requests do not start CI by themselves |
+| `RELEASE_TOKEN` | A fine-grained token on this repository with contents and pull request write, and Dependabot alerts read (Prepare release checks the alerts; added for 1.3.1, PL-19.5) | The release and promote pull requests do not start CI by themselves |
 | `NPM_TOKEN` | An npm granular access token with read and write on all packages, for the first beta only (npm sets a trusted publisher only on a package that exists); delete it once the trusted publishers are set (step 6) | The first beta cannot create the npm packages |
 | `DOCKERHUB_USERNAME` | The Docker Hub user | The image is only on GHCR |
 | `DOCKERHUB_TOKEN` | A Docker Hub personal access token with read and write; the Docker job creates the public repository `shibbirweb/sendmock` before its first push, and stops if it exists but is private | The image is only on GHCR |
@@ -264,3 +264,17 @@ GitHub's MCP Registry (`github.com/mcp`) is curated from the official MCP regist
 Check: SendMock is on `github.com/mcp` and installs from it.
 
 Proves: AI-05.8
+
+## 11. Before every stable release: read the Security tab
+
+Added after 1.3.1 (A22, PL-19.5), so alerts and Dependabot pull requests do not pile up again. Prepare release refuses to start while any code scanning alert on `main`, Dependabot alert or Dependabot pull request is open, so look first:
+
+```sh
+bun scripts/release-readiness.ts
+```
+
+For each item it lists: upgrade the package to a patched version (or merge Dependabot's pull request when its CI passes), fix the code for a code scanning alert, or, only when no fix exists or the vulnerable code is not reachable, dismiss it on GitHub with the reason and write the dismissal into the release's plan section.
+
+Check: the three lists under "Open code scanning alerts on main", "Open Dependabot alerts" and "Open Dependabot pull requests" are empty. For 1.3.1 this is also the proof of its clean-up: after its pull request has merged and CI has run the upgraded examples and Testcontainers modules, empty lists tick PL-19.1 to PL-19.4.
+
+Proves: PL-19.1, PL-19.2, PL-19.3, PL-19.4, PL-19.5

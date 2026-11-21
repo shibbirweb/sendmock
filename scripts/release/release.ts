@@ -27,6 +27,7 @@ import {
   fetchOpenReleasePullRequestNumbers,
   fetchPullRequestsMergedSince,
 } from "./github-api";
+import { fetchSecurityItems } from "./security-items";
 import {
   decidePublication,
   decideDockerTags,
@@ -84,11 +85,14 @@ async function checkReadiness() {
   const releaseBlockers = findReleaseBlockers({
     ciConclusion: await fetchCiConclusion(process.env.GITHUB_SHA ?? "HEAD"),
     openReleasePullRequestNumbers: await fetchOpenReleasePullRequestNumbers(),
+    openSecurityItems: await fetchSecurityItems(),
   });
   if (releaseBlockers.length > 0) {
     fail(releaseBlockers.join("\n"));
   }
-  console.log("CI passed on this commit and no release is in progress.");
+  console.log(
+    "CI passed on this commit, no release is in progress and the Security tab is clean.",
+  );
 }
 
 function decide(publicationWorkflow: PublicationWorkflow) {

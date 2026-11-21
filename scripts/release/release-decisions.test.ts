@@ -60,18 +60,44 @@ describe("decidePublication", () => {
   });
 });
 
+const noSecurityItems = {
+  codeScanningAlerts: [],
+  dependabotAlerts: [],
+  dependabotPullRequests: [],
+};
+
 describe("findReleaseBlockers", () => {
+  test("PL-19.5 refuses while a code scanning alert, Dependabot alert or Dependabot pull request is open", () => {
+    expect(
+      findReleaseBlockers({
+        ciConclusion: "success",
+        openReleasePullRequestNumbers: [],
+        openSecurityItems: {
+          codeScanningAlerts: ["#60 rust/unsafe-deserialization in a.rs"],
+          dependabotAlerts: ["#1 glib in Cargo.lock"],
+          dependabotPullRequests: ["#327 bump the github-actions group"],
+        },
+      }),
+    ).toEqual([
+      "Code scanning alert #60 rust/unsafe-deserialization in a.rs is open; fix, merge or dismiss it with a reason first.",
+      "Dependabot alert #1 glib in Cargo.lock is open; fix, merge or dismiss it with a reason first.",
+      "Dependabot pull request #327 bump the github-actions group is open; fix, merge or dismiss it with a reason first.",
+    ]);
+  });
+
   test("DS-04.4 refuses a release from a commit where CI did not pass", () => {
     expect(
       findReleaseBlockers({
         ciConclusion: "failure",
         openReleasePullRequestNumbers: [],
+        openSecurityItems: noSecurityItems,
       }),
     ).toHaveLength(1);
     expect(
       findReleaseBlockers({
         ciConclusion: null,
         openReleasePullRequestNumbers: [],
+        openSecurityItems: noSecurityItems,
       }),
     ).toHaveLength(1);
   });
@@ -81,6 +107,7 @@ describe("findReleaseBlockers", () => {
       findReleaseBlockers({
         ciConclusion: "success",
         openReleasePullRequestNumbers: [61],
+        openSecurityItems: noSecurityItems,
       }),
     ).toEqual([
       "Release pull request #61 is still open; merge or close it first.",
@@ -92,6 +119,7 @@ describe("findReleaseBlockers", () => {
       findReleaseBlockers({
         ciConclusion: "success",
         openReleasePullRequestNumbers: [],
+        openSecurityItems: noSecurityItems,
       }),
     ).toEqual([]);
   });
