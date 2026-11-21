@@ -80,6 +80,14 @@ For an app with one Twilio subaccount per customer: `sendmock_twilio_subaccount_
 
 An app on Mailgun can read `GET /v3/{domain}/events` and manage `/v3/{domain}/complaints` on the provider port. `sendmock_email_simulate` with `complained` puts the address on the domain's complaints table, so the app's suppression handling can be tested; `sendmock_email_mailgun_complaint_list` shows the tables and `sendmock_email_mailgun_complaint_clear` empties one (ask the user first).
 
+### Fill a missing vendor endpoint
+
+When the app calls a vendor endpoint SendMock does not implement (a `404` from the provider port, such as Twilio's `Calls.json`):
+
+1. `sendmock_http_provider_bin_attach` with the provider's area (`email`, `sms`, `push` or `payments`), its key and a bin name: the provider's unmatched requests now go to that bin, on the same base URL, and built-in endpoints still answer first.
+2. Read the vendor's documented answer, then `sendmock_http_response_set` on the bin with a rule: the method, a path glob (`/2010-04-01/Accounts/*/Calls.json`), that answer, and, if the vendor calls the app back, a `follow_up` webhook with the vendor's template (`twilio.status_callback` signs as Twilio does) and the callback URL from the request (`{{ request.form.StatusCallback }}`), or an endpoint.
+3. `sendmock_http_response_preview` to check the rule, call the endpoint from the app, then `sendmock_http_wait`, `sendmock_logs_http` and `sendmock_webhook_delivery_list` to confirm the answer and the callback. `sendmock_seed_export` keeps it.
+
 ### Capture outgoing HTTP calls
 
 `sendmock_http_bin_create` with a preset (Slack, Discord, Telegram, push), point the app at the bin's URL, and `sendmock_http_wait` for the call.

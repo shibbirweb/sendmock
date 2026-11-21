@@ -20,6 +20,7 @@ import { usePaymentGatewayForm } from "@/features/payments/gateways/use-payment-
 import type { CodeEditorHandle } from "@/features/webhooks/templates/reference/code-editor/code-editor-types";
 import { TemplateReferencePanel } from "@/features/webhooks/templates/reference/template-reference-panel";
 import type { PaymentGatewayDefinition } from "@/lib/api/types";
+import { UnmatchedRequestsSection } from "@/features/http/provider-bins/unmatched-requests-section";
 
 type GatewayTab =
   "general" | "checkout" | "merchant" | "redirect" | "notification";
@@ -113,8 +114,15 @@ export function GatewaySheet({
               }
             >
               <div className="min-w-0">
-                <TabsContent value="general">
+                <TabsContent value="general" className="grid gap-6">
                   <GatewayGeneralTab gatewayForm={gatewayForm} />
+                  <UnmatchedRequestsSection
+                    providerReference={{
+                      area: "payments",
+                      providerKey: paymentGateway.key,
+                    }}
+                    providerName={paymentGateway.name}
+                  />
                 </TabsContent>
                 <TabsContent value="checkout">
                   <GatewayCheckoutTab gatewayForm={gatewayForm} />

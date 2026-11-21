@@ -3,11 +3,12 @@
 use std::collections::BTreeMap;
 
 use sendmock_store::{CapturedFileRecord, CapturedRequestRecord, HttpBinRecord};
-use serde_json::json;
+use serde_json::{Value, json};
 
 use super::http_bin_presets::plain_default_response;
 use super::http_catcher_views::present_captured_request;
 use super::http_catcher_wire::{CapturedHttpRequest, HttpMockResponse};
+use super::http_follow_up::send_rule_follow_up;
 use super::http_response_rules::{
     HttpResponseRule, build_response_context, find_answering_rule, render_mock_response,
 };
@@ -33,6 +34,9 @@ pub struct IncomingHttpRequest {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CatchAnswer {
     pub request_id: String,
+    pub bin_name: String,
+    /// The rule that answered; `None` for the bin's default reply.
+    pub matched_rule_name: Option<String>,
     pub response: HttpMockResponse,
     /// The matching rule's delay, which the route waits before answering.
     pub delay_ms: u32,
@@ -116,11 +120,12 @@ struct DecidedAnswer {
 
 /// The first matching rule's reply (or the bin's default), with the failure rate and delay
 /// drawn from the random source (HC-02.1 to HC-02.3).
-async fn decide_answer(
+fn decide_answer(
     operation_context: &OperationContext,
     http_bin: &HttpBinRecord,
     request_view: &CapturedHttpRequest,
-) -> Result<DecidedAnswer, OperationError> {
+    response_context: &Value,
+) -> DecidedAnswer {
     let rules = read_bin_rules(&http_bin.rules_json);
     let answering_rule = find_answering_rule(&rules, request_view).cloned();
     let random_source = &operation_context.random_source;
@@ -137,43 +142,50 @@ async fn decide_answer(
         (None, _) => serde_json::from_str(&http_bin.default_response_json)
             .unwrap_or_else(|_| plain_default_response()),
     };
-    let response_context = build_response_context(operation_context, request_view).await?;
-    let (response, _) = render_mock_response(operation_context, &mock_response, &response_context);
+    let (response, _) = render_mock_response(operation_context, &mock_response, response_context);
     let delay_ms = answering_rule.as_ref().map_or(0, |rule| {
         let delay_spread = u64::from(rule.delay_max_ms - rule.delay_min_ms) + 1;
         rule.delay_min_ms
             + u32::try_from(random_source.next_u64() % delay_spread).unwrap_or_default()
     });
-    Ok(DecidedAnswer {
+    DecidedAnswer {
         response,
         rule: answering_rule,
         is_simulated_failure,
         delay_ms,
-    })
+    }
 }
 
-/// Stores the request with the bin's answer and fires `http.captured`.
+/// Stores the request in the bin its path names, with the bin's answer.
 pub async fn capture_http_request(
     operation_context: &OperationContext,
     incoming_request: IncomingHttpRequest,
 ) -> Result<CatchAnswer, OperationError> {
     let http_bin =
         find_or_create_bin(operation_context, &read_bin_name(&incoming_request.path)).await?;
-    let mut captured_request =
-        build_captured_record(operation_context, &http_bin, incoming_request);
+    capture_in_bin(operation_context, &http_bin, incoming_request, None).await
+}
+
+/// Stores the request in the bin with the bin's answer, fires `http.captured` and queues the
+/// answering rule's follow-up webhook. `provider_key` names the provider whose base URL the
+/// request arrived on.
+pub async fn capture_in_bin(
+    operation_context: &OperationContext,
+    http_bin: &HttpBinRecord,
+    incoming_request: IncomingHttpRequest,
+    provider_key: Option<String>,
+) -> Result<CatchAnswer, OperationError> {
+    let mut captured_request = build_captured_record(operation_context, http_bin, incoming_request);
+    captured_request.provider_key = provider_key;
+    let request_view = present_captured_request(captured_request.clone());
+    let response_context = build_response_context(operation_context, &request_view).await?;
     let decided_answer = decide_answer(
         operation_context,
-        &http_bin,
-        &present_captured_request(captured_request.clone()),
-    )
-    .await?;
-    captured_request.response_status = decided_answer.response.status_code;
-    captured_request.response_headers_json = write_json(&decided_answer.response.headers);
-    captured_request.response_body = decided_answer.response.body.clone();
-    captured_request.matched_rule_id = decided_answer.rule.as_ref().map(|rule| rule.id.clone());
-    captured_request.matched_rule_name = decided_answer.rule.as_ref().map(|rule| rule.name.clone());
-    captured_request.is_simulated_failure = decided_answer.is_simulated_failure;
-    captured_request.duration_ms = decided_answer.delay_ms + 1;
+        http_bin,
+        &request_view,
+        &response_context,
+    );
+    record_answer(&mut captured_request, &decided_answer);
     let request_id = captured_request.request_id.clone();
     operation_context
         .http_catcher_stores
@@ -185,11 +197,39 @@ pub async fn capture_http_request(
         AppEventType::HttpCaptured,
         json!({ "id": request_id, "bin_name": http_bin.name }),
     );
+    if let Some(answering_rule) = decided_answer
+        .rule
+        .as_ref()
+        .filter(|_| !decided_answer.is_simulated_failure)
+        && let Err(follow_up_error) = send_rule_follow_up(
+            operation_context,
+            answering_rule,
+            &request_view,
+            &decided_answer.response,
+            &response_context,
+        )
+        .await
+    {
+        tracing::warn!(error = %follow_up_error, "could not queue a follow-up webhook");
+    }
     Ok(CatchAnswer {
         request_id,
+        bin_name: http_bin.name.clone(),
+        matched_rule_name: decided_answer.rule.map(|rule| rule.name),
         response: decided_answer.response,
         delay_ms: decided_answer.delay_ms,
     })
+}
+
+/// Notes the decided reply on the stored request.
+fn record_answer(captured_request: &mut CapturedRequestRecord, decided_answer: &DecidedAnswer) {
+    captured_request.response_status = decided_answer.response.status_code;
+    captured_request.response_headers_json = write_json(&decided_answer.response.headers);
+    captured_request.response_body = decided_answer.response.body.clone();
+    captured_request.matched_rule_id = decided_answer.rule.as_ref().map(|rule| rule.id.clone());
+    captured_request.matched_rule_name = decided_answer.rule.as_ref().map(|rule| rule.name.clone());
+    captured_request.is_simulated_failure = decided_answer.is_simulated_failure;
+    captured_request.duration_ms = decided_answer.delay_ms + 1;
 }
 
 /// The request as stored, before the reply is decided.
@@ -219,6 +259,7 @@ fn build_captured_record(
         is_simulated_failure: false,
         duration_ms: 1,
         created_at_unix_ms: operation_context.clock.now_unix_ms(),
+        provider_key: None,
         is_read: false,
         files,
     }

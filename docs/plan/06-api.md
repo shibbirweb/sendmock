@@ -107,6 +107,8 @@ The Twilio Verify wire API itself (`/v2/Services/...`) is served on the provider
 | DELETE | `/http/requests/{requestId}` | delete one captured request with its uploaded files (A17, UI-14) |
 | GET | `/http/requests/{requestId}/files/{fileIndex}` | download a file uploaded in a multipart request |
 | POST | `/http/requests/{requestId}/forward` | resend a captured request to `{ "url": ... }`; returns the status, duration and body it got |
+| GET | `/provider-bins` | which HTTP Catcher bin answers each provider's unmatched requests: area (`email`, `sms`, `push`, `payments`), provider key, bin (A23, PL-21) |
+| PUT/DELETE | `/provider-bins/{area}/{providerKey}` | send the provider's unmatched requests to `{ "bin_name": ... }` (made if new), or answer them with the provider's `404` again; response rules gain `follow_up` (`url` template or `endpoint_id`, `template_id`, `delay_ms`), captured requests `provider_key`, API log entries `catcher_answer` |
 
 ## Payments
 

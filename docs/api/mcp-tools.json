@@ -2794,7 +2794,7 @@
           "type": "string",
           "is_required": true,
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio"
         }
       ],
@@ -2803,7 +2803,7 @@
         "properties": {
           "provider_key": {
             "type": "string",
-            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
             "examples": [
               "twilio"
             ]
@@ -2856,7 +2856,7 @@
           "type": "string",
           "is_required": true,
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio"
         }
       ],
@@ -2865,7 +2865,7 @@
         "properties": {
           "provider_key": {
             "type": "string",
-            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
             "examples": [
               "twilio"
             ]
@@ -2954,7 +2954,7 @@
           "type": "string",
           "is_required": true,
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio"
         },
         {
@@ -3065,7 +3065,7 @@
         "properties": {
           "provider_key": {
             "type": "string",
-            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
             "examples": [
               "twilio"
             ]
@@ -3810,7 +3810,7 @@
           "type": "string",
           "is_required": true,
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio"
         }
       ],
@@ -3819,7 +3819,7 @@
         "properties": {
           "provider_key": {
             "type": "string",
-            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
             "examples": [
               "twilio"
             ]
@@ -3872,7 +3872,7 @@
           "type": "string",
           "is_required": true,
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio"
         }
       ],
@@ -3881,7 +3881,7 @@
         "properties": {
           "provider_key": {
             "type": "string",
-            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
             "examples": [
               "twilio"
             ]
@@ -3934,7 +3934,7 @@
           "type": "string",
           "is_required": true,
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio"
         },
         {
@@ -4188,7 +4188,7 @@
         "properties": {
           "provider_key": {
             "type": "string",
-            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
             "examples": [
               "twilio"
             ]
@@ -7659,6 +7659,229 @@
       ]
     },
     {
+      "name": "sendmock_http_provider_bin_attach",
+      "toolset": "http",
+      "summary": "Send a provider's unmatched requests to an HTTP Catcher bin, made if new.",
+      "area": "HTTP Catcher",
+      "area_slug": "http-catcher",
+      "operations": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/provider-bins/{area}/{providerKey}",
+          "operation_id": "putProviderBinsByAreaByProviderKey",
+          "summary": "Send a provider's unmatched requests to an HTTP Catcher bin, made if new.",
+          "area_slug": "http-catcher",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "area",
+          "input": {
+            "name": "area",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "Where the provider lives: `email`, `sms`, `push` or `payments`.",
+          "example": "sms"
+        },
+        {
+          "name": "provider_key",
+          "input": {
+            "name": "providerKey",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
+          "example": "twilio"
+        },
+        {
+          "name": "bin_name",
+          "input": {
+            "name": "bin_name",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The bin's name; a bin of that name is made when there is none.",
+          "example": "twilio-gaps"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "string",
+            "description": "Where the provider lives: `email`, `sms`, `push` or `payments`.",
+            "examples": [
+              "sms"
+            ]
+          },
+          "provider_key": {
+            "type": "string",
+            "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
+            "examples": [
+              "twilio"
+            ]
+          },
+          "bin_name": {
+            "type": "string",
+            "description": "The bin's name; a bin of that name is made when there is none.",
+            "examples": [
+              "twilio-gaps"
+            ]
+          }
+        },
+        "required": [
+          "area",
+          "provider_key",
+          "bin_name"
+        ]
+      },
+      "example_arguments": {
+        "area": "sms",
+        "provider_key": "twilio",
+        "bin_name": "twilio-gaps"
+      },
+      "output": "ProviderBin",
+      "cli": [
+        "sendmock http provider-bin attach <area> <providerKey>"
+      ],
+      "ui": [
+        "Mail, SMS or Payments > provider > General > Unmatched requests"
+      ]
+    },
+    {
+      "name": "sendmock_http_provider_bin_detach",
+      "toolset": "http",
+      "summary": "Answer a provider's unmatched requests with its 404 again; the bin stays.",
+      "area": "HTTP Catcher",
+      "area_slug": "http-catcher",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/provider-bins/{area}/{providerKey}",
+          "operation_id": "deleteProviderBinsByAreaByProviderKey",
+          "summary": "Answer a provider's unmatched requests with its 404 again; the bin stays.",
+          "area_slug": "http-catcher",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "area",
+          "input": {
+            "name": "area",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "Where the provider lives: `email`, `sms`, `push` or `payments`.",
+          "example": "sms"
+        },
+        {
+          "name": "provider_key",
+          "input": {
+            "name": "providerKey",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
+          "example": "twilio"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "string",
+            "description": "Where the provider lives: `email`, `sms`, `push` or `payments`.",
+            "examples": [
+              "sms"
+            ]
+          },
+          "provider_key": {
+            "type": "string",
+            "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
+            "examples": [
+              "twilio"
+            ]
+          }
+        },
+        "required": [
+          "area",
+          "provider_key"
+        ]
+      },
+      "example_arguments": {
+        "area": "sms",
+        "provider_key": "twilio"
+      },
+      "output": null,
+      "cli": [
+        "sendmock http provider-bin detach <area> <providerKey>"
+      ],
+      "ui": [
+        "HTTP Catcher > bin > Detach"
+      ]
+    },
+    {
+      "name": "sendmock_http_provider_bin_list",
+      "toolset": "http",
+      "summary": "Which HTTP Catcher bin answers each provider's unmatched requests.",
+      "area": "HTTP Catcher",
+      "area_slug": "http-catcher",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/provider-bins",
+          "operation_id": "getProviderBins",
+          "summary": "Which HTTP Catcher bin answers each provider's unmatched requests.",
+          "area_slug": "http-catcher",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [],
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "example_arguments": {},
+      "output": "ProviderBin[]",
+      "cli": [
+        "sendmock http provider-bin list"
+      ],
+      "ui": [
+        "HTTP Catcher > bin > Answers unmatched requests for"
+      ]
+    },
+    {
       "name": "sendmock_http_response_list",
       "toolset": "http",
       "summary": "A bin's response rules, checked from top to bottom.",
@@ -7786,7 +8009,13 @@
             "delay_min_ms": 0,
             "delay_max_ms": 500,
             "failure_rate_percent": 10,
-            "failure_status_code": 503
+            "failure_status_code": 503,
+            "follow_up": {
+              "url": "{{ request.form.StatusCallback }}",
+              "endpoint_id": null,
+              "template_id": "twilio.status_callback",
+              "delay_ms": 1000
+            }
           }
         },
         {
@@ -7837,7 +8066,13 @@
                 "delay_min_ms": 0,
                 "delay_max_ms": 500,
                 "failure_rate_percent": 10,
-                "failure_status_code": 503
+                "failure_status_code": 503,
+                "follow_up": {
+                  "url": "{{ request.form.StatusCallback }}",
+                  "endpoint_id": null,
+                  "template_id": "twilio.status_callback",
+                  "delay_ms": 1000
+                }
               }
             ]
           },
@@ -7855,6 +8090,53 @@
           "request_id"
         ],
         "$defs": {
+          "HttpFollowUpWebhook": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string",
+                "description": "A URL template; empty when an endpoint is chosen.",
+                "examples": [
+                  "{{ request.form.StatusCallback }}"
+                ]
+              },
+              "endpoint_id": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/Ulid"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "A webhook endpoint's ID: its URL and retry policy are used instead of `url`.",
+                "examples": [
+                  null
+                ]
+              },
+              "template_id": {
+                "type": "string",
+                "description": "The webhook template its body and headers render with; vendor templates sign as the vendor does.",
+                "examples": [
+                  "twilio.status_callback"
+                ]
+              },
+              "delay_ms": {
+                "type": "number",
+                "description": "How long after the answer it is sent, in milliseconds (0 to 600,000).",
+                "examples": [
+                  1000
+                ]
+              }
+            },
+            "required": [
+              "url",
+              "endpoint_id",
+              "template_id",
+              "delay_ms"
+            ],
+            "description": "The webhook a response rule sends after it answers."
+          },
           "HttpMethod": {
             "type": "string",
             "enum": [
@@ -7989,6 +8271,17 @@
                 "examples": [
                   503
                 ]
+              },
+              "follow_up": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/HttpFollowUpWebhook"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "A webhook sent after the rule answers; null for none."
               }
             },
             "required": [
@@ -8002,7 +8295,8 @@
               "delay_min_ms",
               "delay_max_ms",
               "failure_rate_percent",
-              "failure_status_code"
+              "failure_status_code",
+              "follow_up"
             ],
             "description": "One mock response rule; rules are checked in order and the first match answers."
           },
@@ -8126,7 +8420,13 @@
           "delay_min_ms": 0,
           "delay_max_ms": 500,
           "failure_rate_percent": 10,
-          "failure_status_code": 503
+          "failure_status_code": 503,
+          "follow_up": {
+            "url": "{{ request.form.StatusCallback }}",
+            "endpoint_id": null,
+            "template_id": "twilio.status_callback",
+            "delay_ms": 1000
+          }
         },
         "request_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
       },
@@ -22061,7 +22361,7 @@
           "type": "string",
           "is_required": true,
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio"
         }
       ],
@@ -22070,7 +22370,7 @@
         "properties": {
           "provider_key": {
             "type": "string",
-            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
             "examples": [
               "twilio"
             ]
@@ -22123,7 +22423,7 @@
           "type": "string",
           "is_required": true,
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio"
         }
       ],
@@ -22132,7 +22432,7 @@
         "properties": {
           "provider_key": {
             "type": "string",
-            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
             "examples": [
               "twilio"
             ]
@@ -22221,7 +22521,7 @@
           "type": "string",
           "is_required": true,
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio"
         },
         {
@@ -22332,7 +22632,7 @@
         "properties": {
           "provider_key": {
             "type": "string",
-            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
             "examples": [
               "twilio"
             ]
@@ -23077,7 +23377,7 @@
           "type": "string",
           "is_required": true,
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio"
         }
       ],
@@ -23086,7 +23386,7 @@
         "properties": {
           "provider_key": {
             "type": "string",
-            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
             "examples": [
               "twilio"
             ]
@@ -23139,7 +23439,7 @@
           "type": "string",
           "is_required": true,
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio"
         }
       ],
@@ -23148,7 +23448,7 @@
         "properties": {
           "provider_key": {
             "type": "string",
-            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
             "examples": [
               "twilio"
             ]
@@ -23201,7 +23501,7 @@
           "type": "string",
           "is_required": true,
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio"
         },
         {
@@ -23455,7 +23755,7 @@
         "properties": {
           "provider_key": {
             "type": "string",
-            "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+            "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
             "examples": [
               "twilio"
             ]

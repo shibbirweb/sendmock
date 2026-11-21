@@ -116,6 +116,7 @@ pub async fn answer_whatsapp_cloud(
             .filter(|credential| credential.is_secret)
             .map(|credential| credential.value.clone())
             .collect(),
+        is_unknown_path: false,
     }))
 }
 

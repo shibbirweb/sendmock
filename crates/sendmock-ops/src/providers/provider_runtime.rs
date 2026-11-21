@@ -36,6 +36,9 @@ pub struct ProviderOutcome {
     pub created_message: Option<CreatedMessage>,
     /// Masked wherever they appear in the logged request.
     pub secret_values: Vec<String>,
+    /// The answer is the provider's "no such path": no built-in operation serves the request,
+    /// so an attached HTTP Catcher bin may answer it instead.
+    pub is_unknown_path: bool,
 }
 
 /// The SMS providers as they are now, so a saved change applies to the next request.
@@ -100,6 +103,7 @@ pub async fn answer_provider_request(
         provider_key: Some(provider.key.clone()),
         created_message: provider_answer.created_message,
         secret_values: list_secret_values(provider),
+        is_unknown_path: false,
     })
 }
 
@@ -189,6 +193,7 @@ async fn answer_twilio_services(
         provider_key: Some(TWILIO_PROVIDER_KEY.to_owned()),
         created_message: None,
         secret_values: twilio_answer.secret_values,
+        is_unknown_path: false,
     }))
 }
 
@@ -217,6 +222,7 @@ async fn answer_twilio_verify(
         provider_key: Some(TWILIO_VERIFY_PROVIDER_KEY.to_owned()),
         created_message: None,
         secret_values: list_secret_values(verify_provider),
+        is_unknown_path: false,
     }))
 }
 
@@ -232,6 +238,7 @@ fn answer_unmatched(provider_route: ProviderRoute<'_>) -> ProviderOutcome {
         },
         created_message: None,
         secret_values: Vec::new(),
+        is_unknown_path: true,
     }
 }
 

@@ -43,7 +43,9 @@ mod webhook_variable;
 pub use activity_stats::{
     ActivityStatsRepository, HourlyActivityRecord, HourlyCountRecord, MessageTotalsRecord,
 };
-pub use api_request::{ApiRequestFilter, ApiRequestPage, ApiRequestRecord, ApiRequestRepository};
+pub use api_request::{
+    ApiRequestFilter, ApiRequestPage, ApiRequestRecord, ApiRequestRepository, CatcherAnswerRecord,
+};
 pub use database::{CheckpointProgress, Database};
 pub use database_location::DatabaseLocation;
 pub use email::{
@@ -57,7 +59,7 @@ pub use email_provider_send::{
 pub use email_response::{EmailResponseRecord, EmailResponseRepository};
 pub use http_catcher::{
     CapturedFileRecord, CapturedRequestRecord, CapturedRequestRepository, HttpBinRecord,
-    HttpBinRepository,
+    HttpBinRepository, ProviderBinRecord, ProviderBinRepository,
 };
 pub use inbound_route::{InboundRouteRecord, InboundRouteRepository};
 pub use mailgun_complaint::{MailgunComplaintRecord, MailgunComplaintRepository};

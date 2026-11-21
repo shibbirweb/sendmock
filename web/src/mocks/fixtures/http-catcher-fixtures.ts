@@ -50,6 +50,7 @@ function buildRule(
     delay_max_ms: 0,
     failure_rate_percent: 0,
     failure_status_code: 500,
+    follow_up: null,
     ...ruleFields,
   };
 }
@@ -283,6 +284,7 @@ export function buildCapturedHttpRequestFixtures(
         matched_rule_name: matchedRule?.name ?? null,
         is_simulated_failure: false,
         duration_ms: 2,
+        provider_key: null,
         is_read: requestSpec.minutesAgo > olderThanReadMinutes,
         created_at: minutesAgo(requestSpec.minutesAgo),
       },

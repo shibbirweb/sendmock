@@ -37,7 +37,16 @@ export type ApiRequestLogEntry = {
   duration_ms: number;
   /** The SMS or email this request created; null for rejected requests. */
   linked_message: ApiRequestLinkedMessage | null;
+  /** The attached bin and rule that answered; null when SendMock answered itself. */
+  catcher_answer: ApiRequestCatcherAnswer | null;
   created_at: IsoTimestamp;
+};
+
+/** The HTTP Catcher bin and rule that answered a provider request no built-in operation answers. */
+export type ApiRequestCatcherAnswer = {
+  bin_name: string;
+  /** Null when the bin's default reply answered. */
+  rule_name: string | null;
 };
 
 export type ApiRequestLinkedMessage = {

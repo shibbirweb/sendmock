@@ -90,6 +90,8 @@ export function CapturedRequestDetail({
           {formatDateTime(capturedRequest.created_at)} from{" "}
           {capturedRequest.client_ip}, answered in{" "}
           {formatDurationMs(capturedRequest.duration_ms)}
+          {capturedRequest.provider_key !== null &&
+            `, on ${capturedRequest.provider_key}'s base URL`}
         </p>
         <CapturedRequestActions capturedRequest={capturedRequest} />
       </header>

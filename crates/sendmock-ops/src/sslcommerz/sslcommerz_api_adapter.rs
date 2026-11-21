@@ -83,11 +83,16 @@ async fn route_sslcommerz_request(
         ["validator", "api", "merchantTransIDvalidationAPI.php"] => {
             Ok((200, answer_merchant_api(sslcommerz_call).await?))
         }
-        _ => Ok((
-            404,
-            json!({"status": "FAILED", "failedreason": "Unknown API path"}),
-        )),
+        _ => Ok(unknown_path_answer()),
     }
+}
+
+/// What SSLCommerz answers for a path it does not serve.
+fn unknown_path_answer() -> (u16, Value) {
+    (
+        404,
+        json!({"status": "FAILED", "failedreason": "Unknown API path"}),
+    )
 }
 
 /// The gateway's secrets and the password the request sent, which the request log masks.
@@ -131,6 +136,7 @@ pub async fn answer_sslcommerz_request(
         request_fields: read_request_fields(request),
     };
     let (status, body) = route_sslcommerz_request(&sslcommerz_call, &request.path).await?;
+    let is_unknown_path = (status, body.clone()) == unknown_path_answer();
     Ok(Some(ProviderOutcome {
         response: ProviderHttpResponse {
             status,
@@ -140,5 +146,6 @@ pub async fn answer_sslcommerz_request(
         provider_key: Some(SSLCOMMERZ_PROVIDER_KEY.to_owned()),
         created_message: None,
         secret_values: collect_secret_values(&sslcommerz_call),
+        is_unknown_path,
     }))
 }

@@ -98,6 +98,11 @@ pub const PAYMENT_METHODS_SECTION: SeedSection =
 pub const PAYMENT_GATEWAYS_SECTION: SeedSection =
     item_list("payments.gateways", "Payment gateway", KEY_KEY);
 pub const HTTP_BINS_SECTION: SeedSection = item_list("http.bins", "HTTP bin", NAME_KEY);
+pub const PROVIDER_BINS_SECTION: SeedSection = item_list(
+    "http.provider_bins",
+    "Provider bin",
+    &[key_field("area"), key_field("provider")],
+);
 pub const TAG_RULES_SECTION: SeedSection = item_list("email.tag_rules", "Tag rule", NAME_KEY);
 pub const FORWARD_RULES_SECTION: SeedSection =
     item_list("email.forward_rules", "Forward rule", NAME_KEY);
@@ -109,7 +114,7 @@ pub const INBOUND_ROUTES_SECTION: SeedSection = item_list(
 pub const SCENARIOS_SECTION: SeedSection = item_list("scenarios", "Saved scenario", NAME_KEY);
 
 /// Every section a seed file may hold, in the order the summary lists them.
-pub const SEED_SECTIONS: [SeedSection; 24] = [
+pub const SEED_SECTIONS: [SeedSection; 25] = [
     SETTINGS_SECTION,
     PROJECTS_SECTION,
     WEBHOOK_ENDPOINTS_SECTION,
@@ -121,6 +126,7 @@ pub const SEED_SECTIONS: [SeedSection; 24] = [
     NUMBERS_SECTION,
     MESSAGING_SERVICES_SECTION,
     HTTP_BINS_SECTION,
+    PROVIDER_BINS_SECTION,
     TAG_RULES_SECTION,
     FORWARD_RULES_SECTION,
     INBOUND_ROUTES_SECTION,

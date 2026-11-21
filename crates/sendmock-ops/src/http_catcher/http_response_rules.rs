@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
 use super::http_catcher_wire::{CapturedHttpRequest, HttpMockResponse};
+use super::http_follow_up::{HttpFollowUpWebhook, check_follow_up};
 use crate::webhooks::RuleFilter;
 use crate::{OperationContext, OperationError};
 
@@ -34,6 +35,13 @@ pub struct HttpResponseRule {
     /// How often, out of 100, the rule answers `failure_status_code` instead.
     pub failure_rate_percent: u32,
     pub failure_status_code: u16,
+    /// A webhook sent after the rule answers; null for none.
+    #[serde(default)]
+    #[schemars(
+        required,
+        schema_with = "crate::nullable_schema::<HttpFollowUpWebhook>"
+    )]
+    pub follow_up: Option<HttpFollowUpWebhook>,
 }
 
 /// `/catch/slack/v1/send` in bin `slack` is `/v1/send`; the bin root is `/`.
@@ -97,6 +105,21 @@ pub fn find_answering_rule<'rules>(
     })
 }
 
+/// A URL-encoded body's fields, such as Twilio's `StatusCallback`; empty for other bodies.
+fn read_form_body(request: &CapturedHttpRequest) -> BTreeMap<String, String> {
+    let is_form = request
+        .content_type
+        .as_deref()
+        .is_some_and(|content_type| content_type.contains("x-www-form-urlencoded"));
+    if !is_form {
+        return BTreeMap::new();
+    }
+    serde_urlencoded::from_str::<Vec<(String, String)>>(&request.body)
+        .unwrap_or_default()
+        .into_iter()
+        .collect()
+}
+
 /// What a reply template reads: `request.*`, the global `vars` and `sendmock` (HC-02.2).
 pub async fn build_response_context(
     operation_context: &OperationContext,
@@ -120,6 +143,7 @@ pub async fn build_response_context(
             "headers": request.headers,
             "body": request.body,
             "json": serde_json::from_str::<Value>(&request.body).unwrap_or(Value::Null),
+            "form": read_form_body(request),
         },
         "vars": global_variables,
         "sendmock": { "version": instance_details.version, "http_url": format!("http://{}", instance_details.http_address) },
@@ -206,6 +230,9 @@ pub fn check_response_rule(response_rule: &HttpResponseRule) -> Result<(), Opera
             "failure",
             "Use 0 to 100% and a status code from 100 to 599",
         ));
+    }
+    if let Some(follow_up) = &response_rule.follow_up {
+        check_follow_up(follow_up)?;
     }
     Ok(())
 }

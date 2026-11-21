@@ -7,6 +7,7 @@ mod http_bin_presets;
 mod http_capture;
 mod http_catcher_views;
 mod http_catcher_wire;
+mod http_follow_up;
 mod http_forward_operation;
 mod http_response_rules;
 mod http_rule_operations;
@@ -22,8 +23,10 @@ pub use captured_request_operations::{
 pub use http_bin_operations::{
     CreateHttpBinOperation, DeleteHttpBinOperation, ListHttpBinsOperation, UpdateHttpBinOperation,
 };
+pub(crate) use http_capture::capture_in_bin;
 pub use http_capture::{CatchAnswer, IncomingHttpRequest, capture_http_request};
 pub use http_catcher_wire::{CapturedHttpRequest, HttpBin, HttpMockResponse};
+pub use http_follow_up::HttpFollowUpWebhook;
 pub use http_forward_operation::ForwardHttpRequestOperation;
 pub use http_rule_operations::{
     ListHttpResponseRulesOperation, PreviewHttpResponseRuleOperation,
@@ -33,6 +36,7 @@ pub use http_wait_operation::WaitForHttpRequestOperation;
 
 pub(crate) use http_bin_operations::check_bin_name;
 pub(crate) use http_bin_presets::preset_default_response;
+pub(crate) use http_capture::find_or_create_bin;
 pub(crate) use http_catcher_wire::HttpBinPreset;
 pub(crate) use http_response_rules::{HttpResponseRule, check_response_rule};
 pub(crate) use http_rule_operations::read_bin_rules;

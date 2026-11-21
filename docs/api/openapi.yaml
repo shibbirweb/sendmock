@@ -4277,7 +4277,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4304,7 +4304,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4339,7 +4339,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4363,7 +4363,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4393,7 +4393,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4423,7 +4423,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4457,7 +4457,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4540,7 +4540,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4567,7 +4567,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4602,7 +4602,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4626,7 +4626,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4656,7 +4656,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4686,7 +4686,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4720,7 +4720,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -5346,6 +5346,97 @@ paths:
       x-sendmock-cli: sendmock http send <bin>
       x-sendmock-mcp: sendmock_http_send
       x-sendmock-ui: HTTP Catcher > Send a sample request
+  /api/v1/provider-bins:
+    get:
+      operationId: getProviderBins
+      summary: Which HTTP Catcher bin answers each provider's unmatched requests.
+      tags:
+        - HTTP Catcher
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProviderBin"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http provider-bin list
+      x-sendmock-mcp: sendmock_http_provider_bin_list
+      x-sendmock-ui: HTTP Catcher > bin > Answers unmatched requests for
+  /api/v1/provider-bins/{area}/{providerKey}:
+    put:
+      operationId: putProviderBinsByAreaByProviderKey
+      summary: Send a provider's unmatched requests to an HTTP Catcher bin, made if new.
+      tags:
+        - HTTP Catcher
+      parameters:
+        - name: area
+          in: path
+          required: true
+          description: "Where the provider lives: `email`, `sms`, `push` or `payments`."
+          schema:
+            type: string
+          example: sms
+        - name: providerKey
+          in: path
+          required: true
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
+          schema:
+            type: string
+          example: twilio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProviderBinAttachment"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProviderBin"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http provider-bin attach <area> <providerKey>
+      x-sendmock-mcp: sendmock_http_provider_bin_attach
+      x-sendmock-ui: Mail, SMS or Payments > provider > General > Unmatched requests
+    delete:
+      operationId: deleteProviderBinsByAreaByProviderKey
+      summary: Answer a provider's unmatched requests with its 404 again; the bin stays.
+      tags:
+        - HTTP Catcher
+      parameters:
+        - name: area
+          in: path
+          required: true
+          description: "Where the provider lives: `email`, `sms`, `push` or `payments`."
+          schema:
+            type: string
+          example: sms
+        - name: providerKey
+          in: path
+          required: true
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
+          schema:
+            type: string
+          example: twilio
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http provider-bin detach <area> <providerKey>
+      x-sendmock-mcp: sendmock_http_provider_bin_detach
+      x-sendmock-ui: HTTP Catcher > bin > Detach
   /api/v1/payments:
     get:
       operationId: getPayments
@@ -8534,6 +8625,20 @@ components:
             - message
       required:
         - error
+    ApiRequestCatcherAnswer:
+      type: object
+      properties:
+        bin_name:
+          type: string
+        rule_name:
+          type:
+            - string
+            - "null"
+          description: Null when the bin's default reply answered.
+      required:
+        - bin_name
+        - rule_name
+      description: The HTTP Catcher bin and rule that answered a provider request no built-in operation answers.
     ApiRequestLinkedMessage:
       type: object
       properties:
@@ -8581,6 +8686,11 @@ components:
             - $ref: "#/components/schemas/ApiRequestLinkedMessage"
             - type: "null"
           description: The SMS or email this request created; null for rejected requests.
+        catcher_answer:
+          anyOf:
+            - $ref: "#/components/schemas/ApiRequestCatcherAnswer"
+            - type: "null"
+          description: The attached bin and rule that answered; null when SendMock answered itself.
         created_at:
           $ref: "#/components/schemas/IsoTimestamp"
       required:
@@ -8594,6 +8704,7 @@ components:
         - response_body
         - duration_ms
         - linked_message
+        - catcher_answer
         - created_at
     ApiStatusClass:
       type: string
@@ -9335,6 +9446,11 @@ components:
           type: boolean
         duration_ms:
           type: number
+        provider_key:
+          type:
+            - string
+            - "null"
+          description: The provider whose base URL it arrived on; null for `/catch/` and the catch-all port.
         is_read:
           type: boolean
           description: Requests arrive unread; opening one marks it read.
@@ -9360,6 +9476,7 @@ components:
         - matched_rule_name
         - is_simulated_failure
         - duration_ms
+        - provider_key
         - is_read
         - created_at
     CapturedHttpRequestUpdate:
@@ -10922,6 +11039,37 @@ components:
       required:
         - default_response
       description: Body of `PATCH /http/bins/{binId}`.
+    HttpFollowUpWebhook:
+      type: object
+      properties:
+        url:
+          type: string
+          description: A URL template; empty when an endpoint is chosen.
+          examples:
+            - "{{ request.form.StatusCallback }}"
+        endpoint_id:
+          anyOf:
+            - $ref: "#/components/schemas/Ulid"
+            - type: "null"
+          description: "A webhook endpoint's ID: its URL and retry policy are used instead of `url`."
+          examples:
+            - null
+        template_id:
+          type: string
+          description: The webhook template its body and headers render with; vendor templates sign as the vendor does.
+          examples:
+            - twilio.status_callback
+        delay_ms:
+          type: number
+          description: How long after the answer it is sent, in milliseconds (0 to 600,000).
+          examples:
+            - 1000
+      required:
+        - url
+        - endpoint_id
+        - template_id
+        - delay_ms
+      description: The webhook a response rule sends after it answers.
     HttpForwardRequest:
       type: object
       properties:
@@ -11037,6 +11185,11 @@ components:
           description: The status sent for a simulated failure.
           examples:
             - 503
+        follow_up:
+          anyOf:
+            - $ref: "#/components/schemas/HttpFollowUpWebhook"
+            - type: "null"
+          description: A webhook sent after the rule answers; null for none.
       required:
         - id
         - name
@@ -11049,6 +11202,7 @@ components:
         - delay_max_ms
         - failure_rate_percent
         - failure_status_code
+        - follow_up
       description: One mock response rule; rules are checked in order and the first match answers.
     HttpRulePreviewRequest:
       type: object
@@ -14217,6 +14371,57 @@ components:
         - name
       additionalProperties: false
       description: "Body of PATCH /api/v1/projects/{projectKey}: the new name."
+    ProviderArea:
+      type: string
+      enum:
+        - email
+        - sms
+        - push
+        - payments
+      description: "Where a provider lives: email and SMS providers (Verify services among them), push services and payment gateways."
+    ProviderBin:
+      type: object
+      properties:
+        area:
+          $ref: "#/components/schemas/ProviderArea"
+          description: The provider's area.
+          examples:
+            - sms
+        provider_key:
+          type: string
+          description: The provider's key.
+          examples:
+            - twilio
+        bin_id:
+          $ref: "#/components/schemas/Ulid"
+          description: The attached bin's ID.
+          examples:
+            - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+        bin_name:
+          type: string
+          description: The attached bin's name.
+          examples:
+            - twilio-gaps
+        attached_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+      required:
+        - area
+        - provider_key
+        - bin_id
+        - bin_name
+        - attached_at
+      description: "An HTTP Catcher bin attached to a provider: requests on its base URL that no built-in operation answers are captured there and answered by the bin's rules."
+    ProviderBinAttachment:
+      type: object
+      properties:
+        bin_name:
+          type: string
+          description: The bin's name; a bin of that name is made when there is none.
+          examples:
+            - twilio-gaps
+      required:
+        - bin_name
+      description: Body of `PUT /api/v1/provider-bins/{area}/{providerKey}`.
     ProviderCredential:
       type: object
       properties:

@@ -154,6 +154,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_http_catcher_samples(app_router).await);
     samples.extend(prepare_number_samples(app_router).await);
     samples.extend(prepare_twilio_subaccount_samples(app_router).await);
+    samples.extend(provider_gap_samples());
     samples.extend(prepare_verify_samples(app_router).await);
     samples.extend(prepare_sms_provider_samples(app_router).await);
     samples.extend([
@@ -742,6 +743,12 @@ async fn prepare_twilio_subaccount_samples(
             "deleteTwilioSubaccountsByAccountSid",
             vec![json!({ "account_sid": deleted_sid })],
         ),
+    ]
+}
+
+/// Mailgun complaints, the local CA and provider bins, which need no setup.
+fn provider_gap_samples() -> Vec<(&'static str, Vec<Value>)> {
+    vec![
         (
             "getMailgunComplaints",
             vec![json!({}), json!({ "domain": "mg.shop.test" })],
@@ -750,6 +757,15 @@ async fn prepare_twilio_subaccount_samples(
         (
             "deleteMailgunComplaintsByDomain",
             vec![json!({ "domain": "mg.shop.test" })],
+        ),
+        (
+            "putProviderBinsByAreaByProviderKey",
+            vec![json!({ "area": "sms", "provider_key": "twilio", "bin_name": "twilio-gaps" })],
+        ),
+        ("getProviderBins", vec![json!({})]),
+        (
+            "deleteProviderBinsByAreaByProviderKey",
+            vec![json!({ "area": "sms", "provider_key": "twilio" })],
         ),
     ]
 }

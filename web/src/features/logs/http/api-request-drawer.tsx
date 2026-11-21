@@ -89,6 +89,15 @@ function ApiRequestDetails({ apiRequest }: { apiRequest: ApiRequestLogEntry }) {
             <LinkedMessageButton linkedMessage={apiRequest.linked_message} />
           </div>
         )}
+        {apiRequest.catcher_answer !== null && (
+          <p className="text-xs text-muted-foreground">
+            Answered by HTTP Catcher bin {apiRequest.catcher_answer.bin_name}
+            {apiRequest.catcher_answer.rule_name === null
+              ? ", its default reply"
+              : `, rule ${apiRequest.catcher_answer.rule_name}`}
+            , as no built-in operation serves this path.
+          </p>
+        )}
       </div>
       <HttpHeadersList
         title="Request headers"

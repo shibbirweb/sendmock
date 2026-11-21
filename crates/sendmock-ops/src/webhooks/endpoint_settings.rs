@@ -2,6 +2,7 @@ use std::collections::BTreeMap;
 
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use serde_json::{Value, json};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "UPPERCASE")]
@@ -120,4 +121,29 @@ pub struct EndpointRequestSettings {
     pub raw_body: String,
     /// `strict` or `lenient` rendering of undefined variables.
     pub render_mode: RenderMode,
+}
+
+/// A new endpoint's request settings as JSON: the template's body, sent with `POST`, retried
+/// on the default schedule.
+pub fn default_request_settings() -> Value {
+    json!({
+        "method": "POST",
+        "headers": {},
+        "extra_fields": {},
+        "template_id": "native",
+        "template_mode": "linked",
+        "timeout_ms": 10_000,
+        "retry_policy": {
+            "max_attempts": 5,
+            "backoff_seconds": [1, 5, 30, 120, 600],
+            "retry_on_client_errors": false,
+        },
+        "query_params": [],
+        "body_mode": "template",
+        "body_fields": [],
+        "fields_encoding": "json",
+        "raw_content_type": "application/json",
+        "raw_body": "",
+        "render_mode": "strict",
+    })
 }

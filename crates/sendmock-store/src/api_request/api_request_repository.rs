@@ -2,11 +2,11 @@ use std::sync::Arc;
 
 use rusqlite::{OptionalExtension, Row, params};
 
-use super::{ApiRequestFilter, ApiRequestPage, ApiRequestRecord};
+use super::{ApiRequestFilter, ApiRequestPage, ApiRequestRecord, CatcherAnswerRecord};
 use crate::{Database, StoreError};
 
 const REQUEST_COLUMNS: &str = "id, api, method, path, request_headers, request_body, response_status, response_body, \
-     duration_ms, linked_message_kind, linked_message_id, created_at";
+     duration_ms, linked_message_kind, linked_message_id, created_at, catcher_bin_name, catcher_rule_name";
 
 /// Filters shared by the count and the page; `?1` to `?3` are the filter values.
 const FILTER_CONDITIONS: &str = "(?1 IS NULL OR api = ?1) \
@@ -28,8 +28,12 @@ impl ApiRequestRepository {
         self.database
             .write(move |connection| {
                 let (linked_message_kind, linked_message_id) = request.linked_message.unzip();
+                let (catcher_bin_name, catcher_rule_name) = request
+                    .catcher_answer
+                    .map(|catcher_answer| (catcher_answer.bin_name, catcher_answer.rule_name))
+                    .unzip();
                 connection.execute(
-                    &format!("INSERT INTO api_requests ({REQUEST_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)"),
+                    &format!("INSERT INTO api_requests ({REQUEST_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)"),
                     params![
                         request.request_id,
                         request.api,
@@ -43,6 +47,8 @@ impl ApiRequestRepository {
                         linked_message_kind,
                         linked_message_id,
                         request.created_at_unix_ms,
+                        catcher_bin_name,
+                        catcher_rule_name.flatten(),
                     ],
                 )?;
                 Ok(())
@@ -152,6 +158,15 @@ fn read_request_row(row: &Row<'_>) -> rusqlite::Result<ApiRequestRecord> {
         response_body: row.get(7)?,
         duration_ms: u64::try_from(duration_ms).unwrap_or_default(),
         linked_message: linked_message_kind.zip(linked_message_id),
+        catcher_answer: row
+            .get::<_, Option<String>>(12)?
+            .map(|bin_name| -> rusqlite::Result<CatcherAnswerRecord> {
+                Ok(CatcherAnswerRecord {
+                    bin_name,
+                    rule_name: row.get(13)?,
+                })
+            })
+            .transpose()?,
         created_at_unix_ms: row.get(11)?,
     })
 }
@@ -185,6 +200,7 @@ mod tests {
             duration_ms: 3,
             linked_message: (response_status < 300)
                 .then(|| ("email".to_owned(), format!("email-{request_id}"))),
+            catcher_answer: None,
             created_at_unix_ms: 1,
         }
     }

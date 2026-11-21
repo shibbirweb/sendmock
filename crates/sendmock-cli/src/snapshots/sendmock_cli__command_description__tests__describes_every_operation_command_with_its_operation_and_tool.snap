@@ -3474,6 +3474,71 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock http provider-bin list",
+    "usage": "sendmock http provider-bin list",
+    "aliases": [],
+    "summary": "Which HTTP Catcher bin answers each provider's unmatched requests.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/provider-bins",
+        "operation_id": "getProviderBins",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_http_provider_bin_list"
+    ]
+  },
+  {
+    "command": "sendmock http provider-bin attach",
+    "usage": "sendmock http provider-bin attach <area> <providerKey>",
+    "aliases": [],
+    "summary": "Send a provider's unmatched requests to an HTTP Catcher bin, made if new.",
+    "arguments": [
+      "area",
+      "providerKey"
+    ],
+    "flags": [
+      "--bin-name"
+    ],
+    "operations": [
+      {
+        "method": "PUT",
+        "path": "/api/v1/provider-bins/{area}/{providerKey}",
+        "operation_id": "putProviderBinsByAreaByProviderKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_http_provider_bin_attach"
+    ]
+  },
+  {
+    "command": "sendmock http provider-bin detach",
+    "usage": "sendmock http provider-bin detach <area> <providerKey>",
+    "aliases": [],
+    "summary": "Answer a provider's unmatched requests with its 404 again; the bin stays.",
+    "arguments": [
+      "area",
+      "providerKey"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/provider-bins/{area}/{providerKey}",
+        "operation_id": "deleteProviderBinsByAreaByProviderKey",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_http_provider_bin_detach"
+    ]
+  },
+  {
     "command": "sendmock scenario validate",
     "usage": "sendmock scenario validate <file>",
     "aliases": [],

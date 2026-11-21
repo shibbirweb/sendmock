@@ -12,6 +12,7 @@ mod payment_flow_seed_adapter;
 mod payment_gateway_seed_adapter;
 mod payment_method_seed_adapter;
 mod project_seed_adapter;
+mod provider_bin_seed_adapter;
 mod saved_delivery_seed_adapter;
 mod saved_scenario_seed_adapter;
 mod settings_seed_adapter;
@@ -36,6 +37,7 @@ use payment_flow_seed_adapter::PaymentFlowSeedAdapter;
 use payment_gateway_seed_adapter::PaymentGatewaySeedAdapter;
 use payment_method_seed_adapter::PaymentMethodSeedAdapter;
 use project_seed_adapter::ProjectSeedAdapter;
+use provider_bin_seed_adapter::ProviderBinSeedAdapter;
 use saved_delivery_seed_adapter::SavedDeliverySeedAdapter;
 use saved_scenario_seed_adapter::SavedScenarioSeedAdapter;
 use settings_seed_adapter::SettingsSeedAdapter;
@@ -56,7 +58,7 @@ use super::seed_section_adapter::SeedSectionAdapter;
 /// exist before their variables, rules and saved deliveries; a payment flow exists before the
 /// methods that run it, which exist before the gateways that offer them, after the endpoints
 /// gateways notify. HTTP bins, email tag, forward and inbound rules and saved scenarios refer to
-/// nothing else, so they come last.
+/// nothing else, so they come last; provider bins follow the bins and providers they join.
 pub fn seed_section_adapters() -> Vec<Box<dyn SeedSectionAdapter>> {
     vec![
         Box::new(SettingsSeedAdapter),
@@ -79,6 +81,7 @@ pub fn seed_section_adapters() -> Vec<Box<dyn SeedSectionAdapter>> {
         Box::new(PaymentMethodSeedAdapter),
         Box::new(PaymentGatewaySeedAdapter),
         Box::new(HttpBinSeedAdapter),
+        Box::new(ProviderBinSeedAdapter),
         Box::new(TagRuleSeedAdapter),
         Box::new(ForwardRuleSeedAdapter),
         Box::new(InboundRouteSeedAdapter),

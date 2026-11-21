@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProviderCallbacksTab } from "@/features/providers/provider-callbacks-tab";
+import { UnmatchedRequestsSection } from "@/features/http/provider-bins/unmatched-requests-section";
 import { ProviderGeneralTab } from "@/features/providers/provider-general-tab";
 import { ProviderMappingEditor } from "@/features/providers/provider-mapping-editor";
 import { ProviderOperationsEditor } from "@/features/providers/provider-operations-editor";
@@ -120,10 +121,17 @@ export function MessageProviderSheet({
               </TabsList>
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
-              <TabsContent value="general" className="max-w-2xl">
+              <TabsContent value="general" className="grid max-w-2xl gap-6">
                 <ProviderGeneralTab
                   providerForm={providerForm}
                   savedCredentials={messageProvider.credentials}
+                />
+                <UnmatchedRequestsSection
+                  providerReference={{
+                    area: messageProvider.area,
+                    providerKey: messageProvider.key,
+                  }}
+                  providerName={messageProvider.name}
                 />
               </TabsContent>
               {hasComplaintsTab && (

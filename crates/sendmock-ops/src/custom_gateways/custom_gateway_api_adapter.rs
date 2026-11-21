@@ -89,5 +89,6 @@ pub async fn answer_custom_gateway_request(
         provider_key: Some(gateway_key.to_owned()),
         created_message: None,
         secret_values: list_secret_values(gateway_fields),
+        is_unknown_path: false,
     }))
 }

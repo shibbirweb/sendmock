@@ -218,11 +218,13 @@ pub async fn answer_paypal_request(
             provider_key: Some(PAYPAL_PROVIDER_KEY.to_owned()),
             created_message: None,
             secret_values: Vec::new(),
+            is_unknown_path: false,
         }));
     }
     let credentials = read_credentials(request);
     let paypal_call = build_paypal_call(operation_context, request);
     let paypal_answer = answer_paypal_call(&paypal_call, request, &credentials).await;
+    let is_unknown_path = paypal_answer.as_ref().err() == Some(&PayPalError::unknown_path());
     let debug_id = format!("{:x}", operation_context.random_source.next_u64())
         .chars()
         .take(13)
@@ -241,5 +243,6 @@ pub async fn answer_paypal_request(
         provider_key: Some(PAYPAL_PROVIDER_KEY.to_owned()),
         created_message: None,
         secret_values,
+        is_unknown_path,
     }))
 }

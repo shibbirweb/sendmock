@@ -11,6 +11,7 @@ import type {
   HttpResponseRule,
   PaymentDetail,
   MessagingService,
+  ProviderBin,
   PushNotification,
   SavedDelivery,
   SmsMessageDetail,
@@ -162,6 +163,8 @@ export type MockDatabase = {
   /** Push notifications, newest first (PN-01). */
   pushNotifications: PushNotification[];
   httpBins: HttpBin[];
+  /** Bins attached to providers for their unmatched requests (PL-21). */
+  providerBins: ProviderBin[];
   /** Each bin's response rules in order, by bin id. */
   httpResponseRules: Map<string, HttpResponseRule[]>;
   capturedHttpRequests: CapturedHttpRequest[];
@@ -212,6 +215,7 @@ function buildConfiguration() {
     webhookVariables: buildWebhookVariableFixtures(),
     savedDeliveries: buildSavedDeliveryFixtures(),
     httpBins,
+    providerBins: [],
     paymentMethods: buildBuiltinPaymentMethods(),
     paymentFlows: buildBuiltinPaymentFlows(),
     paymentSubscriptions: [],

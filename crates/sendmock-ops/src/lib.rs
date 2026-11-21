@@ -33,6 +33,7 @@ mod paypal;
 mod pop3_mailbox;
 mod present_value;
 mod projects;
+mod provider_bins;
 mod providers;
 mod push;
 mod razorpay;
@@ -69,8 +70,8 @@ pub use events::{
     publish_email_inbound, publish_email_received, publish_event,
 };
 pub use http_catcher::{
-    CapturedHttpRequest, CatchAnswer, HttpBin, HttpMockResponse, IncomingHttpRequest,
-    capture_http_request,
+    CapturedHttpRequest, CatchAnswer, HttpBin, HttpFollowUpWebhook, HttpMockResponse,
+    IncomingHttpRequest, capture_http_request,
 };
 pub use inbound_routes::{InboundRoute, InboundRouteAction, InboundRouteFilter};
 pub use input_coercion::build_input_from_text;
@@ -113,6 +114,9 @@ pub use pop3_mailbox::{
     read_pop3_message,
 };
 pub use projects::{PROJECT_HEADER, Project, find_named_project};
+pub use provider_bins::{
+    ProviderArea, ProviderBin, ProviderGapAnswer, ProviderGapOrigin, answer_provider_gap,
+};
 pub use providers::{
     MessageProviderDefinition, ProviderHttpRequest, ProviderHttpResponse, ProviderOutcome,
     ProviderRoute, answer_provider_request, builtin_email_providers, builtin_sms_providers,
@@ -206,6 +210,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     push::register_push_operations(&mut operation_registry);
     inbound_routes::register_inbound_route_operations(&mut operation_registry);
     http_catcher::register_http_catcher_operations(&mut operation_registry);
+    provider_bins::register_provider_bin_operations(&mut operation_registry);
     scenarios::register_scenario_operations(&mut operation_registry);
     subscriptions::register_subscription_operations(&mut operation_registry);
     ai::register_ai_operations(&mut operation_registry);

@@ -74,5 +74,6 @@ pub async fn answer_mailgun_domain_request(
         provider_key: Some(MAILGUN_PROVIDER_KEY.to_owned()),
         created_message: None,
         secret_values: Vec::new(),
+        is_unknown_path: false,
     }))
 }

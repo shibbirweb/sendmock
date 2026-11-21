@@ -47,11 +47,7 @@ async fn route_paddle_request(
             get_transaction(paddle_call, transaction_id).await
         }
         ("POST", ["adjustments"]) => create_adjustment(paddle_call).await,
-        _ => Ok(Err(PaddleError::new(
-            404,
-            "not_found",
-            "The requested URL was not found",
-        ))),
+        _ => Ok(Err(PaddleError::unknown_path())),
     }
 }
 
@@ -112,7 +108,9 @@ pub async fn answer_paddle_request(
         .generate_id()
         .to_string()
         .to_ascii_lowercase();
-    let (status, body) = wrap_answer(route_paddle_request(&paddle_call).await?, &request_id);
+    let paddle_answer = route_paddle_request(&paddle_call).await?;
+    let is_unknown_path = paddle_answer.as_ref().err() == Some(&PaddleError::unknown_path());
+    let (status, body) = wrap_answer(paddle_answer, &request_id);
     Ok(Some(ProviderOutcome {
         response: ProviderHttpResponse {
             status,
@@ -122,5 +120,6 @@ pub async fn answer_paddle_request(
         provider_key: Some(PADDLE_PROVIDER_KEY.to_owned()),
         created_message: None,
         secret_values: collect_secret_values(&paddle_call),
+        is_unknown_path,
     }))
 }

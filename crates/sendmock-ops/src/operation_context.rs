@@ -8,7 +8,7 @@ use sendmock_store::{
     EmailRepository, EmailResponseRepository, HttpBinRepository, InboundRouteRepository,
     MailgunComplaintRepository, MessageProviderRepository, MessageRuleKind, MessageRuleRepository,
     MessagingServiceRepository, PaymentDefinitionRepository, PaymentProviderObjectRepository,
-    PaymentRepository, PaymentSubscriptionRepository, ProjectRepository,
+    PaymentRepository, PaymentSubscriptionRepository, ProjectRepository, ProviderBinRepository,
     PushNotificationRepository, SavedScenarioRepository, SavedWebhookDeliveryRepository,
     SeedStateRepository, SettingsRepository, SmsCallbackAttemptRepository,
     SmsOutcomeRuleRepository, SmsReplyWebhookRepository, SmsRepository, SmtpSessionRepository,
@@ -152,11 +152,12 @@ impl LogStores {
     }
 }
 
-/// The HTTP catcher's bins and the requests captured in them.
+/// The HTTP catcher's bins, the requests captured in them and the providers they serve.
 #[derive(Clone)]
 pub struct HttpCatcherStores {
     pub bins: HttpBinRepository,
     pub requests: CapturedRequestRepository,
+    pub provider_bins: ProviderBinRepository,
 }
 
 impl HttpCatcherStores {
@@ -164,6 +165,7 @@ impl HttpCatcherStores {
         Self {
             bins: HttpBinRepository::new(Arc::clone(database)),
             requests: CapturedRequestRepository::new(Arc::clone(database)),
+            provider_bins: ProviderBinRepository::new(Arc::clone(database)),
         }
     }
 }

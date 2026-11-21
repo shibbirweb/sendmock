@@ -87,6 +87,11 @@ jobs:
             language: php
             folder: php-twilio-subaccounts
             run: composer install --no-interaction --quiet && php send-under-subaccount-and-verify.php
+          # AC: PL-21.7
+          - client: Twilio Node SDK with a call answered by a provider bin
+            language: node
+            folder: node-twilio-calls-gap
+            run: bun install && node answer-calls-and-verify.js
           # AC: SM-20.5
           - client: Twilio Node SDK with numbers
             language: node

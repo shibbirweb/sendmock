@@ -146,6 +146,7 @@ export const queryKeys = {
   httpCatcher: {
     all: ["http-catcher"] as const,
     bins: ["http-catcher", "bins"] as const,
+    providerBins: ["http-catcher", "provider-bins"] as const,
     requests: (binId: string | null) =>
       ["http-catcher", "requests", binId] as const,
     request: (requestId: string) =>

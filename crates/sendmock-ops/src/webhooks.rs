@@ -30,6 +30,7 @@ mod endpoint_test_operation;
 mod endpoint_validation;
 mod endpoint_view;
 mod file_template_library;
+mod follow_up_delivery;
 mod manual_send_operation;
 mod metrics_inputs;
 mod metrics_loading;
@@ -105,7 +106,7 @@ pub use endpoint_secret_operations::{
     RevealWebhookEndpointSecretOperation, RevealedEndpointSecret,
     RotateWebhookEndpointSecretOperation,
 };
-pub(crate) use endpoint_settings::EndpointRequestSettings;
+pub(crate) use endpoint_settings::{EndpointRequestSettings, default_request_settings};
 pub(crate) use endpoint_template::{choose_detached_template, write_detached_template};
 pub use endpoint_test_operation::TestWebhookEndpointOperation;
 pub(crate) use endpoint_validation::validate_endpoint_input;
@@ -114,6 +115,7 @@ pub(crate) use endpoint_view::{read_request_settings, write_request_settings};
 pub use file_template_library::{
     FileTemplateLibrary, LoadedTemplateDirectory, load_template_directory,
 };
+pub(crate) use follow_up_delivery::{FollowUpOrder, FollowUpTarget, queue_follow_up_delivery};
 pub use manual_send_operation::SendWebhookOperation;
 pub(crate) use metrics_loading::{load_delivery_samples, load_metered_endpoints};
 pub use metrics_operation::GetWebhookMetricsOperation;
