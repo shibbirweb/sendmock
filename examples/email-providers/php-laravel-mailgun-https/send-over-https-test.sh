@@ -14,10 +14,12 @@ composer create-project laravel/laravel laravel-app --prefer-dist --no-interacti
 cd laravel-app
 composer require symfony/mailgun-mailer symfony/http-client --no-interaction --quiet
 
-export MAIL_MAILER=mailgun MAILGUN_DOMAIN=mg.shop.test MAILGUN_SECRET=key-sendmock-example \
-  MAILGUN_ENDPOINT="localhost:$provider_tls_port" MAIL_FROM_ADDRESS=app@mg.shop.test MAIL_FROM_NAME=App
+export MAIL_FROM_ADDRESS=app@mg.shop.test MAIL_FROM_NAME=App
+# New Laravel skeletons define neither the mailgun mailer nor services.mailgun, so set both.
+mailgun_config="config(['mail.mailers.mailgun' => ['transport' => 'mailgun'], 'services.mailgun' => ['domain' => 'mg.shop.test', 'secret' => 'key-sendmock-example', 'endpoint' => 'localhost:$provider_tls_port', 'scheme' => 'https']]);"
+send_mail="Illuminate\\Support\\Facades\\Mail::mailer('mailgun')->raw('Sent over HTTPS', fn (\$message) => \$message->to('user@example.test')->subject('$subject'));"
 php -d "curl.cainfo=$PWD/../sendmock-ca.pem" -d "openssl.cafile=$PWD/../sendmock-ca.pem" artisan tinker \
-  --execute="Illuminate\\Support\\Facades\\Mail::raw('Sent over HTTPS', fn (\$message) => \$message->to('user@example.test')->subject('$subject'));"
+  --execute="$mailgun_config $send_mail"
 
 stored_source="$(curl -fsS "$sendmock_url/api/v1/emails" | jq -r --arg subject "$subject" '.items[] | select(.subject == $subject) | .source')"
 if [ "$stored_source" != "mailgun" ]; then

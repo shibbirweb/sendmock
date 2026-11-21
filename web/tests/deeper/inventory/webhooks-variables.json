@@ -7,6 +7,7 @@
       "link: Read the Variables guide",
       "heading: Webhook variables",
       "paragraph: Values templates read as {{ vars.name }}: endpoint ones win over global ones.",
+      "paragraph: Twilio templates sign with: Twilio provider: the token of the event's subaccount, or of account ACtest# for any other. Set a variable named twilio_auth_token to use your own.",
       "button: Add variable",
       "textbox: Search variables",
       "combobox: Scope filter",
@@ -73,6 +74,7 @@
       "button: Close"
     ],
     "failing": [
+      "paragraph: Twilio templates sign with: Twilio provider: the token of the event's subaccount, or of the main account for any other. Set a variable named twilio_auth_token to use your own.",
       "alert: Could not load the variables. Try again",
       "paragraph: Could not load the variables.",
       "button: Try again"

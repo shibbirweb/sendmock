@@ -38,7 +38,7 @@ export function describeTwilioSigning(
       ?.credentials.find((credential) => credential.name === "account_sid")
       ?.value ?? "";
   const mainAccountPart =
-    mainAccountSid === "" ? "" : `, or account ${mainAccountSid}`;
+    mainAccountSid === "" ? "the main account" : `account ${mainAccountSid}`;
 
-  return `Twilio provider: the token of the event's subaccount${mainAccountPart} for any other. Set a variable named ${twilioAuthTokenVariable} to use your own.`;
+  return `Twilio provider: the token of the event's subaccount, or of ${mainAccountPart} for any other. Set a variable named ${twilioAuthTokenVariable} to use your own.`;
 }

@@ -32,6 +32,16 @@ const twilioEntries: DeeperEntry[] = [
     operationIds: ["getSmsProvidersByProviderKeyCredentialsByCredentialName"],
   },
   {
+    control: "button: Reveal debugger_url",
+    does: "Shows the Debugger webhook URL once, after you confirm.",
+    operationIds: ["getSmsProvidersByProviderKeyCredentialsByCredentialName"],
+  },
+  {
+    control: "tab: Accounts",
+    does: "Twilio subaccounts: add, suspend, close or delete one, and reveal its Auth Token.",
+    operationIds: ["getTwilioSubaccounts"],
+  },
+  {
     control: "textbox: queued",
     does: "The provider's name for a message waiting to be sent, as its status callbacks show it.",
   },
