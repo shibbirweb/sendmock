@@ -20,6 +20,8 @@ const processCommands = [
   "sendmock serve",
   "sendmock mcp",
   "sendmock help",
+  "sendmock last-run",
+  "sendmock last-run clear",
   "sendmock",
 ];
 
