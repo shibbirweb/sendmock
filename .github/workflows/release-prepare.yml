@@ -43,8 +43,8 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
 
-      # GITHUB_TOKEN cannot read Dependabot alerts; RELEASE_TOKEN needs "Dependabot alerts: read".
-      - name: CI passed on this commit, no release is in progress and the Security tab is clean
+      # GITHUB_TOKEN cannot read Dependabot alerts; with "Dependabot alerts: read", RELEASE_TOKEN lists them.
+      - name: CI passed, no release is in progress, and no code scanning alert or Dependabot pull request is open
         env:
           SECURITY_ALERTS_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: bun scripts/release/release.ts readiness

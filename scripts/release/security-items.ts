@@ -24,6 +24,8 @@ type OpenPullRequest = {
 export type SecurityItems = {
   codeScanningAlerts: string[];
   dependabotAlerts: string[];
+  /** Why the Dependabot alerts could not be read, or null when they were. */
+  dependabotAlertsProblem: string | null;
   dependabotPullRequests: string[];
 };
 
@@ -49,8 +51,11 @@ async function fetchCodeScanningAlerts(): Promise<string[]> {
 }
 
 // The workflow's GITHUB_TOKEN cannot read Dependabot alerts, so this call takes a token that
-// can (SECURITY_ALERTS_TOKEN, which the workflow sets from RELEASE_TOKEN).
-async function fetchDependabotAlerts(): Promise<string[]> {
+// can (SECURITY_ALERTS_TOKEN, which the workflow sets from RELEASE_TOKEN). The alerts are only
+// listed, never a blocker, so a token without access is reported instead of failing.
+async function fetchDependabotAlerts(): Promise<
+  Pick<SecurityItems, "dependabotAlerts" | "dependabotAlertsProblem">
+> {
   const alertsToken =
     process.env.SECURITY_ALERTS_TOKEN || process.env.GITHUB_TOKEN || "";
   try {
@@ -58,14 +63,18 @@ async function fetchDependabotAlerts(): Promise<string[]> {
       "/dependabot/alerts?state=open&per_page=100",
       alertsToken,
     );
-    return openAlerts.map(
-      (alert) =>
-        `#${alert.number} ${alert.dependency.package.name} in ${alert.dependency.manifest_path}`,
-    );
+    return {
+      dependabotAlerts: openAlerts.map(
+        (alert) =>
+          `#${alert.number} ${alert.dependency.package.name} in ${alert.dependency.manifest_path}`,
+      ),
+      dependabotAlertsProblem: null,
+    };
   } catch (fetchError) {
-    throw new Error(
-      `Could not read the Dependabot alerts (${String(fetchError)}). Give RELEASE_TOKEN the "Dependabot alerts: read" permission (docs/plan/31-release-runbook.md, step 3).`,
-    );
+    return {
+      dependabotAlerts: [],
+      dependabotAlertsProblem: `${String(fetchError)}; the token needs "Dependabot alerts: read" to list them`,
+    };
   }
 }
 
@@ -79,7 +88,7 @@ async function fetchDependabotPullRequests(): Promise<string[]> {
 export async function fetchSecurityItems(): Promise<SecurityItems> {
   return {
     codeScanningAlerts: await fetchCodeScanningAlerts(),
-    dependabotAlerts: await fetchDependabotAlerts(),
+    ...(await fetchDependabotAlerts()),
     dependabotPullRequests: await fetchDependabotPullRequests(),
   };
 }
