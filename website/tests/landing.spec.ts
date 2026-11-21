@@ -677,3 +677,33 @@ test("the footer and header link to docs, feedback forms, security and the repos
     page.getByRole("link", { name: /SendMock on GitHub/ }).first(),
   ).toBeVisible();
 });
+
+test("the footer wordmark spells SendMock in caught traffic, hidden from assistive technology", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const wordmark = page.locator("footer svg[aria-hidden='true']").last();
+
+  await expect(wordmark).toBeVisible();
+  await expect(wordmark.locator("clipPath text")).toHaveText("SendMock");
+  await expect(
+    wordmark.locator("text.animate-wordmark-feed").first(),
+  ).toContainText("email.received");
+});
+
+test("the footer wordmark's traffic lines stay still with reduced motion", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const firstFeedRow = page
+    .locator("footer svg[aria-hidden='true'] text.animate-wordmark-feed")
+    .first();
+  const readTransform = () =>
+    firstFeedRow.evaluate((feedRow) => getComputedStyle(feedRow).transform);
+
+  const firstTransform = await readTransform();
+  await page.waitForTimeout(500);
+
+  expect(await readTransform()).toBe(firstTransform);
+});

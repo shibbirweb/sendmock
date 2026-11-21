@@ -8,6 +8,10 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ## [Unreleased]
 
+### Added
+
+- **Website footer wordmark:** the foot of every page on the website ends with a large SendMock wordmark whose letters are made of the email, SMS, webhook and payment events SendMock catches. Move the pointer over it to light the lines up.
+
 ### Changed
 
 - **Testcontainers for Go needs Go 1.26:** the `sendmock-testcontainers` Go module moves to patched releases of its dependencies (OpenTelemetry 1.47, `klauspost/compress`, `moby/go-archive`, `moby/sys/user`), and OpenTelemetry 1.47 requires Go 1.26. The Python module's test dependency moves to pytest 9.
