@@ -56,6 +56,7 @@ mod saved_delivery_send_operation;
 mod saved_delivery_template_operation;
 mod saved_delivery_view;
 mod secret_value_masking;
+mod signature_verify_operation;
 mod signed_body_functions;
 mod template_catalogue;
 mod template_context;
@@ -246,5 +247,7 @@ pub fn register_webhook_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(ImportWebhookTemplateOperation);
     operation_registry.register(ExportWebhookTemplateOperation);
     operation_registry.register(GetWebhookTemplateReferenceOperation);
+    operation_registry.register(VerifyWebhookSignatureOperation);
 }
+pub use signature_verify_operation::VerifyWebhookSignatureOperation;
 pub(crate) use signed_body_functions::SignedBodyFunctions;

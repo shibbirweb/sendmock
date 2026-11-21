@@ -149,6 +149,187 @@
       ]
     },
     {
+      "command": "sendmock ci init",
+      "slug": "ci-init",
+      "usage": "sendmock ci init [flags]",
+      "summary": "The setup, a starter CI file and the pipeline job for a CI system, from this instance.",
+      "area": "Automation",
+      "area_slug": "automation",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/ci/init",
+          "operation_id": "postCiInit",
+          "summary": "The setup, a starter CI file and the pipeline job for a CI system, from this instance.",
+          "area_slug": "automation",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--provider",
+          "input": {
+            "name": "provider",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<provider>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "github_actions",
+            "gitlab_ci",
+            "circleci",
+            "bitbucket_pipelines",
+            "azure_pipelines",
+            "jenkins"
+          ],
+          "description": "The CI system to write a job for. `sendmock ci init` finds it from the repository.",
+          "example": "github_actions"
+        },
+        {
+          "flag": "--setup-url",
+          "input": {
+            "name": "setup_url",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<setup-url>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Where the pipeline downloads the setup; the written file's path when null.",
+          "example": null
+        },
+        {
+          "flag": "--app-url",
+          "input": {
+            "name": "app_url",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<app-url>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The app's base URL in the pipeline [default: http://localhost:8000].",
+          "example": "http://localhost:8000"
+        }
+      ],
+      "example": "sendmock ci init --provider github_actions --setup-url null --app-url http://localhost:8000",
+      "output": "CiInitFiles",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_ci_init"
+      ],
+      "ui": [
+        "Settings > Setup > Use in CI"
+      ]
+    },
+    {
+      "command": "sendmock ci run",
+      "slug": "ci-run",
+      "usage": "sendmock ci run <file>",
+      "summary": "Run a CI file's setup and scenarios here and answer the report, with JUnit XML.",
+      "area": "Automation",
+      "area_slug": "automation",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/ci/run",
+          "operation_id": "postCiRun",
+          "summary": "Run a CI file's setup and scenarios here and answer the report, with JUnit XML.",
+          "area_slug": "automation",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "file",
+          "input": {
+            "name": "ci_file",
+            "location": "body"
+          },
+          "type": "path",
+          "allowed_values": null,
+          "description": "A file whose text is sent as `ci_file`: The CI file (`format: sendmock.ci`) in JSON or YAML. A setup or scenario named by a path must be inlined first, as `sendmock ci run` does; URLs are downloaded.",
+          "example": "input.txt",
+          "reads_file": true
+        }
+      ],
+      "flags": [],
+      "example": "sendmock ci run input.txt",
+      "output": "CiReport",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_ci_run"
+      ],
+      "ui": [
+        "Scenarios > CI file > Run"
+      ]
+    },
+    {
+      "command": "sendmock ci validate",
+      "slug": "ci-validate",
+      "usage": "sendmock ci validate <file>",
+      "summary": "Check a CI file and its scenarios without running anything.",
+      "area": "Automation",
+      "area_slug": "automation",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/ci/validate",
+          "operation_id": "postCiValidate",
+          "summary": "Check a CI file and its scenarios without running anything.",
+          "area_slug": "automation",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "file",
+          "input": {
+            "name": "ci_file",
+            "location": "body"
+          },
+          "type": "path",
+          "allowed_values": null,
+          "description": "A file whose text is sent as `ci_file`: The CI file (`format: sendmock.ci`) in JSON or YAML. A setup or scenario named by a path must be inlined first, as `sendmock ci run` does; URLs are downloaded.",
+          "example": "input.txt",
+          "reads_file": true
+        }
+      ],
+      "flags": [],
+      "example": "sendmock ci validate input.txt",
+      "output": "CiValidation",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_ci_validate"
+      ],
+      "ui": [
+        "Scenarios > CI file > Validate"
+      ]
+    },
+    {
       "command": "sendmock email attachments",
       "slug": "email-attachments",
       "usage": "sendmock email attachments <emailId> <attachmentIndex>",
@@ -22558,6 +22739,184 @@
       ],
       "ui": [
         "Mail, SMS, HTTP > Send to webhook; Webhooks > Composer > Send"
+      ]
+    },
+    {
+      "command": "sendmock webhook signature verify",
+      "slug": "webhook-signature-verify",
+      "usage": "sendmock webhook signature verify [flags]",
+      "summary": "Check a captured request's webhook signature: Standard Webhooks, Stripe or an HMAC header.",
+      "area": "Webhook deliveries",
+      "area_slug": "webhook-deliveries",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/webhooks/signatures/verify",
+          "operation_id": "postWebhooksSignaturesVerify",
+          "summary": "Check a captured request's webhook signature: Standard Webhooks, Stripe or an HMAC header.",
+          "area_slug": "webhook-deliveries",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--scheme",
+          "input": {
+            "name": "scheme",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<scheme>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "standard_webhooks",
+            "stripe",
+            "hmac"
+          ],
+          "description": "`standard_webhooks`, `stripe` or `hmac`.",
+          "example": "standard_webhooks"
+        },
+        {
+          "flag": "--secret",
+          "input": {
+            "name": "secret",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<secret>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The signing secret the app checks with; never logged.",
+          "example": "whsec_c2VuZG1vY2stdGVzdC1rZXktMDAwMQ=="
+        },
+        {
+          "flag": "--request-id",
+          "input": {
+            "name": "request_id",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<request-id>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "A captured request's ID, from an HTTP Catcher bin; or give `headers` and `body`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
+          "flag": "--headers",
+          "input": {
+            "name": "headers",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<headers>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "",
+          "example": {}
+        },
+        {
+          "flag": "--body",
+          "input": {
+            "name": "body",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<body>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "",
+          "example": ""
+        },
+        {
+          "flag": "--header",
+          "input": {
+            "name": "header",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<header>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "For `hmac`: the header holding the digest [default: X-Signature].",
+          "example": "X-Hub-Signature-256"
+        },
+        {
+          "flag": "--encoding",
+          "input": {
+            "name": "encoding",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<encoding>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "hex",
+            "base64"
+          ],
+          "description": "For `hmac`: `hex` or `base64` [default: hex].",
+          "example": "hex"
+        },
+        {
+          "flag": "--prefix",
+          "input": {
+            "name": "prefix",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<prefix>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "For `hmac`: text before the digest, such as `sha256=` [default: none].",
+          "example": "sha256="
+        },
+        {
+          "flag": "--tolerance-seconds",
+          "input": {
+            "name": "tolerance_seconds",
+            "location": "body"
+          },
+          "type": "number",
+          "value_label": "<tolerance-seconds>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "How far a signed timestamp may be from now, in seconds [default: 300].",
+          "example": 300
+        }
+      ],
+      "example": "sendmock webhook signature verify --scheme standard_webhooks --secret whsec_c2VuZG1vY2stdGVzdC1rZXktMDAwMQ== --body '' --header X-Hub-Signature-256",
+      "output": "SignatureVerification",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_webhook_signature_verify"
+      ],
+      "ui": [
+        "HTTP Catcher > request > Verify signature"
       ]
     },
     {

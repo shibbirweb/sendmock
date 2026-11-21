@@ -3718,6 +3718,71 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock ci validate",
+    "usage": "sendmock ci validate <file>",
+    "aliases": [],
+    "summary": "Check a CI file and its scenarios without running anything.",
+    "arguments": [
+      "file"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/ci/validate",
+        "operation_id": "postCiValidate",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_ci_validate"
+    ]
+  },
+  {
+    "command": "sendmock ci run",
+    "usage": "sendmock ci run <file>",
+    "aliases": [],
+    "summary": "Run a CI file's setup and scenarios here and answer the report, with JUnit XML.",
+    "arguments": [
+      "file"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/ci/run",
+        "operation_id": "postCiRun",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_ci_run"
+    ]
+  },
+  {
+    "command": "sendmock ci init",
+    "usage": "sendmock ci init",
+    "aliases": [],
+    "summary": "The setup, a starter CI file and the pipeline job for a CI system, from this instance.",
+    "arguments": [],
+    "flags": [
+      "--app-url",
+      "--provider",
+      "--setup-url"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/ci/init",
+        "operation_id": "postCiInit",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_ci_init"
+    ]
+  },
+  {
     "command": "sendmock payments subscriptions list",
     "usage": "sendmock payments subscriptions list",
     "aliases": [],
@@ -6118,6 +6183,35 @@ expression: command_descriptions
     ],
     "mcp": [
       "sendmock_webhook_template_reference"
+    ]
+  },
+  {
+    "command": "sendmock webhook signature verify",
+    "usage": "sendmock webhook signature verify",
+    "aliases": [],
+    "summary": "Check a captured request's webhook signature: Standard Webhooks, Stripe or an HMAC header.",
+    "arguments": [],
+    "flags": [
+      "--body",
+      "--encoding",
+      "--header",
+      "--headers",
+      "--prefix",
+      "--request-id",
+      "--scheme",
+      "--secret",
+      "--tolerance-seconds"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/webhooks/signatures/verify",
+        "operation_id": "postWebhooksSignaturesVerify",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_webhook_signature_verify"
     ]
   },
   {

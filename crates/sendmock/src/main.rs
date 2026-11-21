@@ -2,6 +2,7 @@
 
 mod ai_install;
 mod catcher_listener;
+mod ci_command;
 mod cli_arguments;
 mod client_command;
 mod config;
@@ -59,15 +60,22 @@ fn main() -> ExitCode {
         return sendmail_shim::run_sendmail_shim(&sendmail_arguments);
     }
     let operation_registry = build_operation_registry();
-    let root_command = ai_install::add_install_flags(
+    let root_command = ci_command::add_ci_flags(ai_install::add_install_flags(
         CliArguments::command().subcommands(build_operation_commands(&operation_registry)),
-    );
+    ));
     let root_matches = root_command.clone().get_matches();
     if let Some(matched_operation) = find_matched_operation(&operation_registry, &root_matches) {
-        if matched_operation.operation.definition().operation_id
-            == ai_install::AI_AGENTS_OPERATION_ID
-        {
-            return ai_install::run_ai_install(&matched_operation);
+        match matched_operation.operation.definition().operation_id {
+            ai_install::AI_AGENTS_OPERATION_ID => {
+                return ai_install::run_ai_install(&matched_operation);
+            }
+            ci_command::CI_RUN_OPERATION_ID => {
+                return ci_command::run_ci_run_command(&matched_operation);
+            }
+            ci_command::CI_INIT_OPERATION_ID => {
+                return ci_command::run_ci_init_command(&matched_operation);
+            }
+            _ => {}
         }
         return client_command::run_client_command(&matched_operation);
     }

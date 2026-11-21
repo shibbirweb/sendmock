@@ -1427,6 +1427,82 @@ paths:
       x-sendmock-cli: sendmock ai skill
       x-sendmock-mcp: sendmock://docs/skill
       x-sendmock-ui: Settings > Connection > AI agents > Download the skill
+  /api/v1/ci/validate:
+    post:
+      operationId: postCiValidate
+      summary: Check a CI file and its scenarios without running anything.
+      tags:
+        - Automation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CiFileRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CiValidation"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock ci validate <file>
+      x-sendmock-mcp: sendmock_ci_validate
+      x-sendmock-ui: Scenarios > CI file > Validate
+  /api/v1/ci/run:
+    post:
+      operationId: postCiRun
+      summary: Run a CI file's setup and scenarios here and answer the report, with JUnit XML.
+      tags:
+        - Automation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CiFileRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CiReport"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock ci run <file>
+      x-sendmock-mcp: sendmock_ci_run
+      x-sendmock-ui: Scenarios > CI file > Run
+  /api/v1/ci/init:
+    post:
+      operationId: postCiInit
+      summary: The setup, a starter CI file and the pipeline job for a CI system, from this instance.
+      tags:
+        - Automation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CiInitRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CiInitFiles"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock ci init
+      x-sendmock-mcp: sendmock_ci_init
+      x-sendmock-ui: Settings > Setup > Use in CI
   /api/v1/emails:
     get:
       operationId: getEmails
@@ -8203,6 +8279,32 @@ paths:
       x-sendmock-cli: sendmock webhook var preview
       x-sendmock-mcp: sendmock_webhook_variable_preview
       x-sendmock-ui: Webhooks > Variables > variable sheet > Resolves to
+  /api/v1/webhooks/signatures/verify:
+    post:
+      operationId: postWebhooksSignaturesVerify
+      summary: "Check a captured request's webhook signature: Standard Webhooks, Stripe or an HMAC header."
+      tags:
+        - Webhook deliveries
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignatureVerifyRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignatureVerification"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook signature verify
+      x-sendmock-mcp: sendmock_webhook_signature_verify
+      x-sendmock-ui: HTTP Catcher > request > Verify signature
   /api/v1/projects:
     get:
       operationId: getProjects
@@ -9675,6 +9777,139 @@ components:
           examples:
             - "12121"
       description: What the customer typed in a flow's steps; only the flow's own steps are read.
+    CiFileRequest:
+      type: object
+      properties:
+        ci_file:
+          type: string
+          description: "The CI file (`format: sendmock.ci`) in JSON or YAML. A setup or scenario named by a path must be inlined first, as `sendmock ci run` does; URLs are downloaded."
+          examples:
+            - |
+              sendmock:
+                format: sendmock.ci
+                format_version: 1
+              scenarios:
+                - name: health
+                  steps:
+                    - run: http
+                      with: { method: GET, url: /api/v1/health }
+      required:
+        - ci_file
+      description: Body of POST /api/v1/ci/run and /ci/validate.
+    CiInitFile:
+      type: object
+      properties:
+        path:
+          type: string
+          description: Relative to the repository's root.
+        content:
+          type: string
+        purpose:
+          type: string
+          description: What it is and what to do with it.
+      required:
+        - path
+        - content
+        - purpose
+      description: One file `sendmock ci init` writes.
+    CiInitFiles:
+      type: object
+      properties:
+        provider:
+          $ref: "#/components/schemas/CiSystem"
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/CiInitFile"
+      required:
+        - provider
+        - files
+      description: Answer of POST /api/v1/ci/init.
+    CiInitRequest:
+      type: object
+      properties:
+        provider:
+          $ref: "#/components/schemas/CiSystem"
+          description: The CI system to write a job for. `sendmock ci init` finds it from the repository.
+          examples:
+            - github_actions
+        setup_url:
+          type:
+            - string
+            - "null"
+          description: Where the pipeline downloads the setup; the written file's path when null.
+          examples:
+            - null
+        app_url:
+          type:
+            - string
+            - "null"
+          description: "The app's base URL in the pipeline [default: http://localhost:8000]."
+          examples:
+            - http://localhost:8000
+      required:
+        - provider
+      description: Body of POST /api/v1/ci/init.
+    CiReport:
+      type: object
+      properties:
+        is_passed:
+          type: boolean
+        started_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+        duration_ms:
+          type: number
+        passed_count:
+          type: number
+        failed_count:
+          type: number
+        scenarios:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScenarioReport"
+        junit_xml:
+          type: string
+          description: "The JUnit XML report: a test suite per scenario and a test case per step."
+        summary_markdown:
+          type: string
+          description: A Markdown summary, as `GITHUB_STEP_SUMMARY` shows it.
+      required:
+        - is_passed
+        - started_at
+        - duration_ms
+        - passed_count
+        - failed_count
+        - scenarios
+        - junit_xml
+        - summary_markdown
+      description: "Answer of POST /api/v1/ci/run: every scenario's steps, and the reports CI systems read."
+    CiSystem:
+      type: string
+      enum:
+        - github_actions
+        - gitlab_ci
+        - circleci
+        - bitbucket_pipelines
+        - azure_pipelines
+        - jenkins
+      description: The CI systems `sendmock ci init` writes a job for.
+    CiValidation:
+      type: object
+      properties:
+        is_valid:
+          type: boolean
+        scenario_count:
+          type: number
+        problems:
+          type: array
+          items:
+            type: string
+          description: Each problem, with the scenario it is in when there is one.
+      required:
+        - is_valid
+        - scenario_count
+        - problems
+      description: Answer of POST /api/v1/ci/validate.
     CreatedBy:
       type: string
       enum:
@@ -15727,6 +15962,91 @@ components:
         - location
         - message
       description: A problem in a setup, by line when the format keeps one and by key path otherwise.
+    SignatureSchemeName:
+      type: string
+      enum:
+        - standard_webhooks
+        - stripe
+        - hmac
+      description: How a webhook is signed.
+    SignatureVerification:
+      type: object
+      properties:
+        is_valid:
+          type: boolean
+        scheme:
+          $ref: "#/components/schemas/SignatureSchemeName"
+        reason:
+          type:
+            - string
+            - "null"
+          description: Why it does not check out; null when it does.
+      required:
+        - is_valid
+        - scheme
+        - reason
+      description: Answer of POST /api/v1/webhooks/signatures/verify.
+    SignatureVerifyRequest:
+      type: object
+      properties:
+        scheme:
+          $ref: "#/components/schemas/SignatureSchemeName"
+          description: "`standard_webhooks`, `stripe` or `hmac`."
+          examples:
+            - standard_webhooks
+        secret:
+          type: string
+          description: The signing secret the app checks with; never logged.
+          examples:
+            - whsec_c2VuZG1vY2stdGVzdC1rZXktMDAwMQ==
+        request_id:
+          type:
+            - string
+            - "null"
+          description: A captured request's ID, from an HTTP Catcher bin; or give `headers` and `body`.
+          examples:
+            - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+        body:
+          type:
+            - string
+            - "null"
+        header:
+          type:
+            - string
+            - "null"
+          description: "For `hmac`: the header holding the digest [default: X-Signature]."
+          examples:
+            - X-Hub-Signature-256
+        encoding:
+          type: string
+          enum:
+            - hex
+            - base64
+          description: "For `hmac`: `hex` or `base64` [default: hex]."
+          examples:
+            - hex
+        prefix:
+          type:
+            - string
+            - "null"
+          description: "For `hmac`: text before the digest, such as `sha256=` [default: none]."
+          examples:
+            - sha256=
+        tolerance_seconds:
+          type:
+            - number
+            - "null"
+          description: "How far a signed timestamp may be from now, in seconds [default: 300]."
+          examples:
+            - 300
+      required:
+        - scheme
+        - secret
+      description: Body of POST /api/v1/webhooks/signatures/verify.
     SimulatedEmailOutcome:
       type: object
       properties:

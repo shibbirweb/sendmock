@@ -2,6 +2,7 @@
 
 pub mod ai;
 mod bkash;
+mod ci;
 mod custom_gateways;
 mod demo;
 mod email;
@@ -57,6 +58,10 @@ mod updates;
 mod verify;
 mod webhooks;
 
+pub use ci::{
+    CI_FORMAT_NAME, CI_FORMAT_VERSION, CiFile, CiFileRequest, CiInitFile, CiInitFiles,
+    CiInitRequest, CiReport, CiSystem, CiValidation, build_ci_json_schema, parse_ci_file,
+};
 pub use demo::{DemoDataError, DemoLoadOutcome, load_demo_data};
 pub use email::mailpit;
 pub use email::{
@@ -212,6 +217,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     http_catcher::register_http_catcher_operations(&mut operation_registry);
     provider_bins::register_provider_bin_operations(&mut operation_registry);
     scenarios::register_scenario_operations(&mut operation_registry);
+    ci::register_ci_operations(&mut operation_registry);
     subscriptions::register_subscription_operations(&mut operation_registry);
     ai::register_ai_operations(&mut operation_registry);
     numbers::register_number_operations(&mut operation_registry);

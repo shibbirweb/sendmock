@@ -155,6 +155,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_number_samples(app_router).await);
     samples.extend(prepare_twilio_subaccount_samples(app_router).await);
     samples.extend(provider_gap_samples());
+    samples.extend(ci_samples());
     samples.extend(prepare_verify_samples(app_router).await);
     samples.extend(prepare_sms_provider_samples(app_router).await);
     samples.extend([
@@ -766,6 +767,27 @@ fn provider_gap_samples() -> Vec<(&'static str, Vec<Value>)> {
         (
             "deleteProviderBinsByAreaByProviderKey",
             vec![json!({ "area": "sms", "provider_key": "twilio" })],
+        ),
+    ]
+}
+
+/// A CI file run against this instance, its check, init's files and a signature check.
+fn ci_samples() -> Vec<(&'static str, Vec<Value>)> {
+    let ci_file = "sendmock:\n  format: sendmock.ci\n  format_version: 1\nscenarios:\n  - name: health\n    steps:\n      - run: http\n        with: { method: GET, url: /api/v1/health }\n";
+    vec![
+        ("postCiValidate", vec![json!({ "ci_file": ci_file })]),
+        ("postCiRun", vec![json!({ "ci_file": ci_file })]),
+        (
+            "postCiInit",
+            vec![json!({ "provider": "github_actions", "setup_url": null, "app_url": null })],
+        ),
+        (
+            "postWebhooksSignaturesVerify",
+            vec![json!({
+                "scheme": "hmac", "secret": "shop-secret", "headers": { "x-signature": "00" },
+                "body": "{}", "header": "X-Signature", "encoding": "hex", "prefix": null,
+                "tolerance_seconds": null,
+            })],
         ),
     ]
 }

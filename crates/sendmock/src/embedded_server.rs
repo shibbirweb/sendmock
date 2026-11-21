@@ -13,6 +13,18 @@ use crate::server_runner::run_server;
 use crate::server_startup::prepare_server;
 use crate::startup_error::StartupError;
 
+const DEFAULT_HTTP_PORT: u16 = 8025;
+const DEFAULT_SMTP_PORT: u16 = 1025;
+
+/// `127.0.0.1` on the port when nothing listens there, else on a free port.
+fn choose_ci_address(preferred_port: u16) -> Option<SocketAddr> {
+    [preferred_port, 0].into_iter().find_map(|port| {
+        std::net::TcpListener::bind(SocketAddr::from(([127, 0, 0, 1], port)))
+            .and_then(|free_listener| free_listener.local_addr())
+            .ok()
+    })
+}
+
 const CONNECT_ATTEMPT_TIMEOUT: Duration = Duration::from_millis(500);
 const STARTUP_TIMEOUT: Duration = Duration::from_secs(30);
 const STARTUP_POLL_INTERVAL: Duration = Duration::from_millis(50);
@@ -81,6 +93,26 @@ impl EmbeddedServer {
         let server_task = tokio::spawn(async move { run_server(&server_config, database).await });
         wait_until_listening(http_addr, &server_task).await?;
         Ok(Some(Self { server_task }))
+    }
+
+    /// A SendMock for `sendmock ci run`: the default ports when they are free, so an app set up
+    /// for SendMock's defaults reaches it, else free ones; an in-memory database and nothing
+    /// printed on stdout. Answers its URL.
+    pub async fn start_for_ci() -> Result<(Self, String), EmbeddedServerError> {
+        let http_addr = choose_ci_address(DEFAULT_HTTP_PORT)
+            .ok_or(EmbeddedServerError::StoppedWhileStarting)?;
+        let mut serve_arguments =
+            EmbeddedServeSettings::try_parse_from(["sendmock"])?.serve_arguments;
+        serve_arguments.http_addr = Some(http_addr);
+        if serve_arguments.smtp_addr.is_none() {
+            serve_arguments.smtp_addr = choose_ci_address(DEFAULT_SMTP_PORT);
+        }
+        serve_arguments.database_setting = Some("memory".to_owned());
+        serve_arguments.ready_json = false;
+        let (server_config, database) = prepare_server(&serve_arguments, true)?;
+        let server_task = tokio::spawn(async move { run_server(&server_config, database).await });
+        wait_until_listening(http_addr, &server_task).await?;
+        Ok((Self { server_task }, format!("http://{http_addr}")))
     }
 
     /// Resolves when the server stops, on Ctrl+C or a termination signal.

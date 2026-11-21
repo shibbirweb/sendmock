@@ -22,6 +22,7 @@ export type StageBPhase =
   | "A8"
   | "A17"
   | "A18"
+  | "A19"
   | "A23";
 
 export type OperationSurfaces = {

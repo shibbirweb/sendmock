@@ -1,4 +1,5 @@
 import { FeatureAvailabilityGate } from "@/features/availability/feature-availability-gate";
+import { CiUseCard } from "@/features/settings/sections/setup/ci-use-card";
 import { SeedStatusCard } from "@/features/settings/sections/setup/seed-status-card";
 import { SetupExportCard } from "@/features/settings/sections/setup/setup-export-card";
 import { SetupImportCard } from "@/features/settings/sections/setup/setup-import-card";
@@ -16,6 +17,7 @@ export function SetupSection() {
       </FeatureAvailabilityGate>
       <SetupExportCard />
       <SetupImportCard />
+      <CiUseCard />
     </div>
   );
 }

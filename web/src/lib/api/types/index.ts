@@ -7,6 +7,7 @@ export type * from "@/lib/api/types/twilio-accounts";
 export type * from "@/lib/api/types/webhooks";
 export type * from "@/lib/api/types/events";
 export type * from "@/lib/api/types/system";
+export type * from "@/lib/api/types/ci";
 export type * from "@/lib/api/types/http-catcher";
 export type * from "@/lib/api/types/provider-bins";
 export type * from "@/lib/api/types/payments";

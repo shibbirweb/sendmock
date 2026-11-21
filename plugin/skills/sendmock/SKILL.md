@@ -88,6 +88,14 @@ When the app calls a vendor endpoint SendMock does not implement (a `404` from t
 2. Read the vendor's documented answer, then `sendmock_http_response_set` on the bin with a rule: the method, a path glob (`/2010-04-01/Accounts/*/Calls.json`), that answer, and, if the vendor calls the app back, a `follow_up` webhook with the vendor's template (`twilio.status_callback` signs as Twilio does) and the callback URL from the request (`{{ request.form.StatusCallback }}`), or an endpoint.
 3. `sendmock_http_response_preview` to check the rule, call the endpoint from the app, then `sendmock_http_wait`, `sendmock_logs_http` and `sendmock_webhook_delivery_list` to confirm the answer and the callback. `sendmock_seed_export` keeps it.
 
+### ci-setup
+
+To test the app's webhooks in its CI pipeline:
+
+1. `sendmock_ci_init` with the repository's CI system (`github_actions`, `gitlab_ci`, `circleci`, `bitbucket_pipelines`, `azure_pipelines` or `jenkins`) answers three files: the setup (`sendmock.setup.yml`), a starter CI file (`sendmock.ci.yml`) and the job. Write them; `sendmock ci init` in the repository does the same.
+2. Edit the CI file: `app_url` is where the app listens in the pipeline, and each scenario checks one behaviour, such as `webhook.endpoint.test` then `webhook.delivery.wait` for a signed webhook the app must accept, or `http.request.wait`, `webhook.signature.verify` and an `assert` with `path` and `equals` for a webhook the app sends to an HTTP Catcher bin.
+3. `sendmock_ci_validate` checks it, `sendmock_ci_run` runs it here and answers the report, and in the pipeline `sendmock ci run sendmock.ci.yml --junit sendmock-report.xml` exits `0`, `5` when a scenario fails or `2` when a file is invalid.
+
 ### Capture outgoing HTTP calls
 
 `sendmock_http_bin_create` with a preset (Slack, Discord, Telegram, push), point the app at the bin's URL, and `sendmock_http_wait` for the call.

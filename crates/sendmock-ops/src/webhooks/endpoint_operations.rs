@@ -28,6 +28,29 @@ pub(super) async fn find_stored_endpoint(
         })
 }
 
+/// The endpoint by ID, else by name, as a scenario that cannot know a generated ID names it.
+pub(super) async fn find_endpoint_by_id_or_name(
+    operation_context: &OperationContext,
+    endpoint_text: &str,
+) -> Result<WebhookEndpointRecord, OperationError> {
+    if let Some(stored_endpoint) = operation_context
+        .webhook_endpoint_repository
+        .find_endpoint(endpoint_text)
+        .await?
+    {
+        return Ok(stored_endpoint);
+    }
+    operation_context
+        .webhook_endpoint_repository
+        .list_endpoints()
+        .await?
+        .into_iter()
+        .find(|stored_endpoint| stored_endpoint.name == endpoint_text)
+        .ok_or_else(|| OperationError::NotFound {
+            message: format!("No webhook endpoint with the ID or name {endpoint_text}"),
+        })
+}
+
 pub struct ListWebhookEndpointsOperation;
 
 impl Operation for ListWebhookEndpointsOperation {
