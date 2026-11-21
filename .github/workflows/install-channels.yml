@@ -32,7 +32,7 @@ jobs:
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - uses: oven-sh/setup-bun@v2
 
@@ -60,7 +60,7 @@ jobs:
       VERSION: ${{ inputs.version }}
       RELEASE_CHANNEL: ${{ inputs.channel }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: What the channel needs on a bare system
         if: matrix.prepare != ''
