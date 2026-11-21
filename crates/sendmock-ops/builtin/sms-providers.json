@@ -12,6 +12,11 @@
         "name": "auth_token",
         "value": "twilio-test-token",
         "is_secret": true
+      },
+      {
+        "name": "debugger_url",
+        "value": "",
+        "is_secret": false
       }
     ],
     "outcome_error_codes": {

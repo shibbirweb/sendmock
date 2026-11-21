@@ -5,6 +5,7 @@ use sendmock_store::{SmsCallbackAttemptRecord, SmsRecord, SmsStatusChangeRecord}
 use super::sms_views::RecordedHttpRequest;
 use super::status_callback_attempt::send_callback_attempt;
 use crate::providers::{ProviderCallback, render_provider_status_callback};
+use crate::twilio_accounts::report_failed_message;
 use crate::{OperationContext, OperationError};
 
 /// Calls the message's status callback URL for one status change, in its provider's format
@@ -16,6 +17,13 @@ pub async fn send_status_callback(
     sms: &SmsRecord,
     status_change: &SmsStatusChangeRecord,
 ) -> Result<(), OperationError> {
+    report_failed_message(
+        operation_context,
+        sms,
+        &status_change.status,
+        status_change.error_code.as_deref(),
+    )
+    .await?;
     let Some(callback_url) = sms.status_callback_url.as_deref() else {
         return Ok(());
     };

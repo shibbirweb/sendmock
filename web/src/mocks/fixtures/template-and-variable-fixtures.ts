@@ -169,6 +169,14 @@ const builtinTemplateSpecs: TemplateSpec[] = [
     ["twilio_auth_token"],
   ],
   [
+    "twilio.debugger",
+    "Twilio: Debugger event",
+    "Twilio",
+    "sms-provider",
+    ["sms.status"],
+    ["twilio_auth_token"],
+  ],
+  [
     "vonage.inbound",
     "Vonage: inbound SMS",
     "Vonage",

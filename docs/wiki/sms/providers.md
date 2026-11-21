@@ -75,6 +75,16 @@ The provider port answers Twilio's number APIs over the same numbers and pools a
 
 Each number has a `PN` SID, shown under it on the Numbers screen. A number belongs to the account it was created under (numbers made on the Numbers screen belong to the main account) and lists only under that account. An invalid number answers Twilio's `21421`, one already registered `21422`, and adding a number that is in another Messaging Service answers `21712`.
 
+## Twilio Debugger
+
+Twilio's Console sends a **Debugger event** to a webhook URL when something goes wrong. SendMock does the same:
+
+1. Set the URL: `debugger_url` among the Twilio provider's credentials on the **General** tab for the main account, or **Debugger webhook URL** on a subaccount in the **Accounts** tab.
+2. Send a message that ends `failed` or `undelivered` with an error code (a [test number](./delivery-and-test-numbers.md) such as `+15005550101`, an outcome rule or Simulate): one event with that code and the message's SID.
+3. Or let a status callback or the inbound URL fail: one event with error `11200` and the `webhook` request and answer.
+
+The event is a form POST in the `twilio.debugger` template: `Sid` (`NO...`), `AccountSid`, `ParentAccountSid` for a subaccount, `Timestamp`, `Level` (`ERROR`), `PayloadType` (`application/json`) and `Payload`, signed with the account's token. It shows on the message's timeline with its callbacks and is retried like them. The template can also be picked for any webhook endpoint.
+
 ## Twilio signatures
 
 Every Twilio webhook carries `X-Twilio-Signature`, made with the auth token of the account the message belongs to:
@@ -116,11 +126,11 @@ The full walkthrough, adding Africa's Talking from its API docs: [Advanced: crea
 | remove a built-in or delete a custom one | [`sendmock sms providers delete <providerKey>`](/cli/sms-providers/#sms-providers-delete) | [`DELETE /api/v1/sms/providers/{providerKey}`](/api/sms-providers/#deleteSmsProvidersByProviderKey) | [`sendmock_sms_provider_delete`](/mcp/sms-providers/#sendmock_sms_provider_delete) |
 | restore a removed built-in | [`sendmock sms providers restore <providerKey>`](/cli/sms-providers/#sms-providers-restore) | [`POST /api/v1/sms/providers/{providerKey}/restore`](/api/sms-providers/#postSmsProvidersByProviderKeyRestore) | [`sendmock_sms_provider_restore`](/mcp/sms-providers/#sendmock_sms_provider_restore) |
 | reveal a credential (agents cannot) | [`sendmock sms providers credential <providerKey> <credentialName> --reveal`](/cli/sms-providers/#sms-providers-credential) | [`GET /api/v1/sms/providers/{providerKey}/credentials/{credentialName}`](/api/sms-providers/#getSmsProvidersByProviderKeyCredentialsByCredentialName) | none: agents never read secrets |
-| list Twilio subaccounts | `sendmock sms twilio subaccounts list` | `GET /api/v1/twilio/subaccounts` | `sendmock_twilio_subaccount_list` |
-| add a Twilio subaccount | `sendmock sms twilio subaccounts create` | `POST /api/v1/twilio/subaccounts` | `sendmock_twilio_subaccount_create` |
-| change a Twilio subaccount | `sendmock sms twilio subaccounts update <accountSid>` | `PATCH /api/v1/twilio/subaccounts/{accountSid}` | `sendmock_twilio_subaccount_update` |
-| remove a Twilio subaccount | `sendmock sms twilio subaccounts delete <accountSid>` | `DELETE /api/v1/twilio/subaccounts/{accountSid}` | `sendmock_twilio_subaccount_delete` |
-| reveal a subaccount's token (agents cannot) | `sendmock sms twilio subaccounts token <accountSid> --reveal` | `GET /api/v1/twilio/subaccounts/{accountSid}/auth-token` | none: agents never read secrets |
+| list Twilio subaccounts | [`sendmock sms twilio subaccounts list`](/cli/sms/#sms-twilio-subaccounts-list) | [`GET /api/v1/twilio/subaccounts`](/api/sms/#getTwilioSubaccounts) | [`sendmock_twilio_subaccount_list`](/mcp/sms/#sendmock_twilio_subaccount_list) |
+| add a Twilio subaccount | [`sendmock sms twilio subaccounts create`](/cli/sms/#sms-twilio-subaccounts-create) | [`POST /api/v1/twilio/subaccounts`](/api/sms/#postTwilioSubaccounts) | [`sendmock_twilio_subaccount_create`](/mcp/sms/#sendmock_twilio_subaccount_create) |
+| change a Twilio subaccount | [`sendmock sms twilio subaccounts update <accountSid>`](/cli/sms/#sms-twilio-subaccounts-update) | [`PATCH /api/v1/twilio/subaccounts/{accountSid}`](/api/sms/#patchTwilioSubaccountsByAccountSid) | [`sendmock_twilio_subaccount_update`](/mcp/sms/#sendmock_twilio_subaccount_update) |
+| remove a Twilio subaccount | [`sendmock sms twilio subaccounts delete <accountSid>`](/cli/sms/#sms-twilio-subaccounts-delete) | [`DELETE /api/v1/twilio/subaccounts/{accountSid}`](/api/sms/#deleteTwilioSubaccountsByAccountSid) | [`sendmock_twilio_subaccount_delete`](/mcp/sms/#sendmock_twilio_subaccount_delete) |
+| reveal a subaccount's token (agents cannot) | [`sendmock sms twilio subaccounts token <accountSid> --reveal`](/cli/sms/#sms-twilio-subaccounts-token) | [`GET /api/v1/twilio/subaccounts/{accountSid}/auth-token`](/api/sms/#getTwilioSubaccountsByAccountSidAuthToken) | none: agents never read secrets |
 
 ## Related
 
