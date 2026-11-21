@@ -1,10 +1,4 @@
-import {
-  devices,
-  expect,
-  type Locator,
-  type Page,
-  test,
-} from "@playwright/test";
+import { expect, type Locator, type Page, test } from "@playwright/test";
 
 import { mockDownloadRegistries } from "./support/download-registries";
 
@@ -233,7 +227,13 @@ test("WS-15.5 with reduced motion the spotlight moves without easing and the squ
 });
 
 test.describe("on a touch screen", () => {
-  test.use({ ...devices["Pixel 7"] });
+  // A phone's touch options; the whole device entry would also switch the browser type,
+  // which a describe group cannot do.
+  test.use({
+    hasTouch: true,
+    isMobile: true,
+    viewport: { width: 412, height: 915 },
+  });
 
   test("WS-15.5 a touch screen attaches no pointer listener, so the spotlight never lights", async ({
     page,
