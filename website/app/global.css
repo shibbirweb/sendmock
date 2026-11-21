@@ -48,7 +48,6 @@ pre span[style*="--shiki-dark:#6A737D"] {
   --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
   --animate-marquee: marquee var(--duration) infinite linear;
   --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
-  --animate-wordmark-feed: wordmark-feed var(--duration) linear infinite;
   @keyframes shiny-text {
     0%,
     90%,
@@ -87,16 +86,6 @@ pre span[style*="--shiki-dark:#6A737D"] {
     }
     to {
       transform: translateX(calc(-100% - var(--gap)));
-    }
-  }
-  /* The footer wordmark's traffic rows: each row holds its text twice, so half a row's width
-     loops without a seam. */
-  @keyframes wordmark-feed {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(-50%);
     }
   }
   @keyframes marquee-vertical {

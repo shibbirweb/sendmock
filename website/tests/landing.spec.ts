@@ -687,24 +687,27 @@ test("the footer wordmark spells SendMock in caught traffic, hidden from assisti
   await expect(wordmark).toBeVisible();
   await expect(wordmark.locator("clipPath text")).toHaveText("SendMock");
   await expect(
-    wordmark.locator("text.animate-wordmark-feed").first(),
+    wordmark.locator("text[data-wordmark-feed-row]").first(),
   ).toContainText("email.received");
 });
 
-test("the footer wordmark's traffic lines stay still with reduced motion", async ({
+test("the footer wordmark's traffic lines stay still, so the page does not lag", async ({
   page,
 }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const firstFeedRow = page
-    .locator("footer svg[aria-hidden='true'] text.animate-wordmark-feed")
+    .locator("footer svg[aria-hidden='true'] text[data-wordmark-feed-row]")
     .first();
-  const readTransform = () =>
-    firstFeedRow.evaluate((feedRow) => getComputedStyle(feedRow).transform);
+  const readMotion = () =>
+    firstFeedRow.evaluate((feedRow) => {
+      const feedRowStyle = getComputedStyle(feedRow);
+      return `${feedRowStyle.animationName} ${feedRowStyle.transform}`;
+    });
 
-  // Once the styles have loaded the row has no transform, and it keeps none.
-  await expect.poll(readTransform).toBe("none");
+  // The monospace font shows the styles have loaded, so "none" is not read too early.
+  await expect(firstFeedRow).toHaveCSS("font-family", /monospace/);
+  expect(await readMotion()).toBe("none none");
   await page.waitForTimeout(500);
 
-  expect(await readTransform()).toBe("none");
+  expect(await readMotion()).toBe("none none");
 });
