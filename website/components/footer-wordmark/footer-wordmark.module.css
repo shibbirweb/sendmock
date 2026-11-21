@@ -1,0 +1,90 @@
+/* The footer wordmark: the word drawn only as squares on a canvas, tinted by each day's
+   downloads, with no solid letter behind them. The squares show at --graph-rest everywhere;
+   inside a soft circle that follows the pointer they rise to full strength. usePointerSpotlight
+   writes the pointer variables and --spotlight-opacity to .spotlight; pointer moves never
+   render React. */
+
+.spotlight {
+  /* An inline-size container, so 1cqw is 1% of the wordmark's width and the circle keeps
+     its proportion at every width. */
+  container-type: inline-size;
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  --spotlight-radius: 72cqw;
+  --spotlight-edge: 80%;
+  --spotlight-opacity: 0;
+  --graph-rest: 0.55;
+  --graph-strength-center: calc(
+    var(--graph-rest) + (1 - var(--graph-rest)) * var(--spotlight-opacity)
+  );
+  --graph-strength-middle: calc(
+    var(--graph-rest) + (1 - var(--graph-rest)) * var(--spotlight-opacity) * 0.5
+  );
+
+  /* Fades the bottom edge into whatever is behind the footer, in both themes, without
+     naming a colour. Masks nest, so it composes over each layer's own mask. */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 78%,
+    rgb(0 0 0 / 0.55) 90%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 78%,
+    rgb(0 0 0 / 0.55) 90%,
+    transparent 100%
+  );
+}
+
+.reveal {
+  -webkit-mask-image: radial-gradient(
+    circle var(--spotlight-radius) at var(--pointer-x) var(--pointer-y),
+    rgb(0 0 0 / var(--graph-strength-center)) 0%,
+    rgb(0 0 0 / var(--graph-strength-middle)) 50%,
+    rgb(0 0 0 / var(--graph-rest)) var(--spotlight-edge)
+  );
+  mask-image: radial-gradient(
+    circle var(--spotlight-radius) at var(--pointer-x) var(--pointer-y),
+    rgb(0 0 0 / var(--graph-strength-center)) 0%,
+    rgb(0 0 0 / var(--graph-strength-middle)) 50%,
+    rgb(0 0 0 / var(--graph-rest)) var(--spotlight-edge)
+  );
+}
+
+/* The five levels, from a day with no downloads to the busiest, read by the canvas on every
+   draw and inherited by the placeholder. The top levels are the brand tokens; the canvas
+   mixes hex colours only. */
+.levels {
+  --download-level-0: #d4d4d4;
+  --download-level-1: #a7f3d0;
+  --download-level-2: #34d399;
+  --download-level-3: var(--brand-from);
+  --download-level-4: var(--brand-text);
+}
+
+:global(.dark) .levels {
+  --download-level-0: #262626;
+  --download-level-1: #134e4a;
+  --download-level-2: #0f766e;
+  --download-level-3: #14b8a6;
+  --download-level-4: var(--brand-from);
+}
+
+.activityCanvas,
+.placeholder {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* The letters as empty-day squares, in the HTML itself, so the first paint is never blank
+   while the page's script loads; it fades out once the canvas has drawn. */
+.placeholder {
+  transition: opacity 400ms ease-out;
+}
+
+.activityCanvas[data-drawn] + .placeholder {
+  opacity: 0;
+}

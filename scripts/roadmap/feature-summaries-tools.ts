@@ -255,7 +255,7 @@ export const toolFeatureSummaries: Record<string, FeatureSummary> = {
   },
   "WS-15": {
     summary:
-      "The website's footer wordmark as a pixel graph of SendMock's downloads per day over the last 7 days, from npm, crates.io and PyPI, fetched at build and refreshed live in the browser, lit by a soft pointer spotlight.",
+      "The website's footer wordmark drawn as squares showing SendMock's downloads per day over the last 7 days, from npm, crates.io and PyPI, read at build and refreshed live in the browser, lit by a soft pointer spotlight.",
     outcome:
       "See at a glance how much SendMock is used, in a footer that stays smooth on phones and laptops.",
   },
