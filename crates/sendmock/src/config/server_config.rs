@@ -14,6 +14,7 @@ use super::smtp_config::SmtpConfig;
 use super::startup_settings_config::StartupSettingsConfig;
 use super::{ConfigError, LogFormat, LogLevel};
 use crate::cli_arguments::ServeArguments;
+use crate::startup_setup::StartupSetupSource;
 
 /// Only this machine can reach the defaults; Docker sets `0.0.0.0` through the environment.
 pub const DEFAULT_HTTP_ADDR: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 8025);
@@ -45,6 +46,8 @@ pub struct ServerConfig {
     pub prints_ready_json: bool,
     /// `--demo`: load the demo data into an empty instance at startup.
     pub loads_demo_data: bool,
+    /// `--setup`: a setup file or URL applied at startup.
+    pub startup_setup: Option<StartupSetupSource>,
 }
 
 impl ServerConfig {
@@ -122,6 +125,7 @@ impl ServerConfig {
             config_file_path,
             prints_ready_json: serve_arguments.ready_json,
             loads_demo_data: serve_arguments.demo,
+            startup_setup: StartupSetupSource::from_arguments(serve_arguments),
         })
     }
 

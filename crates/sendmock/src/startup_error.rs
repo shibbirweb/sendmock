@@ -47,6 +47,9 @@ pub enum StartupError {
         problems: String,
     },
 
+    #[error("The setup {location} could not be applied: {reason}")]
+    Setup { location: String, reason: String },
+
     #[error(transparent)]
     SmtpTls(#[from] sendmock_smtp::TlsSetupError),
 
@@ -60,9 +63,10 @@ pub enum StartupError {
 impl StartupError {
     pub fn exit_code(&self) -> ExitCode {
         match self {
-            Self::Config(_) | Self::UnreadableSeed { .. } | Self::InvalidSeed { .. } => {
-                ExitCode::from(USAGE_ERROR_EXIT_CODE)
-            }
+            Self::Config(_)
+            | Self::UnreadableSeed { .. }
+            | Self::InvalidSeed { .. }
+            | Self::Setup { .. } => ExitCode::from(USAGE_ERROR_EXIT_CODE),
             Self::PortInUse { .. }
             | Self::Listen { .. }
             | Self::Database(_)

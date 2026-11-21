@@ -35,6 +35,7 @@ mod shutdown_signal;
 mod smtp_startup;
 mod spamd_client;
 mod startup_error;
+mod startup_setup;
 mod template_directory_task;
 mod tls_provider;
 mod update_check_task;

@@ -207,6 +207,24 @@ pub struct ServeArguments {
     #[arg(long = "seed", env = "SENDMOCK_SEED", value_name = "FILE")]
     pub seed_file_path: Option<PathBuf>,
 
+    /// A setup file (TOML, JSON or YAML) or an https:// URL to one, applied at startup before SendMock reports ready
+    #[arg(long = "setup", env = "SENDMOCK_SETUP", value_name = "PATH|URL")]
+    pub setup_location: Option<String>,
+
+    /// The SHA-256 the --setup download must have
+    #[arg(long, env = "SENDMOCK_SETUP_SHA256", value_name = "HEX")]
+    pub setup_sha256: Option<String>,
+
+    /// Headers for a private --setup URL, as `Name: value` (repeat, or one per line in the variable); never logged
+    #[arg(
+        long = "setup-header",
+        env = "SENDMOCK_SETUP_HEADERS",
+        hide_env_values = true,
+        value_name = "HEADER",
+        value_delimiter = '\n'
+    )]
+    pub setup_headers: Vec<String>,
+
     /// Start the services the launcher saved last, without asking; flags given with it win
     #[arg(long)]
     pub last: bool,

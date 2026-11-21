@@ -35,6 +35,7 @@ use crate::seed_file_check::apply_seed_file;
 use crate::shutdown_signal::ShutdownSignal;
 use crate::smtp_startup::build_smtp_server;
 use crate::startup_error::StartupError;
+use crate::startup_setup::apply_startup_setup;
 use crate::template_directory_task::{load_file_templates, run_template_directory_task};
 use crate::update_check_task::{build_update_checker, run_update_check_task};
 use crate::webhook_dispatch_task::run_webhook_dispatch_task;
@@ -339,6 +340,9 @@ async fn apply_startup_data(
 ) -> Result<(), StartupError> {
     if let Some(seed_file_path) = &server_config.seed_file_path {
         apply_seed_file(seed_file_path, operation_context).await?;
+    }
+    if let Some(setup_source) = &server_config.startup_setup {
+        apply_startup_setup(setup_source, operation_context).await?;
     }
     apply_startup_settings(server_config, operation_context).await;
     Ok(())

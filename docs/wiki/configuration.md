@@ -107,11 +107,28 @@ The sections, each a list of items unless noted:
 | `[[email.providers]]`, `[[sms.providers]]` | custom and edited providers | `key` |
 | `[[payments.flows]]`, `[[payments.methods]]`, `[[payments.gateways]]` | payment flows, methods and gateways | `key` |
 | `[[http.bins]]` | HTTP Catcher bins with their mock responses | `name` |
+| `[[http.provider_bins]]` | the bin that answers each provider's unmatched requests | `area` and `provider` |
 | `[[scenarios]]` | saved scenarios, with their `[[scenarios.steps]]` | `name` |
 
 The JSON Schema of each format version is published at [`/schema/setup/v2.json`](/schema/setup/v2.json), so an editor checks a file as you write it. In JSON and YAML the sections nest under their group (`{"webhook": {"endpoints": [...]}}`).
 
 Secrets are `${ENV_VAR}` references, read from the environment on import, or, with `--include-secrets`, text starting `encrypted:v1:` that only the export's passphrase opens. A setup never holds traffic or the options in `sendmock.toml` (ports, database path, auth), which belong to each machine.
+
+### Load a setup at startup: `--setup`
+
+`--setup` (`SENDMOCK_SETUP`) applies a setup file, or an `https://` URL to one, when SendMock starts, merged over the seed file. SendMock reports ready (`--ready-json`, `/api/v1/health/ready`) only after it is applied, and a setup that cannot be downloaded or does not validate stops the start with the reason. A CI service container needs only this variable:
+
+```yaml
+services:
+  sendmock:
+    image: ghcr.io/shibbirweb/sendmock:1
+    ports: ["8025:8025", "1025:1025"]
+    env:
+      SENDMOCK_DB: memory
+      SENDMOCK_SETUP: https://raw.githubusercontent.com/acme/shop/main/sendmock.setup.yml
+```
+
+The download follows the same limits as **Settings > Setup > Import from a URL**: `https://` only (plain `http://` for loopback and private addresses), at most 1 MB, 10 seconds and 3 redirects. `--setup-sha256` (`SENDMOCK_SETUP_SHA256`) pins the file's SHA-256, `--setup-header` (`SENDMOCK_SETUP_HEADERS`, one `Name: value` per line) adds headers for a private URL, and `SENDMOCK_SETUP_PASSPHRASE` opens its encrypted secrets.
 
 ## How much is kept: `--max-emails`, `--max-sms` and `--max-age`
 
