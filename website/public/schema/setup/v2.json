@@ -1053,6 +1053,37 @@
       ],
       "type": "object"
     },
+    "SeedTwilioSubaccount": {
+      "additionalProperties": false,
+      "description": "`[[sms.twilio_subaccounts]]`, matched by `sid`. The token is an `${ENV_VAR}` reference or\nan encrypted secret, never the token itself.",
+      "properties": {
+        "auth_token": {
+          "description": "Left empty (an unset `${ENV_VAR}`), an existing subaccount keeps its token and a new\none gets a generated token.",
+          "type": "string"
+        },
+        "debugger_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "sid": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/TwilioAccountStatus",
+          "default": "active"
+        }
+      },
+      "required": [
+        "sid",
+        "name"
+      ],
+      "type": "object"
+    },
     "SeedVerifyService": {
       "additionalProperties": false,
       "description": "`[[verify.services]]`, matched by `sid`.",
@@ -1265,6 +1296,15 @@
       ],
       "type": "string"
     },
+    "TwilioAccountStatus": {
+      "description": "A Twilio account's status, as the Accounts API writes it.",
+      "enum": [
+        "active",
+        "suspended",
+        "closed"
+      ],
+      "type": "string"
+    },
     "UpdateCheckMode": {
       "description": "When SendMock looks for a newer release: `off` never calls out, `manual` only on\nrequest, `daily` on start and once a day.",
       "enum": [
@@ -1457,6 +1497,12 @@
         "providers": {
           "items": {
             "$ref": "#/$defs/SeedMessageProvider"
+          },
+          "type": "array"
+        },
+        "twilio_subaccounts": {
+          "items": {
+            "$ref": "#/$defs/SeedTwilioSubaccount"
           },
           "type": "array"
         }
