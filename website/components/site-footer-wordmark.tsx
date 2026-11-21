@@ -15,7 +15,7 @@ const startingSpotlight = { x: viewBoxWidth / 2, y: viewBoxHeight * 0.55 };
 const feedFontSize = 6.5;
 const feedRowHeight = 7.5;
 const feedRowCount = Math.ceil(viewBoxHeight / feedRowHeight);
-/** Each row repeats its events until it is at least this wide, then holds that text twice. */
+/** Each row repeats its events until it is at least this wide, so it spans the whole word. */
 const feedRowMinimumCharacters = 420;
 
 /** What SendMock catches, as the event lines that fill the letters. */
@@ -32,7 +32,7 @@ const caughtEvents = [
   "email.opened  invoice-2291  Mail.app",
 ];
 
-/** Row `rowIndex`: the events from a different starting point, long enough to loop. */
+/** Row `rowIndex`: the events from a different starting point, so the rows do not line up. */
 function buildFeedRow(rowIndex: number): string {
   const startIndex = rowIndex % caughtEvents.length;
   const rotatedEvents = [
@@ -43,14 +43,12 @@ function buildFeedRow(rowIndex: number): string {
   while (rowText.length < feedRowMinimumCharacters) {
     rowText += `${rotatedEvents.join("   ·   ")}   ·   `;
   }
-  return rowText + rowText;
+  return rowText;
 }
 
 const feedRows = Array.from({ length: feedRowCount }, (_, rowIndex) => ({
   rowText: buildFeedRow(rowIndex),
   baselineY: feedRowHeight * (rowIndex + 1) - 1.5,
-  durationSeconds: 70 + (rowIndex % 4) * 18,
-  isReversed: rowIndex % 2 === 1,
 }));
 
 /** `useId` gives `«r1»`-style ids, which `url(#...)` references cannot hold. */
@@ -58,22 +56,20 @@ function toSvgId(reactId: string, partName: string): string {
   return `wordmark-${reactId.replace(/[^a-zA-Z0-9]/g, "")}-${partName}`;
 }
 
-/** The scrolling event lines; the same rows serve the quiet layer and the lit one. */
+/**
+ * The event lines; the same rows serve the quiet layer and the lit one. They stay still:
+ * scrolling them repainted every row through the clip and the mask on each frame, which made
+ * the page lag on phones and laptops.
+ */
 function FeedRows({ fill }: { fill: string }) {
   return feedRows.map((feedRow) => (
     <text
       key={feedRow.baselineY}
       y={feedRow.baselineY}
       fill={fill}
-      className={`animate-wordmark-feed font-mono [transform-box:fill-box] ${
-        feedRow.isReversed ? "[animation-direction:reverse]" : ""
-      }`}
-      style={
-        {
-          fontSize: feedFontSize,
-          "--duration": `${feedRow.durationSeconds}s`,
-        } as React.CSSProperties
-      }
+      data-wordmark-feed-row=""
+      className="font-mono"
+      style={{ fontSize: feedFontSize }}
     >
       {feedRow.rowText}
     </text>
@@ -82,8 +78,8 @@ function FeedRows({ fill }: { fill: string }) {
 
 /**
  * The large SendMock wordmark at the foot of every page, its letters filled with the traffic
- * SendMock catches: rows of email, SMS, webhook and payment events scroll through them, and
- * the rows under the pointer light up in the brand gradient. Decorative, so hidden from
+ * SendMock catches: rows of email, SMS, webhook and payment events fill them, and the rows
+ * under the pointer light up in the brand gradient. Decorative, so hidden from
  * assistive technology; the footer above already names SendMock.
  */
 export function SiteFooterWordmark() {

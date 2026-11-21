@@ -33,6 +33,7 @@ Smallest change with the most users first; items that need an outside party (a d
 | A23 | Fuller Twilio and Mailgun emulation, HTTPS on the provider port and HTTP Catcher bins on a provider's own URL (a user's request, widened by the owner) | #310, #311, #312, #309, #313, #314, #316 (bug) | SM-19, SM-20, SM-21, EM-23, PL-20, PL-21 (new), EM-05.6 (fix) | 1.4.0 |
 | A24 | Interactive launcher: pick services and ports when `sendmock` starts, remembered for next time, and `--last` to skip the questions | #315 | PL-22 (new) | 1.4.0 |
 | A25 | Storage mock: an S3-compatible API, more storage and image upload vendors, your own storage services, and files kept in a folder you choose | #317 to #322 | ST-01 to ST-06 (new area, Storage) | 2.0.0 |
+| A26 | Download activity in the website's footer wordmark: the letters as a pixel graph of the last 7 days' downloads, lit by a pointer spotlight | #338 | WS-15 (new) | 1.4.0 |
 
 ## A1. Mailpit API compatibility (EM-19)
 
@@ -862,3 +863,29 @@ A18 and AI-07 are built on one branch and one pull request into `develop`, one c
 **Order:** ST-01 and ST-03 (the core and where files live), then ST-02 (the screen and surfaces), then ST-05 (image vendors), ST-04 (GCS and Azure), and ST-06 (custom storage services).
 
 **Not in this part:** image transformations, video processing, object versioning, lifecycle rules, bucket policies and ACLs beyond public or private, S3 Select, and forwarding uploads to a real bucket (A14's real forwarding can follow).
+
+## A26. Download activity in the footer wordmark (WS-15)
+
+**Why (owner request, 2026-11-21):** the website's footer wordmark, the letters made of scrolling event lines (#335, 1.3.1), made the page lag on phones and laptops, because every line repainted through an SVG clip and mask on each frame. 1.3.1 stops the scrolling. For 1.4.0 the owner wants the design of the footer signature on shibbir.me (`SignatureSpotlight` in the portfolio repository), with SendMock's own data: where that one shows the owner's GitHub contributions, SendMock's shows how many times it was downloaded each day.
+
+**How the portfolio's signature works:** the name is an outline SVG path in a dim solid colour. A canvas over it fills the letters with small rounded squares, coloured in five levels from the activity data. Two CSS radial-gradient masks, driven by `--pointer-x`, `--pointer-y` and `--spotlight-opacity`, make a soft circle: the graph shows at 30% everywhere and at full strength inside the circle, where the solid letters step aside. One window `pointermove` listener measures how close the pointer is to the signature, so the circle wakes before the pointer reaches the letters. It writes the variables straight to the element (React never renders on pointer moves) and runs animation frames only while something is still moving.
+
+**The design:**
+
+- **The wordmark:** "SendMock" as an outline SVG path, made once from a font and committed, so it looks the same on every device. At rest it is a dim solid colour from the design tokens, and the bottom edge fades into the page.
+- **The pixel graph:** a canvas fills the letters with small rounded squares. The letter shape is drawn once into a tiny off-screen canvas, one pixel per square, and read back in one call, so finding the squares inside the letters costs one draw. The five levels use the design tokens' brand colours and follow the light and dark themes.
+- **The data:** total downloads per day for the last 7 complete UTC days, oldest on the left, yesterday on the right, the busiest day at the top level and every other day at `ceil(4 x day / busiest)`, a day with none at level 0. The days blend into each other at their edges, with a little variation per square, as in the portfolio.
+- **The sources:** only registries that publish counts per day:
+  - npm: `sendmock` and `sendmock-testcontainers`, in one bulk request (`api.npmjs.org/downloads/range`).
+  - crates.io: the `sendmock` crate, its per-version counts summed per day (`crates.io/api/v1/crates/sendmock/downloads`).
+  - PyPI: `sendmock-testcontainers` (`pypistats.org/api/packages/sendmock-testcontainers/overall`, without mirrors). pypistats blocks browser requests, so PyPI's days come from the build only.
+  - Left out, because they come along with a counted package and would count one install twice: the npm platform packages and the library crates (`sendmock-api`, `sendmock-ops`).
+  - Not counted: GitHub Releases (the binaries, install scripts, Homebrew, Scoop, WinGet and AUR), Docker Hub, NuGet and Chocolatey give running totals only, not days; GHCR, apt, dnf, COPR and Nix give no counts.
+- **At build, then live (owner decision 2026-11-21):**
+  - **The build** fetches every source's days and writes them into the site (`website/lib/download-activity/`, run by the website build), so the graph shows real numbers on first paint, with no request. A source that fails at build is left out, and a build with no data at all still succeeds, with every square at level 0. Every website deploy refreshes them: each push to `develop`, each release, and a hand-run of the Website workflow (`workflow_dispatch`) whenever the owner wants newer numbers.
+  - **In the browser** the page then fetches npm and crates.io again, when the footer comes within 600 px of the screen (8 second timeout), and keeps the answer in `localStorage` for 4 hours. Each source's live days replace its build days; PyPI keeps its build days. The 7 days are always the last 7 complete UTC days at the time of the visit, so an older build's days that fall outside them drop out. A failed live request keeps the build's numbers, and nothing errors.
+- **The spotlight:** a soft circle `72cqw` wide (it scales with the wordmark), which wakes as the pointer comes within 72 px above, 56 px beside or 28 px below the letters. Its position eases over 120 ms and its brightness over 380 ms. While dark it jumps to the pointer, so it never slides in, and when the pointer leaves it fades out where it was. The squares breathe gently while it is lit.
+- **Cost:** no frame runs while idle, only changed squares are repainted, and touch screens (no hover, coarse pointer) attach no listener, so phones show the graph at rest. With reduced motion the squares do not breathe and the circle moves without easing.
+- **Decorative:** hidden from assistive technology; the footer above already names SendMock.
+- **Files:** `website/components/footer-wordmark/` (the component, its CSS module, the path), `website/lib/download-activity/` (the sources, the build snapshot, the daily totals, the levels and the cache, with unit tests), and Playwright tests with the registry requests answered by fixtures.
+

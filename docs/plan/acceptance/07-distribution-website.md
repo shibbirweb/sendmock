@@ -261,3 +261,13 @@ Phase 5, screen by screen as each live mode lands in Stage B (owner feedback F17
 - [x] WS-14.3 The Upgrade guide shows the version's upgrade notes from the changelog, or says nothing needs changing, then numbered one-command steps for every install channel, the beta channel's in the beta docs, each linking its Install section.
 - [x] WS-14.4 Prepare release refuses a new major version, and its betas, when `[Unreleased]` has no `### Upgrade notes`.
 
+## WS-15 Download activity in the footer wordmark
+
+1.4.0 (planned as After 1.0), planned 2026-11-21 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a26-download-activity-in-the-footer-wordmark-ws-15) (A26).
+
+- [ ] WS-15.1 Every website page's footer ends with a "SendMock" wordmark drawn from an outline path, its letters filled with small squares that show the total downloads per day of the last 7 complete UTC days, oldest on the left, the busiest day at the top of five levels and a day with none at level 0.
+- [ ] WS-15.2 The daily totals add npm (`sendmock`, `sendmock-testcontainers`), crates.io (`sendmock`, every version) and PyPI (`sendmock-testcontainers`); the website build fetches them all into the site, and a source that fails, or no data at all, still builds, with the missing days at level 0.
+- [ ] WS-15.3 In the browser, when the footer comes near the screen, npm and crates.io are fetched again and kept for 4 hours, and their days replace the build's while PyPI keeps its build days; a failed request keeps the build's numbers and shows no error.
+- [ ] WS-15.4 With a fine pointer, a soft spotlight wakes as the pointer comes near the letters from above, beside or over them, raises the graph to full strength, glides after the pointer and fades out where the pointer left it; the squares breathe only while it is lit.
+- [ ] WS-15.5 No animation frame runs once the spotlight has settled, touch screens attach no pointer listener, and with reduced motion the squares do not breathe and the spotlight moves without easing.
+- [ ] WS-15.6 The wordmark is hidden from assistive technology, follows the light and dark themes, and fades into the page at its bottom edge.
