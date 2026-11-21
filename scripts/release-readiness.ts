@@ -1,11 +1,13 @@
 /**
- * What is still open before the 1.0 release (docs/plan/31-release-runbook.md): the secrets and
- * variables the workflows read that the repository does not have, the features that are not
- * Accepted, and each unticked criterion with the runbook step that proves it. Needs `gh` logged in.
+ * What is still open before a release (docs/plan/31-release-runbook.md): the secrets and
+ * variables the workflows read that the repository does not have, the open code scanning alerts,
+ * Dependabot alerts and Dependabot pull requests (PL-19.5), the features that are not Accepted,
+ * and each unticked criterion with the runbook step that proves it. Needs `gh` logged in.
  *
  *     bun scripts/release-readiness.ts
  */
 import { readCriterionReferences } from "./acceptance";
+import { fetchSecurityItems } from "./release/security-items";
 import {
   listFeaturesNotAccepted,
   listUntickedCriterionIds,
@@ -32,6 +34,23 @@ const missingSettings = listWorkflowSettings().filter((setting) => !setNames.has
 console.log(`Secrets and variables not set (${missingSettings.length}):`);
 for (const setting of missingSettings) {
   console.log(`  ${setting.kind} ${setting.name}, read by ${setting.workflowFiles.join(", ")}`);
+}
+
+// The GitHub lookups use the logged-in gh token, which can read the Dependabot alerts too.
+const ghToken = Bun.spawnSync(["gh", "auth", "token"]).stdout.toString().trim();
+process.env.GITHUB_TOKEN ||= ghToken;
+process.env.SECURITY_ALERTS_TOKEN ||= ghToken;
+const securityItems = await fetchSecurityItems();
+const securityLists: [string, string[]][] = [
+  ["Open code scanning alerts on main", securityItems.codeScanningAlerts],
+  ["Open Dependabot alerts", securityItems.dependabotAlerts],
+  ["Open Dependabot pull requests", securityItems.dependabotPullRequests],
+];
+for (const [listTitle, openItems] of securityLists) {
+  console.log(`\n${listTitle} (${openItems.length}):`);
+  for (const openItem of openItems) {
+    console.log(`  ${openItem}`);
+  }
 }
 
 const featuresNotAccepted = listFeaturesNotAccepted();

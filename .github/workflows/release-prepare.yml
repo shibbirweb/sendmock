@@ -20,6 +20,7 @@ permissions:
   contents: write
   pull-requests: write
   actions: read
+  security-events: read
 
 concurrency:
   group: release-prepare
@@ -42,7 +43,10 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
 
-      - name: CI passed on this commit and no release is in progress
+      # GITHUB_TOKEN cannot read Dependabot alerts; RELEASE_TOKEN needs "Dependabot alerts: read".
+      - name: CI passed on this commit, no release is in progress and the Security tab is clean
+        env:
+          SECURITY_ALERTS_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: bun scripts/release/release.ts readiness
 
       - name: Pull requests merged since the last tag
