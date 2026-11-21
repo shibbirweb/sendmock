@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 
+use schemars::JsonSchema;
 use sendmock_store::SavedWebhookDeliveryRecord;
 use serde::{Deserialize, Serialize};
 
@@ -12,7 +13,7 @@ use crate::{OperationContext, OperationError, RecordedHttpRequest};
 
 /// `[[webhook.saved]]`, matched by `name`: the request as saved, without signature headers,
 /// which are made on every send. Saved deliveries survive reset, as they do in the UI.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 struct SeedSavedDelivery {
     name: String,
@@ -26,6 +27,7 @@ struct SeedSavedDelivery {
     method: String,
     url: String,
     #[serde(default, deserialize_with = "read_headers")]
+    #[schemars(with = "HeaderForms")]
     headers: BTreeMap<String, String>,
     #[serde(default)]
     body: String,
@@ -40,15 +42,16 @@ fn default_method() -> String {
 }
 
 /// Headers as a table, or as `"Name: value"` lines as the demo exports them.
+#[derive(Deserialize, JsonSchema)]
+#[serde(untagged)]
+enum HeaderForms {
+    Table(BTreeMap<String, String>),
+    Lines(Vec<String>),
+}
+
 fn read_headers<'de, D: serde::Deserializer<'de>>(
     deserializer: D,
 ) -> Result<BTreeMap<String, String>, D::Error> {
-    #[derive(Deserialize)]
-    #[serde(untagged)]
-    enum HeaderForms {
-        Table(BTreeMap<String, String>),
-        Lines(Vec<String>),
-    }
     Ok(match HeaderForms::deserialize(deserializer)? {
         HeaderForms::Table(headers) => headers,
         HeaderForms::Lines(header_lines) => header_lines
@@ -184,4 +187,8 @@ fn build_seeded_saved(
     })
 }
 
-impl_seed_section_adapter!(SavedDeliverySeedAdapter, SAVED_DELIVERIES_SECTION);
+impl_seed_section_adapter!(
+    SavedDeliverySeedAdapter,
+    SAVED_DELIVERIES_SECTION,
+    SeedSavedDelivery
+);

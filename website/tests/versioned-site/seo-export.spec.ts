@@ -178,6 +178,51 @@ test("WS-13.3 the sitemap is served at the site root as XML", async ({
   expect(await sitemapResponse.text()).toContain(`<loc>${siteUrl}</loc>`);
 });
 
+test("WS-13.9 every sitemap entry has the date of the last commit that changed its page", () => {
+  const sitemapXml = readFileSync(join(outputDirectory, "sitemap.xml"), "utf8");
+  const sitemapEntries = [
+    ...sitemapXml.matchAll(/<url>([\s\S]*?)<\/url>/g),
+  ].map(([, entryXml]) => ({
+    pageUrl: /<loc>([^<]+)<\/loc>/.exec(entryXml ?? "")?.[1] ?? "",
+    lastModified: /<lastmod>([^<]+)<\/lastmod>/.exec(entryXml ?? "")?.[1],
+  }));
+  const rootVersion = resolveDocsVersions(gitTagNames).find(
+    (docsVersion) => docsVersion.path === "",
+  );
+  const installPageDate = execFileSync(
+    "git",
+    [
+      "log",
+      "-1",
+      "--format=%cI",
+      rootVersion?.gitRef ?? "HEAD",
+      "--",
+      "docs/wiki/install.md",
+    ],
+    { cwd: join(outputDirectory, "../.."), encoding: "utf8" },
+  ).trim();
+
+  for (const sitemapEntry of sitemapEntries) {
+    expect(sitemapEntry.lastModified, sitemapEntry.pageUrl).toMatch(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})$/,
+    );
+    expect(
+      Date.parse(sitemapEntry.lastModified ?? ""),
+      sitemapEntry.pageUrl,
+    ).toBeLessThanOrEqual(Date.now());
+  }
+  expect(
+    sitemapEntries.find(
+      (sitemapEntry) => sitemapEntry.pageUrl === `${siteUrl}docs/install/`,
+    )?.lastModified,
+  ).toBe(installPageDate);
+  expect(
+    new Set(sitemapEntries.map((sitemapEntry) => sitemapEntry.lastModified))
+      .size,
+    "pages are dated by their own files, not all by the build",
+  ).toBeGreaterThan(1);
+});
+
 test("WS-13.4 every page has Open Graph and large Twitter card tags with absolute image URLs", () => {
   for (const pageFolder of rootPageFolders) {
     const pageHtml = readPageHtml(outputDirectory, pageFolder);

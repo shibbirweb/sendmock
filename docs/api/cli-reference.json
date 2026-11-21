@@ -13158,6 +13158,101 @@
       ]
     },
     {
+      "command": "sendmock scenario delete",
+      "slug": "scenario-delete",
+      "usage": "sendmock scenario delete <scenarioId> [flags]",
+      "summary": "Delete a saved scenario.",
+      "area": "Automation",
+      "area_slug": "automation",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/scenarios/{scenarioId}",
+          "operation_id": "deleteScenariosByScenarioId",
+          "summary": "Delete a saved scenario.",
+          "area_slug": "automation",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "scenarioId",
+          "input": {
+            "name": "scenarioId",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The saved scenario's ID or name, from `GET /api/v1/scenarios`.",
+          "example": "otp-login",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--yes",
+          "input": null,
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Confirms a destructive command; without it the command stops.",
+          "example": true
+        }
+      ],
+      "example": "sendmock scenario delete otp-login --yes",
+      "output": null,
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_scenario_delete"
+      ],
+      "ui": [
+        "Scenarios > Saved > Delete"
+      ]
+    },
+    {
+      "command": "sendmock scenario list",
+      "slug": "scenario-list",
+      "usage": "sendmock scenario list",
+      "summary": "The saved scenarios, by name.",
+      "area": "Automation",
+      "area_slug": "automation",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/scenarios",
+          "operation_id": "getScenarios",
+          "summary": "The saved scenarios, by name.",
+          "area_slug": "automation",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [],
+      "example": "sendmock scenario list",
+      "output": "SavedScenario[]",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_scenario_list"
+      ],
+      "ui": [
+        "Scenarios > Saved"
+      ]
+    },
+    {
       "command": "sendmock scenario run",
       "slug": "scenario-run",
       "usage": "sendmock scenario run <file>",
@@ -13171,7 +13266,10 @@
           "operation_id": "postScenariosRun",
           "summary": "Run a scenario file step by step and report each step.",
           "area_slug": "automation",
-          "selector": null
+          "selector": {
+            "input": "scenario_id",
+            "isGiven": false
+          }
         }
       ],
       "aliases": [],
@@ -13202,6 +13300,277 @@
       ],
       "ui": [
         "Scenarios > Run"
+      ]
+    },
+    {
+      "command": "sendmock scenario run-saved",
+      "slug": "scenario-run-saved",
+      "usage": "sendmock scenario run-saved <scenarioId>",
+      "summary": "Run a saved scenario step by step and report each step.",
+      "area": "Automation",
+      "area_slug": "automation",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/scenarios/{scenarioId}/run",
+          "operation_id": "postScenariosByScenarioIdRun",
+          "summary": "Run a saved scenario step by step and report each step.",
+          "area_slug": "automation",
+          "selector": {
+            "input": "scenario_id",
+            "isGiven": true
+          }
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "scenarioId",
+          "input": {
+            "name": "scenarioId",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The saved scenario's ID or name, from `GET /api/v1/scenarios`.",
+          "example": "otp-login",
+          "reads_file": false
+        }
+      ],
+      "flags": [],
+      "example": "sendmock scenario run-saved otp-login",
+      "output": "ScenarioReport",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_scenario_run"
+      ],
+      "ui": [
+        "Scenarios > Saved > open a scenario > Run"
+      ]
+    },
+    {
+      "command": "sendmock scenario save",
+      "slug": "scenario-save",
+      "usage": "sendmock scenario save <file> [flags]",
+      "summary": "Save a scenario by name; 422 with its problems when it is not valid.",
+      "area": "Automation",
+      "area_slug": "automation",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/scenarios",
+          "operation_id": "postScenarios",
+          "summary": "Save a scenario by name; 422 with its problems when it is not valid.",
+          "area_slug": "automation",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "file",
+          "input": {
+            "name": "scenario",
+            "location": "body"
+          },
+          "type": "path",
+          "allowed_values": null,
+          "description": "A file whose text is sent as `scenario`: The scenario file's text, in TOML; checked as `scenario validate` does.",
+          "example": "otp-login.toml",
+          "reads_file": true
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--name",
+          "input": {
+            "name": "name",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<name>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Unique among saved scenarios.",
+          "example": "otp-login"
+        },
+        {
+          "flag": "--description",
+          "input": {
+            "name": "description",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<description>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "What the scenario checks, shown in the Saved list.",
+          "example": "Signs in with an SMS code"
+        }
+      ],
+      "example": "sendmock scenario save otp-login.toml --name otp-login --description 'Signs in with an SMS code'",
+      "output": "SavedScenario",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_scenario_save"
+      ],
+      "ui": [
+        "Scenarios > Save"
+      ]
+    },
+    {
+      "command": "sendmock scenario show",
+      "slug": "scenario-show",
+      "usage": "sendmock scenario show <scenarioId>",
+      "summary": "One saved scenario, by id or name.",
+      "area": "Automation",
+      "area_slug": "automation",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/scenarios/{scenarioId}",
+          "operation_id": "getScenariosByScenarioId",
+          "summary": "One saved scenario, by id or name.",
+          "area_slug": "automation",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "scenarioId",
+          "input": {
+            "name": "scenarioId",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The saved scenario's ID or name, from `GET /api/v1/scenarios`.",
+          "example": "otp-login",
+          "reads_file": false
+        }
+      ],
+      "flags": [],
+      "example": "sendmock scenario show otp-login",
+      "output": "SavedScenario",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_scenario_get"
+      ],
+      "ui": [
+        "Scenarios > Saved > open a scenario"
+      ]
+    },
+    {
+      "command": "sendmock scenario update",
+      "slug": "scenario-update",
+      "usage": "sendmock scenario update <scenarioId> [flags]",
+      "summary": "Rename a saved scenario or change its description or file.",
+      "area": "Automation",
+      "area_slug": "automation",
+      "operations": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/scenarios/{scenarioId}",
+          "operation_id": "patchScenariosByScenarioId",
+          "summary": "Rename a saved scenario or change its description or file.",
+          "area_slug": "automation",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "scenarioId",
+          "input": {
+            "name": "scenarioId",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The saved scenario's ID or name, from `GET /api/v1/scenarios`.",
+          "example": "otp-login",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--name",
+          "input": {
+            "name": "name",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<name>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Unique among saved scenarios.",
+          "example": "otp-login"
+        },
+        {
+          "flag": "--description",
+          "input": {
+            "name": "description",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<description>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "What the scenario checks, shown in the Saved list.",
+          "example": "Signs in with an SMS code"
+        },
+        {
+          "flag": "--scenario",
+          "input": {
+            "name": "scenario",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<scenario>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The scenario file's text, in TOML; checked as `scenario validate` does.",
+          "example": "[[steps]]\nrun = \"sample.send\"\nwith = { kind = \"sms\" }"
+        }
+      ],
+      "example": "sendmock scenario update otp-login --name otp-login --description 'Signs in with an SMS code'",
+      "output": "SavedScenario",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_scenario_update"
+      ],
+      "ui": [
+        "Scenarios > Saved > Rename, or Save over it"
       ]
     },
     {
@@ -13295,7 +13664,7 @@
         "sendmock_seed_apply"
       ],
       "ui": [
-        "Settings > Seed > Apply a seed file"
+        "Settings > Setup > Import a setup"
       ]
     },
     {
@@ -13329,7 +13698,7 @@
         "sendmock_seed_export"
       ],
       "ui": [
-        "Settings > Seed > Export sendmock.seed.toml"
+        "Settings > Setup > Export sendmock.seed.toml"
       ]
     },
     {
@@ -13363,7 +13732,7 @@
         "sendmock_seed_status"
       ],
       "ui": [
-        "Settings > Seed"
+        "Settings > Setup > Seed file"
       ]
     },
     {
@@ -13410,7 +13779,7 @@
         "sendmock_seed_validate"
       ],
       "ui": [
-        "Settings > Seed > Validate"
+        "Settings > Setup > Import a setup > Preview"
       ]
     },
     {
@@ -14046,6 +14415,541 @@
       ],
       "ui": [
         "Settings > Save changes"
+      ]
+    },
+    {
+      "command": "sendmock setup export",
+      "slug": "setup-export",
+      "usage": "sendmock setup export [flags]",
+      "summary": "The configuration as a versioned setup file in TOML, JSON or YAML.",
+      "area": "Setup",
+      "area_slug": "setup",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/setup/export",
+          "operation_id": "postSetupExport",
+          "summary": "The configuration as a versioned setup file in TOML, JSON or YAML.",
+          "area_slug": "setup",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--format",
+          "input": {
+            "name": "format",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<format>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "toml",
+            "json",
+            "yaml"
+          ],
+          "description": "`toml` (the default), `json` or `yaml`.",
+          "example": "toml"
+        },
+        {
+          "flag": "--only",
+          "input": {
+            "name": "only",
+            "location": "body"
+          },
+          "type": "string[]",
+          "value_label": "<only>",
+          "is_required": false,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only these sections, such as `webhook.endpoints`, or groups, such as `webhook`; every section when empty.",
+          "example": [
+            "webhook",
+            "numbers"
+          ]
+        },
+        {
+          "flag": "--except",
+          "input": {
+            "name": "except",
+            "location": "body"
+          },
+          "type": "string[]",
+          "value_label": "<except>",
+          "is_required": false,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Every section but these.",
+          "example": []
+        },
+        {
+          "flag": "--include-secrets",
+          "input": {
+            "name": "include_secrets",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Write secrets encrypted with `passphrase` instead of as `${ENV_VAR}` references, to move the setup to your own machine.",
+          "example": false
+        },
+        {
+          "flag": "--passphrase",
+          "input": {
+            "name": "passphrase",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<passphrase>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The passphrase for `include_secrets`, 8 characters or more. The CLI reads `SENDMOCK_SETUP_PASSPHRASE` when the flag is not given.",
+          "example": null
+        }
+      ],
+      "example": "sendmock setup export --format toml --only webhook --only numbers",
+      "output": "file (text/plain)",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_setup_export"
+      ],
+      "ui": [
+        "Settings > Setup > Export a setup"
+      ]
+    },
+    {
+      "command": "sendmock setup import",
+      "slug": "setup-import",
+      "usage": "sendmock setup import <file> --yes [flags]",
+      "summary": "Apply a setup from its text or a URL, merging or replacing; 422 with the errors and nothing applied when it is invalid.",
+      "area": "Setup",
+      "area_slug": "setup",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/setup/import",
+          "operation_id": "postSetupImport",
+          "summary": "Apply a setup from its text or a URL, merging or replacing; 422 with the errors and nothing applied when it is invalid.",
+          "area_slug": "setup",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "file",
+          "input": {
+            "name": "setup_text",
+            "location": "body"
+          },
+          "type": "path",
+          "allowed_values": null,
+          "description": "A file whose text is sent as `setup_text`: The setup file's text, in TOML, JSON or YAML; or give `url`.",
+          "example": "input.txt",
+          "reads_file": true
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--yes",
+          "input": null,
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Confirms a destructive command; without it the command stops.",
+          "example": true
+        },
+        {
+          "flag": "--url",
+          "input": {
+            "name": "url",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<url>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Download the setup from this `https://` URL (plain `http://` only for loopback and private addresses): at most 1 MB, 10 seconds and 3 redirects, all to `https://`.",
+          "example": null
+        },
+        {
+          "flag": "--sha256",
+          "input": {
+            "name": "sha256",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<sha256>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The SHA-256 the download must have, as 64 hexadecimal digits.",
+          "example": null
+        },
+        {
+          "flag": "--header",
+          "input": {
+            "name": "headers",
+            "location": "body"
+          },
+          "type": "string[]",
+          "value_label": "<header>",
+          "is_required": false,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Headers for a private URL, each as `Name: value`; never shown or logged.",
+          "example": []
+        },
+        {
+          "flag": "--format",
+          "input": {
+            "name": "format",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<format>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "toml",
+            "json",
+            "yaml"
+          ],
+          "description": "`toml`, `json` or `yaml`, when the URL or the text does not say.",
+          "example": "toml"
+        },
+        {
+          "flag": "--mode",
+          "input": {
+            "name": "mode",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<mode>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "merge",
+            "replace"
+          ],
+          "description": "`merge` (the default) or `replace`.",
+          "example": "merge"
+        },
+        {
+          "flag": "--passphrase",
+          "input": {
+            "name": "passphrase",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<passphrase>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Opens the file's encrypted secrets. The CLI reads `SENDMOCK_SETUP_PASSPHRASE` when the flag is not given.",
+          "example": null
+        },
+        {
+          "flag": "--confirm-removed-count",
+          "input": {
+            "name": "confirm_removed_count",
+            "location": "body"
+          },
+          "type": "number",
+          "value_label": "<confirm-removed-count>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "For `replace` imports: how many items the validation said would be removed; the import is refused when it differs.",
+          "example": null
+        }
+      ],
+      "example": "sendmock setup import input.txt --yes --url null --sha256 null",
+      "output": "SetupValidation",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_setup_import"
+      ],
+      "ui": [
+        "Settings > Setup > Import a setup"
+      ]
+    },
+    {
+      "command": "sendmock setup migrate",
+      "slug": "setup-migrate",
+      "usage": "sendmock setup migrate <file> [flags]",
+      "summary": "A setup file upgraded to this build's format version, without applying it.",
+      "area": "Setup",
+      "area_slug": "setup",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/setup/migrate",
+          "operation_id": "postSetupMigrate",
+          "summary": "A setup file upgraded to this build's format version, without applying it.",
+          "area_slug": "setup",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "file",
+          "input": {
+            "name": "setup_text",
+            "location": "body"
+          },
+          "type": "path",
+          "allowed_values": null,
+          "description": "A file whose text is sent as `setup_text`: The setup file's text.",
+          "example": "input.txt",
+          "reads_file": true
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--format",
+          "input": {
+            "name": "format",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<format>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "toml",
+            "json",
+            "yaml"
+          ],
+          "description": "The format of `setup_text`, when the text does not say.",
+          "example": "toml"
+        },
+        {
+          "flag": "--to-format",
+          "input": {
+            "name": "to_format",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<to-format>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "toml",
+            "json",
+            "yaml"
+          ],
+          "description": "The format to write the upgraded copy in; the same as the file's by default.",
+          "example": "json"
+        }
+      ],
+      "example": "sendmock setup migrate input.txt --format toml --to-format json",
+      "output": "file (text/plain)",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_setup_migrate"
+      ],
+      "ui": [
+        "Settings > Setup > Import a setup > Download the upgraded copy"
+      ]
+    },
+    {
+      "command": "sendmock setup validate",
+      "slug": "setup-validate",
+      "usage": "sendmock setup validate <file> [flags]",
+      "summary": "Check a setup without applying it, with what an import would add, change and remove.",
+      "area": "Setup",
+      "area_slug": "setup",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/setup/validate",
+          "operation_id": "postSetupValidate",
+          "summary": "Check a setup without applying it, with what an import would add, change and remove.",
+          "area_slug": "setup",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "file",
+          "input": {
+            "name": "setup_text",
+            "location": "body"
+          },
+          "type": "path",
+          "allowed_values": null,
+          "description": "A file whose text is sent as `setup_text`: The setup file's text, in TOML, JSON or YAML; or give `url`.",
+          "example": "input.txt",
+          "reads_file": true
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--url",
+          "input": {
+            "name": "url",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<url>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Download the setup from this `https://` URL (plain `http://` only for loopback and private addresses): at most 1 MB, 10 seconds and 3 redirects, all to `https://`.",
+          "example": null
+        },
+        {
+          "flag": "--sha256",
+          "input": {
+            "name": "sha256",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<sha256>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The SHA-256 the download must have, as 64 hexadecimal digits.",
+          "example": null
+        },
+        {
+          "flag": "--header",
+          "input": {
+            "name": "headers",
+            "location": "body"
+          },
+          "type": "string[]",
+          "value_label": "<header>",
+          "is_required": false,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Headers for a private URL, each as `Name: value`; never shown or logged.",
+          "example": []
+        },
+        {
+          "flag": "--format",
+          "input": {
+            "name": "format",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<format>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "toml",
+            "json",
+            "yaml"
+          ],
+          "description": "`toml`, `json` or `yaml`, when the URL or the text does not say.",
+          "example": "toml"
+        },
+        {
+          "flag": "--mode",
+          "input": {
+            "name": "mode",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<mode>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "merge",
+            "replace"
+          ],
+          "description": "`merge` (the default) or `replace`.",
+          "example": "merge"
+        },
+        {
+          "flag": "--passphrase",
+          "input": {
+            "name": "passphrase",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<passphrase>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Opens the file's encrypted secrets. The CLI reads `SENDMOCK_SETUP_PASSPHRASE` when the flag is not given.",
+          "example": null
+        },
+        {
+          "flag": "--confirm-removed-count",
+          "input": {
+            "name": "confirm_removed_count",
+            "location": "body"
+          },
+          "type": "number",
+          "value_label": "<confirm-removed-count>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "For `replace` imports: how many items the validation said would be removed; the import is refused when it differs.",
+          "example": null
+        }
+      ],
+      "example": "sendmock setup validate input.txt --url null --sha256 null",
+      "output": "SetupValidation",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_setup_validate"
+      ],
+      "ui": [
+        "Settings > Setup > Import a setup > Preview"
       ]
     },
     {

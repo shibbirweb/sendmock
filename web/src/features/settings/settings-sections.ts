@@ -18,7 +18,7 @@ import type { AppSettings } from "@/lib/api/types";
 
 export const settingsSectionIds = [
   "general",
-  "seed",
+  "setup",
   "projects",
   "email",
   "sms",
@@ -39,7 +39,7 @@ export const settingsSections: {
   icon: LucideIcon;
 }[] = [
   { sectionId: "general", label: "General", icon: SlidersHorizontalIcon },
-  { sectionId: "seed", label: "Seed", icon: DatabaseIcon },
+  { sectionId: "setup", label: "Setup", icon: DatabaseIcon },
   { sectionId: "projects", label: "Projects", icon: FolderKanbanIcon },
   { sectionId: "email", label: "Email", icon: MailIcon },
   { sectionId: "sms", label: "SMS", icon: MessageSquareIcon },

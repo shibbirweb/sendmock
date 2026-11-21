@@ -2,7 +2,7 @@ import type { DeeperEntry } from "../deeper-types";
 
 const sectionLinks: [string, string][] = [
   ["General", "Retention and the danger zone."],
-  ["Seed", "The seed file: export, validate and apply."],
+  ["Setup", "The seed file, and exporting and importing a setup."],
   ["Projects", "Projects that keep apps' or developers' traffic apart."],
   ["Email", "Receiving, delivery outcomes, release, tag and forward rules, outcome addresses."],
   ["SMS", "Delivery simulation, Verify defaults, outcome numbers and magic numbers."],
@@ -24,7 +24,7 @@ export const settingsGeneralEntries: DeeperEntry[] = [
     links: "[Settings](../settings.md).",
   },
   {
-    control: "paragraph: Changes apply at once, without a restart. Export them to the seed file to keep them across resets.",
+    control: "paragraph: Changes apply at once, without a restart. Export them as a setup to keep them across resets or carry them to another machine.",
     does: "Explains how settings apply and how to keep them.",
     operationIds: ["getSettings"],
   },
@@ -66,17 +66,65 @@ export const settingsGeneralEntries: DeeperEntry[] = [
   { control: "button: Try again", does: "Loads the settings again.", operationIds: ["getSettings"] },
 ];
 
-/** Settings > Seed. */
-export const settingsSeedEntries: DeeperEntry[] = [
+/** Settings > Setup: the seed file, then exporting and importing a setup. */
+export const settingsSetupEntries: DeeperEntry[] = [
   { control: "heading: Seed file", does: "The seed file SendMock starts from and resets to.", operationIds: ["getSeedStatus"] },
   { control: "paragraph: The configuration SendMock starts from and resets to, kept in your repository.", does: "Explains the seed file.", links: "[Advanced: seed file](../advanced/seed-file.md)." },
   { control: "paragraph: ./sendmock.seed.toml applied Month #, #, #:#", does: "Which seed file was applied, and when." },
   { control: "paragraph: # items are not in the seed file yet. Export to keep them after a reset.", does: "How much configuration a reset would lose." },
   { control: "button: Export sendmock.seed.toml", does: "Downloads the current configuration as a seed file; secrets are written as `${ENV}` references.", operationIds: ["getSeedExport"] },
-  { control: "heading: Apply a seed file", does: "Loads a seed file into the running SendMock." },
-  { control: "paragraph: Validate first; applying upserts every item in the file by name or SID.", does: "Explains applying." },
-  { control: "button: Upload file", does: "Reads a seed file from your computer." },
-  { control: "textbox: Seed file (TOML)", does: "The seed file's text." },
-  { control: "button: Validate", does: "Checks the file without applying it and lists errors with their line.", operationIds: ["postSeedValidate"] },
-  { control: "button: Apply", does: "Applies the file: every item in it is added or updated.", operationIds: ["postSeedApply"] },
+  { control: "heading: Export a setup", does: "Writes everything you configured, without traffic, as one setup file." },
+  { control: "paragraph: Everything you configured, without traffic, in one file to share with your team or carry to another machine.", does: "Explains what a setup holds.", links: "[Configuration](../configuration.md)." },
+  { control: "radio: TOML", does: "Writes the setup as TOML, the default." },
+  { control: "radio: JSON", does: "Writes the setup as JSON." },
+  { control: "radio: YAML", does: "Writes the setup as YAML." },
+  ...[
+    "Settings",
+    "Projects",
+    "Webhooks",
+    "Email",
+    "SMS providers and outcome rules",
+    "Virtual numbers",
+    "Messaging Services",
+    "Verify services",
+    "Payments",
+    "HTTP Catcher bins",
+    "Saved scenarios",
+  ].map((sectionGroup): DeeperEntry => ({
+    control: `checkbox: ${sectionGroup}`,
+    does: `Includes ${sectionGroup} in the export; all are on by default, and turning some off exports only the rest.`,
+  })),
+  { control: "radio: As ${ENV_VAR} references To share: the file holds no secret, and whoever imports it sets the variables.", does: "Writes each secret as an `${ENV_VAR}` reference, the default." },
+  {
+    control: "radio: Encrypted with a passphrase For your own machine: each secret is encrypted, and the import asks for the passphrase.",
+    does: "Writes each secret encrypted with the passphrase you type (8 characters or more); the import needs the same passphrase. SendMock does not keep it.",
+  },
+  {
+    control: "button: Export sendmock.setup.toml",
+    does: "Downloads the setup in the chosen format; the name follows the format. Disabled while an encryption passphrase is shorter than 8 characters.",
+    operationIds: ["postSetupExport"],
+  },
+  { control: "heading: Import a setup", does: "Loads a setup file into the running SendMock." },
+  { control: "paragraph: Preview first: the import shows what it adds, changes and removes, and an invalid file changes nothing.", does: "Explains the preview." },
+  { control: "radio: File or text", does: "Takes the setup from a file you upload or text you paste." },
+  { control: "radio: URL", does: "Downloads the setup from an `https://` address, with an optional SHA-256 and headers for a private address." },
+  { control: "button: Upload file", does: "Reads a setup file from your computer into the text box." },
+  { control: "textbox: Setup file", does: "The setup file's text." },
+  { control: "paragraph: TOML, JSON or YAML; the format is read from the text.", does: "Says which formats are read." },
+  { control: "radio: Merge Add and update what the file holds by name; keep everything else.", does: "Adds and updates what the file holds, the default." },
+  { control: "radio: Replace Also remove what the file does not hold, after a confirmation with the count.", does: "Also removes what the file does not hold, after a confirmation that names how many items go." },
+  { control: "textbox: Passphrase", does: "Opens the file's encrypted secrets.", errors: "A missing or wrong passphrase is refused and nothing is applied." },
+  { control: "paragraph: Only for a file exported with encrypted secrets.", does: "Says when the passphrase is needed." },
+  {
+    control: "button: Preview",
+    does: "Checks the file and lists, per section, what the import would add, change and remove. A file from an older SendMock is upgraded in memory; one from a newer SendMock is refused with the version to update to.",
+    errors: "Errors are listed by line or key path.",
+    operationIds: ["postSetupValidate"],
+  },
+  {
+    control: "button: Import",
+    does: "Applies the file with Merge or Replace; Replace asks first with the number of items it removes.",
+    changes: "Adds, updates and (with Replace) removes configuration; traffic is never touched.",
+    operationIds: ["postSetupImport"],
+  },
 ];

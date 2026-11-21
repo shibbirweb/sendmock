@@ -9,7 +9,7 @@ import org.testcontainers.utility.DockerImageName;
  * provider SDKs at their real paths.
  */
 public class SendMockContainer extends GenericContainer<SendMockContainer> {
-    public static final String DEFAULT_IMAGE = "ghcr.io/shibbirweb/sendmock:1.2.0";
+    public static final String DEFAULT_IMAGE = "ghcr.io/shibbirweb/sendmock:1.3.0";
     public static final int SMTP_PORT = 1025;
     public static final int HTTP_PORT = 8025;
     public static final int PROVIDER_PORT = 8026;

@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { demoReleases } from "./support/demo-releases";
+
 test("PL-05.3 a section saves only when changed, and Discard restores it", async ({
   page,
 }) => {
@@ -99,25 +101,27 @@ test("PL-04.6 the seed can be exported, validated and applied", async ({
   const seedDownload = await downloadPromise;
   expect(seedDownload.suggestedFilename()).toBe("sendmock.seed.toml");
 
-  const seedField = page.getByLabel("Seed file (TOML)");
-  await seedField.fill('[[numbers]]\nnumber = "+15550007777\nlabel = Sales');
-  await page.getByRole("button", { name: "Validate" }).click();
-  await expect(page.getByRole("list", { name: "Seed errors" })).toContainText(
+  const setupField = page.getByLabel("Setup file", { exact: true });
+  await setupField.fill('[[numbers]]\nnumber = "+15550007777\nlabel = Sales');
+  await page.getByRole("button", { name: "Preview" }).click();
+  await expect(page.getByRole("list", { name: "Setup errors" })).toContainText(
     "Line 2: A string is missing its closing quote",
   );
-  await expect(page.getByRole("button", { name: "Apply" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Import" })).toBeDisabled();
 
-  await seedField.fill('[[numbers]]\nnumber = "+15550007777"\nlabel = "Sales"');
-  await page.getByRole("button", { name: "Validate" }).click();
-  await expect(page.getByRole("list", { name: "Seed summary" })).toContainText(
+  await setupField.fill(
+    '[[numbers]]\nnumber = "+15550007777"\nlabel = "Sales"',
+  );
+  await page.getByRole("button", { name: "Preview" }).click();
+  await expect(page.getByRole("list", { name: "Setup summary" })).toContainText(
     "1 x Virtual number",
   );
-  await page.getByRole("button", { name: "Apply", exact: true }).click();
+  await page.getByRole("button", { name: "Import", exact: true }).click();
   await page
     .getByRole("alertdialog")
-    .getByRole("button", { name: "Apply" })
+    .getByRole("button", { name: "Import" })
     .click();
-  await expect(page.getByText("Seed file applied")).toBeVisible();
+  await expect(page.getByText("Setup imported")).toBeVisible();
 });
 
 test("EM-05.5 the OTP tester shows the matching pattern and invalid patterns are flagged", async ({
@@ -214,8 +218,12 @@ test("PL-05.6 About shows the version and channel, and the update check stays of
   page,
 }) => {
   await page.goto("/settings?section=about");
-  await expect(page.getByText("0.1.0-beta.2", { exact: true })).toBeVisible();
-  await expect(page.getByText("(beta)")).toBeVisible();
+  await expect(
+    page.getByText(demoReleases.builtAppVersion, { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(`(${demoReleases.builtAppChannel})`),
+  ).toBeVisible();
   const checkButton = page.getByRole("button", { name: "Check for updates" });
   await expect(checkButton).toBeDisabled();
 
@@ -225,7 +233,9 @@ test("PL-05.6 About shows the version and channel, and the update check stays of
   await updatesForm.getByRole("button", { name: "Save changes" }).click();
   await checkButton.click();
   await expect(
-    page.getByText("SendMock 0.2.0-beta.1 is available"),
+    page.getByText(
+      `You are on the latest ${demoReleases.builtAppChannel} version (${demoReleases.builtAppVersion}).`,
+    ),
   ).toBeVisible();
 });
 

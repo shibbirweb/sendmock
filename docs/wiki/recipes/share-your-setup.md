@@ -1,18 +1,82 @@
 ---
 title: Share your setup
-description: Export your endpoints, rules, templates, numbers and settings as a seed file, commit it, and give your team and CI the same SendMock.
+description: Export your endpoints, rules, templates, numbers and settings as a setup file, commit it or carry it to another machine, and give your team and CI the same SendMock.
 ---
 
-> Try it in the [demo](/demo/settings?section=seed).
+> Try it in the [demo](/demo/settings?section=setup).
 
 **The situation:** you set up endpoints, rules, numbers and a Verify service. A teammate, and your CI, should start with exactly the same, and every test run should start clean.
 
 ## Steps
 
-1. In **Settings > Seed**, press **Export sendmock.seed.toml**.
+1. In **Settings > Setup**, press **Export sendmock.seed.toml**. Or, under **Export a setup**, pick TOML, JSON or YAML and the sections, and press **Export**.
 2. Put the file in your app's repository, next to your code, and commit it. Secrets are written as `${ENV_VAR}` references, never in plain text; set those variables on each machine.
 3. Start SendMock with it: `sendmock --seed sendmock.seed.toml` (or mount it at `/config/sendmock.seed.toml` in Docker).
 4. Before each test run, reset to it: **Settings > General > Reset to seed**, or `sendmock reset --yes`, or `POST /api/v1/reset`. Traffic is deleted and the configuration is the file's again.
+
+The same export from the command line:
+
+```bash
+sendmock setup export --format yaml > sendmock.setup.yaml
+```
+
+Export only some sections with `--only` (a section such as `webhook.endpoints`, or a group such as `webhook`), or leave some out with `--except`:
+
+```bash
+sendmock setup export --only webhook --only numbers > webhooks.setup.toml
+```
+
+## Move to another machine
+
+To carry your own setup to your other machine, secrets included:
+
+1. Export with the secrets encrypted. Pick a passphrase of 8 characters or more; SendMock does not keep it.
+
+   ```bash
+   SENDMOCK_SETUP_PASSPHRASE='correct horse battery' sendmock setup export --include-secrets > sendmock.setup.toml
+   ```
+
+   In the app: **Settings > Setup > Export a setup**, choose **Encrypted with a passphrase**, type the passphrase and press **Export**.
+2. Copy `sendmock.setup.toml` to the other machine.
+3. Check what the import would change. Nothing is applied yet.
+
+   ```bash
+   SENDMOCK_SETUP_PASSPHRASE='correct horse battery' sendmock setup validate sendmock.setup.toml
+   ```
+
+4. Import it. **Merge** (the default) adds and updates what the file holds by name and keeps everything else; `--mode replace` also removes what the file does not hold.
+
+   ```bash
+   SENDMOCK_SETUP_PASSPHRASE='correct horse battery' sendmock setup import sendmock.setup.toml --yes
+   ```
+
+   In the app: **Settings > Setup > Import a setup**, upload the file, type the passphrase, press **Preview**, then **Import**.
+
+Without the passphrase, or with a wrong one, the import is refused and nothing changes. A secret is never written in plain text.
+
+## Import from a URL
+
+A setup can come from an `https://` address, such as a raw file in a repository or a gist:
+
+```bash
+sendmock setup import --url https://example.com/sendmock.setup.toml --yes
+```
+
+- Add `--sha256 <digest>` to refuse a file that changed since you checked it.
+- Add `--header "Authorization: Bearer <token>"` for a private address. The header's value is never shown or logged.
+- The download is at most 1 MB and 10 seconds, and follows at most 3 redirects, all to `https://`. Plain `http://` works only for this machine and private networks, such as a file served inside your CI.
+
+In the app: **Settings > Setup > Import a setup > URL**.
+
+## A file from another version
+
+Every setup file starts with a `[sendmock]` header that names its format version. A file from an older SendMock is upgraded for the import, and your file stays as it is; keep the upgraded copy with:
+
+```bash
+sendmock setup migrate sendmock.setup.toml > sendmock.setup.upgraded.toml
+```
+
+A file from a newer SendMock is refused before anything changes, with the version to update to. The format versions are listed on [Docs versions](../versions.md#setup-file-format-versions).
 
 ## In your code
 
@@ -160,8 +224,9 @@ On a teammate's machine, the same endpoints, rules, templates, variables (secret
 
 ## Try it in the demo
 
-1. Open [Settings > Seed](/demo/settings?section=seed).
+1. Open [Settings > Setup](/demo/settings?section=setup).
 2. Press **Export sendmock.seed.toml**. The file downloads.
+3. Under **Import a setup**, paste a file, choose **Replace** and press **Preview** to see what it would add, change and remove.
 
 ## Next
 

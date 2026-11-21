@@ -1,6 +1,10 @@
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { findMockInstallProfile } from "@/mocks/updates/mock-releases";
+import {
+  builtAppVersion,
+  findMockInstallProfile,
+  mockStableReleases,
+} from "@/mocks/updates/mock-releases";
 import {
   clearCachedUpdateCheck,
   runMockUpdateCheck,
@@ -8,6 +12,7 @@ import {
 } from "@/mocks/updates/run-mock-update-check";
 
 const startMs = Date.parse("2026-10-28T09:00:00Z");
+const latestStableRelease = mockStableReleases[0];
 
 describe("runMockUpdateCheck", () => {
   beforeEach(() => {
@@ -23,13 +28,25 @@ describe("runMockUpdateCheck", () => {
 
     expect(updateCheckResult?.is_update_available).toBe(true);
     expect(updateCheckResult?.available_release).toMatchObject({
-      version: "0.1.1",
-      published_at: "2026-10-18T14:00:00Z",
-      upgrade_command: "docker pull ghcr.io/shibbirweb/sendmock:0.1.1",
+      version: latestStableRelease?.version,
+      published_at: `${latestStableRelease?.releasedOn}T12:00:00Z`,
+      release_notes_markdown: latestStableRelease?.notesMarkdown,
+      upgrade_command: `docker pull ghcr.io/shibbirweb/sendmock:${latestStableRelease?.version}`,
     });
+  });
+
+  test("UI-01.4 the demo's default install is the version it was built as, with nothing newer to offer", () => {
+    const defaultInstallProfile = findMockInstallProfile("");
+    expect(defaultInstallProfile.version).toBe(builtAppVersion);
+    expect(builtAppVersion).toMatch(/^\d+\.\d+\.\d+/);
+
     expect(
-      updateCheckResult?.available_release?.release_notes_markdown,
-    ).toContain("### Fixed");
+      runMockUpdateCheck({
+        installProfile: defaultInstallProfile,
+        isGitHubReachable: true,
+        nowMs: startMs,
+      })?.is_update_available,
+    ).toBe(false);
   });
 
   test("PL-05.12 keeps a check for 24 hours", () => {

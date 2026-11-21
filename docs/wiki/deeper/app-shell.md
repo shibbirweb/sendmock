@@ -142,7 +142,7 @@ Link.
 
 - **What it does:** Opens the SendMock repository on GitHub in a new tab.
 
-### 18. Live · demo data, version #.#.#-beta.#
+### 18. Live · demo data, version #.#.#
 
 Status.
 

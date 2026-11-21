@@ -93,7 +93,7 @@ Credentials are not required, because providers send them in different ways, but
 
 ## 7. Keep it
 
-In **Settings > Seed**, press **Export sendmock.seed.toml** and commit the file. Teammates and CI get the same gateway and method; secret credentials are written as `${ENV_VAR}` references.
+In **Settings > Setup**, press **Export sendmock.seed.toml** and commit the file. Teammates and CI get the same gateway and method; secret credentials are written as `${ENV_VAR}` references.
 
 ## Change a built-in instead
 

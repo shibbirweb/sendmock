@@ -23,6 +23,7 @@ impl Operation for ValidateSeedOperation {
                 placeholder: "file",
                 input_name: "seed_toml",
                 reads_file: true,
+                is_optional: false,
             }],
             success_flag_field: Some("is_valid"),
             ..OperationDefinition::DEFAULTS

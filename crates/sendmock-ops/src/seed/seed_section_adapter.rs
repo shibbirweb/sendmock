@@ -1,10 +1,12 @@
 use std::future::Future;
 use std::pin::Pin;
 
+use schemars::{Schema, SchemaGenerator};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 
 use super::seed_sections::SeedSection;
+use crate::setup::SetupSecretWriter;
 use crate::{OperationContext, OperationError};
 
 /// What every seed adapter step answers.
@@ -30,9 +32,11 @@ pub struct SeedItem {
 pub trait SeedSectionAdapter: Send + Sync {
     fn section(&self) -> &'static SeedSection;
 
+    /// Writes each secret through `secret_writer`: a reference, or encrypted for a move.
     fn export_items<'step>(
         &'step self,
         operation_context: &'step OperationContext,
+        secret_writer: &'step dyn SetupSecretWriter,
     ) -> SeedFuture<'step, Vec<SeedItem>>;
 
     /// Creates the item, or updates the one with the same key; answers that key.
@@ -48,6 +52,23 @@ pub trait SeedSectionAdapter: Send + Sync {
         operation_context: &'step OperationContext,
         kept_item_keys: &'step [String],
     ) -> SeedFuture<'step, ()>;
+
+    /// The JSON Schema of one item, for the setup file's published schema.
+    fn describe_item_schema(&self, schema_generator: &mut SchemaGenerator) -> Schema;
+
+    /// The item as an export would write it, with the defaults a file may leave out filled
+    /// in, so an import preview compares like with like.
+    fn normalize_item(&self, item_table: &toml::Table) -> toml::Table;
+}
+
+/// Reads a file item into the section's type and writes it back; an item the type cannot
+/// read stays as written, and the apply names its problem.
+pub fn normalize_seed_table<SeedFields: Serialize + DeserializeOwned>(
+    item_table: &toml::Table,
+) -> toml::Table {
+    read_seed_table::<SeedFields>(item_table.clone())
+        .and_then(|seed_fields| write_seed_table(&seed_fields))
+        .unwrap_or_else(|_| item_table.clone())
 }
 
 /// Reads a seed table into the section's item type, with the field named on failure.
@@ -80,18 +101,6 @@ pub fn to_api_input<ApiInput: DeserializeOwned>(
     })
 }
 
-/// The `${NAME_SECRET}` reference an export writes in place of a secret, from the item's name:
-/// "Laravel inbound mail" gives `${LARAVEL_INBOUND_MAIL_SECRET}`.
-pub fn to_secret_reference(item_name: &str) -> String {
-    let variable_words: Vec<String> = item_name
-        .to_ascii_uppercase()
-        .split(|character: char| !character.is_ascii_alphanumeric())
-        .filter(|word| !word.is_empty())
-        .map(str::to_owned)
-        .collect();
-    format!("${{{}_SECRET}}", variable_words.join("_"))
-}
-
 /// Settings that differ from `default_fields`, as TOML values; `skipped_names` are left out.
 pub fn write_changed_fields(
     current_fields: serde_json::Value,
@@ -115,9 +124,62 @@ pub fn write_changed_fields(
 }
 
 /// Implements `SeedSectionAdapter` for an adapter whose inherent async functions `export`,
-/// `apply` and `remove_unlisted` do the work, so each adapter file holds only its section.
+/// `apply` and `remove_unlisted` do the work, so each adapter file holds only its section. The
+/// third argument is the item's type, whose JSON Schema the setup schema uses, or
+/// `schema = <function>` for a section read without one (its items are compared as written).
+/// A section that holds secrets adds `writes_secrets`, and its `export` also takes the
+/// `SetupSecretWriter`; one whose file items hold only what they change, such as the
+/// settings, adds `compared_as_written`.
 macro_rules! impl_seed_section_adapter {
-    ($adapter:ty, $section:expr) => {
+    ($adapter:ty, $section:expr, schema = $describe_item_schema:path) => {
+        $crate::seed::seed_section_adapter::impl_seed_section_adapter!(
+            @adapter $adapter,
+            $section,
+            $describe_item_schema,
+            |item_table: &toml::Table| item_table.clone(),
+            |operation_context, _secret_writer| Self::export(operation_context)
+        );
+    };
+    ($adapter:ty, $section:expr, $item_type:ty, writes_secrets) => {
+        $crate::seed::seed_section_adapter::impl_seed_section_adapter!(
+            @adapter $adapter,
+            $section,
+            |schema_generator: &mut ::schemars::SchemaGenerator| {
+                schema_generator.subschema_for::<$item_type>()
+            },
+            $crate::seed::seed_section_adapter::normalize_seed_table::<$item_type>,
+            |operation_context, secret_writer| Self::export(operation_context, secret_writer)
+        );
+    };
+    ($adapter:ty, $section:expr, $item_type:ty, compared_as_written) => {
+        $crate::seed::seed_section_adapter::impl_seed_section_adapter!(
+            @adapter $adapter,
+            $section,
+            |schema_generator: &mut ::schemars::SchemaGenerator| {
+                schema_generator.subschema_for::<$item_type>()
+            },
+            |item_table: &toml::Table| item_table.clone(),
+            |operation_context, _secret_writer| Self::export(operation_context)
+        );
+    };
+    ($adapter:ty, $section:expr, $item_type:ty) => {
+        $crate::seed::seed_section_adapter::impl_seed_section_adapter!(
+            @adapter $adapter,
+            $section,
+            |schema_generator: &mut ::schemars::SchemaGenerator| {
+                schema_generator.subschema_for::<$item_type>()
+            },
+            $crate::seed::seed_section_adapter::normalize_seed_table::<$item_type>,
+            |operation_context, _secret_writer| Self::export(operation_context)
+        );
+    };
+    (
+        @adapter $adapter:ty,
+        $section:expr,
+        $describe_item_schema:expr,
+        $normalize_item:expr,
+        |$export_context:ident, $secret_writer:ident| $export_call:expr
+    ) => {
         impl $crate::seed::seed_section_adapter::SeedSectionAdapter for $adapter {
             fn section(&self) -> &'static $crate::seed::seed_sections::SeedSection {
                 &$section
@@ -125,12 +187,13 @@ macro_rules! impl_seed_section_adapter {
 
             fn export_items<'step>(
                 &'step self,
-                operation_context: &'step $crate::OperationContext,
+                $export_context: &'step $crate::OperationContext,
+                $secret_writer: &'step dyn $crate::setup::SetupSecretWriter,
             ) -> $crate::seed::seed_section_adapter::SeedFuture<
                 'step,
                 Vec<$crate::seed::seed_section_adapter::SeedItem>,
             > {
-                Box::pin(Self::export(operation_context))
+                Box::pin($export_call)
             }
 
             fn apply_item<'step>(
@@ -148,25 +211,19 @@ macro_rules! impl_seed_section_adapter {
             ) -> $crate::seed::seed_section_adapter::SeedFuture<'step, ()> {
                 Box::pin(Self::remove_unlisted(operation_context, kept_item_keys))
             }
+
+            fn describe_item_schema(
+                &self,
+                schema_generator: &mut ::schemars::SchemaGenerator,
+            ) -> ::schemars::Schema {
+                ($describe_item_schema)(schema_generator)
+            }
+
+            fn normalize_item(&self, item_table: &toml::Table) -> toml::Table {
+                ($normalize_item)(item_table)
+            }
         }
     };
 }
 
 pub(crate) use impl_seed_section_adapter;
-
-#[cfg(test)]
-mod reference_tests {
-    use super::to_secret_reference;
-
-    #[test]
-    fn names_the_reference_after_the_item() {
-        assert_eq!(
-            to_secret_reference("Laravel inbound mail"),
-            "${LARAVEL_INBOUND_MAIL_SECRET}"
-        );
-        assert_eq!(
-            to_secret_reference("twilio auth-token"),
-            "${TWILIO_AUTH_TOKEN_SECRET}"
-        );
-    }
-}

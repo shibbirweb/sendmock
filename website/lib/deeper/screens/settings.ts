@@ -2,7 +2,7 @@ import type { DeeperPage } from "../deeper-types";
 import { settingsEmailEntries } from "./settings-email";
 import {
   settingsGeneralEntries,
-  settingsSeedEntries,
+  settingsSetupEntries,
 } from "./settings-general-email";
 import {
   settingsBehaviourEntries,
@@ -37,7 +37,7 @@ export const settingsPage: DeeperPage = {
       does: "Deletes every SMS.",
       operationIds: ["deleteSms"],
     },
-    ...settingsSeedEntries,
+    ...settingsSetupEntries,
     ...settingsProjectsEntries,
     ...settingsEmailEntries,
     ...settingsSmsEntries,

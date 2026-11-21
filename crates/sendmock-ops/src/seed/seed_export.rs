@@ -1,17 +1,62 @@
+use sendmock_core::format_rfc3339;
+
 use super::adapters::seed_section_adapters;
+use crate::setup::{
+    CURRENT_FORMAT_VERSION, ExportedSection, SecretReferenceWriter, SetupFileFormat,
+    SetupSecretWriter, SetupSectionFilter, build_setup_header, write_setup_export,
+};
 use crate::{OperationContext, OperationError};
 
-const EXPORT_HEADER: &str = "# SendMock seed file, exported from SendMock.\n# Secrets are ${ENV_VAR} references: set them in the environment.\n";
-
-/// The configuration as `sendmock.seed.toml`, section by section in apply order; secrets are
-/// `${ENV_VAR}` references, never their values, and empty sections are left out.
+/// The configuration as a TOML setup file with secrets as references (see `write_setup_text`).
 pub async fn write_seed_toml(
     operation_context: &OperationContext,
 ) -> Result<String, OperationError> {
-    let mut section_texts = vec![EXPORT_HEADER.to_owned()];
+    write_setup_text(
+        operation_context,
+        SetupFileFormat::Toml,
+        &SecretReferenceWriter,
+    )
+    .await
+}
+
+/// The configuration as a setup file in the chosen format: the `[sendmock]` header naming the
+/// format version, this release and the time, then each section in apply order. Secrets are
+/// what `secret_writer` makes of them (`${ENV_VAR}` references, or encrypted), never their
+/// values, and empty sections are left out.
+pub async fn write_setup_text(
+    operation_context: &OperationContext,
+    setup_format: SetupFileFormat,
+    secret_writer: &dyn SetupSecretWriter,
+) -> Result<String, OperationError> {
+    write_selected_setup_text(
+        operation_context,
+        setup_format,
+        secret_writer,
+        &SetupSectionFilter::default(),
+    )
+    .await
+}
+
+/// Like `write_setup_text`, with only the sections the filter keeps.
+pub async fn write_selected_setup_text(
+    operation_context: &OperationContext,
+    setup_format: SetupFileFormat,
+    secret_writer: &dyn SetupSecretWriter,
+    section_filter: &SetupSectionFilter,
+) -> Result<String, OperationError> {
+    let exported_at = format_rfc3339(operation_context.clock.now_unix_ms());
+    let setup_header = build_setup_header(
+        CURRENT_FORMAT_VERSION,
+        Some(operation_context.instance_details.version),
+        Some(&exported_at),
+    );
+    let mut exported_sections = Vec::new();
     for section_adapter in seed_section_adapters() {
+        if !section_filter.includes(section_adapter.section()) {
+            continue;
+        }
         let section_tables: Vec<toml::Table> = section_adapter
-            .export_items(operation_context)
+            .export_items(operation_context, secret_writer)
             .await?
             .into_iter()
             .map(|seed_item| seed_item.table)
@@ -20,10 +65,10 @@ pub async fn write_seed_toml(
         if section_tables.is_empty() {
             continue;
         }
-        let section_text =
-            super::seed_document::write_section_toml(section_adapter.section(), section_tables)
-                .map_err(|write_error| OperationError::Internal(write_error.to_string()))?;
-        section_texts.push(section_text);
+        exported_sections.push(ExportedSection {
+            seed_section: section_adapter.section(),
+            items: section_tables,
+        });
     }
-    Ok(section_texts.join("\n"))
+    write_setup_export(setup_header, exported_sections, setup_format)
 }

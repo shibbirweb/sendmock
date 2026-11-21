@@ -140,7 +140,7 @@ The helpers map to screens that already show the same thing: waits to the live l
 - **Editor** (the shared code editor) with the scenario text, **Load example** (OTP login, reply by email, checkout), **Upload** a `.toml` file and **Download**.
 - **Validate** lists problems with their step number (an unknown operation, a missing field).
 - **Run** shows each step as it runs: the operation, its input, its answer or error, and the values it saved, with a pass or fail summary. Steps call the same operations as the API, so in Demo mode they are answered by the mock; `http` steps that call your app are recorded as skipped in Demo mode.
-- The last run's report stays until the next run; nothing is stored on the server.
+- The last run's report stays until the next run. Until 1.3.0 nothing was stored on the server; saved scenarios (AI-07, [32](32-after-1-0.md#saved-scenarios-ai-07)) add a saved list beside the editor.
 
 ### Renames and aliases
 

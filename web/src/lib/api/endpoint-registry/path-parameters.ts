@@ -119,6 +119,11 @@ export const pathParameterDocs: Record<string, PathParameterDoc> = {
     description: "The saved delivery's ID, from `GET /api/v1/webhooks/saved`.",
     example: exampleUlid,
   },
+  scenarioId: {
+    description:
+      "The saved scenario's ID or name, from `GET /api/v1/scenarios`.",
+    example: "otp-login",
+  },
   serviceSid: {
     description:
       "The service SID: `MG...` for a Messaging Service, `VA...` for a Verify service.",

@@ -105,6 +105,46 @@ const seedEndpoints = tagEndpoints("Seed", [
   },
 ]);
 
+/** The versioned setup file (docs/plan/32-after-1-0.md, A18); the seed endpoints stay as its aliases. */
+const setupEndpoints = tagEndpoints("Setup", [
+  {
+    method: "POST",
+    path: "/api/v1/setup/export",
+    summary:
+      "The configuration as a versioned setup file in TOML, JSON or YAML.",
+    requestBody: typeRef("SetupExportRequest"),
+    response: fileOf("text/plain"),
+    errorStatuses: [400],
+  },
+  {
+    method: "POST",
+    path: "/api/v1/setup/validate",
+    summary:
+      "Check a setup without applying it, with what an import would add, change and remove.",
+    requestBody: typeRef("SetupImportRequest"),
+    response: typeRef("SetupValidation"),
+    errorStatuses: [400, 422],
+  },
+  {
+    method: "POST",
+    path: "/api/v1/setup/import",
+    summary:
+      "Apply a setup from its text or a URL, merging or replacing; 422 with the errors and nothing applied when it is invalid.",
+    requestBody: typeRef("SetupImportRequest"),
+    response: typeRef("SetupValidation"),
+    errorStatuses: [400, 422],
+  },
+  {
+    method: "POST",
+    path: "/api/v1/setup/migrate",
+    summary:
+      "A setup file upgraded to this build's format version, without applying it.",
+    requestBody: typeRef("SetupMigrateRequest"),
+    response: fileOf("text/plain"),
+    errorStatuses: [400, 422],
+  },
+]);
+
 const smtpSessionFilterParameters = [
   {
     name: "result",
@@ -205,5 +245,6 @@ const logEndpoints = tagEndpoints("Logs", [
 export const systemApi: ApiEndpoint[] = [
   ...systemEndpoints,
   ...seedEndpoints,
+  ...setupEndpoints,
   ...logEndpoints,
 ];

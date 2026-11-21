@@ -1,3 +1,4 @@
+use schemars::JsonSchema;
 use sendmock_store::EmailOutcomeRuleRecord;
 use serde::{Deserialize, Serialize};
 
@@ -10,7 +11,7 @@ use crate::{OperationContext, OperationError};
 
 /// `[[email.outcome_rules]]`, matched by `pattern`; new rules go to the bottom of the list in
 /// file order.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 struct SeedEmailOutcomeRule {
     pattern: String,
@@ -112,4 +113,8 @@ impl EmailOutcomeRuleSeedAdapter {
     }
 }
 
-impl_seed_section_adapter!(EmailOutcomeRuleSeedAdapter, EMAIL_OUTCOME_RULES_SECTION);
+impl_seed_section_adapter!(
+    EmailOutcomeRuleSeedAdapter,
+    EMAIL_OUTCOME_RULES_SECTION,
+    SeedEmailOutcomeRule
+);

@@ -250,6 +250,7 @@ Phase 5, screen by screen as each live mode lands in Stage B (owner feedback F17
 - [x] WS-13.6 Docs pages have `TechArticle` and `BreadcrumbList` JSON-LD, and API, CLI and MCP area pages `WebPage` and `BreadcrumbList`; every JSON-LD block parses.
 - [x] WS-13.7 The demo and the 404 page are `noindex`, and every page has one `h1` and alt text on every image.
 - [x] WS-13.8 Lighthouse scores 100 for SEO on the landing, docs, API, CLI and changelog pages.
+- [x] WS-13.9 Every `sitemap.xml` entry has a `lastmod`: the date of the last commit that changed the files its page is made from (the docs page's Markdown, `CHANGELOG.md`, the OpenAPI spec or the CLI or MCP reference, the landing page's code), never the build time; an entry whose date git cannot give has no `lastmod`. Added 2026-11-17 (owner request, #306): the sitemap had no dates, so search engines could not tell which pages changed after a release.
 
 ## WS-14 What's new and Upgrade guide
 

@@ -173,6 +173,8 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_webhook_template_samples(app_router).await);
     samples.extend(webhook_template_file_samples());
     samples.extend(scenario_samples());
+    samples.extend(prepare_saved_scenario_samples(app_router).await);
+    samples.extend(setup_samples());
     samples.extend(ai_samples());
     samples
 }
@@ -2421,6 +2423,79 @@ fn scenario_samples() -> Vec<(&'static str, Vec<Value>)> {
             "postScenariosRun",
             vec![
                 json!({ "scenario": "name = \"sample\"\n[[steps]]\nrun = \"sample.send\"\nwith = { kind = \"sms\" }\nsave = \"sample\"\n[[steps]]\nrun = \"assert\"\nwith = { that = \"1 == 2\" }\n" }),
+            ],
+        ),
+    ]
+}
+
+const SAMPLE_SCENARIO: &str = "[[steps]]\nrun = \"sample.send\"\nwith = { kind = \"sms\" }\n";
+
+/// Two saved scenarios, by name: `Kept` is read, changed and run, `Doomed` is deleted.
+async fn prepare_saved_scenario_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    for scenario_name in ["Kept", "Doomed"] {
+        post_json(
+            app_router,
+            "/api/v1/scenarios",
+            &json!({ "name": scenario_name, "scenario": SAMPLE_SCENARIO }),
+        )
+        .await;
+    }
+    vec![
+        ("getScenarios", vec![json!({})]),
+        (
+            "postScenarios",
+            vec![
+                json!({ "name": "Saved sample", "description": "Sends an SMS", "scenario": SAMPLE_SCENARIO }),
+            ],
+        ),
+        (
+            "getScenariosByScenarioId",
+            vec![json!({ "scenario_id": "Kept" })],
+        ),
+        (
+            "patchScenariosByScenarioId",
+            vec![json!({ "scenario_id": "Kept", "description": "Changed" })],
+        ),
+        (
+            "postScenariosByScenarioIdRun",
+            vec![json!({ "scenario_id": "Kept" })],
+        ),
+        (
+            "deleteScenariosByScenarioId",
+            vec![json!({ "scenario_id": "Doomed" })],
+        ),
+    ]
+}
+
+fn setup_samples() -> Vec<(&'static str, Vec<Value>)> {
+    vec![
+        (
+            "postSetupExport",
+            vec![
+                json!({}),
+                json!({ "format": "json", "only": ["numbers"] }),
+                json!({ "format": "yaml", "include_secrets": true, "passphrase": "correct horse battery" }),
+            ],
+        ),
+        (
+            "postSetupValidate",
+            vec![
+                json!({ "setup_text": "[[numbers]]\nnumber = \"+15559990001\"\nlabel = \"Contract\"\n" }),
+                json!({ "setup_text": "[[mystery]]\nkey = 1\n", "mode": "replace" }),
+            ],
+        ),
+        (
+            "postSetupImport",
+            vec![
+                json!({ "setup_text": "[[numbers]]\nnumber = \"+15559990001\"\nlabel = \"Contract\"\n" }),
+            ],
+        ),
+        (
+            "postSetupMigrate",
+            vec![
+                json!({ "setup_text": "[[numbers]]\nnumber = \"+15559990002\"\nlabel = \"Old\"\n", "to_format": "yaml" }),
             ],
         ),
     ]

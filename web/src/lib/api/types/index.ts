@@ -19,5 +19,6 @@ export type * from "@/lib/api/types/message-rules";
 export type * from "@/lib/api/types/projects";
 export type * from "@/lib/api/types/push";
 export type * from "@/lib/api/types/automation";
+export type * from "@/lib/api/types/setup";
 export { appEventTypes } from "@/lib/api/types/events";
 export { maxVerificationCheckAttempts } from "@/lib/api/types/verify-and-numbers";

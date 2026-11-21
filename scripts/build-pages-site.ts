@@ -34,6 +34,12 @@ export type PagesSiteBuild = {
    * another version names those pages canonical and keeps the rest out of search.
    */
   rootPagePathsFile?: string;
+  /**
+   * The current checkout (WEBSITE_GIT_ROOT) when `repositoryRoot` is a tag's
+   * worktree: its website code is today's, so the sitemap dates the landing
+   * page from this checkout's history.
+   */
+  websiteGitRoot?: string;
 };
 
 const noindexMetaTag = '<meta name="robots" content="noindex" />';
@@ -43,7 +49,10 @@ export function addNoindexMetaTag(pageHtml: string): string {
   if (pageHtml.includes('name="robots"')) {
     return pageHtml;
   }
-  return pageHtml.replace(/<head>/i, (headTag) => `${headTag}\n    ${noindexMetaTag}`);
+  return pageHtml.replace(
+    /<head>/i,
+    (headTag) => `${headTag}\n    ${noindexMetaTag}`,
+  );
 }
 
 function runCommand(
@@ -120,6 +129,9 @@ export function buildPagesSite(pagesSiteBuild: PagesSiteBuild): string {
   if (pagesSiteBuild.rootPagePathsFile !== undefined) {
     versionEnvironment.DOCS_ROOT_PAGE_PATHS_FILE =
       pagesSiteBuild.rootPagePathsFile;
+  }
+  if (pagesSiteBuild.websiteGitRoot !== undefined) {
+    versionEnvironment.WEBSITE_GIT_ROOT = pagesSiteBuild.websiteGitRoot;
   }
 
   runCommand("bun run build", webDirectory, {

@@ -67,7 +67,7 @@ Open **Preview**. The sample send is built from your field mapping: the **Stored
 1. Press **Save provider**. Mailjet is listed as **Custom**.
 2. Open **Try it** and point Mailjet's SDK at the base URL it shows.
 
-To share it with your team, export the seed file in [Settings > Seed](../settings.md#seed): custom providers are saved with their secrets as `${ENV}` references.
+To share it with your team, export the seed file in [Settings > Setup](../settings.md#setup): custom providers are saved with their secrets as `${ENV}` references.
 
 ## Related
 

@@ -173,6 +173,7 @@ export const queryKeys = {
     forward: ["message-rules", "forward-rules"] as const,
   },
   aiAgents: ["ai", "agents"] as const,
+  savedScenarios: ["scenarios", "saved"] as const,
   system: {
     stats: ["system", "stats"] as const,
     info: ["system", "info"] as const,

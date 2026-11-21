@@ -1,3 +1,4 @@
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
@@ -10,7 +11,7 @@ use crate::seed::seed_sections::NUMBERS_SECTION;
 use crate::{OperationContext, OperationError};
 
 /// `[[numbers]]`, matched by `number`; applied after the Messaging Services it joins.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 struct SeedVirtualNumber {
     number: String,
@@ -120,4 +121,4 @@ impl VirtualNumberSeedAdapter {
     }
 }
 
-impl_seed_section_adapter!(VirtualNumberSeedAdapter, NUMBERS_SECTION);
+impl_seed_section_adapter!(VirtualNumberSeedAdapter, NUMBERS_SECTION, SeedVirtualNumber);

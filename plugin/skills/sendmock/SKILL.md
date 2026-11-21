@@ -5,14 +5,14 @@ description: Test and debug email, SMS, payments, HTTP calls and webhooks locall
 
 # SendMock
 
-Written for SendMock 1.2.0. SendMock catches what an app sends (email over SMTP or a provider API, SMS, push notifications, payments, HTTP calls) and sends back what providers send (status callbacks, inbound messages, payment notifications), all on this machine.
+Written for SendMock 1.3.0. SendMock catches what an app sends (email over SMTP or a provider API, SMS, push notifications, payments, HTTP calls) and sends back what providers send (status callbacks, inbound messages, payment notifications), all on this machine.
 
 ## First step
 
 1. Check it runs: the MCP tool `sendmock_status`, or `sendmock status --json`.
 2. If it does not run, start it in the background with `sendmock serve`, or ask the user to start it.
 3. Prefer the MCP tools. Without them, use the CLI with `--json`; every tool has a command (`sendmock help --all --json` lists them).
-4. The MCP server starts with the toolsets `core`, `email`, `sms`, `verify`, `extract` and `webhooks`, enough to connect an app, read codes and links, and receive webhooks. The other workflows need another toolset: `logs` (SMTP and HTTP logs), `payments`, `http`, `scenario`, `rules`, `numbers`, `templates` (writing templates), `variables` or `admin` (seed and settings). When a tool is missing, run its CLI command instead, or ask the user to add the toolset to the server's arguments (`sendmock mcp --toolsets all`, or a list).
+4. The MCP server starts with the toolsets `core`, `email`, `sms`, `verify`, `extract` and `webhooks`, enough to connect an app, read codes and links, and receive webhooks. The other workflows need another toolset: `logs` (SMTP and HTTP logs), `payments`, `http`, `scenario`, `rules`, `numbers`, `templates` (writing templates), `variables` or `admin` (seed, setup and settings). When a tool is missing, run its CLI command instead, or ask the user to add the toolset to the server's arguments (`sendmock mcp --toolsets all`, or a list).
 
 ## Workflows
 
@@ -88,7 +88,14 @@ The same for an SMS vendor: `sendmock_sms_provider_create`, `sendmock_sms_provid
 
 ### Make it repeatable
 
-Write the steps as a scenario file (see `examples/`), check it with `sendmock_scenario_validate` and run it with `sendmock_scenario_run` or `sendmock scenario run <file>`, which exits with `5` when an `assert` fails, so it works in CI. Export the setup with `sendmock seed export` so it can be committed.
+Write the steps as a scenario file (see `examples/`), check it with `sendmock_scenario_validate` and run it with `sendmock_scenario_run` or `sendmock scenario run <file>`, which exits with `5` when an `assert` fails, so it works in CI. Save it by name with `sendmock_scenario_save` so it runs again with `sendmock_scenario_run` and `scenario_id`, and travels in a setup. Export the setup with `sendmock seed export` so it can be committed.
+
+### Share or move a setup
+
+1. `sendmock_setup_export` writes everything configured (no traffic) in `toml`, `json` or `yaml`; `only` and `except` pick sections such as `webhook` or `numbers`. Secrets come out as `${ENV_VAR}` references; `include_secrets` with a `passphrase` the user chose encrypts them instead, for the user's own machine.
+2. Before importing, `sendmock_setup_validate` with the file's text (or a `url`) lists errors and, per section, what would be added, changed and removed. Show the user that preview.
+3. `sendmock_setup_import` applies it only after the user agrees. `mode` `merge` (the default) keeps everything else; `replace` also removes what the file does not hold and needs `confirm_removed_count` from the preview. Never pick `replace` without the user asking for it.
+4. A file from an older SendMock is upgraded for the import; `sendmock_setup_migrate` writes the upgraded copy to commit. A file from a newer one is refused: tell the user to update SendMock.
 
 ## Safety rules
 

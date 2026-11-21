@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import { buildBreadcrumbLinks, toDocsBreadcrumbSteps } from "./breadcrumbs";
-import { listSitemapPagePaths } from "./sitemap-pages";
+import { listSitemapPages } from "./sitemap-pages";
 import {
   authorPersonId,
   buildDocsStructuredData,
@@ -158,13 +158,18 @@ describe("structured data", () => {
 });
 
 describe("the sitemap's pages", () => {
+  const sitemapPages = listSitemapPages({
+    docsPages: [
+      { pagePath: "/docs", wikiFilePath: "index.md" },
+      { pagePath: "/docs/install", wikiFilePath: "install.md" },
+    ],
+    apiTagSlugs: ["mail"],
+    cliAreaSlugs: ["sms"],
+    mcpAreaSlugs: ["webhooks"],
+  });
+
   test("WS-13.3 lists home, every docs page with What's new and the upgrade guide, and the references, without the playground", () => {
-    const pagePaths = listSitemapPagePaths({
-      docsPagePaths: ["/docs", "/docs/install"],
-      apiTagSlugs: ["mail"],
-      cliAreaSlugs: ["sms"],
-      mcpAreaSlugs: ["webhooks"],
-    });
+    const pagePaths = sitemapPages.map((sitemapPage) => sitemapPage.pagePath);
 
     expect(pagePaths).toEqual([
       "/",
@@ -181,5 +186,26 @@ describe("the sitemap's pages", () => {
       "/changelog",
     ]);
     expect(pagePaths).not.toContain("/playground");
+  });
+
+  test("WS-13.9 dates each page from the files its content comes from", () => {
+    const sourcesByPath = Object.fromEntries(
+      sitemapPages.map((sitemapPage) => [
+        sitemapPage.pagePath,
+        sitemapPage.sourcePaths,
+      ]),
+    );
+
+    expect(sourcesByPath["/docs/install"]).toEqual(["docs/wiki/install.md"]);
+    expect(sourcesByPath["/docs/whats-new"]).toEqual(["CHANGELOG.md"]);
+    expect(sourcesByPath["/changelog"]).toEqual(["CHANGELOG.md"]);
+    expect(sourcesByPath["/api/mail"]).toEqual(["docs/api/openapi.yaml"]);
+    expect(sourcesByPath["/cli/sms"]).toEqual(["docs/api/cli-reference.json"]);
+    expect(sourcesByPath["/mcp/webhooks"]).toEqual(["docs/api/mcp-tools.json"]);
+    expect(
+      sitemapPages
+        .filter((sitemapPage) => sitemapPage.isWebsiteSource)
+        .map((sitemapPage) => sitemapPage.pagePath),
+    ).toEqual(["/"]);
   });
 });

@@ -1,0 +1,32 @@
+# What the previous stable release is set up with before it exports. Only sections every
+# release since 1.0 reads, so the same file works whichever release is the previous one.
+[settings]
+sms_simulation_profile = "manual"
+
+[[projects]]
+key = "shop"
+name = "Shop"
+
+[[verify.services]]
+sid = "VA00000000000000000000000000000001"
+name = "Login"
+fixed_code = "123456"
+
+[[messaging_services]]
+sid = "MG00000000000000000000000000000001"
+name = "Notifications"
+inbound_mode = "defer_to_sender"
+
+[[numbers]]
+number = "+15550001111"
+label = "Support line"
+
+[[sms.outcome_rules]]
+match = "to"
+pattern = "+1555777*"
+outcome = "undelivered"
+error_code = "30003"
+
+[[email.outcome_rules]]
+pattern = "*@bounce.qa.test"
+outcome = "hard_bounce"

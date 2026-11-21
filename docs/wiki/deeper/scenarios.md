@@ -35,38 +35,68 @@ Text.
 - **What it does:** Explains scenarios.
 - **Links to:** [Advanced: scenarios](../../advanced/scenarios.md).
 
-### 4. Load example
+### 4. Saved
+
+Heading.
+
+- **What it does:** Heads the saved scenarios beside the editor. Click one to open it in the editor; its menu renames or deletes it (after a confirmation).
+- **Where its text comes from:** The saved scenarios, which a setup export carries as `[[scenarios]]`.
+- **Same action elsewhere:** REST [`GET /api/v1/scenarios`](/api/automation/#getScenarios), CLI [`sendmock scenario list`](/cli/automation/#scenario-list), MCP [`sendmock_scenario_list`](/mcp/automation/#sendmock_scenario_list)
+
+### 5. Nothing saved yet. Save the editor's scenario to run it again by name and keep it in a setup.
+
+Text.
+
+- **What it does:** Shown while no scenario is saved.
+
+### 6. Not saved
+
+Text.
+
+- **What it does:** The name of the saved scenario in the editor; Not saved while the editor holds one that is not saved. An Unsaved changes mark follows while the editor differs from the saved file.
+
+### 7. Save
+
+Button.
+
+- **What it does:** Saves the editor's scenario: asks for a unique name the first time, then updates the opened one. Save as appears once a scenario is opened and saves a copy under a new name.
+- **What it changes:** Stores the scenario, so it runs by name with `sendmock scenario run-saved` and travels in a setup.
+- **Errors:** An invalid scenario is refused with its errors by step, as Validate lists them; a name already taken is refused.
+- **Same action elsewhere:** REST [`POST /api/v1/scenarios`](/api/automation/#postScenarios), CLI [`sendmock scenario save`](/cli/automation/#scenario-save), MCP [`sendmock_scenario_save`](/mcp/automation/#sendmock_scenario_save)
+- **Same action elsewhere:** REST [`PATCH /api/v1/scenarios/{scenarioId}`](/api/automation/#patchScenariosByScenarioId), CLI [`sendmock scenario update`](/cli/automation/#scenario-update), MCP [`sendmock_scenario_update`](/mcp/automation/#sendmock_scenario_update)
+
+### 8. Load example
 
 Button.
 
 - **What it does:** Puts an example scenario in the editor.
 
-### 5. Upload
+### 9. Upload
 
 Button.
 
 - **What it does:** Reads a scenario file from your computer.
 
-### 6. Download
+### 10. Download
 
 Link.
 
 - **What it does:** Saves the scenario in the editor as a file.
 
-### 7. Scenario
+### 11. Scenario
 
 Field.
 
 - **What it does:** The scenario, in YAML or JSON.
 
-### 8. Validate
+### 12. Validate
 
 Button.
 
 - **What it does:** Checks the scenario without running it and lists any errors.
 - **Same action elsewhere:** REST [`POST /api/v1/scenarios/validate`](/api/automation/#postScenariosValidate), CLI [`sendmock scenario validate`](/cli/automation/#scenario-validate), MCP [`sendmock_scenario_validate`](/mcp/automation/#sendmock_scenario_validate)
 
-### 9. Run
+### 13. Run
 
 Button.
 
@@ -76,7 +106,7 @@ Button.
 
 ## The example has run
 
-### 10. Passed: # of # steps in # ms
+### 14. Passed: # of # steps in # ms
 
 Status.
 

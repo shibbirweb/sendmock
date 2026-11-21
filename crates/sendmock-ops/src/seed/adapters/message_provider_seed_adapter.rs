@@ -1,3 +1,4 @@
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -10,16 +11,16 @@ use crate::providers::{
     is_modified, load_area_providers,
 };
 use crate::seed::seed_section_adapter::{
-    SeedItem, impl_seed_section_adapter, read_seed_table, to_api_input, to_secret_reference,
-    write_seed_table,
+    SeedItem, impl_seed_section_adapter, read_seed_table, to_api_input, write_seed_table,
 };
 use crate::seed::seed_sections::{EMAIL_PROVIDERS_SECTION, SMS_PROVIDERS_SECTION};
+use crate::setup::SetupSecretWriter;
 use crate::{OperationContext, OperationError};
 
 /// `[[sms.providers]]` and `[[email.providers]]`, matched by `key`: an edited or removed
 /// built-in, or a custom provider, with its definition as JSON and secret credentials as
-/// `${ENV_VAR}` references.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+/// `${ENV_VAR}` references or encrypted.
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 struct SeedMessageProvider {
     key: String,
@@ -80,6 +81,7 @@ async fn apply_provider(
 async fn export_providers(
     operation_context: &OperationContext,
     area: &str,
+    secret_writer: &dyn SetupSecretWriter,
 ) -> Result<Vec<SeedItem>, OperationError> {
     let mut seed_items = Vec::new();
     for provider in load_area_providers(operation_context, area).await? {
@@ -88,7 +90,7 @@ async fn export_providers(
             continue;
         }
         let definition = (is_edited || !provider.is_builtin)
-            .then(|| write_definition(&provider))
+            .then(|| write_definition(&provider, secret_writer))
             .transpose()?;
         seed_items.push(SeedItem {
             item_key: provider.key.clone(),
@@ -138,8 +140,11 @@ impl SmsProviderSeedAdapter {
         apply_provider(operation_context, SMS_PROVIDER_AREA, item_table).await
     }
 
-    async fn export(operation_context: &OperationContext) -> Result<Vec<SeedItem>, OperationError> {
-        export_providers(operation_context, SMS_PROVIDER_AREA).await
+    async fn export(
+        operation_context: &OperationContext,
+        secret_writer: &dyn SetupSecretWriter,
+    ) -> Result<Vec<SeedItem>, OperationError> {
+        export_providers(operation_context, SMS_PROVIDER_AREA, secret_writer).await
     }
 
     async fn remove_unlisted(
@@ -160,8 +165,11 @@ impl EmailProviderSeedAdapter {
         apply_provider(operation_context, EMAIL_PROVIDER_AREA, item_table).await
     }
 
-    async fn export(operation_context: &OperationContext) -> Result<Vec<SeedItem>, OperationError> {
-        export_providers(operation_context, EMAIL_PROVIDER_AREA).await
+    async fn export(
+        operation_context: &OperationContext,
+        secret_writer: &dyn SetupSecretWriter,
+    ) -> Result<Vec<SeedItem>, OperationError> {
+        export_providers(operation_context, EMAIL_PROVIDER_AREA, secret_writer).await
     }
 
     async fn remove_unlisted(
@@ -172,13 +180,18 @@ impl EmailProviderSeedAdapter {
     }
 }
 
-/// The definition as JSON with each secret credential replaced by its reference.
-fn write_definition(provider: &MessageProviderDefinition) -> Result<String, OperationError> {
+/// The definition as JSON with each secret credential written by the secret writer.
+fn write_definition(
+    provider: &MessageProviderDefinition,
+    secret_writer: &dyn SetupSecretWriter,
+) -> Result<String, OperationError> {
     let mut exported_provider = provider.clone();
     for credential in &mut exported_provider.credentials {
         if credential.is_secret {
-            credential.value =
-                to_secret_reference(&format!("{}_{}", provider.key, credential.name));
+            credential.value = secret_writer.write_secret(
+                &format!("{}_{}", provider.key, credential.name),
+                &credential.value,
+            )?;
         }
     }
     serde_json::to_string(&exported_provider)
@@ -221,5 +234,15 @@ fn read_provider_update(
     to_api_input(definition_fields)
 }
 
-impl_seed_section_adapter!(SmsProviderSeedAdapter, SMS_PROVIDERS_SECTION);
-impl_seed_section_adapter!(EmailProviderSeedAdapter, EMAIL_PROVIDERS_SECTION);
+impl_seed_section_adapter!(
+    SmsProviderSeedAdapter,
+    SMS_PROVIDERS_SECTION,
+    SeedMessageProvider,
+    writes_secrets
+);
+impl_seed_section_adapter!(
+    EmailProviderSeedAdapter,
+    EMAIL_PROVIDERS_SECTION,
+    SeedMessageProvider,
+    writes_secrets
+);

@@ -106,6 +106,7 @@ impl Operation for ImportWebhookTemplateOperation {
                 placeholder: "file",
                 input_name: "file_text",
                 reads_file: true,
+                is_optional: false,
             }],
             ..template_definition(
                 "postWebhooksTemplatesImport",

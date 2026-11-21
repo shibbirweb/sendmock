@@ -12,7 +12,7 @@ fn write_json(value: &impl serde::Serialize) -> Result<String, OperationError> {
 }
 
 /// A bin's name is its path under `/catch/`: letters, digits, `-` and `_`.
-fn check_bin_name(bin_name: &str) -> Result<(), OperationError> {
+pub fn check_bin_name(bin_name: &str) -> Result<(), OperationError> {
     let is_valid = !bin_name.is_empty()
         && bin_name.len() <= 64
         && bin_name

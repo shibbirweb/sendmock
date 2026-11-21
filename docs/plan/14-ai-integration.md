@@ -366,7 +366,7 @@ run = "webhook.delivery.wait"
 with = { endpoint = "app-sms-status", status = "succeeded", count = 3, timeout = "15s" }
 ```
 
-Steps are operation names, plus `http`, `assert` and `sleep`: an operation's step name is its MCP tool without the `sendmock_` prefix, with dots (`sendmock_webhook_endpoint_create` is `webhook.endpoint.create`). `with` holds the operation's input: path parameters by name, the rest as the query or body. The **Scenarios** screen and `POST /scenarios/run` run the same files. Output is a step-by-step report (`--json` for agents). Scenarios are also exposed as an MCP tool.
+Steps are operation names, plus `http`, `assert` and `sleep`: an operation's step name is its MCP tool without the `sendmock_` prefix, with dots (`sendmock_webhook_endpoint_create` is `webhook.endpoint.create`). `with` holds the operation's input: path parameters by name, the rest as the query or body. The **Scenarios** screen and `POST /scenarios/run` run the same files. A scenario can also be saved by name and run later (AI-07, [32](32-after-1-0.md#saved-scenarios-ai-07)), and saved scenarios travel in a setup file. Output is a step-by-step report (`--json` for agents). Scenarios are also exposed as an MCP tool.
 
 ## MCP server
 

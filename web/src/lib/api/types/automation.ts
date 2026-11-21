@@ -58,6 +58,37 @@ export type ScenarioRequest = {
   scenario: string;
 };
 
+/** A scenario saved by name (AI-07), with its file. */
+export type SavedScenario = {
+  id: string;
+  name: string;
+  description: string;
+  /** The scenario file's text, in TOML. */
+  scenario: string;
+  created_by: string;
+  created_at: IsoTimestamp;
+  updated_at: IsoTimestamp;
+};
+
+/** Body of POST /api/v1/scenarios; PATCH /api/v1/scenarios/{scenarioId} takes only the changed keys. */
+export type SavedScenarioInput = {
+  /**
+   * Unique among saved scenarios.
+   * @example "otp-login"
+   */
+  name: string;
+  /**
+   * What the scenario checks, shown in the Saved list.
+   * @example "Signs in with an SMS code"
+   */
+  description?: string;
+  /**
+   * The scenario file's text, in TOML; checked as `scenario validate` does.
+   * @example "[[steps]]\nrun = \"sample.send\"\nwith = { kind = \"sms\" }"
+   */
+  scenario: string;
+};
+
 export type ScenarioProblem = {
   /** One-based step number, or null for the whole file. */
   step: number | null;

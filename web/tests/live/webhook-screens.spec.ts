@@ -104,14 +104,14 @@ for (const path of ["/webhooks/overview", "/webhooks/composer", "/"]) {
   });
 }
 
-test("PL-04.6 Settings > Seed shows the applied seed, exports it, and validates then applies a pasted file", async ({
+test("PL-04.6 Settings > Setup shows the applied seed, exports it, and previews then imports a pasted file", async ({
   page,
   request,
 }) => {
   await applyLiveSeed(request);
   const failedApiCalls = watchFailedApiCalls(page);
 
-  await page.goto("/settings?section=seed");
+  await page.goto("/settings?section=setup");
   await expect(page.getByText(/applied /)).toBeVisible();
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export sendmock.seed.toml" }).click();
@@ -119,18 +119,20 @@ test("PL-04.6 Settings > Seed shows the applied seed, exports it, and validates 
     "sendmock.seed.toml",
   );
 
-  const seedField = page.getByLabel("Seed file (TOML)");
-  await seedField.fill('[[numbers]]\nnumber = "+15550008800"\nlabel = "Sales"');
-  await page.getByRole("button", { name: "Validate" }).click();
-  await expect(page.getByRole("list", { name: "Seed summary" })).toContainText(
+  const setupField = page.getByLabel("Setup file", { exact: true });
+  await setupField.fill(
+    '[[numbers]]\nnumber = "+15550008800"\nlabel = "Sales"',
+  );
+  await page.getByRole("button", { name: "Preview" }).click();
+  await expect(page.getByRole("list", { name: "Setup summary" })).toContainText(
     "Virtual number",
   );
-  await page.getByRole("button", { name: "Apply", exact: true }).click();
+  await page.getByRole("button", { name: "Import", exact: true }).click();
   await page
     .getByRole("alertdialog")
-    .getByRole("button", { name: "Apply" })
+    .getByRole("button", { name: "Import" })
     .click();
-  await expect(page.getByText("Seed file applied")).toBeVisible();
+  await expect(page.getByText("Setup imported")).toBeVisible();
 
   const numbers = (await (await request.get("/api/v1/numbers")).json()) as {
     number: string;

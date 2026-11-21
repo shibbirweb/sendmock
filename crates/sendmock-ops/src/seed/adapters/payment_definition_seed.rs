@@ -1,3 +1,4 @@
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -7,7 +8,7 @@ use crate::seed::seed_section_adapter::{SeedItem, read_seed_table, write_seed_ta
 /// A `[[payments.flows]]`, `[[payments.methods]]` or `[[payments.gateways]]` item, matched by
 /// `key`: a custom definition, or a built-in's edits, with the definition as JSON as the API
 /// takes it.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct SeedPaymentDefinition {
     pub key: String,

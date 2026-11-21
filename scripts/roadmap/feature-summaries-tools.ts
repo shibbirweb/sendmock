@@ -34,6 +34,12 @@ export const toolFeatureSummaries: Record<string, FeatureSummary> = {
       "`llms.txt` and `llms-full.txt` describing SendMock and every docs page for language models.",
     outcome: "Agents and LLM tools find accurate, current documentation.",
   },
+  "AI-07": {
+    summary:
+      "Save scenarios by name, then list, open, edit, rename, delete and run them from the Scenarios screen, REST, CLI and MCP; saved scenarios travel in a setup file.",
+    outcome:
+      "Keep the end-to-end checks you rely on in SendMock and share them with the rest of your setup.",
+  },
   "UI-01": {
     summary:
       "The app shell: sidebar navigation, command palette, keyboard shortcuts, themes and a responsive layout.",
@@ -308,5 +314,23 @@ export const toolFeatureSummaries: Record<string, FeatureSummary> = {
       "Configurable payment gateways, methods and flows, built-in or custom, from the UI or the seed file.",
     outcome:
       "Model any gateway an app uses, including local ones SendMock does not ship.",
+  },
+  "PL-20": {
+    summary:
+      "An optional HTTPS port for the provider APIs, with your own certificate or a local CA SendMock creates and helps you trust.",
+    outcome:
+      "Point SDKs and mail transports that only speak HTTPS, such as Laravel's Mailgun mailer, at SendMock.",
+  },
+  "PL-21": {
+    summary:
+      "Send the requests a provider does not implement to an HTTP Catcher bin on the provider's own base URL, answered by the bin's rules with optional signed follow-up webhooks, in every area, with a guided flow for AI agents.",
+    outcome:
+      "Fill any missing vendor endpoint yourself, on the same URL your SDK already uses, without waiting for a release.",
+  },
+  "PL-22": {
+    summary:
+      "Running sendmock in a terminal asks which services to start and on which ports, remembers the answer, and starts the next time with two presses of Enter; --last and --services start without questions.",
+    outcome:
+      "Start the services you need without remembering a flag for each one, in a terminal, a script or an agent.",
   },
 };

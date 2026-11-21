@@ -10,6 +10,7 @@
       "status: # of # operations",
       "heading: System",
       "heading: Seed",
+      "heading: Setup",
       "heading: Logs",
       "heading: Test helpers",
       "heading: Automation",

@@ -152,7 +152,7 @@ export function buildSeedToml(mockDatabase: MockDatabase): string {
   ];
 
   return [
-    "# SendMock seed file, exported from Settings > Seed.",
+    "# SendMock seed file, exported from Settings > Setup.",
     "# Secrets are ${ENV_VAR} references: set them in the environment.",
     "",
     [settingsTable, ...itemTables].join("\n\n"),
@@ -175,6 +175,8 @@ const knownSeedSections: Record<string, string> = {
   "[[http.bins]]": "HTTP bin",
   "[[email.tag_rules]]": "Tag rule",
   "[[email.forward_rules]]": "Forward rule",
+  "[[email.inbound_routes]]": "Inbound route",
+  "[[scenarios]]": "Saved scenario",
   "[[sms.outcome_rules]]": "Custom outcome number",
   "[[email.outcome_rules]]": "Custom outcome address",
   "[[email.providers]]": "Email provider",
