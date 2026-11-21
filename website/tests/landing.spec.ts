@@ -702,8 +702,9 @@ test("the footer wordmark's traffic lines stay still with reduced motion", async
   const readTransform = () =>
     firstFeedRow.evaluate((feedRow) => getComputedStyle(feedRow).transform);
 
-  const firstTransform = await readTransform();
+  // Once the styles have loaded the row has no transform, and it keeps none.
+  await expect.poll(readTransform).toBe("none");
   await page.waitForTimeout(500);
 
-  expect(await readTransform()).toBe(firstTransform);
+  expect(await readTransform()).toBe("none");
 });
