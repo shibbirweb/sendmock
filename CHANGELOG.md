@@ -10,7 +10,7 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ### Added
 
-- **Website footer wordmark:** the foot of every page on the website ends with a large SendMock wordmark whose letters are made of the email, SMS, webhook and payment events SendMock catches. Move the pointer over it to light the lines up.
+- **Website footer wordmark:** the website's landing, changelog, reference and playground pages end with a large SendMock wordmark drawn in small squares that show how many times SendMock was downloaded on each of the last 7 days (npm, crates.io and PyPI), oldest day on the left and the busiest day brightest. Move the pointer near it and a soft light brightens the squares; on phones and tablets it rests still.
 
 ### Changed
 

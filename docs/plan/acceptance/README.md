@@ -57,7 +57,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 129 / 155 features, 638 / 797 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 130 / 155 features, 644 / 797 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -203,7 +203,7 @@ On top of its own criteria, a feature is done only when:
 | [WS-12](07-distribution-website.md#ws-12-code-examples-on-every-page) | Code examples on every page | 1.5.0 (A16) | 4 | Not started |
 | [WS-13](07-distribution-website.md#ws-13-search-engines-and-link-previews) | Search engines and link previews | 1.2.0 (A20) | 9 | Accepted |
 | [WS-14](07-distribution-website.md#ws-14-whats-new-and-upgrade-guide) | What's new and Upgrade guide | 1.2.0 (A21) | 4 | Accepted |
-| [WS-15](07-distribution-website.md#ws-15-download-activity-in-the-footer-wordmark) | Download activity in the footer wordmark | 1.4.0 (A26) | 6 | Not started |
+| [WS-15](07-distribution-website.md#ws-15-download-activity-in-the-footer-wordmark) | Download activity in the footer wordmark | 1.3.1 (A26) | 6 | Accepted |
 | [PY-01](08-payments.md#py-01-safety) | Safety | Phase 3P | 4 | Accepted |
 | [PY-02](08-payments.md#py-02-native-payments-api) | Native payments API | Phase 3P | 3 | Accepted |
 | [PY-03](08-payments.md#py-03-hosted-test-checkout-page) | Hosted test checkout page | UI in U2, live in Phase 3P | 4 | Accepted |

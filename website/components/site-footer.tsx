@@ -1,8 +1,8 @@
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 
+import { FooterWordmark } from "@/components/footer-wordmark/footer-wordmark";
 import { SendMockLogo } from "@/components/sendmock-logo";
-import { SiteFooterWordmark } from "@/components/site-footer-wordmark";
 import { basePath } from "@/lib/base-path";
 import {
   bugReportUrl,
@@ -125,7 +125,7 @@ export function SiteFooter() {
           <p>Built for developers who test what their app sends.</p>
         </div>
       </div>
-      <SiteFooterWordmark />
+      <FooterWordmark />
     </footer>
   );
 }

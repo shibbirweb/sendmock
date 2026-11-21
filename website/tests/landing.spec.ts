@@ -677,37 +677,3 @@ test("the footer and header link to docs, feedback forms, security and the repos
     page.getByRole("link", { name: /SendMock on GitHub/ }).first(),
   ).toBeVisible();
 });
-
-test("the footer wordmark spells SendMock in caught traffic, hidden from assistive technology", async ({
-  page,
-}) => {
-  await page.goto("/");
-  const wordmark = page.locator("footer svg[aria-hidden='true']").last();
-
-  await expect(wordmark).toBeVisible();
-  await expect(wordmark.locator("clipPath text")).toHaveText("SendMock");
-  await expect(
-    wordmark.locator("text[data-wordmark-feed-row]").first(),
-  ).toContainText("email.received");
-});
-
-test("the footer wordmark's traffic lines stay still, so the page does not lag", async ({
-  page,
-}) => {
-  await page.goto("/");
-  const firstFeedRow = page
-    .locator("footer svg[aria-hidden='true'] text[data-wordmark-feed-row]")
-    .first();
-  const readMotion = () =>
-    firstFeedRow.evaluate((feedRow) => {
-      const feedRowStyle = getComputedStyle(feedRow);
-      return `${feedRowStyle.animationName} ${feedRowStyle.transform}`;
-    });
-
-  // The monospace font shows the styles have loaded, so "none" is not read too early.
-  await expect(firstFeedRow).toHaveCSS("font-family", /monospace/);
-  expect(await readMotion()).toBe("none none");
-  await page.waitForTimeout(500);
-
-  expect(await readMotion()).toBe("none none");
-});
