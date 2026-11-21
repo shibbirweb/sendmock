@@ -50,6 +50,7 @@ mod sslcommerz;
 mod stripe;
 mod subscriptions;
 mod system;
+mod twilio_accounts;
 mod updates;
 mod verify;
 mod webhooks;
@@ -161,6 +162,7 @@ pub use system::{
     ActivityBucket, AppInfo, AppStats, CurrencyAmount, GetHealthOperation, GetInfoOperation,
     GetStatsOperation, HealthStatus,
 };
+pub use twilio_accounts::{TwilioSubaccount, TwilioSubaccountTokenReveal};
 pub use updates::{
     AvailableRelease, GetUpdatesOperation, InstallMethod, PublishedRelease, ReleaseSource,
     UpdateCheckResult, UpdateChecker,
@@ -205,6 +207,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     subscriptions::register_subscription_operations(&mut operation_registry);
     ai::register_ai_operations(&mut operation_registry);
     numbers::register_number_operations(&mut operation_registry);
+    twilio_accounts::register_twilio_account_operations(&mut operation_registry);
     verify::register_verify_operations(&mut operation_registry);
     message_providers::register_sms_provider_operations(&mut operation_registry);
     webhooks::register_webhook_operations(&mut operation_registry);

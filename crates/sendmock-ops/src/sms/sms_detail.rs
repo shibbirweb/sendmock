@@ -29,11 +29,13 @@ pub async fn load_sms_detail(
     let sms_repository = &operation_context.sms_repository;
     let status_history = sms_repository.list_status_history(&sms.sms_id).await?;
     let callback_attempts = operation_context
-        .sms_callback_attempt_repository
+        .sms_delivery_stores
+        .callback_attempts
         .list_sent_attempts(&sms.sms_id)
         .await?;
     let reply_webhook_attempts = operation_context
-        .sms_reply_webhook_repository
+        .sms_delivery_stores
+        .reply_webhooks
         .list_attempts(&sms.sms_id)
         .await?;
     Ok(SmsMessageDetail {

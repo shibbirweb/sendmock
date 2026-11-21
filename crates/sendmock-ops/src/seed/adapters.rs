@@ -17,6 +17,7 @@ mod saved_scenario_seed_adapter;
 mod settings_seed_adapter;
 mod sms_outcome_rule_seed_adapter;
 mod tag_rule_seed_adapter;
+mod twilio_subaccount_seed_adapter;
 mod verify_service_seed_adapter;
 mod virtual_number_seed_adapter;
 mod webhook_endpoint_seed_adapter;
@@ -40,6 +41,7 @@ use saved_scenario_seed_adapter::SavedScenarioSeedAdapter;
 use settings_seed_adapter::SettingsSeedAdapter;
 use sms_outcome_rule_seed_adapter::SmsOutcomeRuleSeedAdapter;
 use tag_rule_seed_adapter::TagRuleSeedAdapter;
+use twilio_subaccount_seed_adapter::TwilioSubaccountSeedAdapter;
 use verify_service_seed_adapter::VerifyServiceSeedAdapter;
 use virtual_number_seed_adapter::VirtualNumberSeedAdapter;
 use webhook_endpoint_seed_adapter::WebhookEndpointSeedAdapter;
@@ -66,6 +68,7 @@ pub fn seed_section_adapters() -> Vec<Box<dyn SeedSectionAdapter>> {
         Box::new(EmailOutcomeRuleSeedAdapter),
         Box::new(EmailTemplateSeedAdapter),
         Box::new(SmsProviderSeedAdapter),
+        Box::new(TwilioSubaccountSeedAdapter),
         Box::new(EmailProviderSeedAdapter),
         Box::new(WebhookTemplateSeedAdapter),
         Box::new(WebhookEndpointSeedAdapter),

@@ -28,6 +28,8 @@ fn virtual_number(number_id: &str, e164_number: &str) -> VirtualNumberRecord {
         inbound_template_id: None,
         status_callback_url: None,
         messaging_service_sid: None,
+        phone_number_sid: format!("PN{:0>32}", number_id),
+        account_sid: None,
         created_by: "api".to_owned(),
         created_at_unix_ms: 1_000,
     }

@@ -240,6 +240,7 @@ fn read_rendered_headers(render_result: &Value) -> BTreeMap<String, String> {
 }
 
 // AC: WH-06.1
+// AC: SM-19.6
 #[tokio::test]
 async fn the_twilio_inbound_template_matches_twilios_documented_format() {
     let fixture = load_fixture(TWILIO_INBOUND_SMS);
@@ -259,7 +260,44 @@ async fn the_twilio_inbound_template_matches_twilios_documented_format() {
     assert_eq!(inbound_form["NumSegments"], "1");
     assert_eq!(
         rendered_headers.get("X-Twilio-Signature"),
-        Some(&sign_twilio_request(PREVIEW_URL, &inbound_form, ""))
+        Some(&sign_twilio_request(
+            PREVIEW_URL,
+            &inbound_form,
+            TWILIO_AUTH_TOKEN
+        ))
+    );
+}
+
+// AC: SM-19.6
+#[tokio::test]
+async fn a_twilio_auth_token_variable_signs_the_twilio_templates_instead_of_the_provider_token() {
+    let (app_router, _) = build_test_app();
+    let (variable_status, created_variable) = call_api(
+        &app_router,
+        "POST",
+        "/api/v1/webhooks/variables",
+        Some(&json!({
+            "name": "twilio_auth_token", "kind": "secret", "scope": "global",
+            "value": "variable-token", "description": "",
+        })),
+    )
+    .await;
+    assert_eq!(variable_status, 201, "{created_variable}");
+
+    let render_result = render_builtin_template(&app_router, "twilio.inbound_sms").await;
+
+    let rendered_headers = read_rendered_headers(&render_result);
+    let inbound_form = read_payload(
+        "application/x-www-form-urlencoded",
+        render_result["body"].as_str().unwrap_or_default(),
+    );
+    assert_eq!(
+        rendered_headers.get("X-Twilio-Signature"),
+        Some(&sign_twilio_request(
+            PREVIEW_URL,
+            &inbound_form,
+            "variable-token"
+        ))
     );
 }
 

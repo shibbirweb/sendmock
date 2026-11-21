@@ -1,4 +1,7 @@
-import { type SurfaceCatalogue } from "./surface-definition";
+import {
+  secretRevealExemption,
+  type SurfaceCatalogue,
+} from "./surface-definition";
 
 /** SMS, Verify, numbers and Messaging Services. */
 export const smsSurfaces: SurfaceCatalogue = {
@@ -193,5 +196,36 @@ export const smsSurfaces: SurfaceCatalogue = {
     cli: "sendmock sms services delete <serviceSid>",
     mcp: "sendmock_messaging_service_delete",
     ui: "Numbers > Messaging Services > Delete",
+  },
+  "GET /api/v1/twilio/subaccounts": {
+    phase: "A23",
+    cli: "sendmock sms twilio subaccounts list",
+    mcp: "sendmock_twilio_subaccount_list",
+    ui: "SMS > Providers > Twilio > Accounts",
+  },
+  "POST /api/v1/twilio/subaccounts": {
+    phase: "A23",
+    cli: "sendmock sms twilio subaccounts create",
+    mcp: "sendmock_twilio_subaccount_create",
+    ui: "SMS > Providers > Twilio > Accounts > Add subaccount",
+  },
+  "PATCH /api/v1/twilio/subaccounts/{accountSid}": {
+    phase: "A23",
+    cli: "sendmock sms twilio subaccounts update <accountSid>",
+    mcp: "sendmock_twilio_subaccount_update",
+    ui: "SMS > Providers > Twilio > Accounts > Edit",
+  },
+  "DELETE /api/v1/twilio/subaccounts/{accountSid}": {
+    phase: "A23",
+    cli: "sendmock sms twilio subaccounts delete <accountSid>",
+    mcp: "sendmock_twilio_subaccount_delete",
+    ui: "SMS > Providers > Twilio > Accounts > Remove",
+  },
+  "GET /api/v1/twilio/subaccounts/{accountSid}/auth-token": {
+    phase: "A23",
+    cli: "sendmock sms twilio subaccounts token <accountSid> --reveal",
+    mcp: null,
+    mcpExemptReason: secretRevealExemption,
+    ui: "SMS > Providers > Twilio > Accounts > Reveal",
   },
 };

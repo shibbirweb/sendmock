@@ -170,4 +170,12 @@ pub const EMBEDDED_MIGRATIONS: &[Migration] = &[
         schema_version: 40,
         sql: include_str!("../migrations/0040_saved_scenarios.sql"),
     },
+    Migration {
+        schema_version: 41,
+        sql: include_str!("../migrations/0041_twilio_subaccounts.sql"),
+    },
+    Migration {
+        schema_version: 42,
+        sql: include_str!("../migrations/0042_number_sids.sql"),
+    },
 ];

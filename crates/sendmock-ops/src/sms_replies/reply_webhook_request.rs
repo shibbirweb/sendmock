@@ -9,6 +9,7 @@ use crate::providers::{
     find_builtin_webhook_template, load_sms_provider_definitions, render_provider_webhook_request,
 };
 use crate::sms::{RecordedHttpRequest, SmsMessage};
+use crate::twilio_accounts::{apply_twilio_account_vars, find_conversation_account};
 use crate::{OperationContext, OperationError};
 
 /// Twilio's "A message comes in" request, the reply webhook's format unless the number or the
@@ -38,6 +39,16 @@ impl ReplyWebhookRequestBuilder {
         let mut message_data = serde_json::to_value(SmsMessage::from(inbound_sms))
             .map_err(|write_error| OperationError::Internal(write_error.to_string()))?;
         message_data["messaging_service_sid"] = json!(target.messaging_service_sid);
+        let mut template_vars = collect_provider_credential_vars(&providers);
+        let conversation_account =
+            find_conversation_account(operation_context, inbound_sms).await?;
+        apply_twilio_account_vars(
+            operation_context,
+            &providers,
+            conversation_account.as_deref(),
+            &mut template_vars,
+        )
+        .await?;
         let instance_details = &operation_context.instance_details;
         let template_context = json!({
             "event": {
@@ -46,7 +57,7 @@ impl ReplyWebhookRequestBuilder {
                 "created_at": format_rfc3339(inbound_sms.created_at_unix_ms),
             },
             "data": message_data,
-            "vars": collect_provider_credential_vars(&providers),
+            "vars": template_vars,
             "endpoint": { "url": target.url },
             "sendmock": {
                 "version": instance_details.version,

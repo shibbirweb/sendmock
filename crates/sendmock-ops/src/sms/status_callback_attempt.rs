@@ -2,7 +2,8 @@ use sendmock_store::{CallbackAttemptResult, SmsCallbackAttemptRecord};
 use sendmock_webhooks::{AttemptDecision, AttemptOutcome, RetrySchedule};
 
 use super::http_call_result::HttpCallResult;
-use super::sms_views::RecordedHttpRequest;
+use super::sms_views::{RecordedHttpRequest, RecordedHttpResponse};
+use crate::twilio_accounts::{DEBUGGER_REPORTED_STATUS, DebuggerProblem, send_debugger_event};
 use crate::{OperationContext, OperationError};
 
 const NO_SENDER_MESSAGE: &str = "This build cannot make HTTP calls, so the callback was not sent";
@@ -97,10 +98,24 @@ pub async fn send_callback_attempt(
         )),
     };
     let has_retry_due = attempt_result.next_attempt_at_unix_ms.is_some();
+    let is_first_failure = in_flight_attempt.attempt == 1 && attempt_result.status != "succeeded";
+    let failed_response = attempt_result
+        .response_json
+        .as_deref()
+        .and_then(|response_json| serde_json::from_str::<RecordedHttpResponse>(response_json).ok());
     operation_context
-        .sms_callback_attempt_repository
+        .sms_delivery_stores
+        .callback_attempts
         .finish_attempt(&in_flight_attempt.attempt_id, attempt_result)
         .await?;
+    if is_first_failure && in_flight_attempt.reported_status != DEBUGGER_REPORTED_STATUS {
+        report_failed_callback(
+            operation_context,
+            in_flight_attempt,
+            failed_response.as_ref(),
+        )
+        .await?;
+    }
     if has_retry_due {
         operation_context
             .dispatch_signals
@@ -108,4 +123,38 @@ pub async fn send_callback_attempt(
             .notify_one();
     }
     Ok(())
+}
+
+/// A Twilio message's status callback that failed sends one Debugger event with error 11200,
+/// as Twilio does; the event itself is never reported again.
+async fn report_failed_callback(
+    operation_context: &OperationContext,
+    failed_attempt: &SmsCallbackAttemptRecord,
+    failed_response: Option<&RecordedHttpResponse>,
+) -> Result<(), OperationError> {
+    let Ok(callback_request) =
+        serde_json::from_str::<RecordedHttpRequest>(&failed_attempt.request_json)
+    else {
+        return Ok(());
+    };
+    let Some(sms) = operation_context
+        .sms_repository
+        .find_message(&failed_attempt.sms_id)
+        .await?
+    else {
+        return Ok(());
+    };
+    if sms.api != "twilio" {
+        return Ok(());
+    }
+    // Boxed because the Debugger event is itself sent as a callback attempt.
+    Box::pin(send_debugger_event(
+        operation_context,
+        &sms,
+        DebuggerProblem::FailedWebhook {
+            request: &callback_request,
+            response: failed_response,
+        },
+    ))
+    .await
 }

@@ -25,6 +25,7 @@ import type {
   TemplateRevision,
   WebhookTemplateSummary,
   WebhookVariable,
+  TwilioSubaccount,
 } from "@/lib/api/types";
 import {
   buildHttpBinFixtures,
@@ -79,6 +80,7 @@ import {
 } from "@/mocks/fixtures/verify-fixtures";
 import {
   buildMessagingServiceFixtures,
+  buildTwilioSubaccountFixtures,
   buildVirtualNumberFixtures,
 } from "@/mocks/fixtures/number-fixtures";
 import {
@@ -107,6 +109,9 @@ import {
 } from "@/mocks/fixtures/project-fixtures";
 import type { PaymentSubscriptionRecord } from "@/mocks/payments/subscriptions/payment-subscriptions";
 
+/** A Twilio subaccount as the mock keeps it, with its full token; answers mask it. */
+export type MockTwilioSubaccount = TwilioSubaccount;
+
 /** In-memory state behind the mock API. Lists are kept newest first. */
 export type MockDatabase = {
   /** When the seed state was last applied (creation, reset or seed apply). */
@@ -126,6 +131,7 @@ export type MockDatabase = {
   verifications: VerificationDetail[];
   virtualNumbers: VirtualNumber[];
   messagingServices: MessagingService[];
+  twilioSubaccounts: MockTwilioSubaccount[];
   smsOutcomeRules: SmsOutcomeRule[];
   emailOutcomeRules: EmailOutcomeRule[];
   messageRules: MessageRuleSets;
@@ -187,6 +193,7 @@ function buildConfiguration() {
   return {
     virtualNumbers,
     messagingServices: buildMessagingServiceFixtures(virtualNumbers),
+    twilioSubaccounts: buildTwilioSubaccountFixtures(),
     verifyServices,
     webhookEndpoints,
     webhookRules: buildWebhookRuleFixtures(webhookEndpoints),

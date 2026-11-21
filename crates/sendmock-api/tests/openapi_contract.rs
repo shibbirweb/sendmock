@@ -153,6 +153,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_inbound_route_samples(app_router).await);
     samples.extend(prepare_http_catcher_samples(app_router).await);
     samples.extend(prepare_number_samples(app_router).await);
+    samples.extend(prepare_twilio_subaccount_samples(app_router).await);
     samples.extend(prepare_verify_samples(app_router).await);
     samples.extend(prepare_sms_provider_samples(app_router).await);
     samples.extend([
@@ -698,6 +699,48 @@ async fn prepare_number_samples(app_router: &axum::Router) -> Vec<(&'static str,
         (
             "deleteMessagingServicesByServiceSid",
             vec![json!({ "service_sid": deleted_service_sid })],
+        ),
+    ]
+}
+
+/// Two subaccounts: one to edit and reveal, one to delete.
+async fn prepare_twilio_subaccount_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let subaccounts_path = "/api/v1/twilio/subaccounts";
+    let edited_sid = "AC44444444444444444444444444444444";
+    let deleted_sid = "AC55555555555555555555555555555555";
+    for account_sid in [edited_sid, deleted_sid] {
+        post_json(
+            app_router,
+            subaccounts_path,
+            &json!({ "account_sid": account_sid, "friendly_name": "Clinic" }),
+        )
+        .await;
+    }
+    vec![
+        ("getTwilioSubaccounts", vec![json!({})]),
+        (
+            "postTwilioSubaccounts",
+            vec![json!({
+                "account_sid": null, "friendly_name": "Dental", "status": "active",
+                "auth_token": null, "debugger_url": "http://localhost:3000/twilio/debugger",
+            })],
+        ),
+        (
+            "patchTwilioSubaccountsByAccountSid",
+            vec![json!({
+                "account_sid": edited_sid, "friendly_name": "Clinic North", "status": "suspended",
+                "auth_token": null, "debugger_url": null,
+            })],
+        ),
+        (
+            "getTwilioSubaccountsByAccountSidAuthToken",
+            vec![json!({ "account_sid": edited_sid })],
+        ),
+        (
+            "deleteTwilioSubaccountsByAccountSid",
+            vec![json!({ "account_sid": deleted_sid })],
         ),
     ]
 }

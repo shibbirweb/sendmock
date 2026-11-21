@@ -143,7 +143,7 @@ fn build_email_record(
         delivery_status: None,
         open_count: 0,
         opened_at_unix_ms: None,
-        otp_codes: ingest_options.otp_extractor.extract_codes(&readable_text),
+        otp_codes: extract_otp_codes(ingest_options, parsed_email, &readable_text),
         links: extract_links(
             parsed_email.text_body.as_deref(),
             parsed_email.html_body.as_deref(),
@@ -236,6 +236,19 @@ fn collect_tags(
         }
     }
     unique_tags
+}
+
+/// Codes often sit only in the subject ("909582 is your App login code"). The subject gets a
+/// line of its own because the patterns never reach across a line, so it cannot run into the body.
+fn extract_otp_codes(
+    ingest_options: &IngestOptions,
+    parsed_email: &ParsedEmail,
+    readable_text: &str,
+) -> Vec<String> {
+    let subject_and_text = format!("{}\n{readable_text}", parsed_email.subject);
+    ingest_options
+        .otp_extractor
+        .extract_codes(&subject_and_text)
 }
 
 fn build_snippet(readable_text: &str) -> String {

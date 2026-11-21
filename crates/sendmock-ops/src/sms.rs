@@ -50,6 +50,7 @@ pub use sms_send_decision::{
 pub use sms_send_operations::{SendSmsOperation, SimulateInboundSmsOperation};
 pub use sms_thread_operations::{DeleteSmsThreadOperation, UpdateSmsThreadOperation};
 pub use sms_views::{RecordedHttpRequest, RecordedHttpResponse, SmsMessage, SmsThread};
+pub(crate) use status_callback_attempt::send_callback_attempt;
 pub use status_callback_dispatch::{run_due_status_callbacks, run_status_callback_dispatcher};
 pub use status_callback_sender::StatusCallbackSender;
 

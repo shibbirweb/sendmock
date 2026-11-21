@@ -29,7 +29,7 @@ They are a starting point, not a fixed list:
 
 | Provider | What the built-in answers | Read more |
 | --- | --- | --- |
-| Twilio | the Messages API, Messaging Services, status callbacks and WhatsApp addresses | [SMS](./sms/index.md) |
+| Twilio | the Messages API, Messaging Services and their PhoneNumbers, IncomingPhoneNumbers, Accounts and subaccounts, status callbacks signed per account, and WhatsApp addresses | [SMS](./sms/index.md) |
 | Twilio Verify | send and check verification codes | [Verify](./sms/verify.md) |
 | Vonage | `POST /sms/json` and delivery receipts | [SMS](./sms/index.md) |
 | Plivo | `POST /v1/Account/{auth_id}/Message/` | [SMS](./sms/index.md) |

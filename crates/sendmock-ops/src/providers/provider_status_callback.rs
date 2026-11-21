@@ -10,6 +10,7 @@ use super::provider_webhook_request::{
     render_provider_webhook_request,
 };
 use crate::sms::RecordedHttpRequest;
+use crate::twilio_accounts::apply_twilio_account_vars;
 use crate::{OperationContext, OperationError};
 
 /// What a provider message's status change calls back with.
@@ -52,7 +53,7 @@ pub async fn render_provider_status_callback(
     let mut template_context = json!({
         "event": { "type": "sms.status", "created_at": format_rfc3339(status_change.at_unix_ms) },
         "data": describe_status_change(provider, sms, status_change),
-        "vars": collect_template_vars(provider, sms),
+        "vars": collect_template_vars(operation_context, provider, sms).await?,
         "endpoint": { "url": callback_url },
     });
     Ok(ProviderCallback::Rendered(render_provider_webhook_request(
@@ -88,7 +89,13 @@ fn describe_status_change(
     })
 }
 
-fn collect_template_vars(provider: &MessageProviderDefinition, sms: &SmsRecord) -> Value {
+/// The provider's credentials as vars, with the message's account as the account SID and, for
+/// a Twilio subaccount, its own token, so the callback is signed as that account.
+async fn collect_template_vars(
+    operation_context: &OperationContext,
+    provider: &MessageProviderDefinition,
+    sms: &SmsRecord,
+) -> Result<Value, OperationError> {
     let mut template_vars = collect_provider_credential_vars(std::slice::from_ref(provider));
     if let Some(account) = &sms.account {
         template_vars.insert(
@@ -96,5 +103,12 @@ fn collect_template_vars(provider: &MessageProviderDefinition, sms: &SmsRecord) 
             Value::from(account.clone()),
         );
     }
-    Value::Object(template_vars)
+    apply_twilio_account_vars(
+        operation_context,
+        std::slice::from_ref(provider),
+        sms.account.as_deref(),
+        &mut template_vars,
+    )
+    .await?;
+    Ok(Value::Object(template_vars))
 }

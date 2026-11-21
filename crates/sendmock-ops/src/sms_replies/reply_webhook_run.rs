@@ -14,6 +14,7 @@ use crate::sms::SmsMessage;
 use crate::sms::{
     RecordedHttpRequest, ReplyWebhookOutcome, ReplyWebhookTargetName, SmsReplyWebhookResult,
 };
+use crate::twilio_accounts::report_failed_inbound_webhook;
 use crate::{AppEventType, OperationContext, OperationError, publish_event};
 
 /// One inbound message triggers at most this many TwiML fetches, redirects and actions
@@ -77,7 +78,8 @@ pub async fn run_reply_webhook(
     let reply_webhook_json = serde_json::to_string(&reply_webhook_result)
         .map_err(|write_error| OperationError::Internal(write_error.to_string()))?;
     operation_context
-        .sms_reply_webhook_repository
+        .sms_delivery_stores
+        .reply_webhooks
         .record_result(&inbound_sms.sms_id, reply_webhook_json)
         .await?;
     publish_reply_webhook_result(operation_context, &inbound_sms.sms_id).await?;
@@ -156,6 +158,16 @@ impl TwimlConversation<'_> {
             .last_fetch
             .as_ref()
             .and_then(|fetch| fetch.failure.clone());
+        if self.primary_failure.is_some() {
+            let answered_status_code = self.last_fetch.as_ref().and_then(|fetch| fetch.status_code);
+            report_failed_inbound_webhook(
+                self.operation_context,
+                self.inbound_sms,
+                &first_request,
+                answered_status_code,
+            )
+            .await?;
+        }
         let (Some(primary_failure), Some(fallback_url)) =
             (&self.primary_failure, &target.fallback_url)
         else {

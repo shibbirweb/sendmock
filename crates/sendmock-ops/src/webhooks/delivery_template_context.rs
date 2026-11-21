@@ -12,6 +12,7 @@ use super::email_template_data::read_email_event_data;
 use super::request_part_renderer::RenderProblem;
 use super::template_context::build_event_template_context;
 use super::variable_resolution::{read_environment_variables, resolve_template_variables};
+use crate::twilio_accounts::default_twilio_auth_token_variable;
 use crate::{AppEvent, OperationContext, OperationError};
 
 /// Who a delivery goes to and why, for the context.
@@ -133,7 +134,14 @@ pub async fn build_delivery_template_context(
         template_functions,
         render_mode,
     );
-    template_context.insert("vars".to_owned(), Value::Object(resolved_variables.values));
+    let mut resolved_values = resolved_variables.values;
+    default_twilio_auth_token_variable(
+        operation_context,
+        &Value::Object(template_context.clone()),
+        &mut resolved_values,
+    )
+    .await?;
+    template_context.insert("vars".to_owned(), Value::Object(resolved_values));
     Ok(DeliveryTemplateContext {
         template_context: Value::Object(template_context),
         variable_problems: resolved_variables

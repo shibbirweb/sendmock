@@ -17435,6 +17435,386 @@
       ]
     },
     {
+      "command": "sendmock sms twilio subaccounts create",
+      "slug": "sms-twilio-subaccounts-create",
+      "usage": "sendmock sms twilio subaccounts create [flags]",
+      "summary": "Add a Twilio subaccount with its own auth token.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/twilio/subaccounts",
+          "operation_id": "postTwilioSubaccounts",
+          "summary": "Add a Twilio subaccount with its own auth token.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--account-sid",
+          "input": {
+            "name": "account_sid",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<account-sid>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "`AC` and 32 hex digits; null makes a new one.",
+          "example": null
+        },
+        {
+          "flag": "--friendly-name",
+          "input": {
+            "name": "friendly_name",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<friendly-name>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "A name for the subaccount.",
+          "example": "Acme Clinic"
+        },
+        {
+          "flag": "--status",
+          "input": {
+            "name": "status",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<status>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "active",
+            "suspended",
+            "closed"
+          ],
+          "description": "Defaults to `active`.",
+          "example": "active"
+        },
+        {
+          "flag": "--auth-token",
+          "input": {
+            "name": "auth_token",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<auth-token>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The subaccount's auth token. Null, empty or the masked value keeps the stored token; a new subaccount without one gets a generated token.",
+          "example": null
+        },
+        {
+          "flag": "--debugger-url",
+          "input": {
+            "name": "debugger_url",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<debugger-url>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Where Twilio Debugger events for this subaccount are sent; null for none.",
+          "example": null
+        }
+      ],
+      "example": "sendmock sms twilio subaccounts create --friendly-name 'Acme Clinic' --account-sid null --status active",
+      "output": "TwilioSubaccount",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_twilio_subaccount_create"
+      ],
+      "ui": [
+        "SMS > Providers > Twilio > Accounts > Add subaccount"
+      ]
+    },
+    {
+      "command": "sendmock sms twilio subaccounts delete",
+      "slug": "sms-twilio-subaccounts-delete",
+      "usage": "sendmock sms twilio subaccounts delete <accountSid> [flags]",
+      "summary": "Remove a Twilio subaccount; its messages stay.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/twilio/subaccounts/{accountSid}",
+          "operation_id": "deleteTwilioSubaccountsByAccountSid",
+          "summary": "Remove a Twilio subaccount; its messages stay.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "accountSid",
+          "input": {
+            "name": "accountSid",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "A Twilio subaccount SID: `AC` and 32 hex digits.",
+          "example": "AC33333333333333333333333333333333",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--yes",
+          "input": null,
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Confirms a destructive command; without it the command stops.",
+          "example": true
+        }
+      ],
+      "example": "sendmock sms twilio subaccounts delete AC33333333333333333333333333333333 --yes",
+      "output": null,
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_twilio_subaccount_delete"
+      ],
+      "ui": [
+        "SMS > Providers > Twilio > Accounts > Remove"
+      ]
+    },
+    {
+      "command": "sendmock sms twilio subaccounts list",
+      "slug": "sms-twilio-subaccounts-list",
+      "usage": "sendmock sms twilio subaccounts list",
+      "summary": "Subaccounts of the Twilio provider's main account, tokens masked.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/twilio/subaccounts",
+          "operation_id": "getTwilioSubaccounts",
+          "summary": "Subaccounts of the Twilio provider's main account, tokens masked.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [],
+      "example": "sendmock sms twilio subaccounts list",
+      "output": "TwilioSubaccount[]",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_twilio_subaccount_list"
+      ],
+      "ui": [
+        "SMS > Providers > Twilio > Accounts"
+      ]
+    },
+    {
+      "command": "sendmock sms twilio subaccounts token",
+      "slug": "sms-twilio-subaccounts-token",
+      "usage": "sendmock sms twilio subaccounts token <accountSid> --reveal",
+      "summary": "Reveal a subaccount's auth token (asked for after a confirmation).",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/twilio/subaccounts/{accountSid}/auth-token",
+          "operation_id": "getTwilioSubaccountsByAccountSidAuthToken",
+          "summary": "Reveal a subaccount's auth token (asked for after a confirmation).",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "accountSid",
+          "input": {
+            "name": "accountSid",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "A Twilio subaccount SID: `AC` and 32 hex digits.",
+          "example": "AC33333333333333333333333333333333",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--reveal",
+          "input": null,
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Prints the secret in plain text instead of masked.",
+          "example": true
+        }
+      ],
+      "example": "sendmock sms twilio subaccounts token AC33333333333333333333333333333333 --reveal",
+      "output": "TwilioSubaccountTokenReveal",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [],
+      "ui": [
+        "SMS > Providers > Twilio > Accounts > Reveal"
+      ]
+    },
+    {
+      "command": "sendmock sms twilio subaccounts update",
+      "slug": "sms-twilio-subaccounts-update",
+      "usage": "sendmock sms twilio subaccounts update <accountSid> [flags]",
+      "summary": "Change a Twilio subaccount's name, status, token or Debugger URL.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/twilio/subaccounts/{accountSid}",
+          "operation_id": "patchTwilioSubaccountsByAccountSid",
+          "summary": "Change a Twilio subaccount's name, status, token or Debugger URL.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "accountSid",
+          "input": {
+            "name": "accountSid",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "A Twilio subaccount SID: `AC` and 32 hex digits.",
+          "example": "AC33333333333333333333333333333333",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--friendly-name",
+          "input": {
+            "name": "friendly_name",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<friendly-name>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "A name for the subaccount.",
+          "example": "Acme Clinic"
+        },
+        {
+          "flag": "--status",
+          "input": {
+            "name": "status",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<status>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "active",
+            "suspended",
+            "closed"
+          ],
+          "description": "Defaults to `active`.",
+          "example": "active"
+        },
+        {
+          "flag": "--auth-token",
+          "input": {
+            "name": "auth_token",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<auth-token>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The subaccount's auth token. Null, empty or the masked value keeps the stored token; a new subaccount without one gets a generated token.",
+          "example": null
+        },
+        {
+          "flag": "--debugger-url",
+          "input": {
+            "name": "debugger_url",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<debugger-url>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Where Twilio Debugger events for this subaccount are sent; null for none.",
+          "example": null
+        }
+      ],
+      "example": "sendmock sms twilio subaccounts update AC33333333333333333333333333333333 --friendly-name 'Acme Clinic' --status active --auth-token null",
+      "output": "TwilioSubaccount",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_twilio_subaccount_update"
+      ],
+      "ui": [
+        "SMS > Providers > Twilio > Accounts > Edit"
+      ]
+    },
+    {
       "command": "sendmock sms wait",
       "slug": "sms-wait",
       "usage": "sendmock sms wait [flags]",

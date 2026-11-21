@@ -19,6 +19,11 @@ pub struct VirtualNumber {
     pub status_callback_url: Option<String>,
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub messaging_service_sid: Option<String>,
+    /// `PN...`, the number's SID in Twilio's IncomingPhoneNumbers API.
+    pub phone_number_sid: String,
+    /// The Twilio account the number belongs to; null for the main account.
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
+    pub account_sid: Option<String>,
     pub created_by: String,
 }
 
@@ -35,6 +40,8 @@ impl From<VirtualNumberRecord> for VirtualNumber {
             inbound_template_id: stored_number.inbound_template_id,
             status_callback_url: stored_number.status_callback_url,
             messaging_service_sid: stored_number.messaging_service_sid,
+            phone_number_sid: stored_number.phone_number_sid,
+            account_sid: stored_number.account_sid,
             created_by: stored_number.created_by,
         }
     }

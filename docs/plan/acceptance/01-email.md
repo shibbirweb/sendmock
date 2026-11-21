@@ -56,6 +56,7 @@ UI in U1, backend Phase 1.
 - [x] EM-05.3 Custom OTP patterns from Settings are used for new messages. (#48)
 - [x] EM-05.5 The OTP pattern editor flags invalid regular expressions and its tester shows which pattern matched and the extracted code. (#48)
 - [x] EM-05.4 The UI shows a copy button per code and link; `GET /api/v1/otp?to=...` and `sendmock otp` return the latest code for that recipient. (#48)
+- [x] EM-05.6 A code followed by `is your`, up to three words and a word for a code (`909582 is your App login code`) is extracted from SMS bodies and from email subjects and bodies; a number followed by other words is still not a code. (Added 2026-11-22 with the fix for #316.)
 
 ## EM-06 sendmail shim
 

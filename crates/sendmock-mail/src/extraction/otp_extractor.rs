@@ -2,10 +2,11 @@ use std::sync::Arc;
 
 use regex::Regex;
 
-/// 4 to 8 digit codes next to the words people use for them, before or after.
+/// 4 to 8 digit codes next to the words people use for them, before or after. After a code,
+/// up to three words may name what it is for, as in "909582 is your App login code".
 pub const DEFAULT_OTP_PATTERNS: [&str; 2] = [
     r"(?i)(?:code|otp|verification|passcode|pin|one[- ]time)[^0-9\n]{0,40}?\b(\d{4,8})\b",
-    r"(?i)\b(\d{4,8})\b[^0-9\n]{0,20}?is your (?:code|otp|verification|passcode|pin)",
+    r"(?i)\b(\d{4,8})\b[^0-9\n]{0,20}?is your (?:[^\s0-9]+[ \t]+){0,3}?(?:code|otp|verification|passcode|pin)\b",
 ];
 
 /// Finds one-time codes with the default patterns, or the custom ones from Settings. A
@@ -84,6 +85,47 @@ mod tests {
                 .is_empty()
         );
         assert!(otp_extractor.extract_codes("Your code is 123.").is_empty());
+    }
+
+    // AC: EM-05.6
+    #[test]
+    fn finds_a_code_named_with_up_to_three_words_after_is_your() {
+        let otp_extractor = OtpExtractor::with_default_patterns();
+
+        assert_eq!(
+            otp_extractor.extract_codes("909582 is your App login code"),
+            ["909582"]
+        );
+        assert_eq!(
+            otp_extractor.extract_codes("4821 is your Acme Bank sign-in PIN."),
+            ["4821"]
+        );
+        assert_eq!(
+            otp_extractor.extract_codes("123456 is your one-time verification"),
+            ["123456"]
+        );
+    }
+
+    // AC: EM-05.6
+    #[test]
+    fn a_number_followed_by_other_words_is_still_not_a_code() {
+        let otp_extractor = OtpExtractor::with_default_patterns();
+
+        assert!(
+            otp_extractor
+                .extract_codes("1042 is your order number")
+                .is_empty()
+        );
+        assert!(
+            otp_extractor
+                .extract_codes("5551 is your seat on the coach for the codebase tour")
+                .is_empty()
+        );
+        assert!(
+            otp_extractor
+                .extract_codes("2026 is your year\ncode words follow later")
+                .is_empty()
+        );
     }
 
     // AC: EM-05.3

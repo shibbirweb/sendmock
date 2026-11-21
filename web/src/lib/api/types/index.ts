@@ -3,6 +3,7 @@ export type * from "@/lib/api/types/email";
 export type * from "@/lib/api/types/email-checks";
 export type * from "@/lib/api/types/sms";
 export type * from "@/lib/api/types/verify-and-numbers";
+export type * from "@/lib/api/types/twilio-accounts";
 export type * from "@/lib/api/types/webhooks";
 export type * from "@/lib/api/types/events";
 export type * from "@/lib/api/types/system";

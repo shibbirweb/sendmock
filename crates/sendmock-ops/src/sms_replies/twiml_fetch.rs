@@ -63,7 +63,8 @@ pub async fn fetch_twiml(
         failure: twiml_answer.err(),
     };
     operation_context
-        .sms_reply_webhook_repository
+        .sms_delivery_stores
+        .reply_webhooks
         .insert_attempt(build_attempt_record(
             operation_context,
             fetch_request,

@@ -1,0 +1,29 @@
+{
+  "doc_url": "https://www.twilio.com/docs/usage/troubleshooting/debugging-event-webhooks",
+  "verified_on": "2026-11-22",
+  "method": "POST",
+  "content_type": "application/x-www-form-urlencoded",
+  "documented_example": {
+    "Sid": "NO00000000000000000000000000000000",
+    "AccountSid": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "ParentAccountSid": "ACyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+    "Timestamp": "2018-05-14T18:06:20Z",
+    "Level": "ERROR",
+    "PayloadType": "application/json",
+    "Payload": "{\"resource_sid\":\"SM00000000000000000000000000000000\",\"service_sid\":null,\"error_code\":\"11200\",\"more_info\":{\"Msg\":\"HTTP request to your webhook failed\",\"ErrorCode\":\"11200\",\"LogLevel\":\"ERROR\"},\"webhook\":{\"type\":\"application/x-www-form-urlencoded\",\"request\":{\"url\":\"https://example.com/sms\",\"method\":\"POST\",\"headers\":{},\"parameters\":{}},\"response\":{\"status_code\":502,\"headers\":{},\"body\":\"\"}}}"
+  },
+  "schema": {
+    "type": "object",
+    "required": ["Sid", "AccountSid", "Timestamp", "Level", "PayloadType", "Payload"],
+    "properties": {
+      "Sid": { "type": "string", "pattern": "^NO[0-9a-f]{32}$" },
+      "AccountSid": { "type": "string", "pattern": "^AC[0-9a-zA-Z]{32}$" },
+      "ParentAccountSid": { "type": "string", "pattern": "^AC[0-9a-zA-Z]{32}$" },
+      "Timestamp": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T" },
+      "Level": { "enum": ["ERROR", "WARNING"] },
+      "PayloadType": { "const": "application/json" },
+      "Payload": { "type": "string", "pattern": "^\\{.*\"error_code\".*\\}$" }
+    },
+    "additionalProperties": false
+  }
+}

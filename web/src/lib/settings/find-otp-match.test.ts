@@ -5,7 +5,7 @@ import { compileOtpPattern, findOtpMatch } from "@/lib/settings/find-otp-match";
 /** The binary's default patterns, as `GET /api/v1/settings` answers them. */
 const serverDefaultPatterns = [
   String.raw`(?i)(?:code|otp|verification|passcode|pin|one[- ]time)[^0-9\n]{0,40}?\b(\d{4,8})\b`,
-  String.raw`(?i)\b(\d{4,8})\b[^0-9\n]{0,20}?is your (?:code|otp|verification|passcode|pin)`,
+  String.raw`(?i)\b(\d{4,8})\b[^0-9\n]{0,20}?is your (?:[^\s0-9]+[ \t]+){0,3}?(?:code|otp|verification|passcode|pin)\b`,
 ];
 
 describe("compileOtpPattern", () => {
@@ -30,5 +30,11 @@ describe("findOtpMatch", () => {
     expect(
       findOtpMatch(serverDefaultPatterns, "Your verification CODE is 482913."),
     ).toEqual({ patternIndex: 0, code: "482913" });
+  });
+
+  test("EM-05.6 the tester finds a code named with words after 'is your'", () => {
+    expect(
+      findOtpMatch(serverDefaultPatterns, "909582 is your App login code"),
+    ).toEqual({ patternIndex: 1, code: "909582" });
   });
 });
