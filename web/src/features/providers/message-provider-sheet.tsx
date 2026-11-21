@@ -18,6 +18,7 @@ import { ProviderOperationsEditor } from "@/features/providers/provider-operatio
 import { ProviderPreviewTab } from "@/features/providers/provider-preview-tab";
 import { ProviderResponsesTab } from "@/features/providers/provider-responses-tab";
 import { ProviderTryItTab } from "@/features/providers/provider-try-it-tab";
+import { MailgunComplaintsTab } from "@/features/providers/mailgun-complaints/mailgun-complaints-tab";
 import { TwilioAccountsTab } from "@/features/providers/twilio-accounts/twilio-accounts-tab";
 import { useMessageProviderForm } from "@/features/providers/use-message-provider-form";
 import type {
@@ -28,6 +29,7 @@ import type {
 type ProviderTab =
   | "general"
   | "accounts"
+  | "complaints"
   | "requests"
   | "responses"
   | "callbacks"
@@ -37,6 +39,7 @@ type ProviderTab =
 const providerTabs: { tab: ProviderTab; label: string }[] = [
   { tab: "general", label: "General" },
   { tab: "accounts", label: "Accounts" },
+  { tab: "complaints", label: "Complaints" },
   { tab: "requests", label: "Requests" },
   { tab: "responses", label: "Responses" },
   { tab: "callbacks", label: "Callbacks" },
@@ -66,8 +69,13 @@ export function MessageProviderSheet({
   // Subaccounts are Twilio's, so only the Twilio SMS provider has an Accounts tab (SM-19.4).
   const hasAccountsTab =
     providerArea === "sms" && messageProvider.key === "twilio";
+  // Complaints tables are Mailgun's (EM-23.5).
+  const hasComplaintsTab =
+    providerArea === "email" && messageProvider.key === "mailgun";
   const shownTabs = providerTabs.filter(
-    ({ tab }) => tab !== "accounts" || hasAccountsTab,
+    ({ tab }) =>
+      (tab !== "accounts" || hasAccountsTab) &&
+      (tab !== "complaints" || hasComplaintsTab),
   );
   const templateErrorCount = providerForm.templateErrors.length;
 
@@ -118,6 +126,11 @@ export function MessageProviderSheet({
                   savedCredentials={messageProvider.credentials}
                 />
               </TabsContent>
+              {hasComplaintsTab && (
+                <TabsContent value="complaints" className="max-w-2xl">
+                  <MailgunComplaintsTab />
+                </TabsContent>
+              )}
               {hasAccountsTab && (
                 <TabsContent value="accounts" className="max-w-2xl">
                   <TwilioAccountsTab

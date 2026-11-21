@@ -59,6 +59,7 @@ Built-ins you removed are listed here. Requests to their paths get a 404 until y
 | Tab | Holds |
 | --- | --- |
 | **General** | name, key (fixed after creation), host (tells apart providers that share a path), accent, enabled, credentials (secrets masked, reveal asks first) and **Check credentials** |
+| **Complaints** | Mailgun only: each sending domain's complaints table, with **Clear** per domain |
 | **Requests** | the requests it answers (kind, method, path with `{name}` parts, format), the **field mapping** (where to, from, subject, text, html and the rest are read from) and the **checks** on a send |
 | **Responses** | the message id template, the success response and one response per error kind (missing field, invalid value, unauthorized, not found, rate limited) |
 | **Callbacks** | the webhook template for its delivery callbacks and the provider's name for each status |
@@ -69,6 +70,18 @@ A provider with template errors cannot be saved, and a path that another enabled
 
 
 Every control and text, one by one: [Email providers in depth](../deeper/mail/providers.md).
+## Mailgun events and complaints
+
+The provider port answers Mailgun's events and complaints APIs for each sending domain (the `{domain}` of `/v3/{domain}/messages`):
+
+| Path | What it does |
+| --- | --- |
+| `GET /v3/{domain}/events` | the domain's events: `accepted` for each recipient, then `delivered`, `failed` (with `severity` and `delivery-status`), `opened`, `clicked` and `complained` as the email's outcome plays, with the same data the `mailgun.events` template sends. Filters: `event` (also `delivered OR failed`), `recipient`, `message-id`, `from`, `to`, `subject`, `tags`, `severity`, `begin`, `end`, `ascending` and `limit` (up to 300); the `paging` URLs answer the next and previous pages |
+| `GET`, `POST`, `DELETE /v3/{domain}/complaints` | lists the domain's complaints, adds one (`address`) and clears them all |
+| `GET`, `DELETE /v3/{domain}/complaints/{address}` | reads and removes one; an address without a complaint answers `404` |
+
+A complaint made in SendMock (Simulate, the `complaint@` address or an outcome rule) about an email sent through Mailgun puts the address on that domain's table. A later Mailgun send to it is accepted but not delivered: it is recorded as a `failed` event with reason `suppress-complaint`, as Mailgun does. The **Complaints** tab on Mail > Providers > Mailgun lists every domain's table and clears it.
+
 ## Customize
 
 The full walkthrough, from the provider's API docs to a working provider: [Advanced: create an email provider](../advanced/email-provider.md).
@@ -86,6 +99,8 @@ The full walkthrough, from the provider's API docs to a working provider: [Advan
 | remove a built-in or delete a custom one | [`sendmock email providers delete <providerKey>`](/cli/email-providers/#email-providers-delete) | [`DELETE /api/v1/emails/providers/{providerKey}`](/api/email-providers/#deleteEmailsProvidersByProviderKey) | [`sendmock_email_provider_delete`](/mcp/email-providers/#sendmock_email_provider_delete) |
 | restore a removed built-in | [`sendmock email providers restore <providerKey>`](/cli/email-providers/#email-providers-restore) | [`POST /api/v1/emails/providers/{providerKey}/restore`](/api/email-providers/#postEmailsProvidersByProviderKeyRestore) | [`sendmock_email_provider_restore`](/mcp/email-providers/#sendmock_email_provider_restore) |
 | reveal a credential (agents cannot) | [`sendmock email providers credential <providerKey> <credentialName> --reveal`](/cli/email-providers/#email-providers-credential) | [`GET /api/v1/emails/providers/{providerKey}/credentials/{credentialName}`](/api/email-providers/#getEmailsProvidersByProviderKeyCredentialsByCredentialName) | none: agents never read secrets |
+| list Mailgun complaints | [`sendmock email mailgun complaints list`](/cli/email/#email-mailgun-complaints-list) | [`GET /api/v1/mailgun/complaints`](/api/email/#getMailgunComplaints) | [`sendmock_email_mailgun_complaint_list`](/mcp/email/#sendmock_email_mailgun_complaint_list) |
+| clear a domain's complaints | [`sendmock email mailgun complaints clear <domain>`](/cli/email/#email-mailgun-complaints-clear) | [`DELETE /api/v1/mailgun/complaints/{domain}`](/api/email/#deleteMailgunComplaintsByDomain) | [`sendmock_email_mailgun_complaint_clear`](/mcp/email/#sendmock_email_mailgun_complaint_clear) |
 
 ## Related
 

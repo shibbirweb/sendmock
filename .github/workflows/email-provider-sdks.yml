@@ -73,6 +73,16 @@ jobs:
         working-directory: examples/email-providers/node
         run: bun install && node done-when.js
 
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          tools: composer
+
+      # AC: EM-23.6
+      - name: Mailgun PHP SDK reads events and manages complaints
+        working-directory: examples/email-providers/php-mailgun
+        run: composer install --no-interaction --quiet && php send-and-verify.php
+
       - uses: ./.github/actions/check-sendmock-offline
 
       - name: SendMock log
