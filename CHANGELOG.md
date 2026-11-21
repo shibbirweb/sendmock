@@ -11,6 +11,7 @@ Write every user-visible change under **Unreleased** in the same pull request th
 ### Added
 
 - **Twilio subaccounts:** the Twilio provider has subaccounts, each with its own SID, auth token and status, on a new Accounts tab of SMS > Providers > Twilio, through `sendmock sms twilio subaccounts`, the REST API, MCP and the seed file. The provider port answers Twilio's Accounts API (`/2010-04-01/Accounts.json` and `/Accounts/{AccountSid}.json`), so an app can read a subaccount's token the way it does on Twilio. Status callbacks and inbound replies for a message sent under a subaccount are signed with that subaccount's token, and a send under a suspended or closed subaccount is refused with Twilio's error.
+- **Twilio phone numbers:** the provider port answers Twilio's IncomingPhoneNumbers API (`/2010-04-01/Accounts/{AccountSid}/IncomingPhoneNumbers.json`: list, create from a number or an area code, fetch, update and delete) and a Messaging Service's PhoneNumbers (`/v1/Services/{ServiceSid}/PhoneNumbers`: list, add, fetch and remove), over the same numbers and sender pools as the Numbers screen. Each number has a `PN` SID and belongs to the account it was created under.
 
 ### Fixed
 

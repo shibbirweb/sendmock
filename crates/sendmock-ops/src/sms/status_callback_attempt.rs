@@ -98,7 +98,8 @@ pub async fn send_callback_attempt(
     };
     let has_retry_due = attempt_result.next_attempt_at_unix_ms.is_some();
     operation_context
-        .sms_callback_attempt_repository
+        .sms_delivery_stores
+        .callback_attempts
         .finish_attempt(&in_flight_attempt.attempt_id, attempt_result)
         .await?;
     if has_retry_due {

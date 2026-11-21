@@ -14,8 +14,7 @@ use super::request_checks::ProviderFailure;
 use super::request_reader::read_request_fields;
 use super::send_operation_kind::{ProviderAnswer, answer_send};
 use super::twilio_account_guard::{TwilioAccountCheck, check_twilio_account};
-use super::twilio_accounts_api::answer_twilio_accounts_request;
-use super::twilio_messaging_services::answer_messaging_services_request;
+use super::twilio_api::answer_twilio_api_request;
 use super::twilio_verify_api::answer_twilio_verify_request;
 use super::vonage_verify_api::answer_vonage_verify;
 use super::whatsapp_cloud_api::answer_whatsapp_cloud;
@@ -93,18 +92,7 @@ pub async fn answer_provider_request(
             "The body is not valid JSON",
         )
     } else {
-        match check_twilio_account(operation_context, &provider_call).await? {
-            TwilioAccountCheck::Allowed => {
-                run_operation_kind(operation_context, &provider_call).await?
-            }
-            TwilioAccountCheck::Unauthorized => refuse(
-                &provider_call,
-                "unauthorized",
-                "credentials",
-                "The credentials do not match",
-            ),
-            TwilioAccountCheck::Refused(refusal) => refusal,
-        }
+        run_checked_operation(operation_context, &provider_call).await?
     };
     Ok(ProviderOutcome {
         response: provider_answer.response,
@@ -164,7 +152,8 @@ async fn answer_code_served_api(
     answer_whatsapp_cloud(operation_context, providers, provider_route, request).await
 }
 
-/// Twilio's Messaging Services API, served with the Twilio provider while it is routable.
+/// Twilio's code-served APIs (Accounts, numbers, Messaging Services), served with the Twilio
+/// provider while it is routable.
 async fn answer_twilio_services(
     operation_context: &OperationContext,
     providers: &[MessageProviderDefinition],
@@ -182,23 +171,18 @@ async fn answer_twilio_services(
     else {
         return Ok(None);
     };
-    if let Some(accounts_answer) =
-        answer_twilio_accounts_request(operation_context, twilio_provider, request).await?
-    {
-        return Ok(Some(ProviderOutcome {
-            response: accounts_answer.response,
-            provider_key: Some(TWILIO_PROVIDER_KEY.to_owned()),
-            created_message: None,
-            secret_values: accounts_answer.secret_values,
-        }));
-    }
-    let services_response =
-        answer_messaging_services_request(operation_context, twilio_provider, request).await?;
-    Ok(services_response.map(|response| ProviderOutcome {
-        response,
+    let twilio_answer = answer_twilio_api_request(
+        operation_context,
+        twilio_provider,
+        list_secret_values(twilio_provider),
+        request,
+    )
+    .await?;
+    Ok(twilio_answer.map(|twilio_answer| ProviderOutcome {
+        response: twilio_answer.response,
         provider_key: Some(TWILIO_PROVIDER_KEY.to_owned()),
         created_message: None,
-        secret_values: list_secret_values(twilio_provider),
+        secret_values: twilio_answer.secret_values,
     }))
 }
 
@@ -252,6 +236,27 @@ fn list_secret_values(provider: &MessageProviderDefinition) -> Vec<String> {
         .filter(|credential| credential.is_secret)
         .map(|credential| credential.value.clone())
         .collect()
+}
+
+/// The operation, once the request's credentials and account allow it.
+async fn run_checked_operation(
+    operation_context: &OperationContext,
+    provider_call: &ProviderCall<'_>,
+) -> Result<ProviderAnswer, OperationError> {
+    Ok(
+        match check_twilio_account(operation_context, provider_call).await? {
+            TwilioAccountCheck::Allowed => {
+                run_operation_kind(operation_context, provider_call).await?
+            }
+            TwilioAccountCheck::Unauthorized => refuse(
+                provider_call,
+                "unauthorized",
+                "credentials",
+                "The credentials do not match",
+            ),
+            TwilioAccountCheck::Refused(refusal) => refusal,
+        },
+    )
 }
 
 fn refuse(

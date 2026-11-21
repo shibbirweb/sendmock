@@ -77,7 +77,8 @@ pub async fn run_reply_webhook(
     let reply_webhook_json = serde_json::to_string(&reply_webhook_result)
         .map_err(|write_error| OperationError::Internal(write_error.to_string()))?;
     operation_context
-        .sms_reply_webhook_repository
+        .sms_delivery_stores
+        .reply_webhooks
         .record_result(&inbound_sms.sms_id, reply_webhook_json)
         .await?;
     publish_reply_webhook_result(operation_context, &inbound_sms.sms_id).await?;

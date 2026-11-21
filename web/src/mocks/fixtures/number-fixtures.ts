@@ -18,6 +18,8 @@ export function buildVirtualNumberFixtures(): VirtualNumber[] {
       inbound_template_id: "twilio.inbound_sms",
       status_callback_url: "http://localhost:8000/sms/status",
       messaging_service_sid: notificationsServiceSid,
+      phone_number_sid: "PN00000000000000000000000000000001",
+      account_sid: null,
       created_by: "seed",
     },
     {
@@ -31,6 +33,8 @@ export function buildVirtualNumberFixtures(): VirtualNumber[] {
       inbound_template_id: null,
       status_callback_url: null,
       messaging_service_sid: notificationsServiceSid,
+      phone_number_sid: "PN00000000000000000000000000000002",
+      account_sid: null,
       created_by: "ui",
     },
     {
@@ -44,6 +48,8 @@ export function buildVirtualNumberFixtures(): VirtualNumber[] {
       inbound_template_id: "twilio.inbound_sms",
       status_callback_url: null,
       messaging_service_sid: whatsappServiceSid,
+      phone_number_sid: "PN00000000000000000000000000000003",
+      account_sid: null,
       created_by: "mcp",
     },
   ];

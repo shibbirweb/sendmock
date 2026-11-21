@@ -17347,6 +17347,18 @@ components:
           description: The Messaging Service this number belongs to, `MG...`; null for none.
           examples:
             - MG00000000000000000000000000000001
+        phone_number_sid:
+          type: string
+          description: The number's SID in Twilio's IncomingPhoneNumbers API.
+          examples:
+            - PN00000000000000000000000000000001
+        account_sid:
+          type:
+            - string
+            - "null"
+          description: The Twilio account the number belongs to; null for the main account.
+          examples:
+            - null
         created_by:
           $ref: "#/components/schemas/CreatedBy"
       required:
@@ -17360,6 +17372,8 @@ components:
         - inbound_template_id
         - status_callback_url
         - messaging_service_sid
+        - phone_number_sid
+        - account_sid
         - created_by
     VirtualNumberInput:
       type: object

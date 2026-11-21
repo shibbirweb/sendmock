@@ -13,8 +13,8 @@ pub use messaging_service_operations::{
 };
 pub(crate) use number_inputs::{MessagingServiceInput, VirtualNumberInput};
 pub use number_views::{MessagingService, VirtualNumber};
-pub(crate) use registry_fields::{field_error, is_http_url, read_optional_url};
-pub(crate) use virtual_number_builder::build_virtual_number;
+pub(crate) use registry_fields::{field_error, is_e164, is_http_url, read_optional_url};
+pub(crate) use virtual_number_builder::{build_virtual_number, generate_phone_number_sid};
 pub use virtual_number_operations::{
     CreateVirtualNumberOperation, DeleteVirtualNumberOperation, ListVirtualNumbersOperation,
     UpdateVirtualNumberOperation,

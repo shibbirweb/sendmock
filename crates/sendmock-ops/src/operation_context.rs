@@ -36,10 +36,8 @@ pub struct OperationContext {
     /// The Logs screen's SMTP sessions and API requests.
     pub logs: LogStores,
     pub sms_repository: SmsRepository,
-    /// Status callback attempts; the rows are also the callback retry queue.
-    pub sms_callback_attempt_repository: SmsCallbackAttemptRepository,
-    /// Reply webhook calls of inbound messages and their latest outcome.
-    pub sms_reply_webhook_repository: SmsReplyWebhookRepository,
+    /// Status callback attempts and reply webhook calls of SMS messages.
+    pub sms_delivery_stores: SmsDeliveryStores,
     pub sms_outcome_rule_repository: SmsOutcomeRuleRepository,
     pub virtual_number_repository: VirtualNumberRepository,
     pub messaging_service_repository: MessagingServiceRepository,
@@ -101,6 +99,24 @@ pub struct DispatchSignals {
     pub webhooks: Arc<tokio::sync::Notify>,
     /// A status callback retry was scheduled.
     pub status_callbacks: Arc<tokio::sync::Notify>,
+}
+
+/// What SMS messages leave behind as they are delivered.
+#[derive(Clone)]
+pub struct SmsDeliveryStores {
+    /// Status callback attempts; the rows are also the callback retry queue.
+    pub callback_attempts: SmsCallbackAttemptRepository,
+    /// Reply webhook calls of inbound messages and their latest outcome.
+    pub reply_webhooks: SmsReplyWebhookRepository,
+}
+
+impl SmsDeliveryStores {
+    fn new(database: &Arc<Database>) -> Self {
+        Self {
+            callback_attempts: SmsCallbackAttemptRepository::new(Arc::clone(database)),
+            reply_webhooks: SmsReplyWebhookRepository::new(Arc::clone(database)),
+        }
+    }
 }
 
 /// What payments keep beside the payments themselves.
@@ -224,8 +240,7 @@ impl OperationContext {
             payment_repository: PaymentRepository::new(share_database()),
             payment_stores: PaymentStores::new(&database),
             email_stores: EmailStores::new(&database),
-            sms_callback_attempt_repository: SmsCallbackAttemptRepository::new(share_database()),
-            sms_reply_webhook_repository: SmsReplyWebhookRepository::new(share_database()),
+            sms_delivery_stores: SmsDeliveryStores::new(&database),
             sms_outcome_rule_repository: SmsOutcomeRuleRepository::new(share_database()),
             virtual_number_repository: VirtualNumberRepository::new(share_database()),
             messaging_service_repository: MessagingServiceRepository::new(share_database()),

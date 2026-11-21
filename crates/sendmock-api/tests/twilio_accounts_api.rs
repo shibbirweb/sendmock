@@ -286,36 +286,65 @@ async fn the_request_log_masks_the_tokens_in_the_answer() {
     assert!(!logged_answer.contains(MAIN_AUTH_TOKEN), "{logged_answer}");
 }
 
-// AC: SM-19.4
-#[tokio::test]
-async fn subaccounts_are_managed_through_rest_with_tokens_masked_until_revealed() {
-    let (app_router, _) = build_test_app();
-    let new_subaccount = json!({
-        "account_sid": "AC22222222222222222222222222222222",
+const SHOP_SUBACCOUNT_SID: &str = "AC22222222222222222222222222222222";
+const SHOP_SUBACCOUNT_PATH: &str = "/api/v1/twilio/subaccounts/AC22222222222222222222222222222222";
+
+fn shop_subaccount_input() -> Value {
+    json!({
+        "account_sid": SHOP_SUBACCOUNT_SID,
         "friendly_name": "Shop",
         "auth_token": "shop-token-1234",
         "debugger_url": "https://shop.test/twilio/debugger",
-    });
+    })
+}
+
+async fn reveal_shop_token(app_router: &axum::Router) -> Value {
+    let (_, revealed) = call_api(
+        app_router,
+        "GET",
+        &format!("{SHOP_SUBACCOUNT_PATH}/auth-token"),
+        None,
+    )
+    .await;
+    revealed["auth_token"].clone()
+}
+
+// AC: SM-19.4
+#[tokio::test]
+async fn a_subaccount_added_through_rest_shows_its_token_masked_until_revealed() {
+    let (app_router, _) = build_test_app();
 
     let (create_status, created) = call_api(
         &app_router,
         "POST",
         "/api/v1/twilio/subaccounts",
-        Some(&new_subaccount),
+        Some(&shop_subaccount_input()),
     )
     .await;
     let (duplicate_status, _) = call_api(
         &app_router,
         "POST",
         "/api/v1/twilio/subaccounts",
-        Some(&new_subaccount),
+        Some(&shop_subaccount_input()),
     )
     .await;
-    let (_, revealed) = call_api(
+
+    assert_eq!(create_status, 201, "{created}");
+    assert_eq!(created["auth_token"], "••••1234");
+    assert_eq!(created["debugger_url"], "https://shop.test/twilio/debugger");
+    assert_eq!(duplicate_status, 409);
+    assert_eq!(reveal_shop_token(&app_router).await, "shop-token-1234");
+}
+
+// AC: SM-19.4
+#[tokio::test]
+async fn a_subaccount_edit_keeps_a_masked_token_and_a_removal_empties_the_list() {
+    let (app_router, _) = build_test_app();
+    call_api(
         &app_router,
-        "GET",
-        "/api/v1/twilio/subaccounts/AC22222222222222222222222222222222/auth-token",
-        None,
+        "POST",
+        "/api/v1/twilio/subaccounts",
+        Some(&shop_subaccount_input()),
     )
     .await;
     let kept_token_update = json!({
@@ -324,40 +353,24 @@ async fn subaccounts_are_managed_through_rest_with_tokens_masked_until_revealed(
         "auth_token": "••••1234",
         "debugger_url": null,
     });
+
     let (update_status, updated) = call_api(
         &app_router,
         "PATCH",
-        "/api/v1/twilio/subaccounts/AC22222222222222222222222222222222",
+        SHOP_SUBACCOUNT_PATH,
         Some(&kept_token_update),
     )
     .await;
-    let (_, revealed_after_update) = call_api(
-        &app_router,
-        "GET",
-        "/api/v1/twilio/subaccounts/AC22222222222222222222222222222222/auth-token",
-        None,
-    )
-    .await;
-    let (delete_status, _) = call_api(
-        &app_router,
-        "DELETE",
-        "/api/v1/twilio/subaccounts/AC22222222222222222222222222222222",
-        None,
-    )
-    .await;
+    let token_after_update = reveal_shop_token(&app_router).await;
+    let (delete_status, _) = call_api(&app_router, "DELETE", SHOP_SUBACCOUNT_PATH, None).await;
     let (_, listed_after_delete) =
         call_api(&app_router, "GET", "/api/v1/twilio/subaccounts", None).await;
 
-    assert_eq!(create_status, 201, "{created}");
-    assert_eq!(created["auth_token"], "••••1234");
-    assert_eq!(created["debugger_url"], "https://shop.test/twilio/debugger");
-    assert_eq!(duplicate_status, 409);
-    assert_eq!(revealed["auth_token"], "shop-token-1234");
     assert_eq!(update_status, 200, "{updated}");
     assert_eq!(updated["friendly_name"], "Shop EU");
     assert_eq!(updated["status"], "suspended");
     assert_eq!(updated["debugger_url"], Value::Null);
-    assert_eq!(revealed_after_update["auth_token"], "shop-token-1234");
+    assert_eq!(token_after_update, "shop-token-1234");
     assert_eq!(delete_status, 204);
     assert_eq!(listed_after_delete, json!([]));
 }
@@ -450,9 +463,7 @@ async fn a_send_under_a_suspended_subaccount_is_refused_and_nothing_is_stored() 
     assert_eq!(stored_page["items"], json!([]));
 }
 
-// AC: SM-19.5
-#[tokio::test]
-async fn status_callbacks_for_a_subaccount_message_are_signed_with_its_token() {
+async fn build_app_with_callback_recorder() -> (axum::Router, Arc<RecordingCallbackSender>) {
     let callback_sender = Arc::new(RecordingCallbackSender::default());
     let sender_for_context = Arc::clone(&callback_sender);
     let (app_router, _) = build_test_app_with(move |operation_context| {
@@ -465,16 +476,29 @@ async fn status_callbacks_for_a_subaccount_message_are_signed_with_its_token() {
         Some(&json!({ "sms_simulation_profile": "instant" })),
     )
     .await;
-    let new_subaccount = json!({
-        "account_sid": "AC22222222222222222222222222222222",
-        "friendly_name": "Shop",
-        "auth_token": "shop-token-1234",
-    });
+    (app_router, callback_sender)
+}
+
+fn read_callback_form(callback_body: &str) -> Value {
+    let pairs: Vec<(String, String)> =
+        serde_urlencoded::from_str(callback_body).unwrap_or_default();
+    Value::Object(
+        pairs
+            .into_iter()
+            .map(|(name, value)| (name, Value::from(value)))
+            .collect(),
+    )
+}
+
+// AC: SM-19.5
+#[tokio::test]
+async fn status_callbacks_for_a_subaccount_message_are_signed_with_its_token() {
+    let (app_router, callback_sender) = build_app_with_callback_recorder().await;
     call_api(
         &app_router,
         "POST",
         "/api/v1/twilio/subaccounts",
-        Some(&new_subaccount),
+        Some(&shop_subaccount_input()),
     )
     .await;
     let callback_url = "http://127.0.0.1:9/sms/status";
@@ -482,39 +506,26 @@ async fn status_callbacks_for_a_subaccount_message_are_signed_with_its_token() {
     let (status, _) = call_twilio(
         &app_router,
         "POST",
-        "/providers/twilio/2010-04-01/Accounts/AC22222222222222222222222222222222/Messages.json",
+        &format!("/providers/twilio/2010-04-01/Accounts/{SHOP_SUBACCOUNT_SID}/Messages.json"),
         &format!(
             "To=%2B8801700000000&From=%2B15005550006&Body=Hi&StatusCallback={}",
             callback_url.replace(':', "%3A").replace('/', "%2F")
         ),
-        Some(&basic_auth(
-            "AC22222222222222222222222222222222",
-            "shop-token-1234",
-        )),
+        Some(&basic_auth(SHOP_SUBACCOUNT_SID, "shop-token-1234")),
     )
     .await;
     let callback_requests = callback_sender.wait_for_requests(1).await;
 
     assert_eq!(status, 201);
-    let callback_request = &callback_requests[0];
-    let pairs: Vec<(String, String)> =
-        serde_urlencoded::from_str(&callback_request.body).unwrap_or_default();
-    let callback_form = Value::Object(
-        pairs
-            .into_iter()
-            .map(|(name, value)| (name, Value::from(value)))
-            .collect(),
-    );
+    let callback_form = read_callback_form(&callback_requests[0].body);
+    let signature = &callback_requests[0].headers["X-Twilio-Signature"];
+    assert_eq!(callback_form["AccountSid"], SHOP_SUBACCOUNT_SID);
     assert_eq!(
-        callback_form["AccountSid"],
-        "AC22222222222222222222222222222222"
-    );
-    assert_eq!(
-        callback_request.headers["X-Twilio-Signature"],
-        sign_twilio_request(callback_url, &callback_form, "shop-token-1234")
+        signature,
+        &sign_twilio_request(callback_url, &callback_form, "shop-token-1234")
     );
     assert_ne!(
-        callback_request.headers["X-Twilio-Signature"],
-        sign_twilio_request(callback_url, &callback_form, MAIN_AUTH_TOKEN)
+        signature,
+        &sign_twilio_request(callback_url, &callback_form, MAIN_AUTH_TOKEN)
     );
 }

@@ -44,7 +44,8 @@ pub async fn send_status_callback(
         created_at_unix_ms: operation_context.clock.now_unix_ms(),
     };
     operation_context
-        .sms_callback_attempt_repository
+        .sms_delivery_stores
+        .callback_attempts
         .insert_attempt(first_attempt.clone())
         .await?;
     send_callback_attempt(operation_context, &first_attempt).await
