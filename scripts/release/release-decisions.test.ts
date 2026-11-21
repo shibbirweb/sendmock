@@ -62,25 +62,22 @@ describe("decidePublication", () => {
 
 const noSecurityItems = {
   codeScanningAlerts: [],
-  dependabotAlerts: [],
   dependabotPullRequests: [],
 };
 
 describe("findReleaseBlockers", () => {
-  test("PL-19.5 refuses while a code scanning alert, Dependabot alert or Dependabot pull request is open", () => {
+  test("PL-19.5 refuses while a code scanning alert on main or a Dependabot pull request is open", () => {
     expect(
       findReleaseBlockers({
         ciConclusion: "success",
         openReleasePullRequestNumbers: [],
         openSecurityItems: {
           codeScanningAlerts: ["#60 rust/unsafe-deserialization in a.rs"],
-          dependabotAlerts: ["#1 glib in Cargo.lock"],
           dependabotPullRequests: ["#327 bump the github-actions group"],
         },
       }),
     ).toEqual([
       "Code scanning alert #60 rust/unsafe-deserialization in a.rs is open; fix, merge or dismiss it with a reason first.",
-      "Dependabot alert #1 glib in Cargo.lock is open; fix, merge or dismiss it with a reason first.",
       "Dependabot pull request #327 bump the github-actions group is open; fix, merge or dismiss it with a reason first.",
     ]);
   });

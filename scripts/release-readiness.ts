@@ -43,7 +43,10 @@ process.env.SECURITY_ALERTS_TOKEN ||= ghToken;
 const securityItems = await fetchSecurityItems();
 const securityLists: [string, string[]][] = [
   ["Open code scanning alerts on main", securityItems.codeScanningAlerts],
-  ["Open Dependabot alerts", securityItems.dependabotAlerts],
+  [
+    "Open Dependabot alerts (read on main, so a release's own fixes close them only once it is there)",
+    securityItems.dependabotAlerts,
+  ],
   ["Open Dependabot pull requests", securityItems.dependabotPullRequests],
 ];
 for (const [listTitle, openItems] of securityLists) {
