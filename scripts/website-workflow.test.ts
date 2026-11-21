@@ -72,7 +72,7 @@ describe("Website workflow", () => {
       "id-token": "write",
     });
     expect(deployJob?.steps.map((step) => step.uses)).toEqual([
-      "actions/deploy-pages@v4",
+      "actions/deploy-pages@v5",
     ]);
 
     expect(websiteWorkflow.permissions).toEqual({ contents: "read" });

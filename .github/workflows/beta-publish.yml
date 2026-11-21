@@ -24,7 +24,7 @@ jobs:
       version: ${{ steps.decision.outputs.version }}
       tag_name: ${{ steps.decision.outputs.tag_name }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 0
@@ -40,7 +40,7 @@ jobs:
     if: needs.decide.outputs.should_act == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
 
