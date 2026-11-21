@@ -58,6 +58,7 @@ impl EmbeddedServer {
     /// a server already does. The server runs on the current runtime.
     pub async fn start_unless_running(
         server_url: &str,
+        uses_last_run: bool,
     ) -> Result<Option<Self>, EmbeddedServerError> {
         let http_addr = parse_local_http_addr(server_url).ok_or_else(|| {
             EmbeddedServerError::NotLocalAddress {
@@ -70,6 +71,9 @@ impl EmbeddedServer {
         let mut serve_arguments =
             EmbeddedServeSettings::try_parse_from(["sendmock"])?.serve_arguments;
         serve_arguments.http_addr = Some(http_addr);
+        if uses_last_run {
+            crate::launcher::apply_last_run(&mut serve_arguments);
+        }
         // Stdout carries the MCP messages, so nothing else may be printed there.
         serve_arguments.ready_json = false;
         let (server_config, database) = prepare_server(&serve_arguments, true)?;

@@ -17,6 +17,7 @@ mod http_response_recording;
 mod http_setup_fetcher;
 mod http_webhook_sender;
 mod instance_details_builder;
+mod launcher;
 mod listener_binding;
 mod logging;
 mod mcp_command;
@@ -72,7 +73,13 @@ fn main() -> ExitCode {
     let cli_arguments = CliArguments::from_arg_matches(&root_matches)
         .unwrap_or_else(|parse_error| parse_error.exit());
     match cli_arguments.built_in_command() {
-        BuiltInCommand::Serve(serve_arguments) => server_startup::start_server(serve_arguments),
+        BuiltInCommand::Serve(serve_arguments) => match launcher::prepare_launch(serve_arguments) {
+            launcher::LaunchPlan::Start(launched_arguments) => {
+                server_startup::start_server(&launched_arguments)
+            }
+            launcher::LaunchPlan::Stop(exit_code) => exit_code,
+        },
+        BuiltInCommand::LastRun { action, json } => launcher::run_last_run_command(action, json),
         BuiltInCommand::Mcp(mcp_arguments) => mcp_command::run_mcp_command(mcp_arguments),
         BuiltInCommand::Version { json } => version_output::print_version(*json),
         BuiltInCommand::Help { all, json } => {

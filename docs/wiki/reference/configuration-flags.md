@@ -46,3 +46,6 @@ Each setting can come from a flag, a `SENDMOCK_*` environment variable or a key 
 | `--log-format <LOG_FORMAT>` | `SENDMOCK_LOG_FORMAT` | `log_format` | `human` | Log output: readable lines, or one JSON object per line for log collectors. |
 | `--log-level <LOG_LEVEL>` | `SENDMOCK_LOG_LEVEL` | `log_level` | `info` | Lowest log level shown. |
 | `--seed <FILE>` | `SENDMOCK_SEED` | `seed` | ./sendmock.seed.toml when present | Seed file with the configuration to start from. |
+| `--last` |  |  |  | Start the services the launcher saved last, without asking; flags given with it win. |
+| `--services <LIST>` | `SENDMOCK_SERVICES` |  |  | Start these services on their saved or default addresses, without asking: smtp, smtps, provider, provider-tls, catcher, pop3 (comma-separated). |
+| `--no-input` | `SENDMOCK_NO_INPUT` |  |  | Never ask questions, even at a terminal. |

@@ -16,6 +16,47 @@ Ports, database path, auth, relay SMTP and retention. Precedence, highest first:
 
 Every flag, with its variable, key and default, is in [Configuration flags](./reference/configuration-flags.md).
 
+## Choose what starts: the launcher
+
+Run `sendmock` alone in a terminal and it asks which services to start: the web UI, REST API and MCP (always on), SMTP (always on), SMTPS, the provider APIs over HTTP and HTTPS, the HTTP Catcher's catch-all port and POP3, each with its address.
+
+1. Tick the services with Space and press Enter.
+2. Press Enter again on **Run**, or choose **Change ports** to edit each address (a port in use or chosen twice is named, with the next free one offered), **Reset to defaults** or **Cancel**.
+
+SendMock saves the choice to `last-run.toml` in its config folder (next to `sendmock.toml`; `SENDMOCK_LAST_RUN_FILE` moves it) and prints the same start as a `sendmock serve` command for scripts. The next time, the list starts with that choice ticked, so Enter twice starts it again. The file holds addresses only, never secrets; a corrupt file or one from a newer SendMock is ignored with a warning.
+
+SendMock asks only when you type `sendmock` alone with a terminal on both ends. With any command or option, in a pipe, with `CI` set, or with `--no-input` (`SENDMOCK_NO_INPUT=1`, which the Docker image sets) it asks nothing and starts as before.
+
+Start without questions:
+
+- the saved choice; flags given with it win for that run:
+
+```bash
+sendmock --last
+```
+
+- the saved choice for an agent's embedded SendMock:
+
+```bash
+sendmock mcp --embedded --last
+```
+
+- named services on their saved or default addresses (`smtp`, `smtps`, `provider`, `provider-tls`, `catcher`, `pop3`; `SENDMOCK_SERVICES` too):
+
+```bash
+sendmock --services smtp,catcher,pop3
+```
+
+See or clear the saved choice:
+
+```bash
+sendmock last-run
+```
+
+```bash
+sendmock last-run clear
+```
+
 ## What SendMock starts with: `sendmock.seed.toml`
 
 Endpoints, rules, templates, variables, numbers, Messaging Services, Verify services and payment setup. **Reset to seed** in Settings (or `POST /api/v1/reset`) deletes all traffic and restores this file, so every test run starts from the same state.

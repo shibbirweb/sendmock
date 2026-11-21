@@ -28,6 +28,7 @@ sendmock-mcp.workspace = true
 
 axum.workspace = true
 clap.workspace = true
+dialoguer.workspace = true
 dirs.workspace = true
 reqwest.workspace = true
 rcgen.workspace = true

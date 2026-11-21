@@ -18,5 +18,5 @@ pub use log_format::LogFormat;
 pub use log_level::LogLevel;
 pub use pop3_config::Pop3Config;
 pub use provider_port_config::{ProviderPortConfig, ProviderTlsConfig};
-pub use server_config::ServerConfig;
+pub use server_config::{DEFAULT_SMTP_ADDR, ServerConfig};
 pub use startup_settings_config::StartupSettingsConfig;

@@ -72,7 +72,7 @@ pub fn run_mcp_command(mcp_arguments: &McpArguments) -> ExitCode {
     };
     let served = runtime.block_on(async {
         let embedded_server = if mcp_arguments.embedded {
-            EmbeddedServer::start_unless_running(&server_url)
+            EmbeddedServer::start_unless_running(&server_url, mcp_arguments.last)
                 .await
                 .map_err(|embedded_error| embedded_error.to_string())?
         } else {

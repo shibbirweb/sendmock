@@ -206,4 +206,16 @@ pub struct ServeArguments {
     /// Seed file with the configuration to start from [default: ./sendmock.seed.toml when present]
     #[arg(long = "seed", env = "SENDMOCK_SEED", value_name = "FILE")]
     pub seed_file_path: Option<PathBuf>,
+
+    /// Start the services the launcher saved last, without asking; flags given with it win
+    #[arg(long)]
+    pub last: bool,
+
+    /// Start these services on their saved or default addresses, without asking: smtp, smtps, provider, provider-tls, catcher, pop3 (comma-separated)
+    #[arg(long, env = "SENDMOCK_SERVICES", value_name = "LIST")]
+    pub services: Option<String>,
+
+    /// Never ask questions, even at a terminal
+    #[arg(long, env = "SENDMOCK_NO_INPUT")]
+    pub no_input: bool,
 }
