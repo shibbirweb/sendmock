@@ -8,6 +8,8 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-11-21
+
 ### Added
 
 - **Website footer wordmark:** the website's landing, changelog, reference and playground pages end with a large SendMock wordmark drawn in small squares that show how many times SendMock was downloaded on each of the last 7 days (npm, crates.io and PyPI), oldest day on the left and the busiest day brightest. Move the pointer near it and a soft light brightens the squares; on phones and tablets it rests still.
