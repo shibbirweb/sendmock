@@ -4024,6 +4024,160 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock sms twilio subaccounts list",
+    "usage": "sendmock sms twilio subaccounts list",
+    "aliases": [],
+    "summary": "Subaccounts of the Twilio provider's main account, tokens masked.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/twilio/subaccounts",
+        "operation_id": "getTwilioSubaccounts",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_twilio_subaccount_list"
+    ]
+  },
+  {
+    "command": "sendmock sms twilio subaccounts create",
+    "usage": "sendmock sms twilio subaccounts create",
+    "aliases": [],
+    "summary": "Add a Twilio subaccount with its own auth token.",
+    "arguments": [],
+    "flags": [
+      "--account-sid",
+      "--auth-token",
+      "--debugger-url",
+      "--friendly-name",
+      "--status"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/twilio/subaccounts",
+        "operation_id": "postTwilioSubaccounts",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_twilio_subaccount_create"
+    ]
+  },
+  {
+    "command": "sendmock sms twilio subaccounts update",
+    "usage": "sendmock sms twilio subaccounts update <accountSid>",
+    "aliases": [],
+    "summary": "Change a Twilio subaccount's name, status, token or Debugger URL.",
+    "arguments": [
+      "accountSid"
+    ],
+    "flags": [
+      "--auth-token",
+      "--debugger-url",
+      "--friendly-name",
+      "--status"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/twilio/subaccounts/{accountSid}",
+        "operation_id": "patchTwilioSubaccountsByAccountSid",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_twilio_subaccount_update"
+    ]
+  },
+  {
+    "command": "sendmock sms twilio subaccounts delete",
+    "usage": "sendmock sms twilio subaccounts delete <accountSid>",
+    "aliases": [],
+    "summary": "Remove a Twilio subaccount; its messages stay.",
+    "arguments": [
+      "accountSid"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/twilio/subaccounts/{accountSid}",
+        "operation_id": "deleteTwilioSubaccountsByAccountSid",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_twilio_subaccount_delete"
+    ]
+  },
+  {
+    "command": "sendmock sms twilio subaccounts token",
+    "usage": "sendmock sms twilio subaccounts token <accountSid> --reveal",
+    "aliases": [],
+    "summary": "Reveal a subaccount's auth token (asked for after a confirmation).",
+    "arguments": [
+      "accountSid"
+    ],
+    "flags": [
+      "--reveal"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/twilio/subaccounts/{accountSid}/auth-token",
+        "operation_id": "getTwilioSubaccountsByAccountSidAuthToken",
+        "selector": null
+      }
+    ],
+    "mcp": []
+  },
+  {
+    "command": "sendmock email mailgun complaints list",
+    "usage": "sendmock email mailgun complaints list",
+    "aliases": [],
+    "summary": "Addresses on each Mailgun domain's complaints table.",
+    "arguments": [],
+    "flags": [
+      "--domain"
+    ],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/mailgun/complaints",
+        "operation_id": "getMailgunComplaints",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_mailgun_complaint_list"
+    ]
+  },
+  {
+    "command": "sendmock email mailgun complaints clear",
+    "usage": "sendmock email mailgun complaints clear <domain>",
+    "aliases": [],
+    "summary": "Clear a Mailgun domain's complaints, so its addresses get mail again.",
+    "arguments": [
+      "domain"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/mailgun/complaints/{domain}",
+        "operation_id": "deleteMailgunComplaintsByDomain",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_mailgun_complaint_clear"
+    ]
+  },
+  {
     "command": "sendmock verify list",
     "usage": "sendmock verify list",
     "aliases": [],
