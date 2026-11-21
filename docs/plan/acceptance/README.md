@@ -57,7 +57,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 129 / 154 features, 636 / 790 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 129 / 154 features, 636 / 791 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -146,7 +146,7 @@ On top of its own criteria, a feature is done only when:
 | [PL-16](04-catcher-platform.md#pl-16-real-provider-connections) | Real provider connections | 2.0.0 (A14a) | 7 | Not started |
 | [PL-17](04-catcher-platform.md#pl-17-forwarding-rules-for-email-and-sms) | Forwarding rules for email and SMS | 2.0.0 (A14b) | 8 | Not started |
 | [PL-18](04-catcher-platform.md#pl-18-versioned-setup-export-and-import) | Versioned setup export and import | 1.3.0 (A18) | 9 | Accepted |
-| [PL-19](04-catcher-platform.md#pl-19-security-and-quality-clean-up) | Security and quality clean-up | 1.3.1 (A22) | 5 | Not started |
+| [PL-19](04-catcher-platform.md#pl-19-security-and-quality-clean-up) | Security and quality clean-up | 1.3.1 (A22) | 6 | In progress |
 | [PL-20](04-catcher-platform.md#pl-20-https-on-the-provider-port) | HTTPS on the provider port | 1.4.0 (A23) | 5 | Not started |
 | [PL-21](04-catcher-platform.md#pl-21-http-catcher-bins-on-a-providers-own-url) | HTTP Catcher bins on a provider's own URL | 1.4.0 (A23) | 7 | Not started |
 | [PL-22](04-catcher-platform.md#pl-22-interactive-launcher) | Interactive launcher | 1.4.0 (A24) | 7 | Not started |
