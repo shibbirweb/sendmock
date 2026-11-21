@@ -153,13 +153,30 @@ fn last_run_prints_the_saved_choice_as_json_and_clear_deletes_it() -> io::Result
 
 // AC: PL-22.1
 #[test]
+fn no_input_from_the_environment_reads_one_as_true_as_the_docker_image_sets_it() -> io::Result<()> {
+    let working_directory = tempfile::tempdir()?;
+    let mut command = launcher_command(working_directory.path());
+    command.env("SENDMOCK_NO_INPUT", "1");
+
+    let output = run_until_exit(command.args(["last-run", "--json"]))?;
+
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    Ok(())
+}
+
+// AC: PL-22.1
+#[test]
 fn a_bare_sendmock_without_a_terminal_asks_nothing_and_starts() -> io::Result<()> {
     let working_directory = tempfile::tempdir()?;
     let mut command = launcher_command(working_directory.path());
     command
         .env("SENDMOCK_HTTP_ADDR", "127.0.0.1:0")
         .env("SENDMOCK_DB", "memory")
-        .env("SENDMOCK_READY_JSON", "1");
+        .env("SENDMOCK_READY_JSON", "true");
 
     let server = SendmockProcess::start(&mut command)?;
     let ready_fields = read_ready_fields(&server)?;

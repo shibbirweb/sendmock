@@ -234,6 +234,10 @@ pub struct ServeArguments {
     pub services: Option<String>,
 
     /// Never ask questions, even at a terminal
-    #[arg(long, env = "SENDMOCK_NO_INPUT")]
+    #[arg(
+        long,
+        env = "SENDMOCK_NO_INPUT",
+        value_parser = clap::builder::FalseyValueParser::new()
+    )]
     pub no_input: bool,
 }

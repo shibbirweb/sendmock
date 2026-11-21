@@ -59,7 +59,7 @@ fn build_client(matched_operation: &MatchedOperation, server_url: String) -> Api
 }
 
 async fn run_ci_file(matched_operation: &MatchedOperation) -> Result<bool, CliError> {
-    let location = read_flag(matched_operation, "file")
+    let location = read_flag(matched_operation, "ci_file")
         .cloned()
         .unwrap_or_default();
     let (ci_text, base_directory) = read_ci_source(&location).await?;
@@ -106,8 +106,8 @@ async fn init_ci_files(matched_operation: &MatchedOperation) -> Result<(), CliEr
     );
     let input = json!({
         "provider": provider,
-        "setup_url": read_flag(matched_operation, "setup-url"),
-        "app_url": read_flag(matched_operation, "app-url"),
+        "setup_url": read_flag(matched_operation, "setup_url"),
+        "app_url": read_flag(matched_operation, "app_url"),
     });
     let answer = build_client(matched_operation, server_url)
         .call_operation(matched_operation.operation.definition(), &input)

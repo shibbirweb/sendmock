@@ -453,7 +453,7 @@
       ],
       "aliases": [],
       "annotations": {
-        "read_only_hint": false,
+        "read_only_hint": true,
         "destructive_hint": false,
         "idempotent_hint": false
       },
@@ -34535,7 +34535,7 @@
       ],
       "aliases": [],
       "annotations": {
-        "read_only_hint": false,
+        "read_only_hint": true,
         "destructive_hint": false,
         "idempotent_hint": false
       },

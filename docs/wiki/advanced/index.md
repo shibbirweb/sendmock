@@ -44,6 +44,7 @@ Everything here can also be done by an AI agent: see [Build it with AI](../ai/bu
 | --- | --- |
 | [Seed file](./seed-file.md) | your setup as a file in your repository, for your team and CI |
 | [Scenarios](./scenarios.md) | multi-step tests you write once and run again |
+| [Webhook tests in CI](./ci-pipelines.md) | a CI file, `sendmock ci run` with JUnit reports, and a job for each CI system |
 
 ## What still needs code
 
