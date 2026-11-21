@@ -37,7 +37,8 @@ describe("SMS clients workflow", () => {
       (clientEntry) =>
         clientEntry.client.startsWith("Twilio ") &&
         !clientEntry.client.endsWith("with a subaccount") &&
-        !clientEntry.client.endsWith("with numbers"),
+        !clientEntry.client.endsWith("with numbers") &&
+        !clientEntry.client.endsWith("answered by a provider bin"),
     );
     expect(twilioEntries.map((clientEntry) => clientEntry.client)).toEqual([
       "Twilio Node SDK",
