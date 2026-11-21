@@ -13,8 +13,15 @@ const buildDays = [
   { date: "2026-01-07", downloads: 12, level: 2 },
 ];
 
-async function openFooterWordmark(page: Page) {
-  await page.goto("/");
+/**
+ * A page with the footer and no motion components. The landing page's flow beams repeat
+ * forever, so they request animation frames of their own, and its motion components can
+ * re-render the page under reduced motion while a test reaches for the footer.
+ */
+const quietPagePath = "/changelog";
+
+async function openFooterWordmark(page: Page, pagePath = "/") {
+  await page.goto(pagePath);
   const wordmark = page.locator("[data-footer-wordmark]");
   await wordmark.scrollIntoViewIfNeeded();
   const canvas = wordmark.locator("canvas");
@@ -171,7 +178,7 @@ test("WS-15.5 no animation frame runs once the spotlight has settled", async ({
     };
   });
   await mockDownloadRegistries(page, { isFailing: true });
-  const { wordmark, canvas } = await openFooterWordmark(page);
+  const { wordmark, canvas } = await openFooterWordmark(page, quietPagePath);
   const wordmarkBox = await findWordmarkBox(wordmark);
 
   await page.mouse.move(
@@ -201,7 +208,7 @@ test("WS-15.5 with reduced motion the spotlight moves without easing and the squ
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await mockDownloadRegistries(page, { isFailing: true });
-  const { wordmark, canvas } = await openFooterWordmark(page);
+  const { wordmark, canvas } = await openFooterWordmark(page, quietPagePath);
   const wordmarkBox = await findWordmarkBox(wordmark);
   const middleY = wordmarkBox.y + wordmarkBox.height / 2;
   await page.mouse.move(wordmarkBox.x + 20, middleY);
