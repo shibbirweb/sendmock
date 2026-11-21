@@ -85,6 +85,26 @@ paths:
       x-sendmock-cli: sendmock status
       x-sendmock-mcp: sendmock_status
       x-sendmock-ui: Settings > About
+  /api/v1/tls/ca:
+    get:
+      operationId: getTlsCa
+      summary: The local CA to trust for the HTTPS provider port.
+      tags:
+        - System
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TlsCertificateAuthority"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock tls ca
+      x-sendmock-mcp: sendmock_tls_ca
+      x-sendmock-ui: Settings > Connection > Provider APIs over HTTPS > Download the CA
   /api/v1/stats:
     get:
       operationId: getStats
@@ -8663,6 +8683,11 @@ components:
           type:
             - string
             - "null"
+        provider_tls_address:
+          type:
+            - string
+            - "null"
+          description: The provider APIs over HTTPS (`--provider-tls-addr`); null when it is off.
         catcher_address:
           type:
             - string
@@ -8692,6 +8717,7 @@ components:
         - smtp_address
         - http_address
         - provider_address
+        - provider_tls_address
         - catcher_address
         - pop3_address
         - database_path
@@ -16834,6 +16860,32 @@ components:
         - outcome
         - decline_reason
       description: A test account number or voucher code with its outcome.
+    TlsCertificateAuthority:
+      type: object
+      properties:
+        path:
+          type: string
+          description: Where the CA certificate is on the machine SendMock runs on.
+          examples:
+            - /home/sam/.local/share/sendmock/provider-ca-certificate.pem
+        pem:
+          type: string
+          description: The CA certificate (PEM), to add to a trust store or `NODE_EXTRA_CA_CERTS`.
+          examples:
+            - |
+              -----BEGIN CERTIFICATE-----
+              ...
+              -----END CERTIFICATE-----
+        provider_tls_address:
+          type: string
+          description: The provider APIs over HTTPS.
+          examples:
+            - 127.0.0.1:8027
+      required:
+        - path
+        - pem
+        - provider_tls_address
+      description: SendMock's local CA, to trust for the HTTPS provider port.
     TwilioAccountStatus:
       type: string
       enum:

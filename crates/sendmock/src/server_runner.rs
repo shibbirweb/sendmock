@@ -27,6 +27,9 @@ use crate::pop3_startup::{bind_pop3_listener, serve_pop3_listener};
 use crate::provider_listeners::{
     ProviderListener, bind_provider_listeners, start_provider_listeners,
 };
+use crate::provider_tls::{
+    BoundTlsProviderListener, bind_tls_provider_listener, start_tls_provider_listener,
+};
 use crate::retention_task::{apply_startup_settings, run_retention_task};
 use crate::seed_file_check::apply_seed_file;
 use crate::shutdown_signal::ShutdownSignal;
@@ -46,6 +49,7 @@ struct BoundListeners {
     smtps_listener: Option<TcpListener>,
     pop3_listener: Option<TcpListener>,
     provider_listeners: Vec<ProviderListener>,
+    provider_tls_listener: Option<BoundTlsProviderListener>,
     catcher_listener: Option<TcpListener>,
     addresses: ListenerAddresses,
 }
@@ -58,6 +62,8 @@ struct ListenerAddresses {
     smtps_addr: Option<SocketAddr>,
     /// The listener serving every provider at its real paths, when configured.
     provider_addr: Option<SocketAddr>,
+    /// The provider APIs over HTTPS, when configured.
+    provider_tls_addr: Option<SocketAddr>,
     /// The HTTP catcher's catch-all listener, when configured.
     catcher_addr: Option<SocketAddr>,
     /// The POP3 listener, when configured.
@@ -83,17 +89,17 @@ pub async fn run_server(
     )?;
     start_extra_http_listeners(
         &mut background_tasks,
-        listeners.provider_listeners,
+        (
+            listeners.provider_listeners,
+            listeners.provider_tls_listener,
+        ),
         listeners
             .catcher_listener
             .zip(listeners.addresses.catcher_addr),
         &operation_context,
         &shutdown_receiver_for_providers,
     );
-    if let Some(seed_file_path) = &server_config.seed_file_path {
-        apply_seed_file(seed_file_path, &operation_context).await?;
-    }
-    apply_startup_settings(server_config, &operation_context).await;
+    apply_startup_data(server_config, &operation_context).await?;
     let shutdown_signal = ShutdownSignal::install().map_err(StartupError::Runtime)?;
     start_background_work(
         &mut background_tasks,
@@ -121,7 +127,10 @@ pub async fn run_server(
 /// The provider listeners and the catch-all catcher listener, each stopping on the shutdown signal.
 fn start_extra_http_listeners(
     background_tasks: &mut JoinSet<()>,
-    provider_listeners: Vec<ProviderListener>,
+    (provider_listeners, provider_tls_listener): (
+        Vec<ProviderListener>,
+        Option<BoundTlsProviderListener>,
+    ),
     catcher_listener: Option<(TcpListener, SocketAddr)>,
     operation_context: &OperationContext,
     shutdown_receiver: &watch::Receiver<bool>,
@@ -132,6 +141,14 @@ fn start_extra_http_listeners(
         operation_context,
         shutdown_receiver,
     );
+    if let Some(tls_listener) = provider_tls_listener {
+        start_tls_provider_listener(
+            background_tasks,
+            tls_listener,
+            operation_context,
+            shutdown_receiver,
+        );
+    }
     if let Some((catcher_listener, catcher_addr)) = catcher_listener {
         start_catcher_listener(
             background_tasks,
@@ -267,6 +284,10 @@ fn build_operation_context(database: Database, listeners: &BoundListeners) -> Op
             listeners.addresses.provider_addr,
             listeners.addresses.catcher_addr,
             listeners.addresses.pop3_addr,
+            listeners
+                .provider_tls_listener
+                .as_ref()
+                .map(|tls_listener| tls_listener.details.clone()),
             started_at_unix_ms,
         ),
     )
@@ -311,6 +332,38 @@ fn reachable_address(listen_address: SocketAddr) -> SocketAddr {
     }
 }
 
+/// The seed file, when given, then the settings startup flags set.
+async fn apply_startup_data(
+    server_config: &ServerConfig,
+    operation_context: &OperationContext,
+) -> Result<(), StartupError> {
+    if let Some(seed_file_path) = &server_config.seed_file_path {
+        apply_seed_file(seed_file_path, operation_context).await?;
+    }
+    apply_startup_settings(server_config, operation_context).await;
+    Ok(())
+}
+
+fn read_local_address(
+    listener: &TcpListener,
+    configured_address: SocketAddr,
+) -> Result<SocketAddr, StartupError> {
+    listener
+        .local_addr()
+        .map_err(|source| StartupError::Listen {
+            address: configured_address,
+            source,
+        })
+}
+
+/// The listener for every provider at their real paths, not one provider's own port.
+fn find_shared_provider_addr(provider_listeners: &[ProviderListener]) -> Option<SocketAddr> {
+    provider_listeners
+        .iter()
+        .find(|provider_listener| provider_listener.is_shared())
+        .map(|provider_listener| provider_listener.bound_addr)
+}
+
 async fn bind_listeners(server_config: &ServerConfig) -> Result<BoundListeners, StartupError> {
     let http_listener = bind_listener(server_config.http_addr, "--http-addr").await?;
     let smtp_listener = bind_listener(server_config.smtp_addr, "--smtp-addr").await?;
@@ -319,29 +372,26 @@ async fn bind_listeners(server_config: &ServerConfig) -> Result<BoundListeners, 
         None => None,
     };
     let provider_listeners = bind_provider_listeners(&server_config.provider_ports).await?;
+    let provider_tls_listener = bind_tls_provider_listener(
+        server_config.provider_ports.tls.as_ref(),
+        server_config.generated_files_folder().as_deref(),
+    )
+    .await?;
     let catcher_listener = match server_config.catcher_addr {
         Some(catcher_addr) => Some(bind_listener(catcher_addr, "--catcher-addr").await?),
         None => None,
     };
     let pop3_listener = bind_pop3_listener(server_config).await?;
-    let local_address = |listener: &TcpListener, configured_address: SocketAddr| {
-        listener
-            .local_addr()
-            .map_err(|source| StartupError::Listen {
-                address: configured_address,
-                source,
-            })
-    };
     let addresses = ListenerAddresses {
-        http_addr: local_address(&http_listener, server_config.http_addr)?,
-        smtp_addr: local_address(&smtp_listener, server_config.smtp_addr)?,
+        http_addr: read_local_address(&http_listener, server_config.http_addr)?,
+        smtp_addr: read_local_address(&smtp_listener, server_config.smtp_addr)?,
         smtps_addr: smtps_listener
             .as_ref()
             .and_then(|listener| listener.local_addr().ok()),
-        provider_addr: provider_listeners
-            .iter()
-            .find(|provider_listener| provider_listener.is_shared())
-            .map(|provider_listener| provider_listener.bound_addr),
+        provider_addr: find_shared_provider_addr(&provider_listeners),
+        provider_tls_addr: provider_tls_listener
+            .as_ref()
+            .map(|tls_listener| tls_listener.bound_addr),
         catcher_addr: catcher_listener
             .as_ref()
             .and_then(|listener| listener.local_addr().ok()),
@@ -355,6 +405,7 @@ async fn bind_listeners(server_config: &ServerConfig) -> Result<BoundListeners, 
         smtps_listener,
         pop3_listener,
         provider_listeners,
+        provider_tls_listener,
         catcher_listener,
         addresses,
     })
@@ -370,6 +421,7 @@ fn announce_ready(
         smtp_addr,
         smtps_addr,
         provider_addr,
+        provider_tls_addr,
         catcher_addr,
         pop3_addr,
     } = addresses;
@@ -385,6 +437,7 @@ fn announce_ready(
             "smtp_addr": smtp_addr.to_string(),
             "smtps_addr": smtps_addr.map(|smtps_addr| smtps_addr.to_string()),
             "provider_addr": provider_addr.map(|provider_addr| provider_addr.to_string()),
+            "provider_tls_addr": provider_tls_addr.map(|tls_addr| tls_addr.to_string()),
             "catcher_addr": catcher_addr.map(|catcher_addr| catcher_addr.to_string()),
             "pop3_addr": pop3_addr.map(|pop3_addr| pop3_addr.to_string()),
             "version": env!("CARGO_PKG_VERSION"),
@@ -396,6 +449,7 @@ fn announce_ready(
         smtp_addr = %smtp_addr,
         smtps_addr = ?smtps_addr,
         provider_addr = ?provider_addr,
+        provider_tls_addr = ?provider_tls_addr,
         catcher_addr = ?catcher_addr,
         pop3_addr = ?pop3_addr,
         database = %operation_context.database.location(),

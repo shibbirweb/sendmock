@@ -22,6 +22,7 @@ mod logging;
 mod mcp_command;
 mod pop3_startup;
 mod provider_listeners;
+mod provider_tls;
 #[cfg(test)]
 mod reference_pages;
 mod retention_task;

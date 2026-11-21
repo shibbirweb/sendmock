@@ -33,6 +33,7 @@ pub fn build_test_app_with(
             provider_address: None,
             catcher_address: None,
             pop3_address: None,
+            provider_tls: None,
             is_container: false,
         },
     );

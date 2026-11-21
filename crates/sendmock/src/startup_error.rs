@@ -50,6 +50,9 @@ pub enum StartupError {
     #[error(transparent)]
     SmtpTls(#[from] sendmock_smtp::TlsSetupError),
 
+    #[error("Could not set up HTTPS for the provider APIs: {0}")]
+    ProviderTls(String),
+
     #[error("Could not start the server runtime: {0}")]
     Runtime(io::Error),
 }
@@ -64,6 +67,7 @@ impl StartupError {
             | Self::Listen { .. }
             | Self::Database(_)
             | Self::SmtpTls(_)
+            | Self::ProviderTls(_)
             | Self::Runtime(_) => ExitCode::from(ERROR_EXIT_CODE),
         }
     }

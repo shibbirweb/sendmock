@@ -18159,6 +18159,41 @@
       ]
     },
     {
+      "command": "sendmock tls ca",
+      "slug": "tls-ca",
+      "usage": "sendmock tls ca",
+      "summary": "The local CA to trust for the HTTPS provider port.",
+      "area": "System",
+      "area_slug": "system",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/tls/ca",
+          "operation_id": "getTlsCa",
+          "summary": "The local CA to trust for the HTTPS provider port.",
+          "area_slug": "system",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [],
+      "example": "sendmock tls ca",
+      "output": "TlsCertificateAuthority",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_tls_ca"
+      ],
+      "ui": [
+        "Settings > Connection > Provider APIs over HTTPS > Download the CA"
+      ]
+    },
+    {
       "command": "sendmock traffic delete-all",
       "slug": "traffic-delete-all",
       "usage": "sendmock traffic delete-all --yes",

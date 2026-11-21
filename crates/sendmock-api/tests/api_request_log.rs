@@ -25,6 +25,7 @@ fn build_router() -> axum::Router {
             provider_address: None,
             catcher_address: None,
             pop3_address: None,
+            provider_tls: None,
             is_container: false,
         },
     );

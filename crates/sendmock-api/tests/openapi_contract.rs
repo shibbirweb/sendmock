@@ -746,6 +746,7 @@ async fn prepare_twilio_subaccount_samples(
             "getMailgunComplaints",
             vec![json!({}), json!({ "domain": "mg.shop.test" })],
         ),
+        ("getTlsCa", vec![json!({})]),
         (
             "deleteMailgunComplaintsByDomain",
             vec![json!({ "domain": "mg.shop.test" })],
@@ -2071,6 +2072,13 @@ fn build_bare_operation_context() -> OperationContext {
             provider_address: None,
             catcher_address: None,
             pop3_address: None,
+            provider_tls: Some(sendmock_ops::ProviderTlsDetails {
+                address: "127.0.0.1:8027".to_owned(),
+                ca_certificate_path: Some("/tmp/sendmock/provider-ca-certificate.pem".to_owned()),
+                ca_certificate_pem: Some(
+                    "-----BEGIN CERTIFICATE-----\nMIIB\n-----END CERTIFICATE-----\n".to_owned(),
+                ),
+            }),
             is_container: false,
         },
     )

@@ -1,4 +1,5 @@
 use std::net::SocketAddr;
+use std::path::PathBuf;
 
 use super::ConfigError;
 use super::config_file::ConfigFile;
@@ -11,6 +12,18 @@ pub struct ProviderPortConfig {
     pub provider_addr: Option<SocketAddr>,
     /// Bound on the provider address's host, or the HTTP address's host without one.
     pub dedicated_ports: Vec<(String, SocketAddr)>,
+    /// The provider routes over HTTPS, when on.
+    pub tls: Option<ProviderTlsConfig>,
+}
+
+/// `--provider-tls-addr` with its certificate: the user's files, or one from the local CA for
+/// these extra names.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProviderTlsConfig {
+    pub tls_addr: SocketAddr,
+    pub certificate_file: Option<PathBuf>,
+    pub key_file: Option<PathBuf>,
+    pub extra_names: Vec<String>,
 }
 
 impl ProviderPortConfig {
@@ -35,8 +48,28 @@ impl ProviderPortConfig {
                 .map(|port_setting| parse_port_setting(port_setting))
                 .collect::<Result<_, _>>()?
         };
+        let tls = serve_arguments
+            .provider_tls_addr
+            .or(config_file.provider_tls_addr)
+            .map(|tls_addr| ProviderTlsConfig {
+                tls_addr,
+                certificate_file: serve_arguments
+                    .provider_tls_cert
+                    .clone()
+                    .or_else(|| config_file.provider_tls_cert.clone()),
+                key_file: serve_arguments
+                    .provider_tls_key
+                    .clone()
+                    .or_else(|| config_file.provider_tls_key.clone()),
+                extra_names: if serve_arguments.provider_tls_names.is_empty() {
+                    config_file.provider_tls_names.clone().unwrap_or_default()
+                } else {
+                    serve_arguments.provider_tls_names.clone()
+                },
+            });
         Ok(Self {
             provider_addr,
+            tls,
             dedicated_ports: port_settings
                 .into_iter()
                 .map(|(provider_key, port)| (provider_key, SocketAddr::new(host_address, port)))

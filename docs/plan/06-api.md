@@ -211,6 +211,7 @@ These make SendMock useful from any test framework without polling loops:
 | GET | `/info` | version, uptime, listeners (`provider_address`, `catcher_address`, the catch-all catcher port added in Phase 5, and `pop3_address`, added after 1.0 as A6, each null when off), counts, DB size, `is_container` (true when SendMock runs in Docker, so the UI can default to container hostnames), and `available_operations` (the `operationId`s this binary serves, so the UI shows Not available yet for the rest; added to `AppInfo` in Phase 1, [07](07-ui.md#not-available-yet-stage-b)) |
 | GET | `/updates` | opt-in update check against GitHub Releases for the running channel: the newest version, its date, release notes and the upgrade command for the install method; `409` while `update_check_mode` is `off`, `502` when GitHub cannot be reached |
 | GET | `/health` | liveness for Docker/CI (also `sendmock health` CLI for the Docker HEALTHCHECK) |
+| GET | `/tls/ca` | the local CA (path and PEM) to trust for the HTTPS provider port, 404 when SendMock has none (A23, PL-20) |
 
 ## Projects
 

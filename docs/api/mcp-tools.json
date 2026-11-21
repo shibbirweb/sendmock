@@ -26713,6 +26713,42 @@
       ]
     },
     {
+      "name": "sendmock_tls_ca",
+      "toolset": "core",
+      "summary": "The local CA to trust for the HTTPS provider port.",
+      "area": "System",
+      "area_slug": "system",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/tls/ca",
+          "operation_id": "getTlsCa",
+          "summary": "The local CA to trust for the HTTPS provider port.",
+          "area_slug": "system",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [],
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "example_arguments": {},
+      "output": "TlsCertificateAuthority",
+      "cli": [
+        "sendmock tls ca"
+      ],
+      "ui": [
+        "Settings > Connection > Provider APIs over HTTPS > Download the CA"
+      ]
+    },
+    {
       "name": "sendmock_traffic_delete_all",
       "toolset": "admin",
       "summary": "Delete every captured item in every project and keep every setting and configuration list.",

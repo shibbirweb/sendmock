@@ -48,6 +48,25 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock tls ca",
+    "usage": "sendmock tls ca",
+    "aliases": [],
+    "summary": "The local CA to trust for the HTTPS provider port.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/tls/ca",
+        "operation_id": "getTlsCa",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_tls_ca"
+    ]
+  },
+  {
     "command": "sendmock seed status",
     "usage": "sendmock seed status",
     "aliases": [],

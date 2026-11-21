@@ -8,6 +8,9 @@ inputs:
   offline-user:
     description: The system user SendMock runs as
     default: sendmock-offline
+  extra-args:
+    description: More flags for sendmock, such as --provider-tls-addr 127.0.0.1:8027
+    default: ""
 runs:
   using: composite
   steps:
@@ -34,9 +37,11 @@ runs:
       shell: bash
       env:
         OFFLINE_USER: ${{ inputs.offline-user }}
+        EXTRA_ARGS: ${{ inputs.extra-args }}
       run: |
+        # shellcheck disable=SC2086 # the extra flags are split into words on purpose
         (cd / && sudo -u "$OFFLINE_USER" env HOME="/var/lib/$OFFLINE_USER" \
-          /usr/local/bin/sendmock --db memory --provider-addr 127.0.0.1:8026) \
+          /usr/local/bin/sendmock --db memory --provider-addr 127.0.0.1:8026 $EXTRA_ARGS) \
           > sendmock.log 2>&1 &
         for _ in $(seq 1 30); do
           curl -fsS http://127.0.0.1:8025/api/v1/health > /dev/null && exit 0

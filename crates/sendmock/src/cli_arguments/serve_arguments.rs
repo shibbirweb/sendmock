@@ -29,6 +29,37 @@ pub struct ServeArguments {
     #[arg(long, env = "SENDMOCK_PROVIDER_ADDR", value_name = "HOST:PORT")]
     pub provider_addr: Option<SocketAddr>,
 
+    /// Address that serves the provider APIs over HTTPS, next to --provider-addr; off unless set
+    #[arg(long, env = "SENDMOCK_PROVIDER_TLS_ADDR", value_name = "HOST:PORT")]
+    pub provider_tls_addr: Option<SocketAddr>,
+
+    /// Certificate (PEM) for --provider-tls-addr [default: one from SendMock's local CA]
+    #[arg(
+        long,
+        env = "SENDMOCK_PROVIDER_TLS_CERT",
+        value_name = "FILE",
+        requires = "provider_tls_key"
+    )]
+    pub provider_tls_cert: Option<PathBuf>,
+
+    /// Private key (PEM) for `--provider-tls-cert`
+    #[arg(
+        long,
+        env = "SENDMOCK_PROVIDER_TLS_KEY",
+        value_name = "FILE",
+        requires = "provider_tls_cert"
+    )]
+    pub provider_tls_key: Option<PathBuf>,
+
+    /// More names for the local CA's certificate, besides localhost, 127.0.0.1 and ::1 (comma-separated)
+    #[arg(
+        long,
+        env = "SENDMOCK_PROVIDER_TLS_NAMES",
+        value_name = "NAMES",
+        value_delimiter = ','
+    )]
+    pub provider_tls_names: Vec<String>,
+
     /// Address that captures every request at any path in the HTTP catcher, the first path segment naming the bin; off unless set
     #[arg(long, env = "SENDMOCK_CATCHER_ADDR", value_name = "HOST:PORT")]
     pub catcher_addr: Option<SocketAddr>,

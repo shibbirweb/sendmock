@@ -75,7 +75,7 @@ pub use http_catcher::{
 pub use inbound_routes::{InboundRoute, InboundRouteAction, InboundRouteFilter};
 pub use input_coercion::build_input_from_text;
 pub use input_shape::{InputShape, ScalarType, accepts_null, describe_input_shape};
-pub use instance_details::{InstanceDetails, ReleaseChannel};
+pub use instance_details::{InstanceDetails, ProviderTlsDetails, ReleaseChannel};
 pub use integrations::{GetIntegrationOperation, IntegrationSnippet};
 pub use logs::{
     ApiRequestLinkedMessage, ApiRequestLogEntry, CompletedApiRequest, ProviderRequestLogEntry,
@@ -162,7 +162,7 @@ pub use smtp_chaos::{SmtpChaos, read_smtp_chaos, take_chaos_rejection};
 pub use smtp_delivery::{SmtpMessage, record_smtp_session, store_smtp_message};
 pub use system::{
     ActivityBucket, AppInfo, AppStats, CurrencyAmount, GetHealthOperation, GetInfoOperation,
-    GetStatsOperation, HealthStatus,
+    GetStatsOperation, GetTlsCaOperation, HealthStatus, TlsCertificateAuthority,
 };
 pub use twilio_accounts::{TwilioSubaccount, TwilioSubaccountTokenReveal};
 pub use updates::{
@@ -188,6 +188,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     let mut operation_registry = OperationRegistry::default();
     operation_registry.register(GetHealthOperation);
     operation_registry.register(GetInfoOperation);
+    operation_registry.register(GetTlsCaOperation);
     operation_registry.register(GetSeedStatusOperation);
     operation_registry.register(ExportSeedOperation);
     operation_registry.register(ValidateSeedOperation);
