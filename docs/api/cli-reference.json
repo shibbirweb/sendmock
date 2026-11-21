@@ -1854,6 +1854,116 @@
       ]
     },
     {
+      "command": "sendmock email mailgun complaints clear",
+      "slug": "email-mailgun-complaints-clear",
+      "usage": "sendmock email mailgun complaints clear <domain> [flags]",
+      "summary": "Clear a Mailgun domain's complaints, so its addresses get mail again.",
+      "area": "Email",
+      "area_slug": "email",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/mailgun/complaints/{domain}",
+          "operation_id": "deleteMailgunComplaintsByDomain",
+          "summary": "Clear a Mailgun domain's complaints, so its addresses get mail again.",
+          "area_slug": "email",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "domain",
+          "input": {
+            "name": "domain",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "A Mailgun sending domain, as in `/v3/{domain}/messages`.",
+          "example": "mg.shop.test",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--yes",
+          "input": null,
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Confirms a destructive command; without it the command stops.",
+          "example": true
+        }
+      ],
+      "example": "sendmock email mailgun complaints clear mg.shop.test --yes",
+      "output": null,
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_email_mailgun_complaint_clear"
+      ],
+      "ui": [
+        "Mail > Providers > Mailgun > Complaints > Clear"
+      ]
+    },
+    {
+      "command": "sendmock email mailgun complaints list",
+      "slug": "email-mailgun-complaints-list",
+      "usage": "sendmock email mailgun complaints list [flags]",
+      "summary": "Addresses on each Mailgun domain's complaints table.",
+      "area": "Email",
+      "area_slug": "email",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/mailgun/complaints",
+          "operation_id": "getMailgunComplaints",
+          "summary": "Addresses on each Mailgun domain's complaints table.",
+          "area_slug": "email",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--domain",
+          "input": {
+            "name": "domain",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<domain>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only this sending domain's complaints.",
+          "example": "mg.shop.test"
+        }
+      ],
+      "example": "sendmock email mailgun complaints list --domain mg.shop.test",
+      "output": "MailgunComplaint[]",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_email_mailgun_complaint_list"
+      ],
+      "ui": [
+        "Mail > Providers > Mailgun > Complaints"
+      ]
+    },
+    {
       "command": "sendmock email mime",
       "slug": "email-mime",
       "usage": "sendmock email mime <emailId>",

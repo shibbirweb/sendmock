@@ -75,6 +75,8 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | GET/POST/PATCH/DELETE | `/messaging-services` | Twilio-style Messaging Services (sender pools) |
 | GET/POST/PATCH/DELETE | `/twilio/subaccounts`, `/twilio/subaccounts/{accountSid}` | subaccounts of the Twilio provider's main account: name, status (`active`, `suspended`, `closed`), auth token (masked in answers; empty or masked on `PATCH` keeps it) and Debugger webhook URL (A23, SM-19) |
 | GET | `/twilio/subaccounts/{accountSid}/auth-token` | reveal a subaccount's token (UI and CLI only, never MCP) |
+| GET | `/mailgun/complaints` | addresses on each Mailgun sending domain's complaints table; `domain` filters (A23, EM-23) |
+| DELETE | `/mailgun/complaints/{domain}` | clear one domain's complaints table |
 | GET/POST/PATCH/DELETE | `/sms/providers`, `/sms/providers/{providerKey}` | SMS provider definitions, as for email providers ([22](22-configurable-providers.md)) |
 | POST | `/sms/providers/{providerKey}/restore`, `/reset`, `/preview` | as for email providers |
 | GET | `/sms/providers/{providerKey}/credentials/{credentialName}` | reveal one secret credential (UI and CLI only) |

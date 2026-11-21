@@ -59,6 +59,8 @@ test("WH-09.9 a new template opens in the editor and keeps its details", async (
   );
 
   await page.keyboard.press("Escape");
+  // The closing sheet clears the URL's template, so a click before it is gone is undone.
+  await expect(templateSheet).toBeHidden();
   const slackSheet = await openTemplate(page, "Slack: incoming webhook");
   await slackSheet.getByRole("button", { name: "Edit" }).click();
   await expect(slackSheet.getByText("Template details")).toBeHidden();

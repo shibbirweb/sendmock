@@ -22,6 +22,7 @@ pub use template::{
     render_template, render_template_in_mode,
 };
 pub use timestamp::{
-    add_calendar_months, format_rfc3339, format_rfc5322, parse_duration_ms, parse_rfc3339,
+    add_calendar_months, format_rfc3339, format_rfc5322, parse_duration_ms, parse_rfc2822,
+    parse_rfc3339,
 };
 pub use wildcard_pattern::matches_wildcard_pattern;

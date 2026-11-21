@@ -742,6 +742,14 @@ async fn prepare_twilio_subaccount_samples(
             "deleteTwilioSubaccountsByAccountSid",
             vec![json!({ "account_sid": deleted_sid })],
         ),
+        (
+            "getMailgunComplaints",
+            vec![json!({}), json!({ "domain": "mg.shop.test" })],
+        ),
+        (
+            "deleteMailgunComplaintsByDomain",
+            vec![json!({ "domain": "mg.shop.test" })],
+        ),
     ]
 }
 

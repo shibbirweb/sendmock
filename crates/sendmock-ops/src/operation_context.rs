@@ -6,13 +6,13 @@ use sendmock_store::{
     ActivityStatsRepository, ApiRequestRepository, CapturedRequestRepository, Database,
     EmailLocalTemplateRepository, EmailOutcomeRuleRepository, EmailProviderSendRepository,
     EmailRepository, EmailResponseRepository, HttpBinRepository, InboundRouteRepository,
-    MessageProviderRepository, MessageRuleKind, MessageRuleRepository, MessagingServiceRepository,
-    PaymentDefinitionRepository, PaymentProviderObjectRepository, PaymentRepository,
-    PaymentSubscriptionRepository, ProjectRepository, PushNotificationRepository,
-    SavedScenarioRepository, SavedWebhookDeliveryRepository, SeedStateRepository,
-    SettingsRepository, SmsCallbackAttemptRepository, SmsOutcomeRuleRepository,
-    SmsReplyWebhookRepository, SmsRepository, SmtpSessionRepository, TrafficPruner,
-    TwilioSubaccountRepository, VerificationRepository, VerifyServiceRepository,
+    MailgunComplaintRepository, MessageProviderRepository, MessageRuleKind, MessageRuleRepository,
+    MessagingServiceRepository, PaymentDefinitionRepository, PaymentProviderObjectRepository,
+    PaymentRepository, PaymentSubscriptionRepository, ProjectRepository,
+    PushNotificationRepository, SavedScenarioRepository, SavedWebhookDeliveryRepository,
+    SeedStateRepository, SettingsRepository, SmsCallbackAttemptRepository,
+    SmsOutcomeRuleRepository, SmsReplyWebhookRepository, SmsRepository, SmtpSessionRepository,
+    TrafficPruner, TwilioSubaccountRepository, VerificationRepository, VerifyServiceRepository,
     VirtualNumberRepository, WebhookDeliveryRepository, WebhookEndpointRepository,
     WebhookRuleRepository, WebhookTemplateRepository, WebhookVariableRepository,
 };
@@ -200,6 +200,8 @@ pub struct EmailStores {
     /// Which emails are simulated replies or forwards, and of what.
     pub responses: EmailResponseRepository,
     pub inbound_routes: InboundRouteRepository,
+    /// Addresses on each Mailgun domain's complaints table.
+    pub mailgun_complaints: MailgunComplaintRepository,
 }
 
 impl EmailStores {
@@ -214,6 +216,7 @@ impl EmailStores {
             ),
             responses: EmailResponseRepository::new(Arc::clone(database)),
             inbound_routes: InboundRouteRepository::new(Arc::clone(database)),
+            mailgun_complaints: MailgunComplaintRepository::new(Arc::clone(database)),
         }
     }
 }

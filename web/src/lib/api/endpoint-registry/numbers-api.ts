@@ -207,8 +207,35 @@ const twilioAccountEndpoints = tagEndpoints("SMS", [
   },
 ]);
 
+/** Addresses on Mailgun domains' complaints tables (EM-23, A23). */
+const mailgunComplaintEndpoints = tagEndpoints("Email", [
+  {
+    method: "GET",
+    path: "/api/v1/mailgun/complaints",
+    summary: "Addresses on each Mailgun domain's complaints table.",
+    queryParameters: [
+      {
+        name: "domain",
+        description: "Only this sending domain's complaints.",
+        schema: "string",
+        example: "mg.shop.test",
+      },
+    ],
+    response: listOf("MailgunComplaint"),
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/mailgun/complaints/{domain}",
+    summary:
+      "Clear a Mailgun domain's complaints, so its addresses get mail again.",
+    response: null,
+    successStatus: 204,
+  },
+]);
+
 export const numbersApi: ApiEndpoint[] = [
   ...verifyEndpoints,
   ...numberEndpoints,
   ...twilioAccountEndpoints,
+  ...mailgunComplaintEndpoints,
 ];

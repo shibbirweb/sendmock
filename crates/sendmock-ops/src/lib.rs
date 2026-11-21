@@ -13,6 +13,7 @@ mod input_shape;
 mod instance_details;
 mod integrations;
 mod logs;
+mod mailgun;
 mod message_providers;
 mod message_rules;
 mod no_input;
@@ -80,6 +81,7 @@ pub use logs::{
     ApiRequestLinkedMessage, ApiRequestLogEntry, CompletedApiRequest, ProviderRequestLogEntry,
     RequestLogSettings, SmtpSessionLogEntry, record_api_request, record_provider_request,
 };
+pub use mailgun::MailgunComplaint;
 pub use message_providers::{
     MessageProviderInput, MessageProviderPreview, MessageProviderView, ProviderCredentialReveal,
     ProviderSampleRequest, WhatsappWebhookVerification, WhatsappWebhookVerificationRequest,
@@ -208,6 +210,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     ai::register_ai_operations(&mut operation_registry);
     numbers::register_number_operations(&mut operation_registry);
     twilio_accounts::register_twilio_account_operations(&mut operation_registry);
+    mailgun::register_mailgun_operations(&mut operation_registry);
     verify::register_verify_operations(&mut operation_registry);
     message_providers::register_sms_provider_operations(&mut operation_registry);
     webhooks::register_webhook_operations(&mut operation_registry);

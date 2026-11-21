@@ -75,3 +75,15 @@ export type TwilioSubaccountTokenReveal = {
   /** @example "example-subaccount-token-9f2c" */
   auth_token: string;
 };
+
+/** An address on a Mailgun sending domain's complaints table (EM-23). */
+export type MailgunComplaint = {
+  /**
+   * The sending domain, as in `/v3/{domain}/messages`.
+   * @example "mg.shop.test"
+   */
+  domain: string;
+  /** @example "ana@example.test" */
+  address: string;
+  created_at: IsoTimestamp;
+};

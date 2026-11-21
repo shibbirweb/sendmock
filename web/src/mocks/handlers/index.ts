@@ -37,6 +37,7 @@ import { smsThreadHandlers } from "@/mocks/handlers/sms-thread-handlers";
 import { smsSendHandlers } from "@/mocks/handlers/sms-send-handlers";
 import { systemHandlers } from "@/mocks/handlers/system-handlers";
 import { twilioSubaccountHandlers } from "@/mocks/handlers/twilio-subaccount-handlers";
+import { mailgunComplaintHandlers } from "@/mocks/handlers/mailgun-complaint-handlers";
 import { verifyHandlers } from "@/mocks/handlers/verify-handlers";
 import { webhookDeliveryHandlers } from "@/mocks/handlers/webhook-delivery-handlers";
 import { webhookEndpointHandlers } from "@/mocks/handlers/webhook-endpoint-handlers";
@@ -79,6 +80,7 @@ export const mockHandlers = [
   ...verifyHandlers,
   ...numbersHandlers,
   ...twilioSubaccountHandlers,
+  ...mailgunComplaintHandlers,
   ...outcomeRulesHandlers,
   ...logsHandlers,
   ...httpBinHandlers,

@@ -19,6 +19,7 @@ use super::twilio_verify_api::answer_twilio_verify_request;
 use super::vonage_verify_api::answer_vonage_verify;
 use super::whatsapp_cloud_api::answer_whatsapp_cloud;
 use crate::custom_gateways::answer_custom_gateway_request;
+use crate::mailgun::answer_mailgun_domain_request;
 use crate::{OperationContext, OperationError};
 
 /// Messaging Services are Twilio's; their API is served under its key.
@@ -128,6 +129,11 @@ async fn answer_code_served_api(
     .await?
     {
         return Ok(Some(mailgun_routes_outcome));
+    }
+    if let Some(mailgun_domain_outcome) =
+        answer_mailgun_domain_request(operation_context, provider_route, request).await?
+    {
+        return Ok(Some(mailgun_domain_outcome));
     }
     if let Some(custom_gateway_outcome) =
         answer_custom_gateway_request(operation_context, provider_route, request).await?

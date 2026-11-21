@@ -25,6 +25,7 @@ import type {
   TemplateRevision,
   WebhookTemplateSummary,
   WebhookVariable,
+  MailgunComplaint,
   TwilioSubaccount,
 } from "@/lib/api/types";
 import {
@@ -132,6 +133,7 @@ export type MockDatabase = {
   virtualNumbers: VirtualNumber[];
   messagingServices: MessagingService[];
   twilioSubaccounts: MockTwilioSubaccount[];
+  mailgunComplaints: MailgunComplaint[];
   smsOutcomeRules: SmsOutcomeRule[];
   emailOutcomeRules: EmailOutcomeRule[];
   messageRules: MessageRuleSets;
@@ -194,6 +196,13 @@ function buildConfiguration() {
     virtualNumbers,
     messagingServices: buildMessagingServiceFixtures(virtualNumbers),
     twilioSubaccounts: buildTwilioSubaccountFixtures(),
+    mailgunComplaints: [
+      {
+        domain: "mg.acme.test",
+        address: "complaint@example.test",
+        created_at: "2026-11-20T09:30:00Z",
+      },
+    ],
     verifyServices,
     webhookEndpoints,
     webhookRules: buildWebhookRuleFixtures(webhookEndpoints),

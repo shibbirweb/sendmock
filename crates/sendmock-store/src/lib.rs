@@ -9,6 +9,7 @@ mod email_provider_send;
 mod email_response;
 mod http_catcher;
 mod inbound_route;
+mod mailgun_complaint;
 mod message_open;
 mod message_provider;
 mod message_rule;
@@ -59,6 +60,7 @@ pub use http_catcher::{
     HttpBinRepository,
 };
 pub use inbound_route::{InboundRouteRecord, InboundRouteRepository};
+pub use mailgun_complaint::{MailgunComplaintRecord, MailgunComplaintRepository};
 pub use message_open::{MessageOpenRecord, OpenRecording};
 pub use message_provider::{MessageProviderRecord, MessageProviderRepository};
 pub use message_rule::{MessageRuleKind, MessageRuleRecord, MessageRuleRepository};

@@ -2183,6 +2183,127 @@
       ]
     },
     {
+      "name": "sendmock_email_mailgun_complaint_clear",
+      "toolset": "email",
+      "summary": "Clear a Mailgun domain's complaints, so its addresses get mail again.",
+      "area": "Email",
+      "area_slug": "email",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/mailgun/complaints/{domain}",
+          "operation_id": "deleteMailgunComplaintsByDomain",
+          "summary": "Clear a Mailgun domain's complaints, so its addresses get mail again.",
+          "area_slug": "email",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "domain",
+          "input": {
+            "name": "domain",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "A Mailgun sending domain, as in `/v3/{domain}/messages`.",
+          "example": "mg.shop.test"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "A Mailgun sending domain, as in `/v3/{domain}/messages`.",
+            "examples": [
+              "mg.shop.test"
+            ]
+          }
+        },
+        "required": [
+          "domain"
+        ]
+      },
+      "example_arguments": {
+        "domain": "mg.shop.test"
+      },
+      "output": null,
+      "cli": [
+        "sendmock email mailgun complaints clear <domain>"
+      ],
+      "ui": [
+        "Mail > Providers > Mailgun > Complaints > Clear"
+      ]
+    },
+    {
+      "name": "sendmock_email_mailgun_complaint_list",
+      "toolset": "email",
+      "summary": "Addresses on each Mailgun domain's complaints table.",
+      "area": "Email",
+      "area_slug": "email",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/mailgun/complaints",
+          "operation_id": "getMailgunComplaints",
+          "summary": "Addresses on each Mailgun domain's complaints table.",
+          "area_slug": "email",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "domain",
+          "input": {
+            "name": "domain",
+            "location": "query"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Only this sending domain's complaints.",
+          "example": "mg.shop.test"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "Only this sending domain's complaints.",
+            "examples": [
+              "mg.shop.test"
+            ]
+          }
+        }
+      },
+      "example_arguments": {
+        "domain": "mg.shop.test"
+      },
+      "output": "MailgunComplaint[]",
+      "cli": [
+        "sendmock email mailgun complaints list"
+      ],
+      "ui": [
+        "Mail > Providers > Mailgun > Complaints"
+      ]
+    },
+    {
       "name": "sendmock_email_mime",
       "toolset": "email",
       "summary": "The MIME tree of the message.",

@@ -6,7 +6,7 @@ use super::EmailProviderSendRecord;
 use crate::{Database, StoreError};
 
 const SEND_COLUMNS: &str =
-    "email_id, provider_key, provider_message_id, template_id, template_data";
+    "email_id, provider_key, provider_message_id, template_id, template_data, sending_domain";
 
 /// Provider sends beside their emails; they go when their email goes.
 #[derive(Clone)]
@@ -21,6 +21,7 @@ fn read_send_row(row: &Row<'_>) -> rusqlite::Result<EmailProviderSendRecord> {
         provider_message_id: row.get(2)?,
         template_id: row.get(3)?,
         template_data_json: row.get(4)?,
+        sending_domain: row.get(5)?,
     })
 }
 
@@ -37,7 +38,7 @@ impl EmailProviderSendRepository {
             .write(move |connection| {
                 connection.execute(
                     &format!(
-                        "INSERT OR REPLACE INTO email_provider_sends ({SEND_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5)"
+                        "INSERT OR REPLACE INTO email_provider_sends ({SEND_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6)"
                     ),
                     params![
                         provider_send.email_id,
@@ -45,9 +46,31 @@ impl EmailProviderSendRepository {
                         provider_send.provider_message_id,
                         provider_send.template_id,
                         provider_send.template_data_json,
+                        provider_send.sending_domain,
                     ],
                 )?;
                 Ok(())
+            })
+            .await
+    }
+
+    /// The sends through one provider for one sending domain, oldest first.
+    pub async fn list_sends_for_domain(
+        &self,
+        provider_key: &str,
+        sending_domain: &str,
+    ) -> Result<Vec<EmailProviderSendRecord>, StoreError> {
+        let provider_key = provider_key.to_owned();
+        let sending_domain = sending_domain.to_owned();
+        self.database
+            .read(move |connection| {
+                let mut statement = connection.prepare(&format!(
+                    "SELECT {SEND_COLUMNS} FROM email_provider_sends WHERE provider_key = ?1 AND sending_domain = ?2 ORDER BY rowid"
+                ))?;
+                let sends = statement
+                    .query_map(params![provider_key, sending_domain], read_send_row)?
+                    .collect::<rusqlite::Result<Vec<_>>>()?;
+                Ok(sends)
             })
             .await
     }

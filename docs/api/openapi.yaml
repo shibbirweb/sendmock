@@ -4150,6 +4150,56 @@ paths:
       x-sendmock-mcp: null
       x-sendmock-mcp-exempt: Agents may set secrets but never read them back; the CLI and UI reveal them after a confirmation.
       x-sendmock-ui: SMS > Providers > Twilio > Accounts > Reveal
+  /api/v1/mailgun/complaints:
+    get:
+      operationId: getMailgunComplaints
+      summary: Addresses on each Mailgun domain's complaints table.
+      tags:
+        - Email
+      parameters:
+        - name: domain
+          in: query
+          required: false
+          description: Only this sending domain's complaints.
+          schema:
+            type: string
+          example: mg.shop.test
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MailgunComplaint"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email mailgun complaints list
+      x-sendmock-mcp: sendmock_email_mailgun_complaint_list
+      x-sendmock-ui: Mail > Providers > Mailgun > Complaints
+  /api/v1/mailgun/complaints/{domain}:
+    delete:
+      operationId: deleteMailgunComplaintsByDomain
+      summary: Clear a Mailgun domain's complaints, so its addresses get mail again.
+      tags:
+        - Email
+      parameters:
+        - name: domain
+          in: path
+          required: true
+          description: A Mailgun sending domain, as in `/v3/{domain}/messages`.
+          schema:
+            type: string
+          example: mg.shop.test
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email mailgun complaints clear <domain>
+      x-sendmock-mcp: sendmock_email_mailgun_complaint_clear
+      x-sendmock-ui: Mail > Providers > Mailgun > Complaints > Clear
   /api/v1/emails/providers:
     get:
       operationId: getEmailsProviders
@@ -11459,6 +11509,25 @@ components:
         - values
         - supports_one_click
         - warnings
+    MailgunComplaint:
+      type: object
+      properties:
+        domain:
+          type: string
+          description: The sending domain, as in `/v3/{domain}/messages`.
+          examples:
+            - mg.shop.test
+        address:
+          type: string
+          examples:
+            - ana@example.test
+        created_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+      required:
+        - domain
+        - address
+        - created_at
+      description: An address on a Mailgun sending domain's complaints table.
     ManualSendRequest:
       type: object
       properties:
