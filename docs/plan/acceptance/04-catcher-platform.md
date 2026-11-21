@@ -251,11 +251,11 @@ Phase 5. Plan: [30-phase-5.md](../30-phase-5.md) (W8).
 
 1.3.1 (A22), planned 2026-11-17 by owner request: a patch release after 1.3.0 that clears the repository's Security and quality tab. Plan: [32-after-1-0.md](../32-after-1-0.md#a22-security-and-quality-clean-up-pl-19) (A22).
 
-- [ ] PL-19.1 `main` has no open code scanning alert once 1.3.1 is released (the CodeQL `js/polynomial-redos` alert in `website/lib/seo/site-url.ts` is fixed in 1.3.0 and closed).
-- [ ] PL-19.2 Every Dependabot alert open on 2026-11-17 is fixed by upgrading the package to a patched version, or dismissed on GitHub with a written reason when no fix exists or the vulnerable code is not reachable; each dismissal is listed in the plan.
-- [ ] PL-19.3 Every Dependabot pull request open on 2026-11-17 (#201, #202, #203, #204, #205, #228, #243, and the GitHub Actions group, #247 then, #327 since Dependabot replaced it) is merged into `develop` or closed with a comment saying where its update was made.
+- [x] PL-19.1 `main` has no open code scanning alert once 1.3.1 is released (the CodeQL `js/polynomial-redos` alert in `website/lib/seo/site-url.ts` is fixed in 1.3.0 and closed).
+- [x] PL-19.2 Every Dependabot alert open on 2026-11-17 is fixed by upgrading the package to a patched version, or dismissed on GitHub with a written reason when no fix exists or the vulnerable code is not reachable; each dismissal is listed in the plan.
+- [x] PL-19.3 Every Dependabot pull request open on 2026-11-17 (#201, #202, #203, #204, #205, #228, #243, and the GitHub Actions group, #247 then, #327 since Dependabot replaced it) is merged into `develop` or closed with a comment saying where its update was made.
 - [x] PL-19.6 The Chocolatey package sets `<copyright>` to the rights holder and `<licenseUrl>` to a license file in the repository, as Chocolatey's reviewer asked when approving 1.0.0 (added 2026-11-21).
-- [ ] PL-19.4 Each upgraded example and Testcontainers module passes its tests in CI against a real `sendmock` (the cross-language matrix and the Testcontainers jobs), and an example whose code changed for an upgrade has its README updated with it.
+- [x] PL-19.4 Each upgraded example and Testcontainers module passes its tests in CI against a real `sendmock` (the cross-language matrix and the Testcontainers jobs), and an example whose code changed for an upgrade has its README updated with it.
 - [x] PL-19.5 `scripts/release-readiness.ts` lists the open code scanning alerts, Dependabot alerts and Dependabot pull requests, and Prepare release for 1.3.1 does not start while a code scanning alert on `main` or a Dependabot pull request is open; it lists the Dependabot alerts without blocking on them. (Changed 2026-11-21, owner decision: GitHub reads Dependabot alerts on `main` only, so a release's own fixes, still on `develop`, could never clear them first, and blocking on them would stop the release that fixes them. Runbook step 11 checks them again once the stable is on `main`.)
 
 ## PL-20 HTTPS on the provider port
