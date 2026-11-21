@@ -3074,7 +3074,7 @@ checksum = "8a7852d02fc848982e0c167ef163aaff9cd91dc640ba85e263cb1ce46fae51cd"
 
 [[package]]
 name = "sendmock"
-version = "1.3.1-beta.1"
+version = "1.3.1-beta.2"
 dependencies = [
  "axum",
  "clap",
@@ -3105,7 +3105,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-api"
-version = "1.3.1-beta.1"
+version = "1.3.1-beta.2"
 dependencies = [
  "axum",
  "base64 0.23.1",
@@ -3136,7 +3136,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-cli"
-version = "1.3.1-beta.1"
+version = "1.3.1-beta.2"
 dependencies = [
  "clap",
  "insta",
@@ -3152,7 +3152,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-core"
-version = "1.3.1-beta.1"
+version = "1.3.1-beta.2"
 dependencies = [
  "base64 0.23.1",
  "chrono",
@@ -3169,7 +3169,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-mail"
-version = "1.3.1-beta.1"
+version = "1.3.1-beta.2"
 dependencies = [
  "base64 0.23.1",
  "mail-parser",
@@ -3186,7 +3186,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-mcp"
-version = "1.3.1-beta.1"
+version = "1.3.1-beta.2"
 dependencies = [
  "base64 0.23.1",
  "insta",
@@ -3200,7 +3200,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-ops"
-version = "1.3.1-beta.1"
+version = "1.3.1-beta.2"
 dependencies = [
  "base64 0.23.1",
  "hmac",
@@ -3227,7 +3227,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-payments"
-version = "1.3.1-beta.1"
+version = "1.3.1-beta.2"
 dependencies = [
  "hmac",
  "md-5",
@@ -3236,7 +3236,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-pop3"
-version = "1.3.1-beta.1"
+version = "1.3.1-beta.2"
 dependencies = [
  "sendmock-core",
  "sendmock-ops",
@@ -3248,7 +3248,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-sms"
-version = "1.3.1-beta.1"
+version = "1.3.1-beta.2"
 dependencies = [
  "roxmltree",
  "sendmock-core",
@@ -3257,7 +3257,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-smtp"
-version = "1.3.1-beta.1"
+version = "1.3.1-beta.2"
 dependencies = [
  "base64 0.23.1",
  "hmac",
@@ -3277,7 +3277,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-store"
-version = "1.3.1-beta.1"
+version = "1.3.1-beta.2"
 dependencies = [
  "rusqlite",
  "sendmock-core",
@@ -3291,7 +3291,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-tray"
-version = "1.3.1-beta.1"
+version = "1.3.1-beta.2"
 dependencies = [
  "serde_json",
  "tao",
@@ -3300,7 +3300,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-webhooks"
-version = "1.3.1-beta.1"
+version = "1.3.1-beta.2"
 dependencies = [
  "base64 0.23.1",
  "hmac",
