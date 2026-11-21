@@ -8,6 +8,10 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ## [Unreleased]
 
+### Fixed
+
+- **One-time codes named after "is your":** a code followed by a few words before the word for it, such as `909582 is your App login code`, is now found in SMS messages and in email, including a code that appears only in an email's subject.
+
 ## [1.3.1] - 2026-11-21
 
 ### Added

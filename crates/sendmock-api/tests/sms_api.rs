@@ -73,6 +73,23 @@ async fn a_json_or_form_send_is_stored_with_its_status_segments_and_encoding() {
     assert_eq!(form_sms["encoding"], "GSM-7");
 }
 
+// AC: EM-05.6
+#[tokio::test]
+async fn an_sms_naming_its_code_after_is_your_has_the_code_extracted() {
+    let (app_router, _) = build_test_app();
+
+    let (status, sms) = call_api(
+        &app_router,
+        "POST",
+        "/api/v1/sms",
+        Some(&native_sms("909582 is your App login code")),
+    )
+    .await;
+
+    assert_eq!(status, 201);
+    assert_eq!(sms["extracted"]["otp"], json!(["909582"]));
+}
+
 // AC: SM-01.2
 #[tokio::test]
 async fn the_get_variant_sends_from_the_query_string() {
