@@ -61,6 +61,20 @@ Apps that give each customer a Twilio subaccount send under `/2010-04-01/Account
 - Or create them the way your app does on Twilio: the provider port answers `GET` and `POST /2010-04-01/Accounts.json` (list, filtered by `FriendlyName` and `Status`, and create) and `GET` and `POST /2010-04-01/Accounts/{AccountSid}.json` (fetch, and change `FriendlyName` and `Status`), in Twilio's shapes. These answers hold auth tokens, so they always check credentials: the main account sees every account, a subaccount only itself, and anything else gets Twilio's `401`.
 - A send under a **suspended** or **closed** subaccount is refused with Twilio's error `20005` and nothing is stored.
 
+## Twilio phone numbers
+
+The provider port answers Twilio's number APIs over the same numbers and pools as the [Numbers](../numbers.md) screen, so a change on either side shows on the other:
+
+| Path | What it does |
+| --- | --- |
+| `GET /2010-04-01/Accounts/{AccountSid}/IncomingPhoneNumbers.json` | lists the account's numbers, filtered by `PhoneNumber` and `FriendlyName` |
+| `POST /2010-04-01/Accounts/{AccountSid}/IncomingPhoneNumbers.json` | adds a number from `PhoneNumber` (E.164) or `AreaCode` (a free `+1<area>555....` number), with `FriendlyName`, `SmsUrl`, `SmsMethod`, `SmsFallbackUrl` and `StatusCallback` |
+| `GET`, `POST`, `DELETE /2010-04-01/Accounts/{AccountSid}/IncomingPhoneNumbers/{PhoneNumberSid}.json` | fetches, changes and deletes one number |
+| `GET`, `POST /v1/Services/{ServiceSid}/PhoneNumbers` | lists a Messaging Service's numbers and adds one by `PhoneNumberSid` |
+| `GET`, `DELETE /v1/Services/{ServiceSid}/PhoneNumbers/{PhoneNumberSid}` | fetches one and takes it out of the pool |
+
+Each number has a `PN` SID, shown under it on the Numbers screen. A number belongs to the account it was created under (numbers made on the Numbers screen belong to the main account) and lists only under that account. An invalid number answers Twilio's `21421`, one already registered `21422`, and adding a number that is in another Messaging Service answers `21712`.
+
 ## Twilio signatures
 
 Every Twilio webhook carries `X-Twilio-Signature`, made with the auth token of the account the message belongs to:

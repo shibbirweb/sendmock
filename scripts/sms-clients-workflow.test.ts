@@ -36,7 +36,8 @@ describe("SMS clients workflow", () => {
     const twilioEntries = clientEntries.filter(
       (clientEntry) =>
         clientEntry.client.startsWith("Twilio ") &&
-        !clientEntry.client.endsWith("with a subaccount"),
+        !clientEntry.client.endsWith("with a subaccount") &&
+        !clientEntry.client.endsWith("with numbers"),
     );
     expect(twilioEntries.map((clientEntry) => clientEntry.client)).toEqual([
       "Twilio Node SDK",
@@ -76,6 +77,27 @@ describe("SMS clients workflow", () => {
       expect(exampleSources).toContain("fetch()");
       expect(exampleSources).toContain("statuscallback");
       expect(exampleSources).toMatch(/validaterequest|requestvalidator/);
+    }
+  });
+
+  test("SM-20.5 the Twilio PHP and Node SDKs create a number and a Messaging Service, add the number and send with the service", () => {
+    const numberEntries = clientEntries.filter((clientEntry) =>
+      clientEntry.client.endsWith("with numbers"),
+    );
+
+    expect(numberEntries.map((clientEntry) => clientEntry.client)).toEqual([
+      "Twilio Node SDK with numbers",
+      "Twilio PHP SDK with numbers",
+    ]);
+    for (const clientEntry of numberEntries) {
+      const exampleSources = readExampleSources(
+        `examples/sms/${clientEntry.folder}`,
+      ).toLowerCase();
+      expect(exampleSources).toContain("incomingphonenumbers");
+      expect(exampleSources).toMatch(/phonenumbers(->|\.)create/);
+      expect(exampleSources.replaceAll("_", "")).toContain(
+        "messagingservicesid",
+      );
     }
   });
 
