@@ -1,9 +1,9 @@
 /** A small client for the GitHub REST API, using the workflow's `GITHUB_TOKEN`. */
 export async function fetchGitHubJson<ParsedJson>(
   apiPath: string,
+  token = process.env.GITHUB_TOKEN ?? "",
 ): Promise<ParsedJson> {
   const repository = process.env.GITHUB_REPOSITORY ?? "shibbirweb/sendmock";
-  const token = process.env.GITHUB_TOKEN ?? "";
   const response = await fetch(
     `https://api.github.com/repos/${repository}${apiPath}`,
     {

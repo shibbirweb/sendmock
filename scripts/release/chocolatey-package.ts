@@ -15,6 +15,8 @@ import { parseChecksums } from "./homebrew-formula";
 
 const repositoryUrl = "https://github.com/shibbirweb/sendmock";
 const windowsArchiveName = "sendmock-x86_64-pc-windows-msvc.zip";
+/** The same notice as LICENSE-MIT; Chocolatey's moderators ask for the rights holder. */
+const copyrightNotice = "Copyright (c) 2026 MD. Shibbir Ahmed";
 
 export function buildChocolateyFiles(
   version: string,
@@ -33,11 +35,12 @@ export function buildChocolateyFiles(
     <version>${version}</version>
     <title>SendMock</title>
     <authors>MD. Shibbir Ahmed</authors>
+    <copyright>${copyrightNotice}</copyright>
     <projectUrl>https://shibbir.me/sendmock/</projectUrl>
     <iconUrl>https://cdn.jsdelivr.net/gh/shibbirweb/sendmock@v${version}/website/app/icon.svg</iconUrl>
     <projectSourceUrl>${repositoryUrl}</projectSourceUrl>
     <packageSourceUrl>${repositoryUrl}/blob/v${version}/scripts/release/chocolatey-package.ts</packageSourceUrl>
-    <licenseUrl>${repositoryUrl}#licence</licenseUrl>
+    <licenseUrl>${repositoryUrl}/blob/v${version}/LICENSE-APACHE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <tags>email sms smtp testing webhooks</tags>
     <summary>Catch email, SMS, payments and webhooks from any app on your machine.</summary>

@@ -82,4 +82,17 @@ describe("Chocolatey package", () => {
     expect(descriptionText).not.toBe("");
     expect(descriptionText).not.toMatch(/https?:\/\//);
   });
+
+  test("PL-19.6 the nuspec names the rights holder and links a license file of the release", () => {
+    const nuspecText =
+      buildChocolateyFiles("1.3.1", checksums).get("sendmock.nuspec") ?? "";
+
+    expect(nuspecText).toContain(
+      "<copyright>Copyright (c) 2026 MD. Shibbir Ahmed</copyright>",
+    );
+    expect(nuspecText).toContain(
+      "<licenseUrl>https://github.com/shibbirweb/sendmock/blob/v1.3.1/LICENSE-APACHE</licenseUrl>",
+    );
+    expect(nuspecText).not.toContain("#licence");
+  });
 });

@@ -3,6 +3,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "nodemailer": "6.10.1"
+    "nodemailer": "10.6.1"
   }
 }

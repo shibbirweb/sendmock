@@ -6,6 +6,7 @@ import { releaseBumps } from "../version/next-version";
 
 type WorkflowInput = { type?: string; default?: unknown; options?: string[] };
 type Workflow = {
+  permissions?: Record<string, string>;
   on: {
     workflow_dispatch?: { inputs?: Record<string, WorkflowInput> };
     workflow_call?: { inputs?: Record<string, WorkflowInput> };
@@ -46,6 +47,18 @@ describe("Prepare release", () => {
   test("DS-04.5 has a dry run, on by default", () => {
     expect(dispatchInputs.dry_run).toEqual(
       expect.objectContaining({ type: "boolean", default: true }),
+    );
+  });
+
+  test("PL-19.5 can read the code scanning and Dependabot alerts its readiness check refuses on", () => {
+    const workflowText = readFileSync(
+      join(import.meta.dir, "../../.github/workflows/release-prepare.yml"),
+      "utf8",
+    );
+
+    expect(prepareWorkflow.permissions?.["security-events"]).toBe("read");
+    expect(workflowText).toContain(
+      "SECURITY_ALERTS_TOKEN: ${{ secrets.RELEASE_TOKEN }}",
     );
   });
 });

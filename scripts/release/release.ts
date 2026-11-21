@@ -27,6 +27,7 @@ import {
   fetchOpenReleasePullRequestNumbers,
   fetchPullRequestsMergedSince,
 } from "./github-api";
+import { fetchSecurityItems, type SecurityItems } from "./security-items";
 import {
   decidePublication,
   decideDockerTags,
@@ -81,14 +82,35 @@ function writeGitHubOutputs(outputs: Record<string, string>) {
 }
 
 async function checkReadiness() {
+  const openSecurityItems = await fetchSecurityItems();
   const releaseBlockers = findReleaseBlockers({
     ciConclusion: await fetchCiConclusion(process.env.GITHUB_SHA ?? "HEAD"),
     openReleasePullRequestNumbers: await fetchOpenReleasePullRequestNumbers(),
+    openSecurityItems,
   });
   if (releaseBlockers.length > 0) {
     fail(releaseBlockers.join("\n"));
   }
-  console.log("CI passed on this commit and no release is in progress.");
+  console.log(
+    "CI passed on this commit, no release is in progress, no code scanning alert is open on main and no Dependabot pull request is open.",
+  );
+  printDependabotAlerts(openSecurityItems);
+}
+
+/** Listed, not blocking: they close once this release's fixes reach `main` (runbook step 11). */
+function printDependabotAlerts(openSecurityItems: SecurityItems) {
+  if (openSecurityItems.dependabotAlertsProblem !== null) {
+    console.log(
+      `Dependabot alerts not listed: ${openSecurityItems.dependabotAlertsProblem}.`,
+    );
+    return;
+  }
+  console.log(
+    `Open Dependabot alerts on main (${openSecurityItems.dependabotAlerts.length}); check that this release fixes each:`,
+  );
+  for (const dependabotAlert of openSecurityItems.dependabotAlerts) {
+    console.log(`  ${dependabotAlert}`);
+  }
 }
 
 function decide(publicationWorkflow: PublicationWorkflow) {

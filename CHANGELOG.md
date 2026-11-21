@@ -8,6 +8,20 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-11-21
+
+### Added
+
+- **Website footer wordmark:** the website's landing, changelog, reference and playground pages end with a large SendMock wordmark drawn in small squares that show how many times SendMock was downloaded on each of the last 7 days (npm, crates.io and PyPI), oldest day on the left and the busiest day brightest. Move the pointer near it and a soft light brightens the squares; on phones and tablets it rests still.
+
+### Changed
+
+- **Testcontainers for Go needs Go 1.26:** the `sendmock-testcontainers` Go module moves to patched releases of its dependencies (OpenTelemetry 1.47, `klauspost/compress`, `moby/go-archive`, `moby/sys/user`), and OpenTelemetry 1.47 requires Go 1.26. The Python module's test dependency moves to pytest 9.
+
+### Fixed
+
+- **Chocolatey package details:** the `sendmock` Chocolatey package names its copyright holder and links the release's license file, as Chocolatey's reviewers asked.
+
 ## [1.3.0] - 2026-11-20
 
 ### Added

@@ -4,6 +4,7 @@ import {
   isBeta,
   parseVersion,
 } from "../version/semantic-version";
+import type { SecurityItems } from "./security-items";
 
 /** The version the code carries before the first Prepare release run. */
 const unreleasedVersion = "0.0.0";
@@ -51,9 +52,17 @@ export function decidePublication(
 export type ReleaseReadiness = {
   ciConclusion: string | null;
   openReleasePullRequestNumbers: number[];
+  /** Open code scanning alerts, Dependabot alerts and Dependabot pull requests (PL-19.5). */
+  openSecurityItems: Pick<
+    SecurityItems,
+    "codeScanningAlerts" | "dependabotPullRequests"
+  >;
 };
 
-/** Why a release may not start now: CI did not pass, or another release is under way. */
+/**
+ * Why a release may not start now: CI did not pass, another release is under way, a code
+ * scanning alert is open on `main`, or Dependabot has an open pull request.
+ */
 export function findReleaseBlockers(readiness: ReleaseReadiness): string[] {
   const releaseBlockers: string[] = [];
   if (readiness.ciConclusion !== "success") {
@@ -65,6 +74,22 @@ export function findReleaseBlockers(readiness: ReleaseReadiness): string[] {
     releaseBlockers.push(
       `Release pull request #${pullRequestNumber} is still open; merge or close it first.`,
     );
+  }
+  // Dependabot alerts are not blockers: GitHub reads them on `main` only, so a release's own
+  // fixes, still on `develop`, cannot close them until that release reaches `main`.
+  const securityLists: [string, string[]][] = [
+    ["Code scanning alert", readiness.openSecurityItems.codeScanningAlerts],
+    [
+      "Dependabot pull request",
+      readiness.openSecurityItems.dependabotPullRequests,
+    ],
+  ];
+  for (const [itemKind, openItems] of securityLists) {
+    for (const openItem of openItems) {
+      releaseBlockers.push(
+        `${itemKind} ${openItem} is open; fix, merge or dismiss it with a reason first.`,
+      );
+    }
   }
   return releaseBlockers;
 }

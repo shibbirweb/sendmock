@@ -36,7 +36,7 @@ gh secret set SECRET_NAME --repo shibbirweb/sendmock
 
 | Secret | What it is | Without it |
 |--------|------------|------------|
-| `RELEASE_TOKEN` | A fine-grained token with contents and pull request write on this repository | The release and promote pull requests do not start CI by themselves |
+| `RELEASE_TOKEN` | A fine-grained token on this repository with contents and pull request write; with Dependabot alerts read too, Prepare release lists the open Dependabot alerts in its log (added for 1.3.1, PL-19.5) | The release and promote pull requests do not start CI by themselves |
 | `NPM_TOKEN` | An npm granular access token with read and write on all packages, for the first beta only (npm sets a trusted publisher only on a package that exists); delete it once the trusted publishers are set (step 6) | The first beta cannot create the npm packages |
 | `DOCKERHUB_USERNAME` | The Docker Hub user | The image is only on GHCR |
 | `DOCKERHUB_TOKEN` | A Docker Hub personal access token with read and write; the Docker job creates the public repository `shibbirweb/sendmock` before its first push, and stops if it exists but is private | The image is only on GHCR |
@@ -264,3 +264,17 @@ GitHub's MCP Registry (`github.com/mcp`) is curated from the official MCP regist
 Check: SendMock is on `github.com/mcp` and installs from it.
 
 Proves: AI-05.8
+
+## 11. Before every stable release: read the Security tab
+
+Added after 1.3.1 (A22, PL-19.5), so alerts and Dependabot pull requests do not pile up again. Prepare release refuses to start while a code scanning alert on `main` or a Dependabot pull request is open, and lists the Dependabot alerts without blocking on them, because GitHub reads those on `main` only and a release's own fixes close them only once it is there. Look first:
+
+```sh
+bun scripts/release-readiness.ts
+```
+
+For each item it lists: upgrade the package to a patched version (or merge Dependabot's pull request when its CI passes), fix the code for a code scanning alert, or, only when no fix exists or the vulnerable code is not reachable, dismiss it on GitHub with the reason and write the dismissal into the release's plan section.
+
+Check: before Prepare release, the code scanning and Dependabot pull request lists are empty and every open Dependabot alert is one the release fixes. After the stable reaches `main`, run it again: all three lists are empty. For 1.3.1 that second run is the proof of its clean-up and ticks PL-19.1 to PL-19.4.
+
+Proves: PL-19.1, PL-19.2, PL-19.3, PL-19.4, PL-19.5

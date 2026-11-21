@@ -1,3 +1,5 @@
+import { fileURLToPath } from "node:url";
+
 import { defineConfig, devices } from "@playwright/test";
 
 const websitePort = 5192;
@@ -23,6 +25,15 @@ export default defineConfig({
     // the API playground needs the demo's bridge page.
     command: `bun ../scripts/build-pages-site.ts && bunx --bun serve out -l ${websitePort} --no-clipboard`,
     url: `http://127.0.0.1:${websitePort}`,
+    // The footer's build-time download numbers come from a fixture, not the registries.
+    env: {
+      DOWNLOAD_ACTIVITY_SOURCES_FILE: fileURLToPath(
+        new URL(
+          "./tests/fixtures/download-activity-sources.json",
+          import.meta.url,
+        ),
+      ),
+    },
     reuseExistingServer: !process.env.CI,
     timeout: 300_000,
   },
