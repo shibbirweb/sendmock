@@ -10,9 +10,11 @@ use super::provider_call::ProviderCall;
 use super::provider_catalog::{EMAIL_PROVIDER_AREA, SMS_PROVIDER_AREA, load_area_providers};
 use super::provider_http::{ProviderHttpRequest, ProviderHttpResponse};
 use super::read_operation_kinds::{answer_fetch, answer_list};
-use super::request_checks::{ProviderFailure, has_valid_credentials};
+use super::request_checks::ProviderFailure;
 use super::request_reader::read_request_fields;
 use super::send_operation_kind::{ProviderAnswer, answer_send};
+use super::twilio_account_guard::{TwilioAccountCheck, check_twilio_account};
+use super::twilio_accounts_api::answer_twilio_accounts_request;
 use super::twilio_messaging_services::answer_messaging_services_request;
 use super::twilio_verify_api::answer_twilio_verify_request;
 use super::vonage_verify_api::answer_vonage_verify;
@@ -90,15 +92,19 @@ pub async fn answer_provider_request(
             "body",
             "The body is not valid JSON",
         )
-    } else if !has_valid_credentials(provider, request) {
-        refuse(
-            &provider_call,
-            "unauthorized",
-            "credentials",
-            "The credentials do not match",
-        )
     } else {
-        run_operation_kind(operation_context, &provider_call).await?
+        match check_twilio_account(operation_context, &provider_call).await? {
+            TwilioAccountCheck::Allowed => {
+                run_operation_kind(operation_context, &provider_call).await?
+            }
+            TwilioAccountCheck::Unauthorized => refuse(
+                &provider_call,
+                "unauthorized",
+                "credentials",
+                "The credentials do not match",
+            ),
+            TwilioAccountCheck::Refused(refusal) => refusal,
+        }
     };
     Ok(ProviderOutcome {
         response: provider_answer.response,
@@ -176,6 +182,16 @@ async fn answer_twilio_services(
     else {
         return Ok(None);
     };
+    if let Some(accounts_answer) =
+        answer_twilio_accounts_request(operation_context, twilio_provider, request).await?
+    {
+        return Ok(Some(ProviderOutcome {
+            response: accounts_answer.response,
+            provider_key: Some(TWILIO_PROVIDER_KEY.to_owned()),
+            created_message: None,
+            secret_values: accounts_answer.secret_values,
+        }));
+    }
     let services_response =
         answer_messaging_services_request(operation_context, twilio_provider, request).await?;
     Ok(services_response.map(|response| ProviderOutcome {

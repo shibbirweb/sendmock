@@ -18,6 +18,7 @@ import { ProviderOperationsEditor } from "@/features/providers/provider-operatio
 import { ProviderPreviewTab } from "@/features/providers/provider-preview-tab";
 import { ProviderResponsesTab } from "@/features/providers/provider-responses-tab";
 import { ProviderTryItTab } from "@/features/providers/provider-try-it-tab";
+import { TwilioAccountsTab } from "@/features/providers/twilio-accounts/twilio-accounts-tab";
 import { useMessageProviderForm } from "@/features/providers/use-message-provider-form";
 import type {
   MessageProviderArea,
@@ -25,10 +26,17 @@ import type {
 } from "@/lib/api/types";
 
 type ProviderTab =
-  "general" | "requests" | "responses" | "callbacks" | "preview" | "try-it";
+  | "general"
+  | "accounts"
+  | "requests"
+  | "responses"
+  | "callbacks"
+  | "preview"
+  | "try-it";
 
 const providerTabs: { tab: ProviderTab; label: string }[] = [
   { tab: "general", label: "General" },
+  { tab: "accounts", label: "Accounts" },
   { tab: "requests", label: "Requests" },
   { tab: "responses", label: "Responses" },
   { tab: "callbacks", label: "Callbacks" },
@@ -55,6 +63,12 @@ export function MessageProviderSheet({
     onClose,
   );
   const [openTab, setOpenTab] = React.useState<ProviderTab>("general");
+  // Subaccounts are Twilio's, so only the Twilio SMS provider has an Accounts tab (SM-19.4).
+  const hasAccountsTab =
+    providerArea === "sms" && messageProvider.key === "twilio";
+  const shownTabs = providerTabs.filter(
+    ({ tab }) => tab !== "accounts" || hasAccountsTab,
+  );
   const templateErrorCount = providerForm.templateErrors.length;
 
   return (
@@ -90,7 +104,7 @@ export function MessageProviderSheet({
           >
             <div className="overflow-x-auto px-4">
               <TabsList>
-                {providerTabs.map(({ tab, label }) => (
+                {shownTabs.map(({ tab, label }) => (
                   <TabsTrigger key={tab} value={tab}>
                     {label}
                   </TabsTrigger>
@@ -104,6 +118,13 @@ export function MessageProviderSheet({
                   savedCredentials={messageProvider.credentials}
                 />
               </TabsContent>
+              {hasAccountsTab && (
+                <TabsContent value="accounts" className="max-w-2xl">
+                  <TwilioAccountsTab
+                    savedCredentials={messageProvider.credentials}
+                  />
+                </TabsContent>
+              )}
               <TabsContent value="requests" className="grid max-w-3xl gap-5">
                 <ProviderOperationsEditor providerForm={providerForm} />
                 <ProviderMappingEditor providerForm={providerForm} />

@@ -129,6 +129,10 @@ export const pathParameterDocs: Record<string, PathParameterDoc> = {
       "The service SID: `MG...` for a Messaging Service, `VA...` for a Verify service.",
     example: "MG00000000000000000000000000000001",
   },
+  accountSid: {
+    description: "A Twilio subaccount SID: `AC` and 32 hex digits.",
+    example: "AC33333333333333333333333333333333",
+  },
   sessionId: {
     description: "The SMTP session's ID, from `GET /api/v1/logs/smtp`.",
     example: exampleUlid,

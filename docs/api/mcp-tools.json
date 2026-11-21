@@ -26628,6 +26628,431 @@
       ]
     },
     {
+      "name": "sendmock_twilio_subaccount_create",
+      "toolset": "sms",
+      "summary": "Add a Twilio subaccount with its own auth token.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/twilio/subaccounts",
+          "operation_id": "postTwilioSubaccounts",
+          "summary": "Add a Twilio subaccount with its own auth token.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "account_sid",
+          "input": {
+            "name": "account_sid",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "`AC` and 32 hex digits; null makes a new one.",
+          "example": null
+        },
+        {
+          "name": "friendly_name",
+          "input": {
+            "name": "friendly_name",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "A name for the subaccount.",
+          "example": "Acme Clinic"
+        },
+        {
+          "name": "status",
+          "input": {
+            "name": "status",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "active",
+            "suspended",
+            "closed"
+          ],
+          "description": "Defaults to `active`.",
+          "example": "active"
+        },
+        {
+          "name": "auth_token",
+          "input": {
+            "name": "auth_token",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The subaccount's auth token. Null, empty or the masked value keeps the stored token; a new subaccount without one gets a generated token.",
+          "example": null
+        },
+        {
+          "name": "debugger_url",
+          "input": {
+            "name": "debugger_url",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Where Twilio Debugger events for this subaccount are sent; null for none.",
+          "example": null
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "account_sid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`AC` and 32 hex digits; null makes a new one.",
+            "examples": [
+              null
+            ]
+          },
+          "friendly_name": {
+            "type": "string",
+            "description": "A name for the subaccount.",
+            "examples": [
+              "Acme Clinic"
+            ]
+          },
+          "status": {
+            "$ref": "#/$defs/TwilioAccountStatus",
+            "description": "Defaults to `active`.",
+            "examples": [
+              "active"
+            ]
+          },
+          "auth_token": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The subaccount's auth token. Null, empty or the masked value keeps the stored token; a new subaccount without one gets a generated token.",
+            "examples": [
+              null
+            ]
+          },
+          "debugger_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Where Twilio Debugger events for this subaccount are sent; null for none.",
+            "examples": [
+              null
+            ]
+          }
+        },
+        "required": [
+          "friendly_name"
+        ],
+        "$defs": {
+          "TwilioAccountStatus": {
+            "type": "string",
+            "enum": [
+              "active",
+              "suspended",
+              "closed"
+            ],
+            "description": "A Twilio account's status, as the Accounts API writes it."
+          }
+        }
+      },
+      "example_arguments": {
+        "friendly_name": "Acme Clinic",
+        "account_sid": null,
+        "status": "active"
+      },
+      "output": "TwilioSubaccount",
+      "cli": [
+        "sendmock sms twilio subaccounts create"
+      ],
+      "ui": [
+        "SMS > Providers > Twilio > Accounts > Add subaccount"
+      ]
+    },
+    {
+      "name": "sendmock_twilio_subaccount_delete",
+      "toolset": "sms",
+      "summary": "Remove a Twilio subaccount; its messages stay.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/twilio/subaccounts/{accountSid}",
+          "operation_id": "deleteTwilioSubaccountsByAccountSid",
+          "summary": "Remove a Twilio subaccount; its messages stay.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "account_sid",
+          "input": {
+            "name": "accountSid",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "A Twilio subaccount SID: `AC` and 32 hex digits.",
+          "example": "AC33333333333333333333333333333333"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "account_sid": {
+            "type": "string",
+            "description": "A Twilio subaccount SID: `AC` and 32 hex digits.",
+            "examples": [
+              "AC33333333333333333333333333333333"
+            ]
+          }
+        },
+        "required": [
+          "account_sid"
+        ]
+      },
+      "example_arguments": {
+        "account_sid": "AC33333333333333333333333333333333"
+      },
+      "output": null,
+      "cli": [
+        "sendmock sms twilio subaccounts delete <accountSid>"
+      ],
+      "ui": [
+        "SMS > Providers > Twilio > Accounts > Remove"
+      ]
+    },
+    {
+      "name": "sendmock_twilio_subaccount_list",
+      "toolset": "sms",
+      "summary": "Subaccounts of the Twilio provider's main account, tokens masked.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/twilio/subaccounts",
+          "operation_id": "getTwilioSubaccounts",
+          "summary": "Subaccounts of the Twilio provider's main account, tokens masked.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [],
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "example_arguments": {},
+      "output": "TwilioSubaccount[]",
+      "cli": [
+        "sendmock sms twilio subaccounts list"
+      ],
+      "ui": [
+        "SMS > Providers > Twilio > Accounts"
+      ]
+    },
+    {
+      "name": "sendmock_twilio_subaccount_update",
+      "toolset": "sms",
+      "summary": "Change a Twilio subaccount's name, status, token or Debugger URL.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/twilio/subaccounts/{accountSid}",
+          "operation_id": "patchTwilioSubaccountsByAccountSid",
+          "summary": "Change a Twilio subaccount's name, status, token or Debugger URL.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "account_sid",
+          "input": {
+            "name": "accountSid",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "A Twilio subaccount SID: `AC` and 32 hex digits.",
+          "example": "AC33333333333333333333333333333333"
+        },
+        {
+          "name": "friendly_name",
+          "input": {
+            "name": "friendly_name",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "A name for the subaccount.",
+          "example": "Acme Clinic"
+        },
+        {
+          "name": "status",
+          "input": {
+            "name": "status",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "active",
+            "suspended",
+            "closed"
+          ],
+          "description": "Defaults to `active`.",
+          "example": "active"
+        },
+        {
+          "name": "auth_token",
+          "input": {
+            "name": "auth_token",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The subaccount's auth token. Null, empty or the masked value keeps the stored token; a new subaccount without one gets a generated token.",
+          "example": null
+        },
+        {
+          "name": "debugger_url",
+          "input": {
+            "name": "debugger_url",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Where Twilio Debugger events for this subaccount are sent; null for none.",
+          "example": null
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "account_sid": {
+            "type": "string",
+            "description": "A Twilio subaccount SID: `AC` and 32 hex digits.",
+            "examples": [
+              "AC33333333333333333333333333333333"
+            ]
+          },
+          "friendly_name": {
+            "type": "string",
+            "description": "A name for the subaccount.",
+            "examples": [
+              "Acme Clinic"
+            ]
+          },
+          "status": {
+            "$ref": "#/$defs/TwilioAccountStatus",
+            "description": "Defaults to `active`.",
+            "examples": [
+              "active"
+            ]
+          },
+          "auth_token": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The subaccount's auth token. Null, empty or the masked value keeps the stored token; a new subaccount without one gets a generated token.",
+            "examples": [
+              null
+            ]
+          },
+          "debugger_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Where Twilio Debugger events for this subaccount are sent; null for none.",
+            "examples": [
+              null
+            ]
+          }
+        },
+        "required": [
+          "account_sid",
+          "friendly_name"
+        ],
+        "$defs": {
+          "TwilioAccountStatus": {
+            "type": "string",
+            "enum": [
+              "active",
+              "suspended",
+              "closed"
+            ],
+            "description": "A Twilio account's status, as the Accounts API writes it."
+          }
+        }
+      },
+      "example_arguments": {
+        "account_sid": "AC33333333333333333333333333333333",
+        "friendly_name": "Acme Clinic",
+        "status": "active",
+        "auth_token": null
+      },
+      "output": "TwilioSubaccount",
+      "cli": [
+        "sendmock sms twilio subaccounts update <accountSid>"
+      ],
+      "ui": [
+        "SMS > Providers > Twilio > Accounts > Edit"
+      ]
+    },
+    {
       "name": "sendmock_update_check",
       "toolset": "admin",
       "summary": "Whether a newer release exists for this channel, with its notes and upgrade command.",
@@ -35777,6 +36202,18 @@
     }
   ],
   "exemptions": [
+    {
+      "operation": {
+        "method": "GET",
+        "path": "/api/v1/twilio/subaccounts/{accountSid}/auth-token",
+        "operation_id": "getTwilioSubaccountsByAccountSidAuthToken",
+        "summary": "Reveal a subaccount's auth token (asked for after a confirmation).",
+        "area_slug": "sms",
+        "selector": null
+      },
+      "reason": "Agents may set secrets but never read them back; the CLI and UI reveal them after a confirmation.",
+      "cli": "sendmock sms twilio subaccounts token <accountSid> --reveal"
+    },
     {
       "operation": {
         "method": "GET",

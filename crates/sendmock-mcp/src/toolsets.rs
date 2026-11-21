@@ -15,6 +15,7 @@ const TOOLSET_PREFIXES: [(&str, &str); 29] = [
     ("sendmock_outcome_rule_", "rules"),
     ("sendmock_email_", "email"),
     ("sendmock_sms_", "sms"),
+    ("sendmock_twilio_", "sms"),
     ("sendmock_messaging_service_", "numbers"),
     ("sendmock_number_", "numbers"),
     ("sendmock_verify_", "verify"),

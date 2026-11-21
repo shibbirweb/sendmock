@@ -90,6 +90,8 @@ pub const EMAIL_PROVIDERS_SECTION: SeedSection =
 pub const EMAIL_TEMPLATES_SECTION: SeedSection =
     item_list("email.templates", "Email template", ID_KEY);
 pub const SMS_PROVIDERS_SECTION: SeedSection = item_list("sms.providers", "SMS provider", KEY_KEY);
+pub const TWILIO_SUBACCOUNTS_SECTION: SeedSection =
+    item_list("sms.twilio_subaccounts", "Twilio subaccount", SID_KEY);
 pub const PAYMENT_FLOWS_SECTION: SeedSection = item_list("payments.flows", "Payment flow", KEY_KEY);
 pub const PAYMENT_METHODS_SECTION: SeedSection =
     item_list("payments.methods", "Payment method", KEY_KEY);
@@ -107,7 +109,7 @@ pub const INBOUND_ROUTES_SECTION: SeedSection = item_list(
 pub const SCENARIOS_SECTION: SeedSection = item_list("scenarios", "Saved scenario", NAME_KEY);
 
 /// Every section a seed file may hold, in the order the summary lists them.
-pub const SEED_SECTIONS: [SeedSection; 23] = [
+pub const SEED_SECTIONS: [SeedSection; 24] = [
     SETTINGS_SECTION,
     PROJECTS_SECTION,
     WEBHOOK_ENDPOINTS_SECTION,
@@ -127,6 +129,7 @@ pub const SEED_SECTIONS: [SeedSection; 23] = [
     EMAIL_PROVIDERS_SECTION,
     EMAIL_TEMPLATES_SECTION,
     SMS_PROVIDERS_SECTION,
+    TWILIO_SUBACCOUNTS_SECTION,
     PAYMENT_FLOWS_SECTION,
     PAYMENT_METHODS_SECTION,
     PAYMENT_GATEWAYS_SECTION,

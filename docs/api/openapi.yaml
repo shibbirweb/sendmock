@@ -4017,6 +4017,139 @@ paths:
       x-sendmock-cli: sendmock sms services delete <serviceSid>
       x-sendmock-mcp: sendmock_messaging_service_delete
       x-sendmock-ui: Numbers > Messaging Services > Delete
+  /api/v1/twilio/subaccounts:
+    get:
+      operationId: getTwilioSubaccounts
+      summary: Subaccounts of the Twilio provider's main account, tokens masked.
+      tags:
+        - SMS
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TwilioSubaccount"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms twilio subaccounts list
+      x-sendmock-mcp: sendmock_twilio_subaccount_list
+      x-sendmock-ui: SMS > Providers > Twilio > Accounts
+    post:
+      operationId: postTwilioSubaccounts
+      summary: Add a Twilio subaccount with its own auth token.
+      tags:
+        - SMS
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TwilioSubaccountInput"
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TwilioSubaccount"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms twilio subaccounts create
+      x-sendmock-mcp: sendmock_twilio_subaccount_create
+      x-sendmock-ui: SMS > Providers > Twilio > Accounts > Add subaccount
+  /api/v1/twilio/subaccounts/{accountSid}:
+    patch:
+      operationId: patchTwilioSubaccountsByAccountSid
+      summary: Change a Twilio subaccount's name, status, token or Debugger URL.
+      tags:
+        - SMS
+      parameters:
+        - name: accountSid
+          in: path
+          required: true
+          description: "A Twilio subaccount SID: `AC` and 32 hex digits."
+          schema:
+            type: string
+          example: AC33333333333333333333333333333333
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TwilioSubaccountChanges"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TwilioSubaccount"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms twilio subaccounts update <accountSid>
+      x-sendmock-mcp: sendmock_twilio_subaccount_update
+      x-sendmock-ui: SMS > Providers > Twilio > Accounts > Edit
+    delete:
+      operationId: deleteTwilioSubaccountsByAccountSid
+      summary: Remove a Twilio subaccount; its messages stay.
+      tags:
+        - SMS
+      parameters:
+        - name: accountSid
+          in: path
+          required: true
+          description: "A Twilio subaccount SID: `AC` and 32 hex digits."
+          schema:
+            type: string
+          example: AC33333333333333333333333333333333
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms twilio subaccounts delete <accountSid>
+      x-sendmock-mcp: sendmock_twilio_subaccount_delete
+      x-sendmock-ui: SMS > Providers > Twilio > Accounts > Remove
+  /api/v1/twilio/subaccounts/{accountSid}/auth-token:
+    get:
+      operationId: getTwilioSubaccountsByAccountSidAuthToken
+      summary: Reveal a subaccount's auth token (asked for after a confirmation).
+      tags:
+        - SMS
+      parameters:
+        - name: accountSid
+          in: path
+          required: true
+          description: "A Twilio subaccount SID: `AC` and 32 hex digits."
+          schema:
+            type: string
+          example: AC33333333333333333333333333333333
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TwilioSubaccountTokenReveal"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms twilio subaccounts token <accountSid> --reveal
+      x-sendmock-mcp: null
+      x-sendmock-mcp-exempt: Agents may set secrets but never read them back; the CLI and UI reveal them after a confirmation.
+      x-sendmock-ui: SMS > Providers > Twilio > Accounts > Reveal
   /api/v1/emails/providers:
     get:
       operationId: getEmailsProviders
@@ -16632,6 +16765,141 @@ components:
         - outcome
         - decline_reason
       description: A test account number or voucher code with its outcome.
+    TwilioAccountStatus:
+      type: string
+      enum:
+        - active
+        - suspended
+        - closed
+      description: A Twilio account's status, as the Accounts API writes it.
+    TwilioSubaccount:
+      type: object
+      properties:
+        account_sid:
+          type: string
+          description: The subaccount SID, `AC` and 32 hex digits.
+          examples:
+            - AC22222222222222222222222222222222
+        friendly_name:
+          type: string
+          description: A name for the subaccount, e.g. the customer it belongs to.
+          examples:
+            - Acme Clinic
+        status:
+          $ref: "#/components/schemas/TwilioAccountStatus"
+          description: "`active`, `suspended` or `closed`; a send under a suspended or closed subaccount is refused."
+          examples:
+            - active
+        auth_token:
+          type: string
+          description: "`••••` and the last four characters; reveal it with the CLI or the provider sheet."
+          examples:
+            - ••••9f2c
+        debugger_url:
+          type:
+            - string
+            - "null"
+          description: Where Twilio Debugger events for this subaccount are sent; null for none.
+          examples:
+            - https://shop.test/twilio/debugger
+        created_by:
+          $ref: "#/components/schemas/CreatedBy"
+        created_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+        updated_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+      required:
+        - account_sid
+        - friendly_name
+        - status
+        - auth_token
+        - debugger_url
+        - created_by
+        - created_at
+        - updated_at
+      description: A subaccount of the Twilio provider's main account; its auth token is masked.
+    TwilioSubaccountChanges:
+      type: object
+      properties:
+        friendly_name:
+          type: string
+          description: A name for the subaccount.
+          examples:
+            - Acme Clinic
+        status:
+          $ref: "#/components/schemas/TwilioAccountStatus"
+          description: Defaults to `active`.
+          examples:
+            - active
+        auth_token:
+          type:
+            - string
+            - "null"
+          description: The subaccount's auth token. Null, empty or the masked value keeps the stored token; a new subaccount without one gets a generated token.
+          examples:
+            - null
+        debugger_url:
+          type:
+            - string
+            - "null"
+          description: Where Twilio Debugger events for this subaccount are sent; null for none.
+          examples:
+            - null
+      required:
+        - friendly_name
+      description: Body of `PATCH /api/v1/twilio/subaccounts/{accountSid}`.
+    TwilioSubaccountInput:
+      type: object
+      properties:
+        account_sid:
+          type:
+            - string
+            - "null"
+          description: "`AC` and 32 hex digits; null makes a new one."
+          examples:
+            - null
+        friendly_name:
+          type: string
+          description: A name for the subaccount.
+          examples:
+            - Acme Clinic
+        status:
+          $ref: "#/components/schemas/TwilioAccountStatus"
+          description: Defaults to `active`.
+          examples:
+            - active
+        auth_token:
+          type:
+            - string
+            - "null"
+          description: The subaccount's auth token. Null, empty or the masked value keeps the stored token; a new subaccount without one gets a generated token.
+          examples:
+            - null
+        debugger_url:
+          type:
+            - string
+            - "null"
+          description: Where Twilio Debugger events for this subaccount are sent; null for none.
+          examples:
+            - null
+      required:
+        - friendly_name
+      description: Body of `POST /api/v1/twilio/subaccounts`.
+    TwilioSubaccountTokenReveal:
+      type: object
+      properties:
+        account_sid:
+          type: string
+          examples:
+            - AC22222222222222222222222222222222
+        auth_token:
+          type: string
+          examples:
+            - example-subaccount-token-9f2c
+      required:
+        - account_sid
+        - auth_token
+      description: A subaccount's auth token, shown in full after a confirmation.
     TwimlMethod:
       type: string
       enum:

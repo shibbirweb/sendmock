@@ -163,7 +163,52 @@ const numberEndpoints = tagEndpoints("Numbers", [
   },
 ]);
 
+/** Subaccounts of the Twilio provider's main account (SM-19, A23). */
+const twilioAccountEndpoints = tagEndpoints("SMS", [
+  {
+    method: "GET",
+    path: "/api/v1/twilio/subaccounts",
+    summary:
+      "Subaccounts of the Twilio provider's main account, tokens masked.",
+    response: listOf("TwilioSubaccount"),
+  },
+  {
+    method: "POST",
+    path: "/api/v1/twilio/subaccounts",
+    summary: "Add a Twilio subaccount with its own auth token.",
+    requestBody: typeRef("TwilioSubaccountInput"),
+    response: typeRef("TwilioSubaccount"),
+    successStatus: 201,
+    errorStatuses: [400, 409],
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/twilio/subaccounts/{accountSid}",
+    summary:
+      "Change a Twilio subaccount's name, status, token or Debugger URL.",
+    requestBody: typeRef("TwilioSubaccountChanges"),
+    response: typeRef("TwilioSubaccount"),
+    errorStatuses: [400, 404],
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/twilio/subaccounts/{accountSid}",
+    summary: "Remove a Twilio subaccount; its messages stay.",
+    response: null,
+    successStatus: 204,
+  },
+  {
+    method: "GET",
+    path: "/api/v1/twilio/subaccounts/{accountSid}/auth-token",
+    summary:
+      "Reveal a subaccount's auth token (asked for after a confirmation).",
+    response: typeRef("TwilioSubaccountTokenReveal"),
+    errorStatuses: [404],
+  },
+]);
+
 export const numbersApi: ApiEndpoint[] = [
   ...verifyEndpoints,
   ...numberEndpoints,
+  ...twilioAccountEndpoints,
 ];

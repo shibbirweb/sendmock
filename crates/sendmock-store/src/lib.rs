@@ -31,6 +31,7 @@ mod sms_callback_attempt;
 mod sms_reply_webhook;
 mod smtp_session;
 mod store_error;
+mod twilio_subaccount;
 mod verify;
 mod webhook_delivery;
 mod webhook_endpoint;
@@ -100,6 +101,7 @@ pub use smtp_session::{
     SmtpSessionFilter, SmtpSessionPage, SmtpSessionRecord, SmtpSessionRepository,
 };
 pub use store_error::StoreError;
+pub use twilio_subaccount::{TwilioSubaccountRecord, TwilioSubaccountRepository};
 pub use verify::{
     VerificationFilter, VerificationPage, VerificationRecord, VerificationRepository,
     VerificationTimelineRecord, VerifyServiceRecord, VerifyServiceRepository,

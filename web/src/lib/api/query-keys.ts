@@ -72,6 +72,9 @@ export const queryKeys = {
     virtualNumbers: ["numbers", "virtual-numbers"] as const,
     messagingServices: ["numbers", "messaging-services"] as const,
   },
+  twilio: {
+    subaccounts: ["twilio", "subaccounts"] as const,
+  },
   webhooks: {
     all: ["webhooks"] as const,
     endpoints: ["webhooks", "endpoints"] as const,

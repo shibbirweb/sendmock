@@ -12,9 +12,9 @@ use sendmock_store::{
     SavedScenarioRepository, SavedWebhookDeliveryRepository, SeedStateRepository,
     SettingsRepository, SmsCallbackAttemptRepository, SmsOutcomeRuleRepository,
     SmsReplyWebhookRepository, SmsRepository, SmtpSessionRepository, TrafficPruner,
-    VerificationRepository, VerifyServiceRepository, VirtualNumberRepository,
-    WebhookDeliveryRepository, WebhookEndpointRepository, WebhookRuleRepository,
-    WebhookTemplateRepository, WebhookVariableRepository,
+    TwilioSubaccountRepository, VerificationRepository, VerifyServiceRepository,
+    VirtualNumberRepository, WebhookDeliveryRepository, WebhookEndpointRepository,
+    WebhookRuleRepository, WebhookTemplateRepository, WebhookVariableRepository,
 };
 
 use crate::{
@@ -43,6 +43,8 @@ pub struct OperationContext {
     pub sms_outcome_rule_repository: SmsOutcomeRuleRepository,
     pub virtual_number_repository: VirtualNumberRepository,
     pub messaging_service_repository: MessagingServiceRepository,
+    /// Subaccounts of the Twilio provider's main account.
+    pub twilio_subaccount_repository: TwilioSubaccountRepository,
     pub verify_service_repository: VerifyServiceRepository,
     pub verification_repository: VerificationRepository,
     /// Counts across emails, SMS and verifications for the Overview.
@@ -227,6 +229,7 @@ impl OperationContext {
             sms_outcome_rule_repository: SmsOutcomeRuleRepository::new(share_database()),
             virtual_number_repository: VirtualNumberRepository::new(share_database()),
             messaging_service_repository: MessagingServiceRepository::new(share_database()),
+            twilio_subaccount_repository: TwilioSubaccountRepository::new(share_database()),
             verify_service_repository: VerifyServiceRepository::new(share_database()),
             verification_repository: VerificationRepository::new(share_database()),
             message_provider_repository: MessageProviderRepository::new(share_database()),
