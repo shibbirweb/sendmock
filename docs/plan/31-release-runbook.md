@@ -275,6 +275,6 @@ bun scripts/release-readiness.ts
 
 For each item it lists: upgrade the package to a patched version (or merge Dependabot's pull request when its CI passes), fix the code for a code scanning alert, or, only when no fix exists or the vulnerable code is not reachable, dismiss it on GitHub with the reason and write the dismissal into the release's plan section.
 
-Check: the three lists under "Open code scanning alerts on main", "Open Dependabot alerts" and "Open Dependabot pull requests" are empty.
+Check: the three lists under "Open code scanning alerts on main", "Open Dependabot alerts" and "Open Dependabot pull requests" are empty. For 1.3.1 this is also the proof of its clean-up: after its pull request has merged and CI has run the upgraded examples and Testcontainers modules, empty lists tick PL-19.1 to PL-19.4.
 
-Proves: PL-19.5
+Proves: PL-19.1, PL-19.2, PL-19.3, PL-19.4, PL-19.5
