@@ -205,7 +205,7 @@ async fn without_the_passphrase_or_with_a_wrong_one_nothing_is_applied() {
         )
         .await
         .err()
-        .unwrap_or_else(|| panic!("{passphrase:?} must be refused"));
+        .unwrap_or_else(|| panic!("an import must be refused with {expected_code}"));
 
         assert_eq!(import_error.code(), expected_code);
         let stored_endpoints = target_context
