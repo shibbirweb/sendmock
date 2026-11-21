@@ -1,1 +1,204 @@
-{}
+{
+  "$defs": {
+    "CiFileHeader": {
+      "additionalProperties": false,
+      "description": "`sendmock: { format: sendmock.ci, format_version: 1 }`.",
+      "properties": {
+        "format": {
+          "description": "Always `sendmock.ci`.",
+          "type": "string"
+        },
+        "format_version": {
+          "description": "The CI file's shape; this build reads version 1.",
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "format",
+        "format_version"
+      ],
+      "type": "object"
+    },
+    "CiReportPaths": {
+      "additionalProperties": false,
+      "description": "Where `sendmock ci run` writes its reports, unless flags say otherwise.",
+      "properties": {
+        "json": {
+          "default": null,
+          "description": "The JSON report.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "junit": {
+          "default": null,
+          "description": "The JUnit XML report, which every CI system shows.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "CiScenario": {
+      "anyOf": [
+        {
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "steps": {
+              "description": "Each with `run`, and optionally `with` and `save`.",
+              "items": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "name",
+            "steps"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "name": {
+              "default": null,
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "text": {
+              "description": "A scenario file's text, in TOML, JSON or YAML.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "text"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "A path relative to the CI file, which `sendmock ci run` reads.",
+          "properties": {
+            "file": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "file"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "An `https://` URL to a scenario file.",
+          "properties": {
+            "url": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "url"
+          ],
+          "type": "object"
+        }
+      ],
+      "description": "One scenario: its steps inline, its text, or a file or URL holding it."
+    },
+    "CiSetup": {
+      "anyOf": [
+        {
+          "description": "An `https://` URL, or a path relative to the CI file (which `sendmock ci run` reads).",
+          "type": "string"
+        },
+        {
+          "properties": {
+            "format": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/SetupFileFormat"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "`toml`, `json` or `yaml`, when the text does not say."
+            },
+            "text": {
+              "description": "The setup file's text.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "text"
+          ],
+          "type": "object"
+        }
+      ],
+      "description": "The setup to apply first: a path or URL, or the file's text."
+    },
+    "SetupFileFormat": {
+      "description": "The text formats a setup file can be written in; all three hold the same structure, so a\nfile converts between them without loss.",
+      "enum": [
+        "toml",
+        "json",
+        "yaml"
+      ],
+      "type": "string"
+    }
+  },
+  "$id": "https://shibbir.me/sendmock/schema/ci/v1.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The CI file, as JSON or YAML.",
+  "properties": {
+    "app_url": {
+      "default": null,
+      "description": "The app's base URL; scenarios read it as `{{ app_url }}`.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "report": {
+      "$ref": "#/$defs/CiReportPaths",
+      "default": {
+        "json": null,
+        "junit": null
+      }
+    },
+    "scenarios": {
+      "items": {
+        "$ref": "#/$defs/CiScenario"
+      },
+      "type": "array"
+    },
+    "sendmock": {
+      "$ref": "#/$defs/CiFileHeader"
+    },
+    "setup": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CiSetup"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "sendmock",
+    "scenarios"
+  ],
+  "title": "SendMock CI file",
+  "type": "object"
+}

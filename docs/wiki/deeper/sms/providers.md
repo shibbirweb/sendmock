@@ -332,13 +332,43 @@ Text.
 
 - **What it does:** Explains Check credentials.
 
-### 51. Cancel
+### 51. Unmatched requests
+
+Heading.
+
+- **What it does:** Sends the requests SendMock does not answer on Twilio's base URL to an HTTP Catcher bin, which answers them with its rules.
+- **Links to:** [Provider gaps](../../http/provider-gaps.md)
+
+### 52. Requests on Twilio's base URL that SendMock does not answer. Send them to a bin to answer them with its rules and follow-up webhooks.
+
+Text.
+
+- **What it does:** Explains Unmatched requests: built-in operations still answer first.
+
+### 53. Where Twilio's unmatched requests go
+
+Drop-down.
+
+- **What it does:** Chooses the bin that answers them, or none (they get `404`). A provider has one bin at most; a bin can serve several providers.
+- **What it changes:** Attaches or detaches the bin right away, with no restart.
+- **Same action elsewhere:** REST [`PUT /api/v1/provider-bins/{area}/{providerKey}`](/api/http-catcher/#putProviderBinsByAreaByProviderKey), CLI [`sendmock http provider-bin attach`](/cli/http-catcher/#http-provider-bin-attach), MCP [`sendmock_http_provider_bin_attach`](/mcp/http-catcher/#sendmock_http_provider_bin_attach)
+- **Same action elsewhere:** REST [`DELETE /api/v1/provider-bins/{area}/{providerKey}`](/api/http-catcher/#deleteProviderBinsByAreaByProviderKey), CLI [`sendmock http provider-bin detach`](/cli/http-catcher/#http-provider-bin-detach), MCP [`sendmock_http_provider_bin_detach`](/mcp/http-catcher/#sendmock_http_provider_bin_detach)
+
+### 54. Create a bin for this provider
+
+Button.
+
+- **What it does:** Creates a bin named after the provider and attaches it, so you can add a rule for the endpoint next.
+- **What it changes:** Adds an HTTP Catcher bin.
+- **Same action elsewhere:** REST [`PUT /api/v1/provider-bins/{area}/{providerKey}`](/api/http-catcher/#putProviderBinsByAreaByProviderKey), CLI [`sendmock http provider-bin attach`](/cli/http-catcher/#http-provider-bin-attach), MCP [`sendmock_http_provider_bin_attach`](/mcp/http-catcher/#sendmock_http_provider_bin_attach)
+
+### 55. Cancel
 
 Button.
 
 - **What it does:** Closes the dialog or editor without saving.
 
-### 52. Save provider
+### 56. Save provider
 
 Button.
 
@@ -346,7 +376,7 @@ Button.
 - **Errors:** A template that does not render, or a path another provider already answers, is refused with the reason.
 - **Same action elsewhere:** REST [`PATCH /api/v1/sms/providers/{providerKey}`](/api/sms-providers/#patchSmsProvidersByProviderKey), CLI [`sendmock sms providers update`](/cli/sms-providers/#sms-providers-update), MCP [`sendmock_sms_provider_update`](/mcp/sms-providers/#sendmock_sms_provider_update)
 
-### 53. Close
+### 57. Close
 
 Button.
 
@@ -354,109 +384,109 @@ Button.
 
 ## Provider editor, Requests tab
 
-### 54. The paths as the provider's API has them; use \{name\} for a part that changes, like /v#/\{domain\}/messages .
+### 58. The paths as the provider's API has them; use \{name\} for a part that changes, like /v#/\{domain\}/messages .
 
 Text.
 
 - **What it does:** Explains request paths and their `{name}` parts.
 
-### 55. Request # kind
+### 59. Request # kind
 
 Drop-down.
 
 - **What it does:** What the request does: send one SMS, send a batch, or another operation the provider has.
 
-### 56. Request # method
+### 60. Request # method
 
 Drop-down.
 
 - **What it does:** The HTTP method it answers.
 
-### 57. Request # path
+### 61. Request # path
 
 Field.
 
 - **What it does:** The path it answers.
 
-### 58. Request # format
+### 62. Request # format
 
 Drop-down.
 
 - **What it does:** The body format the provider's SDK sends: JSON, a form or multipart.
 
-### 59. Remove request #
+### 63. Remove request #
 
 Button.
 
 - **What it does:** Removes the request.
 
-### 60. Add request
+### 64. Add request
 
 Button.
 
 - **What it does:** Adds a request the provider answers.
 
-### 61. A JSON path ( personalizations[*].to[*].email ), a form field ( To ) or h:* for every field with a prefix. Anything unmapped is kept as metadata.
+### 65. A JSON path ( personalizations[*].to[*].email ), a form field ( To ) or h:* for every field with a prefix. Anything unmapped is kept as metadata.
 
 Text.
 
 - **What it does:** Explains the field mapping sources.
 
-### 62. Mapping # part
+### 66. Mapping # part
 
 Drop-down.
 
 - **What it does:** Which part of the stored SMS the field fills, such as the recipients or the subject.
 
-### 63. Mapping # source
+### 67. Mapping # source
 
 Field.
 
 - **What it does:** Where in the request that part is read from.
 
-### 64. Remove mapping #
+### 68. Remove mapping #
 
 Button.
 
 - **What it does:** Removes the mapping.
 
-### 65. Map a part
+### 69. Map a part
 
 Button.
 
 - **What it does:** Adds a mapping.
 
-### 66. Check # part
+### 70. Check # part
 
 Drop-down.
 
 - **What it does:** The part a request check looks at.
 
-### 67. Check # kind
+### 71. Check # kind
 
 Drop-down.
 
 - **What it does:** What the check requires, such as present or at most a length.
 
-### 68. Check # max length
+### 72. Check # max length
 
 Number field.
 
 - **What it does:** The longest value the check allows.
 
-### 69. Check # error
+### 73. Check # error
 
 Drop-down.
 
 - **What it does:** Which error response a request failing the check gets.
 
-### 70. Remove check #
+### 74. Remove check #
 
 Button.
 
 - **What it does:** Removes the check.
 
-### 71. Add check
+### 75. Add check
 
 Button.
 
@@ -464,109 +494,109 @@ Button.
 
 ## Provider editor, Responses tab
 
-### 72. Templates read request , message , error and credentials ; the Preview tab lists every value with an example.
+### 76. Templates read request , message , error and credentials ; the Preview tab lists every value with an example.
 
 Text.
 
 - **What it does:** Explains what response templates can read.
 
-### 73. Message id
+### 77. Message id
 
 Field.
 
 - **What it does:** The template for the provider's id of each message.
 
-### 74. The provider's id for each message, e.g. SM\{\{ random_hex(#) \}\}.
+### 78. The provider's id for each message, e.g. SM\{\{ random_hex(#) \}\}.
 
 Text.
 
 - **What it does:** Gives an example message id template.
 
-### 75. Success response
+### 79. Success response
 
 Heading.
 
 - **What it does:** The answer to an accepted request.
 
-### 76. Success response status
+### 80. Success response status
 
 Number field.
 
 - **What it does:** Its HTTP status.
 
-### 77. Success response header # name
+### 81. Success response header # name
 
 Field.
 
 - **What it does:** A response header's name.
 
-### 78. Success response header # value
+### 82. Success response header # value
 
 Field.
 
 - **What it does:** That header's value template.
 
-### 79. Remove Success response header #
+### 83. Remove Success response header #
 
 Button.
 
 - **What it does:** Removes the header.
 
-### 80. Add header
+### 84. Add header
 
 Button.
 
 - **What it does:** Adds a response header.
 
-### 81. Success response body
+### 85. Success response body
 
 Field.
 
 - **What it does:** The body template.
 
-### 82. Error response # kind
+### 86. Error response # kind
 
 Drop-down.
 
 - **What it does:** The error it answers: invalid input, unauthorized, a failed check, and so on.
 
-### 83. Remove error response #
+### 87. Remove error response #
 
 Button.
 
 - **What it does:** Removes the error response.
 
-### 84. Error response # status
+### 88. Error response # status
 
 Number field.
 
 - **What it does:** Its HTTP status.
 
-### 85. Error response # header # name
+### 89. Error response # header # name
 
 Field.
 
 - **What it does:** A header's name.
 
-### 86. Error response # header # value
+### 90. Error response # header # value
 
 Field.
 
 - **What it does:** That header's value template.
 
-### 87. Remove Error response # header #
+### 91. Remove Error response # header #
 
 Button.
 
 - **What it does:** Removes the header.
 
-### 88. Error response # body
+### 92. Error response # body
 
 Field.
 
 - **What it does:** The error body template, in the provider's real error shape.
 
-### 89. Add an error response
+### 93. Add an error response
 
 Button.
 
@@ -574,135 +604,135 @@ Button.
 
 ## Provider editor, Callbacks tab
 
-### 90. Callback template
+### 94. Callback template
 
 Drop-down.
 
 - **What it does:** The webhook template status callbacks are sent with.
 - **Links to:** [Webhooks > Templates](../../webhooks/templates.md).
 
-### 91. The webhook template its status callbacks and inbound messages are sent with; edit it in Webhooks > Templates.
+### 95. The webhook template its status callbacks and inbound messages are sent with; edit it in Webhooks > Templates.
 
 Text.
 
 - **What it does:** Explains the callback template.
 
-### 92. The provider's name for each SendMock status, as its callbacks and fetch answers show it.
+### 96. The provider's name for each SendMock status, as its callbacks and fetch answers show it.
 
 Text.
 
 - **What it does:** Explains the status names below.
 
-### 93. queued
+### 97. queued
 
 Field.
 
 - **What it does:** The provider's name for a message waiting to be sent, as its status callbacks show it.
 
-### 94. sent
+### 98. sent
 
 Field.
 
 - **What it does:** The provider's name for a message handed to the carrier, as its status callbacks show it.
 
-### 95. delivered
+### 99. delivered
 
 Field.
 
 - **What it does:** The provider's name for a message delivered, as its status callbacks show it.
 
-### 96. undelivered
+### 100. undelivered
 
 Field.
 
 - **What it does:** The provider's name for a message not delivered, as its status callbacks show it.
 
-### 97. failed
+### 101. failed
 
 Field.
 
 - **What it does:** The provider's name for a message failed to send, as its status callbacks show it.
 
-### 98. read
+### 102. read
 
 Field.
 
 - **What it does:** The provider's name for a message read, as its status callbacks show it.
 
-### 99. The provider's error code for each outcome, so the magic test numbers fail with its own codes. Leave one empty to use none.
+### 103. The provider's error code for each outcome, so the magic test numbers fail with its own codes. Leave one empty to use none.
 
 Text.
 
 - **What it does:** Explains the error codes below.
 - **Links to:** [Magic numbers and addresses](../../reference/magic-numbers.md).
 
-### 100. invalid_number
+### 104. invalid_number
 
 Field.
 
 - **What it does:** The provider's error code for an invalid number (Twilio's own is `21211`).
 
-### 101. cannot_route
+### 105. cannot_route
 
 Field.
 
 - **What it does:** The provider's error code for a number it cannot route to (Twilio's own is `21612`).
 
-### 102. no_international_permission
+### 106. no_international_permission
 
 Field.
 
 - **What it does:** The provider's error code for no international permission (Twilio's own is `21408`).
 
-### 103. blocked
+### 107. blocked
 
 Field.
 
 - **What it does:** The provider's error code for a blocked (opted out) number (Twilio's own is `21610`).
 
-### 104. cannot_receive_sms
+### 108. cannot_receive_sms
 
 Field.
 
 - **What it does:** The provider's error code for a number that cannot receive SMS (Twilio's own is `21614`).
 
-### 105. invalid_from
+### 109. invalid_from
 
 Field.
 
 - **What it does:** The provider's error code for an invalid sender (Twilio's own is `21212`).
 
-### 106. not_sms_capable
+### 110. not_sms_capable
 
 Field.
 
 - **What it does:** The provider's error code for a sender that is not SMS capable (Twilio's own is `21606`).
 
-### 107. queue_full
+### 111. queue_full
 
 Field.
 
 - **What it does:** The provider's error code for a full message queue (Twilio's own is `21611`).
 
-### 108. unreachable_handset
+### 112. unreachable_handset
 
 Field.
 
 - **What it does:** The provider's error code for an unreachable handset (Twilio's own is `30003`).
 
-### 109. landline
+### 113. landline
 
 Field.
 
 - **What it does:** The provider's error code for a landline or unreachable carrier (Twilio's own is `30006`).
 
-### 110. carrier_filtered
+### 114. carrier_filtered
 
 Field.
 
 - **What it does:** The provider's error code for a message the carrier filtered (Twilio's own is `30007`).
 
-### 111. unknown_error
+### 115. unknown_error
 
 Field.
 
@@ -710,87 +740,87 @@ Field.
 
 ## Provider editor, Preview tab
 
-### 112. Sample request
+### 116. Sample request
 
 Heading.
 
 - **What it does:** The request the preview sends.
 
-### 113. A send built from the field mapping. Edit it to try another request.
+### 117. A send built from the field mapping. Edit it to try another request.
 
 Text.
 
 - **What it does:** Explains the sample.
 
-### 114. Sample method
+### 118. Sample method
 
 Drop-down.
 
 - **What it does:** The sample's method.
 
-### 115. Sample path
+### 119. Sample path
 
 Field.
 
 - **What it does:** The sample's path.
 
-### 116. Sample body
+### 120. Sample body
 
 Field.
 
 - **What it does:** The sample's body.
 
-### 117. Stored message
+### 121. Stored message
 
 Heading.
 
 - **What it does:** The SMS SendMock would store for the sample.
 - **Same action elsewhere:** REST [`POST /api/v1/sms/providers/{providerKey}/preview`](/api/sms-providers/#postSmsProvidersByProviderKeyPreview), CLI [`sendmock sms providers preview`](/cli/sms-providers/#sms-providers-preview), MCP [`sendmock_sms_provider_preview`](/mcp/sms-providers/#sendmock_sms_provider_preview)
 
-### 118. Response
+### 122. Response
 
 Heading.
 
 - **What it does:** The response the sample would get.
 
-### 119. Search the reference
+### 123. Search the reference
 
 Field.
 
 - **What it does:** Filters the template reference: the values, functions and filters templates can use.
 
-### 120. Values
+### 124. Values
 
 Heading.
 
 - **What it does:** The values a template can read, with an example of each.
 
-### 121. Expand …
+### 125. Expand …
 
 Button, in each row.
 
 - **What it does:** Shows the fields inside a value, such as the parts of `request` or `message`.
 
-### 122. …
+### 126. …
 
 Button, in each row.
 
 - **What it does:** Inserts the value, function or filter into the template field you were editing.
 
-### 123. Functions
+### 127. Functions
 
 Heading.
 
 - **What it does:** The functions a template can call.
 
-### 124. Filters
+### 128. Filters
 
 Heading.
 
 - **What it does:** The filters a template can use.
 - **Links to:** [Template filters](../../reference/template-filters.md).
 
-### 125. … \}\}
+### 129. … \}\}
 
 Button, in each row.
 
@@ -798,25 +828,25 @@ Button, in each row.
 
 ## Provider editor, Try it tab
 
-### 126. Copy sdk base url (provider port)
+### 130. Copy sdk base url (provider port)
 
 Button.
 
 - **What it does:** Copies the base URL to give the provider's SDK when the provider port is on.
 
-### 127. Copy base url on the main port
+### 131. Copy base url on the main port
 
 Button.
 
 - **What it does:** Copies the base URL under `/providers/<key>/` on the main port.
 
-### 128. Copy a curl command
+### 132. Copy a curl command
 
 Button.
 
 - **What it does:** Copies a curl command that sends the sample request.
 
-### 129. The provider port answers once it is on ( --provider-addr ). The preview shows what this request gets back: #. Settings > Connection has the snippets for each language.
+### 133. The provider port answers once it is on ( --provider-addr ). The preview shows what this request gets back: #. Settings > Connection has the snippets for each language.
 
 Text.
 
@@ -824,20 +854,20 @@ Text.
 
 ## When the data cannot load
 
-### 130. Could not load the providers. Try again
+### 134. Could not load the providers. Try again
 
 Message.
 
 - **What it does:** Shown when the list could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 131. Could not load the providers.
+### 135. Could not load the providers.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 132. Try again
+### 136. Try again
 
 Button.
 

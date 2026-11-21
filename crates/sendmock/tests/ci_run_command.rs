@@ -8,7 +8,15 @@ use std::net::TcpListener;
 use std::path::Path;
 use std::thread;
 
-use support::sendmock_process::{run_until_exit, sendmock_command};
+use support::sendmock_process::run_until_exit;
+
+/// A `sendmock` command whose `ci run` server takes a free HTTP port, so the tests here can run
+/// in parallel without racing for 8025.
+fn sendmock_command(working_directory: &Path) -> std::process::Command {
+    let mut command = support::sendmock_process::sendmock_command(working_directory);
+    command.env("SENDMOCK_HTTP_ADDR", "127.0.0.1:0");
+    command
+}
 
 /// A stand-in for the app under test: answers every webhook with this status.
 fn start_app(response_status: u16) -> io::Result<String> {

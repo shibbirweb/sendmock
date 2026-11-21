@@ -236,20 +236,50 @@ Switch.
 
 - **What it does:** Whether the gateway takes payments.
 
-### 36. Reset to default
+### 36. Unmatched requests
+
+Heading.
+
+- **What it does:** Sends the requests SendMock does not answer on Stripe's base URL to an HTTP Catcher bin, which answers them with its rules.
+- **Links to:** [Provider gaps](../../http/provider-gaps.md)
+
+### 37. Requests on Stripe's base URL that SendMock does not answer. Send them to a bin to answer them with its rules and follow-up webhooks.
+
+Text.
+
+- **What it does:** Explains Unmatched requests: built-in operations still answer first.
+
+### 38. Where Stripe's unmatched requests go
+
+Drop-down.
+
+- **What it does:** Chooses the bin that answers them, or none (they get `404`). A provider has one bin at most; a bin can serve several providers.
+- **What it changes:** Attaches or detaches the bin right away, with no restart.
+- **Same action elsewhere:** REST [`PUT /api/v1/provider-bins/{area}/{providerKey}`](/api/http-catcher/#putProviderBinsByAreaByProviderKey), CLI [`sendmock http provider-bin attach`](/cli/http-catcher/#http-provider-bin-attach), MCP [`sendmock_http_provider_bin_attach`](/mcp/http-catcher/#sendmock_http_provider_bin_attach)
+- **Same action elsewhere:** REST [`DELETE /api/v1/provider-bins/{area}/{providerKey}`](/api/http-catcher/#deleteProviderBinsByAreaByProviderKey), CLI [`sendmock http provider-bin detach`](/cli/http-catcher/#http-provider-bin-detach), MCP [`sendmock_http_provider_bin_detach`](/mcp/http-catcher/#sendmock_http_provider_bin_detach)
+
+### 39. Create a bin for this provider
+
+Button.
+
+- **What it does:** Creates a bin named after the provider and attaches it, so you can add a rule for the endpoint next.
+- **What it changes:** Adds an HTTP Catcher bin.
+- **Same action elsewhere:** REST [`PUT /api/v1/provider-bins/{area}/{providerKey}`](/api/http-catcher/#putProviderBinsByAreaByProviderKey), CLI [`sendmock http provider-bin attach`](/cli/http-catcher/#http-provider-bin-attach), MCP [`sendmock_http_provider_bin_attach`](/mcp/http-catcher/#sendmock_http_provider_bin_attach)
+
+### 40. Reset to default
 
 Button.
 
 - **What it does:** Brings back the shipped definition of a built-in, after you confirm.
 - **Same action elsewhere:** REST [`POST /api/v1/payments/gateways/{gatewayKey}/reset`](/api/payment-gateways/#postPaymentsGatewaysByGatewayKeyReset), CLI [`sendmock payments gateways reset`](/cli/payment-gateways/#payments-gateways-reset), MCP [`sendmock_payment_gateway_reset`](/mcp/payment-gateways/#sendmock_payment_gateway_reset)
 
-### 37. Cancel
+### 41. Cancel
 
 Button.
 
 - **What it does:** Closes the dialog or editor without saving.
 
-### 38. Save gateway
+### 42. Save gateway
 
 Button.
 
@@ -257,7 +287,7 @@ Button.
 - **Errors:** A template with errors is refused with the reason.
 - **Same action elsewhere:** REST [`PATCH /api/v1/payments/gateways/{gatewayKey}`](/api/payment-gateways/#patchPaymentsGatewaysByGatewayKey), CLI [`sendmock payments gateways update`](/cli/payment-gateways/#payments-gateways-update), MCP [`sendmock_payment_gateway_update`](/mcp/payment-gateways/#sendmock_payment_gateway_update)
 
-### 39. Close
+### 43. Close
 
 Button.
 
@@ -265,50 +295,50 @@ Button.
 
 ## Gateway editor, Checkout tab
 
-### 40. Methods offered
+### 44. Methods offered
 
 Heading.
 
 - **What it does:** The methods its checkout page offers, in order.
 
-### 41. One method shows its flow directly; several show a picker, in this order.
+### 45. One method shows its flow directly; several show a picker, in this order.
 
 Text.
 
 - **What it does:** Explains how the checkout page shows the methods.
 
-### 42. Move Card up
+### 46. Move Card up
 
 Button.
 
 - **What it does:** Shows the method earlier (here Card).
 
-### 43. Move Card down
+### 47. Move Card down
 
 Button.
 
 - **What it does:** Shows the method later.
 
-### 44. Remove Card
+### 48. Remove Card
 
 Button.
 
 - **What it does:** Stops offering the method.
 
-### 45. Add a method
+### 49. Add a method
 
 Drop-down.
 
 - **What it does:** Offers another method.
 - **Links to:** [Methods](../../payments/methods.md).
 
-### 46. Creates a test payment with this gateway and opens its checkout page.
+### 50. Creates a test payment with this gateway and opens its checkout page.
 
 Text.
 
 - **What it does:** Explains Open a test checkout.
 
-### 47. Open a test checkout
+### 51. Open a test checkout
 
 Button.
 
@@ -317,64 +347,64 @@ Button.
 
 ## Gateway editor, Merchant tab
 
-### 48. Templates read them as merchant.\<name> . Secrets stay masked; the preview masks them too.
+### 52. Templates read them as merchant.\<name> . Secrets stay masked; the preview masks them too.
 
 Text.
 
 - **What it does:** Explains the merchant credentials.
 
-### 49. Credential # name
+### 53. Credential # name
 
 Field.
 
 - **What it does:** A credential's name, such as `secret_key`.
 
-### 50. Credential # value
+### 54. Credential # value
 
 Field.
 
 - **What it does:** Its value; a secret one is masked.
 
-### 51. Secret
+### 55. Secret
 
 Checkbox.
 
 - **What it does:** Masks the value everywhere.
 
-### 52. Reveal secret_key
+### 56. Reveal secret_key
 
 Button.
 
 - **What it does:** Shows the secret key once, after you confirm.
 - **Same action elsewhere:** REST [`GET /api/v1/payments/gateways/{gatewayKey}/credentials/{credentialName}`](/api/payment-gateways/#getPaymentsGatewaysByGatewayKeyCredentialsByCredentialName), CLI [`sendmock payments gateways credential`](/cli/payment-gateways/#payments-gateways-credential)
 
-### 53. Remove credential #
+### 57. Remove credential #
 
 Button.
 
 - **What it does:** Removes the credential.
 
-### 54. Reveal webhook_secret
+### 58. Reveal webhook_secret
 
 Button.
 
 - **What it does:** Shows the webhook signing secret once, after you confirm.
 - **Same action elsewhere:** REST [`GET /api/v1/payments/gateways/{gatewayKey}/credentials/{credentialName}`](/api/payment-gateways/#getPaymentsGatewaysByGatewayKeyCredentialsByCredentialName), CLI [`sendmock payments gateways credential`](/cli/payment-gateways/#payments-gateways-credential)
 
-### 55. Add credential
+### 59. Add credential
 
 Button.
 
 - **What it does:** Adds a credential.
 
-### 56. Notification endpoint
+### 60. Notification endpoint
 
 Drop-down.
 
 - **What it does:** The webhook endpoint its notifications go to.
 - **Links to:** [Endpoints](../../webhooks/endpoints.md).
 
-### 57. Its IPN or webhook deliveries go to this webhook endpoint, with retries and replay.
+### 61. Its IPN or webhook deliveries go to this webhook endpoint, with retries and replay.
 
 Text.
 
@@ -382,104 +412,104 @@ Text.
 
 ## Gateway editor, Redirect tab
 
-### 58. GET The fields go in the query string (Stripe, PayPal).
+### 62. GET The fields go in the query string (Stripe, PayPal).
 
 Choice.
 
 - **What it does:** The customer returns with a GET, the fields in the query string.
 
-### 59. POST The browser posts a form with the fields (SSLCommerz).
+### 63. POST The browser posts a form with the fields (SSLCommerz).
 
 Choice.
 
 - **What it does:** The customer's browser posts a form back to your app.
 
-### 60. Type \{\{ for suggestions; \{\{ redirect.status \}\} is this gateway's event name for the outcome.
+### 64. Type \{\{ for suggestions; \{\{ redirect.status \}\} is this gateway's event name for the outcome.
 
 Text.
 
 - **What it does:** Explains the redirect field templates.
 
-### 61. Redirect field # name
+### 65. Redirect field # name
 
 Field.
 
 - **What it does:** A redirect field's name.
 
-### 62. Redirect field # template
+### 66. Redirect field # template
 
 Field.
 
 - **What it does:** Its value template.
 
-### 63. Redirect field # sent
+### 67. Redirect field # sent
 
 Drop-down.
 
 - **What it does:** When it is sent: always, or only on success or failure.
 
-### 64. Remove redirect field #
+### 68. Remove redirect field #
 
 Button.
 
 - **What it does:** Removes the field.
 
-### 65. Add field
+### 69. Add field
 
 Button.
 
 - **What it does:** Adds a redirect field.
 
-### 66. Preview
+### 70. Preview
 
 Tab.
 
 - **What it does:** Shows the redirect and notification as they would be sent.
 
-### 67. Reference
+### 71. Reference
 
 Tab.
 
 - **What it does:** Lists every value the templates can read.
 
-### 68. Preview payment
+### 72. Preview payment
 
 Drop-down.
 
 - **What it does:** The payment the preview uses.
 
-### 69. Preview event
+### 73. Preview event
 
 Drop-down.
 
 - **What it does:** The event the preview renders.
 
-### 70. Preview redirect outcome
+### 74. Preview redirect outcome
 
 Drop-down.
 
 - **What it does:** The outcome the preview's redirect shows.
 - **Same action elsewhere:** REST [`POST /api/v1/payments/gateways/{gatewayKey}/preview`](/api/payment-gateways/#postPaymentsGatewaysByGatewayKeyPreview), CLI [`sendmock payments gateways preview`](/cli/payment-gateways/#payments-gateways-preview), MCP [`sendmock_payment_gateway_preview`](/mcp/payment-gateways/#sendmock_payment_gateway_preview)
 
-### 71. Redirect
+### 75. Redirect
 
 Heading.
 
 - **What it does:** The redirect as it would be sent.
 
-### 72. GET http://localhost:#/checkout/success
+### 76. GET http://localhost:#/checkout/success
 
 Text.
 
 - **What it does:** The redirect's method and URL (here a GET to the demo app).
 
-### 73. Notification
+### 77. Notification
 
 Heading.
 
 - **What it does:** The notification as it would be sent.
 
-### 74. payment_intent.succeeded
+### 78. payment_intent.succeeded
 
 Text.
 
@@ -487,176 +517,176 @@ Text.
 
 ## Gateway editor, Notification tab
 
-### 75. JSON application/json (Stripe, PayPal, bKash).
+### 79. JSON application/json (Stripe, PayPal, bKash).
 
 Choice.
 
 - **What it does:** The notification body is JSON.
 
-### 76. Form application/x-www-form-urlencoded; write the body as name=value&... (SSLCommerz IPN).
+### 80. Form application/x-www-form-urlencoded; write the body as name=value&... (SSLCommerz IPN).
 
 Choice.
 
 - **What it does:** The notification body is a form.
 
-### 77. This gateway's name for each event, read as \{\{ event.name \}\} . Leave one blank and nothing is sent for it.
+### 81. This gateway's name for each event, read as \{\{ event.name \}\} . Leave one blank and nothing is sent for it.
 
 Text.
 
 - **What it does:** Explains the event names.
 
-### 78. Event name for payment.created
+### 82. Event name for payment.created
 
 Field.
 
 - **What it does:** The gateway's own name for `payment.created`; blank sends nothing for it.
 
-### 79. Event name for payment.authorized
+### 83. Event name for payment.authorized
 
 Field.
 
 - **What it does:** The gateway's own name for `payment.authorized`; blank sends nothing for it.
 
-### 80. Event name for payment.succeeded
+### 84. Event name for payment.succeeded
 
 Field.
 
 - **What it does:** The gateway's own name for `payment.succeeded`; blank sends nothing for it.
 
-### 81. Event name for payment.failed
+### 85. Event name for payment.failed
 
 Field.
 
 - **What it does:** The gateway's own name for `payment.failed`; blank sends nothing for it.
 
-### 82. Event name for payment.canceled
+### 86. Event name for payment.canceled
 
 Field.
 
 - **What it does:** The gateway's own name for `payment.canceled`; blank sends nothing for it.
 
-### 83. Event name for payment.refunded
+### 87. Event name for payment.refunded
 
 Field.
 
 - **What it does:** The gateway's own name for `payment.refunded`; blank sends nothing for it.
 
-### 84. Event name for payment.partially_refunded
+### 88. Event name for payment.partially_refunded
 
 Field.
 
 - **What it does:** The gateway's own name for `payment.partially_refunded`; blank sends nothing for it.
 
-### 85. Event name for payment.dispute_opened
+### 89. Event name for payment.dispute_opened
 
 Field.
 
 - **What it does:** The gateway's own name for `payment.dispute_opened`; blank sends nothing for it.
 
-### 86. Event name for payment.dispute_updated
+### 90. Event name for payment.dispute_updated
 
 Field.
 
 - **What it does:** The gateway's own name for `payment.dispute_updated`; blank sends nothing for it.
 
-### 87. Event name for payment.dispute_closed
+### 91. Event name for payment.dispute_closed
 
 Field.
 
 - **What it does:** The gateway's own name for `payment.dispute_closed`; blank sends nothing for it.
 
-### 88. Event name for checkout.completed
+### 92. Event name for checkout.completed
 
 Field.
 
 - **What it does:** The gateway's own name for `checkout.completed`; blank sends nothing for it.
 
-### 89. Event name for checkout.expired
+### 93. Event name for checkout.expired
 
 Field.
 
 - **What it does:** The gateway's own name for `checkout.expired`; blank sends nothing for it.
 
-### 90. Notification body template
+### 94. Notification body template
 
 Field.
 
 - **What it does:** The notification body, in the template language.
 
-### 91. Header # name
+### 95. Header # name
 
 Field.
 
 - **What it does:** A notification header's name.
 
-### 92. Header # value
+### 96. Header # value
 
 Field.
 
 - **What it does:** Its value template, such as a signature.
 
-### 93. Remove header #
+### 97. Remove header #
 
 Button.
 
 - **What it does:** Removes the header.
 
-### 94. Add header
+### 98. Add header
 
 Button.
 
 - **What it does:** Adds a header.
 
-### 95. Preview
+### 99. Preview
 
 Tab.
 
 - **What it does:** Shows the redirect and notification as they would be sent.
 
-### 96. Reference
+### 100. Reference
 
 Tab.
 
 - **What it does:** Lists every value the templates can read.
 
-### 97. Preview payment
+### 101. Preview payment
 
 Drop-down.
 
 - **What it does:** The payment the preview uses.
 
-### 98. Preview event
+### 102. Preview event
 
 Drop-down.
 
 - **What it does:** The event the preview renders.
 
-### 99. Preview redirect outcome
+### 103. Preview redirect outcome
 
 Drop-down.
 
 - **What it does:** The outcome the preview's redirect shows.
 - **Same action elsewhere:** REST [`POST /api/v1/payments/gateways/{gatewayKey}/preview`](/api/payment-gateways/#postPaymentsGatewaysByGatewayKeyPreview), CLI [`sendmock payments gateways preview`](/cli/payment-gateways/#payments-gateways-preview), MCP [`sendmock_payment_gateway_preview`](/mcp/payment-gateways/#sendmock_payment_gateway_preview)
 
-### 100. Redirect
+### 104. Redirect
 
 Heading.
 
 - **What it does:** The redirect as it would be sent.
 
-### 101. GET http://localhost:#/checkout/success
+### 105. GET http://localhost:#/checkout/success
 
 Text.
 
 - **What it does:** The redirect's method and URL (here a GET to the demo app).
 
-### 102. Notification
+### 106. Notification
 
 Heading.
 
 - **What it does:** The notification as it would be sent.
 
-### 103. payment_intent.succeeded
+### 107. payment_intent.succeeded
 
 Text.
 
@@ -664,20 +694,20 @@ Text.
 
 ## When the data cannot load
 
-### 104. Could not load the gateways. Try again
+### 108. Could not load the gateways. Try again
 
 Message.
 
 - **What it does:** Shown when the gateways could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 105. Could not load the gateways.
+### 109. Could not load the gateways.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 106. Try again
+### 110. Try again
 
 Button.
 

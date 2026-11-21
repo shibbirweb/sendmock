@@ -9,7 +9,7 @@ test("AI-04.2 the live Scenarios screen validates the first example without runn
   const failedApiCalls = watchFailedApiCalls(page);
   await page.goto("/scenarios");
 
-  await page.getByRole("button", { name: "Validate" }).click();
+  await page.getByRole("button", { name: "Validate", exact: true }).click();
 
   await expect(
     page.getByRole("region", { name: "Validation" }).getByRole("status"),
@@ -28,7 +28,7 @@ for (const scenarioExample of scenarioExamples) {
       .getByRole("menuitem", { name: scenarioExample.title, exact: true })
       .click();
 
-    await page.getByRole("button", { name: "Run" }).click();
+    await page.getByRole("button", { name: "Run", exact: true }).click();
 
     const runReport = page.getByRole("region", { name: "Run report" });
     await expect(runReport.getByRole("status")).toContainText("Passed:");

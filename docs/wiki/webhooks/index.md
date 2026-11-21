@@ -96,6 +96,7 @@ Every control and text, one by one: [Webhooks overview in depth](../deeper/webho
 
 - Shape requests for any service: [Advanced: templates](../advanced/templates.md) and [Advanced: request editor](../advanced/request-editor.md).
 - Values that change per send or come from the message: [Advanced: variables](../advanced/variables.md).
+- Test your app's webhook handling in a CI pipeline: [Advanced: CI pipelines](../advanced/ci-pipelines.md).
 - Exact filters: [Advanced: rules and filters](../advanced/rules-and-filters.md).
 
 ## From your code

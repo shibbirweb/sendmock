@@ -54,6 +54,10 @@
       "button: Add credential",
       "switch: Check credentials",
       "paragraph: Off: any credentials pass. On: a request without a secret credential gets the provider's unauthorized answer.",
+      "heading: Unmatched requests",
+      "paragraph: Requests on SendGrid's base URL that SendMock does not answer. Send them to a bin to answer them with its rules and follow-up webhooks.",
+      "combobox: Where SendGrid's unmatched requests go",
+      "button: Create a bin for this provider",
       "button: Cancel",
       "button: Save provider",
       "button: Close"

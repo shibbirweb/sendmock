@@ -70,7 +70,7 @@ sendmock ci run sendmock.ci.yml --junit sendmock-report.xml
 
 2. Read the lines it prints: `passed` or `failed` for each scenario, with the failing step's reason.
 
-`--json` prints the whole report, `--server http://127.0.0.1:8025` runs against a SendMock that is already running, and with `GITHUB_STEP_SUMMARY` set the run adds a summary to the GitHub Actions run page. The Scenarios screen runs a CI file too, shows the report and downloads the JUnit file.
+`--json` prints the whole report, `--server http://127.0.0.1:8025` runs against a SendMock that is already running, and with `GITHUB_STEP_SUMMARY` set the run adds a summary to the GitHub Actions run page. Without `--server`, the run starts its own SendMock on port 8025 (or a free port when 8025 is taken); set `SENDMOCK_HTTP_ADDR=127.0.0.1:0` to always take a free port, for example when several runs share one machine. The Scenarios screen runs a CI file too, shows the report and downloads the JUnit file.
 
 ## Set it up with `sendmock ci init`
 

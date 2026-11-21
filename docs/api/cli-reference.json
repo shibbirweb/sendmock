@@ -22822,8 +22822,12 @@
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
-          "description": "",
-          "example": {}
+          "description": "The request's headers, when no `request_id` is given.",
+          "example": {
+            "webhook-id": "msg_2b7Q",
+            "webhook-timestamp": "1767225600",
+            "webhook-signature": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4="
+          }
         },
         {
           "flag": "--body",
@@ -22837,8 +22841,8 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "",
-          "example": ""
+          "description": "The request's raw body, exactly as sent, when no `request_id` is given.",
+          "example": "{\"type\":\"order.paid\",\"data\":{\"order_id\":\"1042\"}}"
         },
         {
           "flag": "--header",
@@ -22870,7 +22874,7 @@
             "hex",
             "base64"
           ],
-          "description": "For `hmac`: `hex` or `base64` [default: hex].",
+          "description": "For `hmac`: how the digest is written, as hex digits or in Base 64 [default: hex].",
           "example": "hex"
         },
         {
@@ -22904,7 +22908,7 @@
           "example": 300
         }
       ],
-      "example": "sendmock webhook signature verify --scheme standard_webhooks --secret whsec_c2VuZG1vY2stdGVzdC1rZXktMDAwMQ== --body '' --header X-Hub-Signature-256",
+      "example": "sendmock webhook signature verify --scheme standard_webhooks --secret whsec_c2VuZG1vY2stdGVzdC1rZXktMDAwMQ== --body '{\"type\":\"order.paid\",\"data\":{\"order_id\":\"1042\"}}' --header X-Hub-Signature-256",
       "output": "SignatureVerification",
       "exit_codes": [
         0,

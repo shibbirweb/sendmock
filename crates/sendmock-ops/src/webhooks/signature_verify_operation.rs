@@ -37,14 +37,16 @@ pub struct SignatureVerifyRequest {
     /// A captured request's ID, from an HTTP Catcher bin; or give `headers` and `body`.
     #[serde(default)]
     pub request_id: Option<String>,
+    /// The request's headers, when no `request_id` is given.
     #[serde(default)]
     pub headers: BTreeMap<String, String>,
+    /// The request's raw body, exactly as sent, when no `request_id` is given.
     #[serde(default)]
     pub body: Option<String>,
     /// For `hmac`: the header holding the digest [default: X-Signature].
     #[serde(default)]
     pub header: Option<String>,
-    /// For `hmac`: `hex` or `base64` [default: hex].
+    /// For `hmac`: how the digest is written, as hex digits or in Base 64 [default: hex].
     #[serde(default)]
     pub encoding: DigestEncodingName,
     /// For `hmac`: text before the digest, such as `sha256=` [default: none].

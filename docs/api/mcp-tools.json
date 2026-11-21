@@ -34589,8 +34589,12 @@
           "type": "object",
           "is_required": false,
           "allowed_values": null,
-          "description": "",
-          "example": {}
+          "description": "The request's headers, when no `request_id` is given.",
+          "example": {
+            "webhook-id": "msg_2b7Q",
+            "webhook-timestamp": "1767225600",
+            "webhook-signature": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4="
+          }
         },
         {
           "name": "body",
@@ -34601,8 +34605,8 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "",
-          "example": ""
+          "description": "The request's raw body, exactly as sent, when no `request_id` is given.",
+          "example": "{\"type\":\"order.paid\",\"data\":{\"order_id\":\"1042\"}}"
         },
         {
           "name": "header",
@@ -34628,7 +34632,7 @@
             "hex",
             "base64"
           ],
-          "description": "For `hmac`: `hex` or `base64` [default: hex].",
+          "description": "For `hmac`: how the digest is written, as hex digits or in Base 64 [default: hex].",
           "example": "hex"
         },
         {
@@ -34688,9 +34692,13 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "",
+            "description": "The request's headers, when no `request_id` is given.",
             "examples": [
-              {}
+              {
+                "webhook-id": "msg_2b7Q",
+                "webhook-timestamp": "1767225600",
+                "webhook-signature": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4="
+              }
             ]
           },
           "body": {
@@ -34698,9 +34706,9 @@
               "string",
               "null"
             ],
-            "description": "",
+            "description": "The request's raw body, exactly as sent, when no `request_id` is given.",
             "examples": [
-              ""
+              "{\"type\":\"order.paid\",\"data\":{\"order_id\":\"1042\"}}"
             ]
           },
           "header": {
@@ -34719,7 +34727,7 @@
               "hex",
               "base64"
             ],
-            "description": "For `hmac`: `hex` or `base64` [default: hex].",
+            "description": "For `hmac`: how the digest is written, as hex digits or in Base 64 [default: hex].",
             "examples": [
               "hex"
             ]
@@ -34764,7 +34772,7 @@
       "example_arguments": {
         "scheme": "standard_webhooks",
         "secret": "whsec_c2VuZG1vY2stdGVzdC1rZXktMDAwMQ==",
-        "body": "",
+        "body": "{\"type\":\"order.paid\",\"data\":{\"order_id\":\"1042\"}}",
         "header": "X-Hub-Signature-256"
       },
       "output": "SignatureVerification",

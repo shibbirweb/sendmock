@@ -18,7 +18,15 @@ export type SignatureVerifyRequest = {
    * @example "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
    */
   request_id?: string | null;
+  /**
+   * The request's headers, when no `request_id` is given.
+   * @example {"webhook-id": "msg_2b7Q", "webhook-timestamp": "1767225600", "webhook-signature": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4="}
+   */
   headers?: Record<string, string>;
+  /**
+   * The request's raw body, exactly as sent, when no `request_id` is given.
+   * @example "{\"type\":\"order.paid\",\"data\":{\"order_id\":\"1042\"}}"
+   */
   body?: string | null;
   /**
    * For `hmac`: the header holding the digest [default: X-Signature].
@@ -26,7 +34,7 @@ export type SignatureVerifyRequest = {
    */
   header?: string | null;
   /**
-   * For `hmac`: `hex` or `base64` [default: hex].
+   * For `hmac`: how the digest is written, as hex digits or in Base 64 [default: hex].
    * @example "hex"
    */
   encoding?: "hex" | "base64";

@@ -36,6 +36,7 @@
       "button: Copy as cURL",
       "button: Forward to URL",
       "button: Send to webhook",
+      "button: Verify signature",
       "tab: Preview",
       "tab: Body",
       "tab: Headers",

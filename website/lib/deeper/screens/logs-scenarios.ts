@@ -126,6 +126,31 @@ const scenarioEntries: DeeperEntry[] = [
     changes: "The steps' own effects: sends, waits and checks against this SendMock.",
     operationIds: ["postScenariosRun"],
   },
+  {
+    control: "heading: CI file",
+    does: "Runs a CI file, the file `sendmock ci run` reads in a pipeline, and shows the report your CI will show.",
+    links: "[CI pipelines](../../advanced/ci-pipelines.md)",
+  },
+  {
+    control:
+      "paragraph: The setup, the app's URL and the scenarios a pipeline runs with sendmock ci run . Run it here to see the report your CI will show.",
+    does: "Explains the CI file card.",
+  },
+  { control: "textbox: CI file URL", does: "An address to load a CI file from; the browser downloads it." },
+  { control: "button: Import from URL", does: "Downloads the CI file at the address into the text box." },
+  { control: "textbox: CI file", does: "The CI file's text, in YAML or JSON." },
+  {
+    control: "button: Validate CI file",
+    does: "Checks the CI file without running it and lists any problem by its line or key path.",
+    operationIds: ["postCiValidate"],
+  },
+  {
+    control: "button: Run CI file",
+    does: "Applies the CI file's setup, runs every scenario against this SendMock and shows each scenario's result, with a JUnit download.",
+    changes: "The setup it applies and the steps' own effects: sends, webhooks and checks.",
+    errors: "A failing step names the scenario, the step and the reason.",
+    operationIds: ["postCiRun"],
+  },
   { control: "status: Passed: # of # steps in # ms", does: "The run's result: how many steps passed, and how long it took." },
 ];
 

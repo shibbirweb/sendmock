@@ -2,6 +2,7 @@ import type { DeeperEntry, DeeperPage } from "../deeper-types";
 import { buildProviderEditorSetupEntries } from "./provider-editor-entries";
 import { buildProviderEditorResponseEntries } from "./provider-editor-response-entries";
 import { buildProviderListEntries } from "./provider-list-entries";
+import { buildUnmatchedRequestEntries } from "./unmatched-request-entries";
 
 const smsProviderArea = {
   messageWord: "SMS",
@@ -136,6 +137,7 @@ export const smsProvidersPage: DeeperPage = {
     ...buildProviderListEntries(smsProviderArea),
     ...twilioEntries,
     ...buildProviderEditorSetupEntries(smsProviderArea),
+    ...buildUnmatchedRequestEntries("Twilio"),
     ...buildProviderEditorResponseEntries(smsProviderArea),
   ],
 };

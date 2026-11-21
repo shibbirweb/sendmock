@@ -1,5 +1,6 @@
 import type { DeeperEntry, DeeperPage } from "../deeper-types";
 import { gatewayEditorEntries } from "./payments-gateway-editor";
+import { buildUnmatchedRequestEntries } from "./unmatched-request-entries";
 
 const gatewayListEntries: DeeperEntry[] = [
   {
@@ -106,5 +107,9 @@ export const paymentsGatewaysPage: DeeperPage = {
   guideTitle: "Gateways",
   intro:
     "Payments > Gateways holds the payment providers SendMock emulates: their checkout, redirect and notifications.",
-  entries: [...gatewayListEntries, ...gatewayEditorEntries],
+  entries: [
+    ...gatewayListEntries,
+    ...gatewayEditorEntries,
+    ...buildUnmatchedRequestEntries("Stripe"),
+  ],
 };
