@@ -77,6 +77,16 @@ jobs:
             language: node
             folder: node-twilio
             run: bun install && node send-and-verify.js
+          # AC: SM-19.8
+          - client: Twilio Node SDK with a subaccount
+            language: node
+            folder: node-twilio-subaccounts
+            run: bun install && node send-under-subaccount-and-verify.js
+          # AC: SM-19.8
+          - client: Twilio PHP SDK with a subaccount
+            language: php
+            folder: php-twilio-subaccounts
+            run: composer install --no-interaction --quiet && php send-under-subaccount-and-verify.php
           - client: Twilio Python SDK
             language: python
             folder: python-twilio

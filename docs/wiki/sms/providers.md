@@ -44,6 +44,7 @@ Built-ins you removed are listed here. Requests to their paths get a 404 until y
 | Tab | Holds |
 | --- | --- |
 | **General** | name, key (fixed after creation), host, accent, enabled, credentials (secrets masked, reveal asks first) and **Check credentials** |
+| **Accounts** | Twilio only: the main account and its **subaccounts**, each with a name, a status, its own auth token (masked, reveal asks first) and a Debugger webhook URL; **Add subaccount**, edit and remove |
 | **Requests** | the requests it answers (send, fetch, list, cancel, start and check verification), the **field mapping** (from, to, body, media and the rest) and the **checks** on a send, such as an E.164 number |
 | **Responses** | the message id template, the success response and one response per error kind |
 | **Callbacks** | the webhook template for status callbacks, the provider's name for each status, and its **error code** for each delivery outcome |
@@ -52,6 +53,38 @@ Built-ins you removed are listed here. Requests to their paths get a 404 until y
 
 
 Every control and text, one by one: [SMS providers in depth](../deeper/sms/providers.md).
+## Twilio subaccounts
+
+Apps that give each customer a Twilio subaccount send under `/2010-04-01/Accounts/{AccountSid}/Messages.json` with that subaccount's SID and token, and check every webhook with the subaccount's own token. SendMock does the same:
+
+- Add subaccounts on the **Accounts** tab of SMS > Providers > Twilio, with `sendmock sms twilio subaccounts create`, the REST API, MCP or the seed file (`[[sms.twilio_subaccounts]]`, with the token as an `${ENV_VAR}` reference).
+- Or create them the way your app does on Twilio: the provider port answers `GET` and `POST /2010-04-01/Accounts.json` (list, filtered by `FriendlyName` and `Status`, and create) and `GET` and `POST /2010-04-01/Accounts/{AccountSid}.json` (fetch, and change `FriendlyName` and `Status`), in Twilio's shapes. These answers hold auth tokens, so they always check credentials: the main account sees every account, a subaccount only itself, and anything else gets Twilio's `401`.
+- A send under a **suspended** or **closed** subaccount is refused with Twilio's error `20005` and nothing is stored.
+
+## Twilio signatures
+
+Every Twilio webhook carries `X-Twilio-Signature`, made with the auth token of the account the message belongs to:
+
+| Webhook | Signed with |
+| --- | --- |
+| Status callbacks (`StatusCallback`) | the token of the account in the send's path: a subaccount's own token, or the main token for any other SID |
+| Inbound messages and their replies | the token of the account that sent the last message in the conversation, or the main token |
+| A webhook endpoint with the `twilio.status_callback` or `twilio.inbound_sms` template | the provider's token for the event's account, unless a webhook variable named `twilio_auth_token` is set, which then wins |
+
+The main account's token is `twilio-test-token` until you change it on the **General** tab. A value such as `••••oken` in the UI, the API or `GET /api/v1/webhooks/variables` is the token **masked**, not the token: checking a signature against it always fails. To read the real token:
+
+```bash
+sendmock sms providers credential twilio auth_token --reveal
+```
+
+For a subaccount:
+
+```bash
+sendmock sms twilio subaccounts token <accountSid> --reveal
+```
+
+Or press the eye button next to the token on the provider sheet, which asks first.
+
 ## Customize
 
 The full walkthrough, adding Africa's Talking from its API docs: [Advanced: create an SMS provider](../advanced/sms-provider.md).
@@ -69,6 +102,11 @@ The full walkthrough, adding Africa's Talking from its API docs: [Advanced: crea
 | remove a built-in or delete a custom one | [`sendmock sms providers delete <providerKey>`](/cli/sms-providers/#sms-providers-delete) | [`DELETE /api/v1/sms/providers/{providerKey}`](/api/sms-providers/#deleteSmsProvidersByProviderKey) | [`sendmock_sms_provider_delete`](/mcp/sms-providers/#sendmock_sms_provider_delete) |
 | restore a removed built-in | [`sendmock sms providers restore <providerKey>`](/cli/sms-providers/#sms-providers-restore) | [`POST /api/v1/sms/providers/{providerKey}/restore`](/api/sms-providers/#postSmsProvidersByProviderKeyRestore) | [`sendmock_sms_provider_restore`](/mcp/sms-providers/#sendmock_sms_provider_restore) |
 | reveal a credential (agents cannot) | [`sendmock sms providers credential <providerKey> <credentialName> --reveal`](/cli/sms-providers/#sms-providers-credential) | [`GET /api/v1/sms/providers/{providerKey}/credentials/{credentialName}`](/api/sms-providers/#getSmsProvidersByProviderKeyCredentialsByCredentialName) | none: agents never read secrets |
+| list Twilio subaccounts | `sendmock sms twilio subaccounts list` | `GET /api/v1/twilio/subaccounts` | `sendmock_twilio_subaccount_list` |
+| add a Twilio subaccount | `sendmock sms twilio subaccounts create` | `POST /api/v1/twilio/subaccounts` | `sendmock_twilio_subaccount_create` |
+| change a Twilio subaccount | `sendmock sms twilio subaccounts update <accountSid>` | `PATCH /api/v1/twilio/subaccounts/{accountSid}` | `sendmock_twilio_subaccount_update` |
+| remove a Twilio subaccount | `sendmock sms twilio subaccounts delete <accountSid>` | `DELETE /api/v1/twilio/subaccounts/{accountSid}` | `sendmock_twilio_subaccount_delete` |
+| reveal a subaccount's token (agents cannot) | `sendmock sms twilio subaccounts token <accountSid> --reveal` | `GET /api/v1/twilio/subaccounts/{accountSid}/auth-token` | none: agents never read secrets |
 
 ## Related
 

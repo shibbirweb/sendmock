@@ -8,6 +8,7 @@ import { ConfirmDeleteDialog } from "@/components/common/confirm-delete-dialog";
 import { QueryErrorState } from "@/components/common/query-error-state";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TwilioSigningSource } from "@/features/webhooks/twilio-signing/twilio-signing-source";
 import { NoDataState } from "@/features/onboarding/no-data-state";
 import { NoMatchState } from "@/features/onboarding/no-match-state";
 import { globalScopeValue } from "@/features/webhooks/variables/sheet/use-variable-form";
@@ -85,6 +86,9 @@ export function VariablesPage() {
             <p className="text-sm text-muted-foreground">
               Values templates read as {"{{ vars.name }}"}: endpoint ones win
               over global ones.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Twilio templates sign with: <TwilioSigningSource />
             </p>
           </div>
           <Button size="sm" onClick={() => openSheet(null)}>

@@ -72,6 +72,10 @@ Add an email API SendMock does not ship, from its API docs.
 
 The same for an SMS vendor: `sendmock_sms_provider_create`, `sendmock_sms_provider_update` (with its status names and its error code for each delivery outcome), `sendmock_sms_provider_preview`, a test request, then `sendmock_seed_export`.
 
+### Twilio subaccounts
+
+For an app with one Twilio subaccount per customer: `sendmock_twilio_subaccount_create` with the subaccount's SID (or none for a new one), a name and an `${ENV_VAR}` token the user keeps, `sendmock_twilio_subaccount_list` to check it (tokens stay masked; the user reveals one with `sendmock sms twilio subaccounts token <accountSid> --reveal`). The app can also create and fetch subaccounts through Twilio's Accounts API on the provider port. Callbacks for a message sent under a subaccount are signed with its token; a suspended or closed subaccount refuses sends.
+
 ### Capture outgoing HTTP calls
 
 `sendmock_http_bin_create` with a preset (Slack, Discord, Telegram, push), point the app at the bin's URL, and `sendmock_http_wait` for the call.

@@ -33,8 +33,10 @@ function readExampleSources(exampleFolder: string): string {
 
 describe("SMS clients workflow", () => {
   test("SM-02.4 VF-03.4 the official Twilio SDKs send and run a Verify login, each from its example folder", () => {
-    const twilioEntries = clientEntries.filter((clientEntry) =>
-      clientEntry.client.startsWith("Twilio "),
+    const twilioEntries = clientEntries.filter(
+      (clientEntry) =>
+        clientEntry.client.startsWith("Twilio ") &&
+        !clientEntry.client.endsWith("with a subaccount"),
     );
     expect(twilioEntries.map((clientEntry) => clientEntry.client)).toEqual([
       "Twilio Node SDK",
@@ -54,6 +56,26 @@ describe("SMS clients workflow", () => {
         .replaceAll("_", "");
       expect(comparableSources).toContain("statuscallback");
       expect(comparableSources).toContain("verificationcheck");
+    }
+  });
+
+  test("SM-19.8 the Twilio PHP and Node SDKs fetch a subaccount's token, send under it and validate its callbacks", () => {
+    const subaccountEntries = clientEntries.filter((clientEntry) =>
+      clientEntry.client.endsWith("with a subaccount"),
+    );
+
+    expect(subaccountEntries.map((clientEntry) => clientEntry.client)).toEqual([
+      "Twilio Node SDK with a subaccount",
+      "Twilio PHP SDK with a subaccount",
+    ]);
+    for (const clientEntry of subaccountEntries) {
+      const exampleSources = readExampleSources(
+        `examples/sms/${clientEntry.folder}`,
+      ).toLowerCase();
+      expect(exampleSources).toContain("accounts");
+      expect(exampleSources).toContain("fetch()");
+      expect(exampleSources).toContain("statuscallback");
+      expect(exampleSources).toMatch(/validaterequest|requestvalidator/);
     }
   });
 
