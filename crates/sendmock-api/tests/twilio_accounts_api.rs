@@ -389,7 +389,7 @@ async fn a_subaccount_sid_that_is_not_ac_and_32_hex_digits_is_refused() {
     .await;
 
     assert_eq!(status, 400, "{error}");
-    assert_eq!(error["field"], "account_sid");
+    assert_eq!(error["error"]["field"], "account_sid");
 }
 
 // AC: SM-19.4

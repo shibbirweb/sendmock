@@ -168,6 +168,12 @@
         "method": "POST",
         "path": "/v3/{domain}/messages",
         "request_format": "multipart"
+      },
+      {
+        "kind": "send",
+        "method": "POST",
+        "path": "/v3/{domain}/messages.mime",
+        "request_format": "multipart"
       }
     ],
     "field_mapping": [
@@ -206,6 +212,10 @@
       {
         "part": "headers",
         "source": "h:*"
+      },
+      {
+        "part": "raw",
+        "source": "message.content"
       }
     ],
     "validation_rules": [

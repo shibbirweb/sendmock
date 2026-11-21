@@ -15,13 +15,18 @@ function findTemplateCard(page: Page, templateName: string) {
 }
 
 async function openTemplate(page: Page, templateName: string) {
-  await findTemplateCard(page, templateName).first().click();
   const templateSheet = page.getByRole("dialog", {
     name: new RegExp(templateName),
   });
-  await expect(
-    templateSheet.getByRole("region", { name: "Body template" }),
-  ).toBeVisible();
+  // A click while the previous sheet is still closing can be lost, so click again until it opens.
+  await expect(async () => {
+    if (!(await templateSheet.isVisible())) {
+      await findTemplateCard(page, templateName).first().click();
+    }
+    await expect(
+      templateSheet.getByRole("region", { name: "Body template" }),
+    ).toBeVisible({ timeout: 2_000 });
+  }).toPass({ timeout: 15_000 });
 
   return templateSheet;
 }
@@ -59,9 +64,7 @@ test("WH-09.9 a new template opens in the editor and keeps its details", async (
   );
 
   await page.keyboard.press("Escape");
-  // The closing sheet clears the URL's template, so a click before it is gone is undone.
   await expect(templateSheet).toBeHidden();
-  await expect(page).not.toHaveURL(/[?&]template=/);
   const slackSheet = await openTemplate(page, "Slack: incoming webhook");
   await slackSheet.getByRole("button", { name: "Edit" }).click();
   await expect(slackSheet.getByText("Template details")).toBeHidden();

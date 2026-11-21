@@ -44,6 +44,8 @@ Each official SDK has a setting for the address it calls. Point it at the provid
 
 Any API key works unless **Check credentials** is on for the provider.
 
+Mailgun's send is served at both of its paths: `/v3/{domain}/messages` (fields, as `mailgun.js` and Symfony's `mailgun+api` transport send) and `/v3/{domain}/messages.mime` (the whole MIME message in a `message` file, as Symfony's default `mailgun+https` transport and so Laravel's `mailgun` mailer send). For the MIME path the sender, subject and bodies come from the message and the recipients from `to`.
+
 ## Everything on this screen
 
 ### The table
