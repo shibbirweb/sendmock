@@ -102,3 +102,36 @@ if (verificationCheck.status !== "approved") {
   throw new Error(`Verify login ended ${verificationCheck.status}`);
 }
 console.log(`Verify login ${verification.sid} approved with ${verifyCode}`);
+
+/** The recipient texts the app's number, as a reply would arrive (SM-23.4). */
+async function textAppNumber(body) {
+  const inboundResponse = await fetch(new URL("/api/v1/sms/inbound", sendmockUrl), {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ from: recipientNumber, to: "+15005550006", body }),
+  });
+  if (!inboundResponse.ok) {
+    throw new Error(`The ${body} text was refused: ${inboundResponse.status}`);
+  }
+}
+
+await textAppNumber("STOP");
+try {
+  await client.messages.create({
+    from: "+15005550006",
+    to: recipientNumber,
+    body: "Sent after STOP",
+  });
+  throw new Error("A send after STOP was accepted");
+} catch (sendError) {
+  if (sendError.code !== 21610) {
+    throw sendError;
+  }
+}
+await textAppNumber("START");
+const resumedMessage = await client.messages.create({
+  from: "+15005550006",
+  to: recipientNumber,
+  body: "Sent after START",
+});
+console.log(`STOP gave 21610, and after START ${resumedMessage.sid} was sent`);
