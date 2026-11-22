@@ -34,14 +34,6 @@ on:
         type: boolean
         default: false
   pull_request:
-    paths:
-      - .github/workflows/release.yml
-      - .github/workflows/build-archives.yml
-      - packaging/**
-      - scripts/release/**
-      - scripts/release-tests/**
-      - scripts/install/**
-      - scripts/binary-smoke-test.ts
 
 permissions:
   contents: write
@@ -51,8 +43,35 @@ env:
   RELEASE_CHANNEL: ${{ inputs.channel || 'dev' }}
 
 jobs:
+  changes:
+    name: Changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      is_affected: ${{ steps.changed-paths.outputs.is_affected }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            .github/actions
+            scripts/ci
+
+      - id: changed-paths
+        uses: ./.github/actions/changed-paths
+        with:
+          run-every-job: ${{ github.event_name != 'pull_request' }}
+          paths: |
+            .github/workflows/release.yml
+            .github/workflows/build-archives.yml
+            packaging/**
+            scripts/release/**
+            scripts/release-tests/**
+            scripts/install/**
+            scripts/binary-smoke-test.ts
+
   plan:
     name: Version from the code
+    needs: changes
+    if: needs.changes.outputs.is_affected == 'true'
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -83,6 +102,8 @@ jobs:
   # The web UI and the six archives, built as the test builds of every pull request build them.
   build:
     name: Build
+    needs: changes
+    if: needs.changes.outputs.is_affected == 'true'
     uses: ./.github/workflows/build-archives.yml
     with:
       commit_sha: ${{ inputs.commit_sha || github.sha }}
@@ -483,30 +504,44 @@ jobs:
 
   # Real mailers in eight languages against this commit's SMTP server, before publishing.
   smtp-clients:
+    needs: changes
+    if: needs.changes.outputs.is_affected == 'true'
     uses: ./.github/workflows/smtp-clients.yml
 
   # The official Twilio SDKs send and run a Verify login against this commit, before publishing.
   sms-clients:
+    needs: changes
+    if: needs.changes.outputs.is_affected == 'true'
     uses: ./.github/workflows/sms-clients.yml
 
   # An Express handler receives, fails, retries and replays webhooks against this commit.
   webhook-handler:
+    needs: changes
+    if: needs.changes.outputs.is_affected == 'true'
     uses: ./.github/workflows/webhook-handler.yml
 
   # Stripe, PayPal, SSLCommerz, Razorpay and Paddle apps pay, verify, decline and refund against this commit offline.
   payment-apps:
+    needs: changes
+    if: needs.changes.outputs.is_affected == 'true'
     uses: ./.github/workflows/payment-apps.yml
 
   # The email providers' official SDKs send to this commit offline.
   email-provider-sdks:
+    needs: changes
+    if: needs.changes.outputs.is_affected == 'true'
     uses: ./.github/workflows/email-provider-sdks.yml
 
   # The push providers' official SDKs send to this commit offline.
   push-sdks:
+    needs: changes
+    if: needs.changes.outputs.is_affected == 'true'
     uses: ./.github/workflows/push-sdks.yml
 
   # An app in each of eight languages uses the API against this commit.
   example-apps:
+    needs: changes
+    if: needs.changes.outputs.is_affected == 'true'
     uses: ./.github/workflows/example-apps.yml
 
   publish:
@@ -988,3 +1023,48 @@ jobs:
           bun scripts/release/nix-package.ts "${{ needs.plan.outputs.version }}" dist/SHA256SUMS > package.nix
           gh release upload "${{ inputs.tag_name }}" package.nix --clobber
 
+  # The required check: it reports on every pull request, and fails unless each job above
+  # passed or was skipped because the pull request did not touch its paths.
+  passed:
+    name: Release build passed
+    if: always()
+    needs:
+      - changes
+      - plan
+      - build
+      - test
+      - linux-packages
+      - linux-community-packages
+      - checksums
+      - crates
+      - smtp-clients
+      - sms-clients
+      - webhook-handler
+      - payment-apps
+      - email-provider-sdks
+      - push-sdks
+      - example-apps
+      - publish
+      - docker
+      - docker-examples
+      - helm-chart
+      - docker-extension
+      - homebrew
+      - scoop
+      - testcontainers
+      - winget
+      - chocolatey
+      - aur
+      - copr
+      - nix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job passed or was skipped
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          failed_jobs="$(echo "$JOB_RESULTS" | jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | "\(.key): \(.value.result)"')"
+          if [ -n "$failed_jobs" ]; then
+            echo "::error::Not every job passed: $failed_jobs"
+            exit 1
+          fi

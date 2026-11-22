@@ -60,3 +60,23 @@ jobs:
 
       - name: Same names as docs/api/cli-reference.json and mcp-tools.json (summary on the job page)
         run: bun scripts/binary-surface-parity.ts binary-surfaces.json
+
+  # The required check: it reports on every pull request, and fails unless each job above
+  # passed or was skipped because the pull request did not touch its paths.
+  passed:
+    name: Surface parity passed
+    if: always()
+    needs:
+      - parity
+      - binary-parity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job passed or was skipped
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          failed_jobs="$(echo "$JOB_RESULTS" | jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | "\(.key): \(.value.result)"')"
+          if [ -n "$failed_jobs" ]; then
+            echo "::error::Not every job passed: $failed_jobs"
+            exit 1
+          fi

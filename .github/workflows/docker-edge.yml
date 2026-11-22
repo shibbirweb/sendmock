@@ -23,12 +23,6 @@ on:
   push:
     branches: [develop]
   pull_request:
-    paths:
-      - Dockerfile
-      - .dockerignore
-      - .github/workflows/docker-edge.yml
-      - scripts/docker-image-test.sh
-      - scripts/docker-published-check.sh
 
 permissions:
   contents: read
@@ -46,8 +40,33 @@ env:
   RELEASE_CHANNEL: ${{ inputs.channel || 'edge' }}
 
 jobs:
+  changes:
+    name: Changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      is_affected: ${{ steps.changed-paths.outputs.is_affected }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            .github/actions
+            scripts/ci
+
+      - id: changed-paths
+        uses: ./.github/actions/changed-paths
+        with:
+          run-every-job: ${{ github.event_name != 'pull_request' }}
+          paths: |
+            Dockerfile
+            .dockerignore
+            .github/workflows/docker-edge.yml
+            scripts/docker-image-test.sh
+            scripts/docker-published-check.sh
+
   image:
     name: Image for ${{ matrix.platform }} (${{ matrix.variant }})
+    needs: changes
+    if: needs.changes.outputs.is_affected == 'true'
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
@@ -124,7 +143,8 @@ jobs:
   # here, then checked by the same script the manifest job runs after a real push.
   publish-rehearsal:
     name: Signed, with an SBOM and provenance, under 25 MB (rehearsal on a local registry)
-    if: inputs.image_tags == ''
+    needs: changes
+    if: needs.changes.outputs.is_affected == 'true' && (inputs.image_tags == '')
     runs-on: ubuntu-latest
     services:
       registry:
@@ -256,3 +276,25 @@ jobs:
         env:
           MANIFEST_DIGEST: ${{ steps.sign.outputs.manifest_digest }}
         run: bash scripts/docker-published-check.sh "$GHCR_IMAGE" "$MANIFEST_DIGEST" "$IMAGE_TAGS" "$TAG_SUFFIX"
+
+  # The required check: it reports on every pull request, and fails unless each job above
+  # passed or was skipped because the pull request did not touch its paths.
+  passed:
+    name: Docker image passed
+    if: always()
+    needs:
+      - changes
+      - image
+      - publish-rehearsal
+      - manifest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job passed or was skipped
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          failed_jobs="$(echo "$JOB_RESULTS" | jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | "\(.key): \(.value.result)"')"
+          if [ -n "$failed_jobs" ]; then
+            echo "::error::Not every job passed: $failed_jobs"
+            exit 1
+          fi

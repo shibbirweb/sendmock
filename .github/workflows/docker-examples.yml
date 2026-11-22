@@ -17,18 +17,37 @@ on:
         type: string
         default: ""
   pull_request:
-    paths:
-      - Dockerfile
-      - examples/docker/**
-      - docs/wiki/connect/docker.md
-      - .github/workflows/docker-examples.yml
 
 permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      is_affected: ${{ steps.changed-paths.outputs.is_affected }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            .github/actions
+            scripts/ci
+
+      - id: changed-paths
+        uses: ./.github/actions/changed-paths
+        with:
+          run-every-job: ${{ github.event_name != 'pull_request' }}
+          paths: |
+            Dockerfile
+            examples/docker/**
+            docs/wiki/connect/docker.md
+            .github/workflows/docker-examples.yml
+
   compose:
     name: The Compose example
+    needs: changes
+    if: needs.changes.outputs.is_affected == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -69,7 +88,8 @@ jobs:
 
   service-container:
     name: SendMock as a service container
-    if: inputs.image != ''
+    needs: changes
+    if: needs.changes.outputs.is_affected == 'true' && (inputs.image != '')
     runs-on: ubuntu-latest
     services:
       sendmock:
@@ -87,3 +107,24 @@ jobs:
           printf 'From: ci@example.test\r\nTo: user@example.com\r\nSubject: From a service container\r\n\r\nHello.\r\n' > message.eml
           curl -fsS "smtp://$MAIL_HOST:$MAIL_PORT" --mail-from ci@example.test --mail-rcpt user@example.com -T message.eml
           curl -fsS "http://127.0.0.1:8025/api/v1/wait/email?to=user@example.com&timeout=10s" | jq -e '.subject == "From a service container"'
+
+  # The required check: it reports on every pull request, and fails unless each job above
+  # passed or was skipped because the pull request did not touch its paths.
+  passed:
+    name: Docker examples passed
+    if: always()
+    needs:
+      - changes
+      - compose
+      - service-container
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job passed or was skipped
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          failed_jobs="$(echo "$JOB_RESULTS" | jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | "\(.key): \(.value.result)"')"
+          if [ -n "$failed_jobs" ]; then
+            echo "::error::Not every job passed: $failed_jobs"
+            exit 1
+          fi

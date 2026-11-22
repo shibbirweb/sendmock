@@ -5,9 +5,6 @@ name: Docker Desktop extension
 
 on:
   pull_request:
-    paths:
-      - packaging/docker-desktop/**
-      - .github/workflows/docker-desktop-extension.yml
   push:
     branches:
       - develop
@@ -21,8 +18,30 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      is_affected: ${{ steps.changed-paths.outputs.is_affected }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            .github/actions
+            scripts/ci
+
+      - id: changed-paths
+        uses: ./.github/actions/changed-paths
+        with:
+          run-every-job: ${{ github.event_name != 'pull_request' }}
+          paths: |
+            packaging/docker-desktop/**
+            .github/workflows/docker-desktop-extension.yml
+
   extension:
     name: Build and check the extension image
+    needs: changes
+    if: needs.changes.outputs.is_affected == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -67,3 +86,23 @@ jobs:
           test -f "extension-files$(jq -r '.ui."dashboard-tab".root' extension-files/metadata.json)/$(jq -r '.ui."dashboard-tab".src' extension-files/metadata.json)"
           grep -q '"8025:8025"' extension-files/docker-compose.yaml
           grep -q '"1025:1025"' extension-files/docker-compose.yaml
+
+  # The required check: it reports on every pull request, and fails unless each job above
+  # passed or was skipped because the pull request did not touch its paths.
+  passed:
+    name: Docker Desktop extension passed
+    if: always()
+    needs:
+      - changes
+      - extension
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job passed or was skipped
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          failed_jobs="$(echo "$JOB_RESULTS" | jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | "\(.key): \(.value.result)"')"
+          if [ -n "$failed_jobs" ]; then
+            echo "::error::Not every job passed: $failed_jobs"
+            exit 1
+          fi

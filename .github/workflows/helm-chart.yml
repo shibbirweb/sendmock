@@ -5,10 +5,6 @@ name: Helm chart
 
 on:
   pull_request:
-    paths:
-      - packaging/helm/**
-      - Dockerfile
-      - .github/workflows/helm-chart.yml
   push:
     branches:
       - develop
@@ -33,8 +29,31 @@ env:
     --set resources.requests.memory=64Mi
 
 jobs:
+  changes:
+    name: Changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      is_affected: ${{ steps.changed-paths.outputs.is_affected }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            .github/actions
+            scripts/ci
+
+      - id: changed-paths
+        uses: ./.github/actions/changed-paths
+        with:
+          run-every-job: ${{ github.event_name != 'pull_request' }}
+          paths: |
+            packaging/helm/**
+            Dockerfile
+            .github/workflows/helm-chart.yml
+
   chart:
     name: Lint, render and install on kind
+    needs: changes
+    if: needs.changes.outputs.is_affected == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -93,3 +112,23 @@ jobs:
       - name: Pod log
         if: failure()
         run: kubectl logs deployment/sendmock --tail=100 || true
+
+  # The required check: it reports on every pull request, and fails unless each job above
+  # passed or was skipped because the pull request did not touch its paths.
+  passed:
+    name: Helm chart passed
+    if: always()
+    needs:
+      - changes
+      - chart
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job passed or was skipped
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          failed_jobs="$(echo "$JOB_RESULTS" | jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | "\(.key): \(.value.result)"')"
+          if [ -n "$failed_jobs" ]; then
+            echo "::error::Not every job passed: $failed_jobs"
+            exit 1
+          fi

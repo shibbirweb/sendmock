@@ -6,14 +6,6 @@ name: SMS clients
 
 on:
   pull_request:
-    paths:
-      - crates/sendmock-sms/**
-      - crates/sendmock-ops/src/providers/**
-      - crates/sendmock-ops/src/sms/**
-      - crates/sendmock-ops/src/verify/**
-      - crates/sendmock-ops/builtin/**
-      - examples/sms/**
-      - .github/workflows/sms-clients.yml
   push:
     branches:
       - develop
@@ -28,13 +20,45 @@ on:
       - .github/workflows/sms-clients.yml
   workflow_dispatch:
   workflow_call:
+    inputs:
+      run_every_job:
+        description: Run every job without reading the pull request's changes (a calling workflow decides)
+        type: boolean
+        default: true
 
 permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      is_affected: ${{ steps.changed-paths.outputs.is_affected }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            .github/actions
+            scripts/ci
+
+      - id: changed-paths
+        uses: ./.github/actions/changed-paths
+        with:
+          run-every-job: ${{ github.event_name != 'pull_request' || inputs.run_every_job == true }}
+          paths: |
+            crates/sendmock-sms/**
+            crates/sendmock-ops/src/providers/**
+            crates/sendmock-ops/src/sms/**
+            crates/sendmock-ops/src/verify/**
+            crates/sendmock-ops/builtin/**
+            examples/sms/**
+            .github/workflows/sms-clients.yml
+
   binary:
     name: Release binary
+    needs: changes
+    if: needs.changes.outputs.is_affected == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -230,3 +254,24 @@ jobs:
       - name: SendMock log
         if: failure()
         run: cat sendmock.log
+
+  # The required check: it reports on every pull request, and fails unless each job above
+  # passed or was skipped because the pull request did not touch its paths.
+  passed:
+    name: SMS clients passed
+    if: always()
+    needs:
+      - changes
+      - binary
+      - client
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job passed or was skipped
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          failed_jobs="$(echo "$JOB_RESULTS" | jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | "\(.key): \(.value.result)"')"
+          if [ -n "$failed_jobs" ]; then
+            echo "::error::Not every job passed: $failed_jobs"
+            exit 1
+          fi

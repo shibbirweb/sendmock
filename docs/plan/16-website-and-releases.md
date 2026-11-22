@@ -170,6 +170,16 @@ WS-03.1 (unchanged) plus WS-03.4 to WS-03.7 in [acceptance](acceptance/07-distri
 
 Branch protection on `develop` and `main`: pull requests only, CI must pass.
 
+### Required checks (owner decision 2026-11-22)
+
+Every check must pass before a pull request merges, not only the ones GitHub enforces: the 1.4.0 promotion (#351) merged with a failing CodeQL check because CodeQL was not required. The "Core Protection" ruleset now enforces all of it:
+
+- **One gate per workflow.** Every workflow a pull request starts ends with a `passed` job named "`<workflow>` passed". It runs `always()`, waits for every other job, and fails unless each one succeeded or was skipped. The ruleset requires these gates. A skipped matrix job never reports its per-platform names, so the gate, not each job, is what can be required.
+- **Every workflow starts on every pull request.** The path filters moved from `on.pull_request.paths` into a first `changes` job (`.github/actions/changed-paths`, `scripts/ci/changed-paths.ts`): it lists the pull request's files and matches them against the workflow's patterns, and the jobs that start the work wait for it and are skipped when nothing in their area changed. Their gate still reports, so a docs pull request is not left waiting for a check that never starts. Pushes, manual runs and calls from another workflow (`run_every_job`, for the client and SDK suites the release build calls) always run every job.
+- **CodeQL** is required through the ruleset's code scanning rule: a pull request that adds an alert of any severity cannot merge.
+- **Kept in step:** `scripts/ci/workflow-gates.test.ts` fails when a pull request workflow lacks a gate, filters by path, or has a job its gate does not wait for; `bun scripts/ci/sync-required-checks.ts --apply` writes the gates and the CodeQL rule to the ruleset (run it after adding or renaming a workflow).
+- Not gated: Screenshots (started by a label) and Cache cleanup (a closed pull request), which a normal pull request never starts.
+
 ### Versioning
 
 - SemVer: betas are `X.Y.Z-beta.N`, stables `X.Y.Z`.

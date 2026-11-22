@@ -25,15 +25,6 @@ on:
       - "scripts/release/package-repository.sh"
       - ".github/workflows/website.yml"
   pull_request:
-    paths:
-      - "web/**"
-      - "website/**"
-      - "docs/api/**"
-      - "docs/wiki/**"
-      - "CHANGELOG.md"
-      - "scripts/build-pages-site.ts"
-      - "scripts/build-docs-versions.ts"
-      - ".github/workflows/website.yml"
   # A new stable release becomes / and the previous minor moves to /vX.Y/.
   release:
     types: [published]
@@ -52,11 +43,38 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      is_affected: ${{ steps.changed-paths.outputs.is_affected }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            .github/actions
+            scripts/ci
+
+      - id: changed-paths
+        uses: ./.github/actions/changed-paths
+        with:
+          run-every-job: ${{ github.event_name != 'pull_request' }}
+          paths: |
+            web/**
+            website/**
+            docs/api/**
+            docs/wiki/**
+            CHANGELOG.md
+            scripts/build-pages-site.ts
+            scripts/build-docs-versions.ts
+            .github/workflows/website.yml
+
   # Publish beta and Publish stable run after every CI run on develop and main; deploy only
   # when the run published a release, as Registry publish decides.
   release-check:
     name: Did that run publish a release?
-    if: github.event_name == 'workflow_run'
+    needs: changes
+    if: needs.changes.outputs.is_affected == 'true' && (github.event_name == 'workflow_run')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -83,8 +101,8 @@ jobs:
   # PACKAGES_GPG_PRIVATE_KEY (DS-03.3, plan 30 W4).
   package-repository:
     name: APT and YUM repository
-    needs: release-check
-    if: ${{ !cancelled() && (needs.release-check.result == 'skipped' || needs.release-check.outputs.should_deploy == 'true') }}
+    needs: [changes, release-check]
+    if: ${{ !cancelled() && (needs.release-check.result == 'skipped' || needs.release-check.outputs.should_deploy == 'true') && needs.changes.outputs.is_affected == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       has_repository: ${{ steps.build.outputs.has_repository }}
@@ -128,10 +146,10 @@ jobs:
 
   build:
     name: Build
-    needs: package-repository
+    needs: [changes, package-repository]
     # Without its own condition a job is skipped when any job before it was skipped, and the
     # release check is skipped on every pull request and push.
-    if: ${{ !cancelled() && needs.package-repository.result == 'success' }}
+    if: ${{ !cancelled() && needs.package-repository.result == 'success' && needs.changes.outputs.is_affected == 'true' }}
     runs-on: ubuntu-latest
     # Playwright's own image has the browser and its system packages, as in ci.yml.
     # The tag must equal @playwright/test in website/package.json; web/tests/repository checks it.
@@ -222,8 +240,8 @@ jobs:
 
   deploy:
     name: Publish to GitHub Pages
-    if: ${{ !cancelled() && github.event_name != 'pull_request' && needs.build.result == 'success' }}
-    needs: build
+    if: ${{ !cancelled() && github.event_name != 'pull_request' && needs.build.result == 'success' && needs.changes.outputs.is_affected == 'true' }}
+    needs: [changes, build]
     runs-on: ubuntu-latest
     permissions:
       pages: write
@@ -234,3 +252,26 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v5
+
+  # The required check: it reports on every pull request, and fails unless each job above
+  # passed or was skipped because the pull request did not touch its paths.
+  passed:
+    name: Website passed
+    if: always()
+    needs:
+      - changes
+      - release-check
+      - package-repository
+      - build
+      - deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job passed or was skipped
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          failed_jobs="$(echo "$JOB_RESULTS" | jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | "\(.key): \(.value.result)"')"
+          if [ -n "$failed_jobs" ]; then
+            echo "::error::Not every job passed: $failed_jobs"
+            exit 1
+          fi
