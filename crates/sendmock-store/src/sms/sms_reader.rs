@@ -34,6 +34,14 @@ fn build_conditions(filter: &SmsListFilter) -> (String, Vec<SqlValue>) {
             parameters.push(SqlValue::Text(filter_value.clone()));
         }
     }
+    if let Some(owner_account) = &filter.owner_account {
+        conditions.push(if owner_account.is_main {
+            "(account = ? OR account IS NULL)"
+        } else {
+            "account = ?"
+        });
+        parameters.push(SqlValue::Text(owner_account.account_sid.clone()));
+    }
     if let Some(created_after_unix_ms) = filter.created_after_unix_ms {
         conditions.push("created_at > ?");
         parameters.push(SqlValue::Integer(created_after_unix_ms));

@@ -31,6 +31,7 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ### Fixed
 
+- **Twilio messages stay in their account:** on the Twilio API, fetching, canceling or listing messages under `/Accounts/{AccountSid}/` now sees only that account's messages, so the main account gets Twilio's 20404 for a subaccount's message instead of reading it as its own, and every answer names the account that really sent it.
 - **Inbound SMS name the right Twilio account:** a text to a number owned by a Twilio subaccount is stored under that subaccount, its `twilio.inbound_sms` webhook carries the subaccount's `AccountSid` and is signed with its token, and TwiML replies to it are sent under the same account. Webhook rules on `twilio.inbound_sms` and `twilio.status_callback` now send the message's account (or the main account) as `AccountSid` instead of a placeholder SID.
 - **Location fields on Twilio inbound webhooks:** `twilio.inbound_sms` now always sends `FromCity`, `FromState`, `FromZip`, `FromCountry`, `ToCity`, `ToState`, `ToZip` and `ToCountry`, as Twilio does; the countries come from each number's calling code and the rest are empty.
 - **Percent-encoded paths on the provider port:** an address in a provider path, such as `DELETE /v3/{domain}/complaints/user%40example.org`, now finds the item as the unencoded address does.

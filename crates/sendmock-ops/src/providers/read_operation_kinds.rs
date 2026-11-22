@@ -1,9 +1,10 @@
-use sendmock_store::SmsListFilter;
+use sendmock_store::{SmsListFilter, SmsOwnerAccount};
 use serde_json::{Value, json};
 
 use super::provider_call::{ProviderCall, describe_message};
 use super::request_checks::ProviderFailure;
 use super::send_operation_kind::ProviderAnswer;
+use crate::twilio_accounts::{TWILIO_PROVIDER_KEY, TwilioAccountDirectory};
 use crate::{OperationContext, OperationError};
 
 const DEFAULT_PAGE_SIZE: u32 = 50;
@@ -22,6 +23,7 @@ pub async fn answer_fetch(
     let filter = SmsListFilter {
         api: Some(provider_call.provider.key.clone()),
         provider_id: Some(provider_message_id.clone()),
+        owner_account: read_twilio_owner(operation_context, provider_call).await?,
         ..SmsListFilter::default()
     };
     let page = operation_context
@@ -70,6 +72,7 @@ pub async fn answer_list(
         api: Some(provider_call.provider.key.clone()),
         to_number: first_value("to"),
         from_number: first_value("from"),
+        owner_account: read_twilio_owner(operation_context, provider_call).await?,
         ..SmsListFilter::default()
     };
     let page = operation_context
@@ -90,6 +93,25 @@ pub async fn answer_list(
     response.body =
         build_page_body(&provider_call.request.path, listed_messages, page_size).to_string();
     Ok(ProviderAnswer::without_message(response))
+}
+
+/// The Twilio account in the path, whose messages alone the request may read, as Twilio
+/// answers 20404 for another account's message; none for other providers.
+async fn read_twilio_owner(
+    operation_context: &OperationContext,
+    provider_call: &ProviderCall<'_>,
+) -> Result<Option<SmsOwnerAccount>, OperationError> {
+    if provider_call.provider.key != TWILIO_PROVIDER_KEY {
+        return Ok(None);
+    }
+    let Some(path_account_sid) = provider_call.path_params.get("AccountSid") else {
+        return Ok(None);
+    };
+    let directory = TwilioAccountDirectory::load(operation_context).await?;
+    Ok(Some(SmsOwnerAccount {
+        is_main: directory.main_account.account_sid == *path_account_sid,
+        account_sid: path_account_sid.clone(),
+    }))
 }
 
 fn build_page_body(path: &str, listed_messages: Vec<Value>, page_size: u32) -> Value {

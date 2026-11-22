@@ -6,7 +6,9 @@ mod twilio_subaccount_inputs;
 mod twilio_subaccount_operations;
 mod twilio_subaccount_views;
 
-pub(crate) use twilio_account_directory::{TwilioAccount, TwilioAccountDirectory};
+pub(crate) use twilio_account_directory::{
+    TWILIO_PROVIDER_KEY, TwilioAccount, TwilioAccountDirectory,
+};
 pub(crate) use twilio_debugger::{
     DEBUGGER_REPORTED_STATUS, DebuggerProblem, report_failed_inbound_webhook,
     report_failed_message, send_debugger_event,
