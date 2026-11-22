@@ -28,12 +28,16 @@ Write every user-visible change under **Unreleased** in the same pull request th
 - **Merge imports no longer ask to confirm:** `sendmock setup import` needs no `--yes` for a merge, which only adds and updates. A replace that would remove items names each one and asks you to run it again with `--confirm-removed-count <count>`.
 - **Reset says what it did:** `sendmock reset` and `POST /api/v1/reset` answer what they cleared (emails, SMS, deliveries and the rest) and which configuration stayed, instead of an empty answer. The new `--config` option also removes every configured item and puts the settings and providers back to what SendMock ships with, after you confirm the counts it names; see Seed file, Reset before every test run.
 - **The provider port is on by default:** `sendmock serve` now serves the provider APIs (Twilio, Mailgun, SendGrid, ...) at `127.0.0.1:8026` without `--provider-addr`, so provider SDKs reach SendMock with no extra flag. `--provider-addr none` (or `SENDMOCK_PROVIDER_ADDR=none`, or `provider_addr = "none"` in `sendmock.toml`) turns it off, and if port 8026 is busy SendMock says so and starts without it. `sendmock status`, `GET /api/v1/info` and the MCP status tool warn while it is off. The Docker image and the Helm chart keep it off until you set its address.
-
 ### Fixed
 
 - **Twilio messages stay in their account:** on the Twilio API, fetching, canceling or listing messages under `/Accounts/{AccountSid}/` now sees only that account's messages, so the main account gets Twilio's 20404 for a subaccount's message instead of reading it as its own, and every answer names the account that really sent it.
 - **Inbound SMS name the right Twilio account:** a text to a number owned by a Twilio subaccount is stored under that subaccount, its `twilio.inbound_sms` webhook carries the subaccount's `AccountSid` and is signed with its token, and TwiML replies to it are sent under the same account. Webhook rules on `twilio.inbound_sms` and `twilio.status_callback` now send the message's account (or the main account) as `AccountSid` instead of a placeholder SID.
 - **Location fields on Twilio inbound webhooks:** `twilio.inbound_sms` now always sends `FromCity`, `FromState`, `FromZip`, `FromCountry`, `ToCity`, `ToState`, `ToZip` and `ToCountry`, as Twilio does; the countries come from each number's calling code and the rest are empty.
+
+## [1.4.1] - 2026-11-22
+
+### Fixed
+
 - **Percent-encoded paths on the provider port:** an address in a provider path, such as `DELETE /v3/{domain}/complaints/user%40example.org`, now finds the item as the unencoded address does.
 - **Secure tokens for demo Twilio subaccounts:** in the website's demo and the web UI's mock mode, a new Twilio subaccount's auth token and SID now come from the browser's cryptographically secure random source instead of `Math.random()`.
 
