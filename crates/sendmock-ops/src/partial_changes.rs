@@ -9,8 +9,9 @@ use serde_json::{Map, Value};
 use crate::OperationError;
 
 /// The fields a PATCH body gives for a stored object of type `Full`: the rest keep their
-/// stored values. Objects merge key by key and anything else is replaced, as a JSON merge
-/// patch does (RFC 7386), except that `null` sets a field to null instead of removing it.
+/// stored values. Each given field replaces its stored value whole, an object or a list
+/// included, so a map such as a gateway's `event_names` holds exactly what was sent; `null`
+/// sets a field to null.
 #[derive(Debug, Clone, PartialEq)]
 pub struct PartialChanges<Full> {
     given_fields: Map<String, Value>,
@@ -43,14 +44,7 @@ fn merge_fields(target_value: &mut Value, given_fields: &Map<String, Value>) {
         return;
     };
     for (field_name, given_value) in given_fields {
-        match (target_fields.get_mut(field_name), given_value) {
-            (Some(target_field @ Value::Object(_)), Value::Object(nested_fields)) => {
-                merge_fields(target_field, nested_fields);
-            }
-            _ => {
-                target_fields.insert(field_name.clone(), given_value.clone());
-            }
-        }
+        target_fields.insert(field_name.clone(), given_value.clone());
     }
 }
 
@@ -92,6 +86,8 @@ impl<Full: JsonSchema> JsonSchema for PartialChanges<Full> {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::BTreeMap;
+
     use super::*;
 
     #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
@@ -101,6 +97,7 @@ mod tests {
         limits: Limits,
         tags: Vec<String>,
         note: Option<String>,
+        event_names: BTreeMap<String, String>,
     }
 
     #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
@@ -119,6 +116,10 @@ mod tests {
             },
             tags: vec!["a".to_owned(), "b".to_owned()],
             note: Some("kept".to_owned()),
+            event_names: BTreeMap::from([
+                ("payment.created".to_owned(), "CREATED".to_owned()),
+                ("payment.failed".to_owned(), "FAILED".to_owned()),
+            ]),
         }
     }
 
@@ -129,21 +130,29 @@ mod tests {
     // AC: PL-26.4
     #[test]
     fn a_partial_body_changes_only_its_fields() -> Result<(), OperationError> {
-        let changes =
-            read_changes(serde_json::json!({ "is_enabled": false, "limits": { "per_day": 5 } }));
+        let changes = read_changes(serde_json::json!({ "is_enabled": false }));
 
         let merged = changes.merge_onto(&stored_thing())?;
 
         assert!(!merged.is_enabled);
-        assert_eq!(
-            merged.limits,
-            Limits {
-                per_minute: 10,
-                per_day: 5
-            }
-        );
+        assert_eq!(merged.limits, stored_thing().limits);
         assert_eq!(merged.name, "Shop");
         assert_eq!(merged.note.as_deref(), Some("kept"));
+        Ok(())
+    }
+
+    #[test]
+    fn a_given_map_replaces_the_stored_one_whole() -> Result<(), OperationError> {
+        let changes = read_changes(
+            serde_json::json!({ "event_names": { "payment.succeeded": "COMPLETED" } }),
+        );
+
+        let merged = changes.merge_onto(&stored_thing())?;
+
+        assert_eq!(
+            merged.event_names,
+            BTreeMap::from([("payment.succeeded".to_owned(), "COMPLETED".to_owned())])
+        );
         Ok(())
     }
 

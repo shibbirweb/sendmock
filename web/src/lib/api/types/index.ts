@@ -9,6 +9,7 @@ export type * from "@/lib/api/types/events";
 export type * from "@/lib/api/types/email-templates";
 export type * from "@/lib/api/types/reset";
 export type * from "@/lib/api/types/system";
+export type * from "@/lib/api/types/tls";
 export type * from "@/lib/api/types/ci";
 export type * from "@/lib/api/types/http-catcher";
 export type * from "@/lib/api/types/provider-bins";
