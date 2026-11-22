@@ -2,6 +2,7 @@ mod opt_out_auto_reply;
 mod opt_out_guard;
 mod opt_out_intake;
 mod opt_out_operations;
+mod opt_out_scope;
 mod opt_out_views;
 
 pub(crate) use opt_out_guard::is_send_opted_out;

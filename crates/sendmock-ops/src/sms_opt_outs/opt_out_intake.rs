@@ -5,6 +5,7 @@ use sendmock_sms::OptOutKeyword;
 use sendmock_store::{SmsOptOutRecord, SmsRecord};
 
 use super::opt_out_auto_reply::send_opt_out_reply;
+use super::opt_out_scope::resolve_opt_out_scope;
 use crate::providers::{SMS_PROVIDER_AREA, find_area_provider};
 use crate::twilio_accounts::TWILIO_PROVIDER_KEY;
 use crate::{OperationContext, OperationError};
@@ -46,19 +47,17 @@ async fn apply_opt_out_keyword(
     if !twilio_provider.has_opt_out_keywords() {
         return Ok(None);
     }
-    let app_number = operation_context
-        .virtual_number_repository
-        .find_by_number(&inbound_sms.app_number)
-        .await?;
+    let Some(scope) =
+        resolve_opt_out_scope(operation_context, &inbound_sms.app_number, None).await?
+    else {
+        return Ok(None);
+    };
     let opt_outs = &operation_context.sms_delivery_stores.opt_outs;
     match keyword {
         OptOutKeyword::Stop => {
-            let sender = app_number
-                .and_then(|registered_number| registered_number.messaging_service_sid)
-                .unwrap_or_else(|| inbound_sms.app_number.clone());
             opt_outs
                 .save_opt_out(SmsOptOutRecord {
-                    sender,
+                    sender: scope.stop_sender,
                     contact_number: inbound_sms.contact_number.clone(),
                     keyword: inbound_sms.body.trim().to_owned(),
                     created_at_unix_ms: operation_context.clock.now_unix_ms(),
@@ -66,11 +65,7 @@ async fn apply_opt_out_keyword(
                 .await?;
         }
         OptOutKeyword::Start => {
-            let mut senders = vec![inbound_sms.app_number.clone()];
-            senders.extend(
-                app_number.and_then(|registered_number| registered_number.messaging_service_sid),
-            );
-            for sender in senders {
+            for sender in scope.senders {
                 opt_outs
                     .delete_opt_out(&sender, &inbound_sms.contact_number)
                     .await?;

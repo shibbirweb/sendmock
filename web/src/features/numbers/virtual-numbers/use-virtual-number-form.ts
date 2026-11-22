@@ -26,6 +26,7 @@ export type VirtualNumberFormValues = {
   statusCallbackUrl: string;
   messagingServiceSid: string;
   accountSid: string;
+  hasOptOutKeywords: boolean;
 };
 
 /** Select value for "no Messaging Service" (Select items cannot be empty). */
@@ -50,6 +51,7 @@ function toFormValues(
     messagingServiceSid:
       virtualNumber?.messaging_service_sid ?? noMessagingService,
     accountSid: virtualNumber?.account_sid ?? mainTwilioAccount,
+    hasOptOutKeywords: virtualNumber?.opt_out_keywords ?? true,
   };
 }
 
@@ -79,6 +81,7 @@ function toNumberInput(
       formValues.accountSid === mainTwilioAccount
         ? null
         : formValues.accountSid,
+    opt_out_keywords: formValues.hasOptOutKeywords,
   };
 }
 

@@ -4168,6 +4168,7 @@ expression: command_descriptions
       "--label",
       "--messaging-service-sid",
       "--number",
+      "--opt-out-keywords",
       "--status-callback-url"
     ],
     "operations": [
@@ -4203,6 +4204,7 @@ expression: command_descriptions
       "--label",
       "--messaging-service-sid",
       "--number",
+      "--opt-out-keywords",
       "--status-callback-url"
     ],
     "operations": [
@@ -4272,6 +4274,7 @@ expression: command_descriptions
       "--inbound-mode",
       "--inbound-url",
       "--number-id",
+      "--opt-out-keywords",
       "--sid"
     ],
     "operations": [
@@ -4299,7 +4302,8 @@ expression: command_descriptions
       "--inbound-fallback-url",
       "--inbound-mode",
       "--inbound-url",
-      "--number-id"
+      "--number-id",
+      "--opt-out-keywords"
     ],
     "operations": [
       {

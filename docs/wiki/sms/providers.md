@@ -62,7 +62,7 @@ SendMock emulates Twilio's Advanced Opt-Out, on by default for the Twilio provid
 - START, YES or UNSTOP lifts it; HELP and INFO are left as they are.
 - The inbound message still reaches your app's webhook, as on Twilio.
 
-**Opt-out keywords** in the provider's General tab turns it off (`opt_out_keywords`). **Opt-out auto-replies** (`opt_out_auto_replies`, off by default) answers STOP, START and HELP with Twilio's default replies, stored as outbound messages. The list of opt-outs is on the Numbers screen's **Opt-outs** tab; see [Numbers](../numbers.md#opt-outs).
+**Opt-out keywords** in the provider's General tab turns it off (`opt_out_keywords`); the same switch on a number or a Messaging Service (Numbers) turns it off for just that one. **Opt-out auto-replies** (`opt_out_auto_replies`, off by default) answers STOP, START and HELP with Twilio's default replies, stored as outbound messages. The list of opt-outs is on the Numbers screen's **Opt-outs** tab; see [Numbers](../numbers.md#opt-outs).
 
 ## Twilio subaccounts
 

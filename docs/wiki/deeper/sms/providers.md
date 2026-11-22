@@ -337,7 +337,7 @@ Text.
 Switch.
 
 - **What it does:** Twilio's Advanced Opt-Out: a contact who texts STOP (STOPALL, UNSUBSCRIBE, CANCEL, END or QUIT) gets no more sends from that number or Messaging Service; a send answers error 21610 until they text START, YES or UNSTOP. On by default for Twilio.
-- **Same action elsewhere:** REST getSmsOptOuts
+- **Same action elsewhere:** REST [`GET /api/v1/sms/opt-outs`](/api/sms/#getSmsOptOuts), CLI [`sendmock sms opt-outs list`](/cli/sms/#sms-opt-outs-list), MCP [`sendmock_sms_opt_out_list`](/mcp/sms/#sendmock_sms_opt_out_list)
 
 ### 52. A text of STOP blocks later sends to that contact with error # until they text START, as Twilio's Advanced Opt-Out does.
 

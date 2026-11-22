@@ -46,6 +46,7 @@ The number sheet:
 - **Default status callback**.
 - **Messaging Service:** none or one; a number belongs to at most one.
 - **Twilio account:** the main account or one of its [subaccounts](./sms/providers.md#twilio-subaccounts). Inbound messages to the number carry that account's `AccountSid` and are signed with its token. In the CLI, `sendmock numbers add --account-sid AC...`; in a setup file, `account_sid` on the `[[numbers]]` item. Left out, the main account.
+- **Opt-out keywords:** on by default; off, a text of STOP to this number is an ordinary text (see [Opt-outs](#opt-outs)). The Messaging Service sheet has the same switch for every number in the service.
 
 Delete asks first and removes the number from its service.
 

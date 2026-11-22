@@ -48,6 +48,8 @@
       "combobox: Messaging Service",
       "combobox: Twilio account",
       "paragraph: Inbound messages to the number carry this account's SID and are signed with its token.",
+      "switch: Opt-out keywords",
+      "paragraph: A text of STOP to this number opts the contact out, with the provider's switch on.",
       "button: Cancel",
       "button: Add number",
       "button: Close"
@@ -70,6 +72,8 @@
       "combobox: Messaging Service",
       "combobox: Twilio account",
       "paragraph: Inbound messages to the number carry this account's SID and are signed with its token.",
+      "switch: Opt-out keywords",
+      "paragraph: A text of STOP to this number opts the contact out, with the provider's switch on.",
       "button: Cancel",
       "button: Save changes",
       "button: Close"

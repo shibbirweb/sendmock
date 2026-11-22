@@ -235,6 +235,7 @@ fn build_api_number(
         messaging_service_sid: None,
         phone_number_sid: generate_phone_number_sid(operation_context),
         account_sid,
+        opt_out_keywords: true,
         created_by: "api".to_owned(),
         created_at_unix_ms: operation_context.clock.now_unix_ms(),
     }

@@ -53,9 +53,9 @@ Tab.
 Tab.
 
 - **What it does:** Contacts who texted STOP, with Lift to let your app send to one again and Lift all.
-- **Same action elsewhere:** REST getSmsOptOuts
-- **Same action elsewhere:** REST deleteSmsOptOutsBySenderByContactNumber
-- **Same action elsewhere:** REST deleteSmsOptOuts
+- **Same action elsewhere:** REST [`GET /api/v1/sms/opt-outs`](/api/sms/#getSmsOptOuts), CLI [`sendmock sms opt-outs list`](/cli/sms/#sms-opt-outs-list), MCP [`sendmock_sms_opt_out_list`](/mcp/sms/#sendmock_sms_opt_out_list)
+- **Same action elsewhere:** REST [`DELETE /api/v1/sms/opt-outs/{sender}/{contactNumber}`](/api/sms/#deleteSmsOptOutsBySenderByContactNumber), CLI [`sendmock sms opt-outs delete`](/cli/sms/#sms-opt-outs-delete), MCP [`sendmock_sms_opt_out_delete`](/mcp/sms/#sendmock_sms_opt_out_delete)
+- **Same action elsewhere:** REST [`DELETE /api/v1/sms/opt-outs`](/api/sms/#deleteSmsOptOuts), CLI [`sendmock sms opt-outs clear`](/cli/sms/#sms-opt-outs-clear), MCP [`sendmock_sms_opt_out_clear`](/mcp/sms/#sendmock_sms_opt_out_clear)
 
 ### 7. Fake numbers your app sends from, with their inbound webhooks.
 
@@ -276,20 +276,32 @@ Text.
 
 - **What it does:** Explains what the account changes.
 
-### 42. Cancel
+### 42. Opt-out keywords
+
+Switch.
+
+- **What it does:** Off: a text of STOP to this number is an ordinary text, and sends from it never get 21610. On by default; the provider's Opt-out keywords switch must be on too.
+
+### 43. A text of STOP to this number opts the contact out, with the provider's switch on.
+
+Text.
+
+- **What it does:** Explains Opt-out keywords.
+
+### 44. Cancel
 
 Button.
 
 - **What it does:** Closes the editor without saving.
 
-### 43. Add number
+### 45. Add number
 
 Button.
 
 - **What it does:** Adds the number.
 - **Same action elsewhere:** REST [`POST /api/v1/numbers`](/api/numbers/#postNumbers), CLI [`sendmock numbers add`](/cli/numbers/#numbers-add), MCP [`sendmock_number_upsert`](/mcp/numbers/#sendmock_number_upsert)
 
-### 44. Close
+### 46. Close
 
 Button.
 
@@ -297,122 +309,134 @@ Button.
 
 ## Number editor
 
-### 45. Edit number
+### 47. Edit number
 
 Heading.
 
 - **What it does:** The number editor, for an existing number.
 
-### 46. A fake number your app owns, set up like a provider console.
+### 48. A fake number your app owns, set up like a provider console.
 
 Text.
 
 - **What it does:** Explains the editor.
 
-### 47. Number
+### 49. Number
 
 Field.
 
 - **What it does:** The number in E.164 form, such as `+15550001111`.
 
-### 48. Label
+### 50. Label
 
 Field.
 
 - **What it does:** A name for it.
 
-### 49. SMS
+### 51. SMS
 
 Checkbox.
 
 - **What it does:** It sends and receives SMS.
 
-### 50. WhatsApp
+### 52. WhatsApp
 
 Checkbox.
 
 - **What it does:** It sends and receives WhatsApp messages.
 
-### 51. Webhook URL
+### 53. Webhook URL
 
 Field.
 
 - **What it does:** Where an inbound message to the number is posted, as Twilio's reply webhook; the TwiML answer is read.
 
-### 52. Leave empty to deliver inbound messages through webhook rules only.
+### 54. Leave empty to deliver inbound messages through webhook rules only.
 
 Text.
 
 - **What it does:** Explains an empty webhook URL.
 
-### 53. Method
+### 55. Method
 
 Drop-down.
 
 - **What it does:** POST or GET for the webhook.
 
-### 54. Format
+### 56. Format
 
 Drop-down.
 
 - **What it does:** The webhook's format, Twilio's by default.
 
-### 55. Fallback URL
+### 57. Fallback URL
 
 Field.
 
 - **What it does:** Called when the webhook URL fails.
 
-### 56. Called with ErrorCode and ErrorUrl when the webhook URL fails.
+### 58. Called with ErrorCode and ErrorUrl when the webhook URL fails.
 
 Text.
 
 - **What it does:** Explains the fallback, as Twilio does it.
 
-### 57. Default status callback
+### 59. Default status callback
 
 Field.
 
 - **What it does:** Where status callbacks go for sends that give none.
 
-### 58. Used when a send from this number has no StatusCallback.
+### 60. Used when a send from this number has no StatusCallback.
 
 Text.
 
 - **What it does:** Explains the default status callback.
 
-### 59. Messaging Service
+### 61. Messaging Service
 
 Drop-down.
 
 - **What it does:** The pool the number belongs to, if any.
 
-### 60. Twilio account
+### 62. Twilio account
 
 Drop-down.
 
 - **What it does:** The Twilio account that owns the number: the main account or one of its subaccounts. Inbound messages to the number carry that account's SID and are signed with its token.
 
-### 61. Inbound messages to the number carry this account's SID and are signed with its token.
+### 63. Inbound messages to the number carry this account's SID and are signed with its token.
 
 Text.
 
 - **What it does:** Explains what the account changes.
 
-### 62. Cancel
+### 64. Opt-out keywords
+
+Switch.
+
+- **What it does:** Off: a text of STOP to this number is an ordinary text, and sends from it never get 21610. On by default; the provider's Opt-out keywords switch must be on too.
+
+### 65. A text of STOP to this number opts the contact out, with the provider's switch on.
+
+Text.
+
+- **What it does:** Explains Opt-out keywords.
+
+### 66. Cancel
 
 Button.
 
 - **What it does:** Closes the editor without saving.
 
-### 63. Save changes
+### 67. Save changes
 
 Button.
 
 - **What it does:** Saves the number.
 - **Same action elsewhere:** REST [`PATCH /api/v1/numbers/{numberId}`](/api/numbers/#patchNumbersByNumberId), CLI [`sendmock numbers update`](/cli/numbers/#numbers-update), MCP [`sendmock_number_upsert`](/mcp/numbers/#sendmock_number_upsert)
 
-### 64. Close
+### 68. Close
 
 Button.
 
@@ -420,20 +444,20 @@ Button.
 
 ## When the data cannot load
 
-### 65. Could not load the numbers. Try again
+### 69. Could not load the numbers. Try again
 
 Message.
 
 - **What it does:** Shown when the numbers could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 66. Could not load the numbers.
+### 70. Could not load the numbers.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 67. Try again
+### 71. Try again
 
 Button.
 

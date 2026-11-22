@@ -13044,6 +13044,11 @@ components:
           description: Called when `inbound_url` fails.
           examples:
             - http://localhost:3000/sms/inbound-fallback
+        opt_out_keywords:
+          type: boolean
+          description: Whether a text of STOP to one of its numbers opts the contact out of the whole service.
+          examples:
+            - true
         created_by:
           $ref: "#/components/schemas/CreatedBy"
       required:
@@ -13053,6 +13058,7 @@ components:
         - inbound_mode
         - inbound_url
         - inbound_fallback_url
+        - opt_out_keywords
         - created_by
     MessagingServiceCreateInput:
       type: object
@@ -13064,6 +13070,11 @@ components:
           description: The SID to give the service, `MG` and 32 hex digits, so an app's configured SID works unchanged; left out, a new one is generated.
           examples:
             - MG00000000000000000000000000000001
+        opt_out_keywords:
+          type: boolean
+          description: Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.
+          examples:
+            - true
         friendly_name:
           type: string
           description: A name for the service.
@@ -13113,19 +13124,25 @@ components:
       type: object
       properties:
         friendly_name:
-          type: string
+          type: object
+          properties: {}
           description: A name for the service.
           examples:
             - Notifications
         number_ids:
-          type: array
-          items:
-            $ref: "#/components/schemas/Ulid"
+          type: object
+          properties: {}
           description: The virtual numbers in the sender pool, by ID.
           examples:
             - - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
         inbound_mode:
-          $ref: "#/components/schemas/MessagingServiceInboundMode"
+          anyOf:
+            - type: object
+              properties: {}
+            - type: object
+              properties: {}
+            - type: object
+              properties: {}
           description: "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`."
           examples:
             - webhook
@@ -13143,6 +13160,8 @@ components:
           description: Called when `inbound_url` fails.
           examples:
             - http://localhost:3000/sms/inbound-fallback
+        opt_out_keywords:
+          type: boolean
     MimePart:
       type: object
       properties:
@@ -19061,6 +19080,11 @@ components:
           description: The Twilio account the number belongs to; null for the main account.
           examples:
             - null
+        opt_out_keywords:
+          type: boolean
+          description: Whether a text of STOP to this number opts the contact out (Twilio's Advanced Opt-Out, with the provider's switch on).
+          examples:
+            - true
         created_by:
           $ref: "#/components/schemas/CreatedBy"
       required:
@@ -19076,10 +19100,16 @@ components:
         - messaging_service_sid
         - phone_number_sid
         - account_sid
+        - opt_out_keywords
         - created_by
     VirtualNumberInput:
       type: object
       properties:
+        opt_out_keywords:
+          type: boolean
+          description: Whether a text of STOP to this number opts the contact out; on when left out.
+          examples:
+            - true
         inbound_method:
           $ref: "#/components/schemas/InboundWebhookMethod"
           description: The HTTP method of the reply webhook; POST when left out, as on Twilio.
@@ -19210,6 +19240,8 @@ components:
           description: The Messaging Service this number belongs to, `MG...`; null for none.
           examples:
             - MG00000000000000000000000000000001
+        opt_out_keywords:
+          type: boolean
         inbound_method:
           anyOf:
             - type: object

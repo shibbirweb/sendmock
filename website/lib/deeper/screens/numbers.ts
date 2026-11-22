@@ -60,6 +60,8 @@ const numberEditorEntries: DeeperEntry[] = [
   { control: "combobox: Messaging Service", does: "The pool the number belongs to, if any." },
   { control: "combobox: Twilio account", does: "The Twilio account that owns the number: the main account or one of its subaccounts. Inbound messages to the number carry that account's SID and are signed with its token." },
   { control: "paragraph: Inbound messages to the number carry this account's SID and are signed with its token.", does: "Explains what the account changes." },
+  { control: "switch: Opt-out keywords", does: "Off: a text of STOP to this number is an ordinary text, and sends from it never get 21610. On by default; the provider's Opt-out keywords switch must be on too." },
+  { control: "paragraph: A text of STOP to this number opts the contact out, with the provider's switch on.", does: "Explains Opt-out keywords." },
   { control: "button: Cancel", does: "Closes the editor without saving." },
   { control: "button: Add number", state: "New number editor", does: "Adds the number.", operationIds: ["postNumbers"] },
   { control: "button: Save changes", does: "Saves the number.", operationIds: ["patchNumbersByNumberId"] },

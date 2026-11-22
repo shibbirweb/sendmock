@@ -39,6 +39,7 @@ pub async fn build_virtual_number(
         status_callback_url: read_optional_url("status_callback_url", input.status_callback_url)?,
         messaging_service_sid,
         account_sid,
+        opt_out_keywords: input.opt_out_keywords,
         ..existing_number.unwrap_or_else(|| new_number_record(operation_context))
     })
 }
@@ -131,6 +132,7 @@ fn new_number_record(operation_context: &OperationContext) -> VirtualNumberRecor
         messaging_service_sid: None,
         phone_number_sid: generate_phone_number_sid(operation_context),
         account_sid: None,
+        opt_out_keywords: true,
         created_by: operation_context.request.client.as_str().to_owned(),
         created_at_unix_ms: operation_context.clock.now_unix_ms(),
     }

@@ -35,6 +35,17 @@ struct SeedVirtualNumber {
     /// The SID of the subaccount that owns the number; left out, the main account.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     account_sid: Option<String>,
+    /// `false` turns opt-out keywords off for this number.
+    #[serde(default = "is_on", skip_serializing_if = "is_on_value")]
+    opt_out_keywords: bool,
+}
+
+fn is_on() -> bool {
+    true
+}
+
+fn is_on_value(opt_out_keywords: &bool) -> bool {
+    *opt_out_keywords
 }
 
 fn default_channels() -> Vec<String> {
@@ -68,6 +79,7 @@ impl VirtualNumberSeedAdapter {
             "status_callback_url": seed_number.status_callback,
             "messaging_service_sid": seed_number.messaging_service,
             "account_sid": seed_number.account_sid,
+            "opt_out_keywords": seed_number.opt_out_keywords,
         }))?;
         let is_new_number = existing_number.is_none();
         let mut seeded_number =
@@ -104,6 +116,7 @@ impl VirtualNumberSeedAdapter {
                         status_callback: stored_number.status_callback_url,
                         messaging_service: stored_number.messaging_service_sid,
                         account_sid: stored_number.account_sid,
+                        opt_out_keywords: stored_number.opt_out_keywords,
                     })?,
                 })
             })

@@ -129,6 +129,7 @@ export const numbersHandlers = [
     const virtualNumber: VirtualNumber = {
       ...numberInput,
       inbound_method: numberInput.inbound_method ?? "POST",
+      opt_out_keywords: numberInput.opt_out_keywords ?? true,
       label: numberInput.label.trim(),
       messaging_service_sid: null,
       phone_number_sid: createProviderId("PN"),
@@ -233,6 +234,7 @@ export const numbersHandlers = [
 
     const messagingService: MessagingService = {
       ...serviceInput,
+      opt_out_keywords: serviceInput.opt_out_keywords ?? true,
       friendly_name: serviceInput.friendly_name.trim(),
       number_ids: [],
       sid: trimmedSid === "" ? createProviderId("MG") : trimmedSid,

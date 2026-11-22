@@ -42,6 +42,7 @@ pub async fn build_messaging_service(
             "inbound_fallback_url",
             input.inbound_fallback_url,
         )?,
+        opt_out_keywords: input.opt_out_keywords,
         created_by,
         created_at_unix_ms,
     })

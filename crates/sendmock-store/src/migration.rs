@@ -198,4 +198,8 @@ pub const EMBEDDED_MIGRATIONS: &[Migration] = &[
         schema_version: 47,
         sql: include_str!("../migrations/0047_sms_opt_outs.sql"),
     },
+    Migration {
+        schema_version: 48,
+        sql: include_str!("../migrations/0048_opt_out_switches.sql"),
+    },
 ];

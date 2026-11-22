@@ -17,6 +17,8 @@ pub struct VirtualNumberRecord {
     pub phone_number_sid: String,
     /// The Twilio account the number belongs to; `None` for the main account.
     pub account_sid: Option<String>,
+    /// Whether texts of STOP to it opt the contact out, with the provider's emulation on.
+    pub opt_out_keywords: bool,
     pub created_by: String,
     pub created_at_unix_ms: i64,
 }
@@ -31,6 +33,8 @@ pub struct MessagingServiceRecord {
     pub inbound_mode: String,
     pub inbound_url: Option<String>,
     pub inbound_fallback_url: Option<String>,
+    /// Whether texts of STOP to its numbers opt the contact out of the whole service.
+    pub opt_out_keywords: bool,
     pub created_by: String,
     pub created_at_unix_ms: i64,
 }

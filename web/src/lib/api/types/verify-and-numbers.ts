@@ -161,14 +161,29 @@ export type VirtualNumber = {
    * @example null
    */
   account_sid: string | null;
+  /**
+   * Whether a text of STOP to this number opts the contact out (Twilio's Advanced Opt-Out, with the provider's switch on).
+   * @example true
+   */
+  opt_out_keywords: boolean;
   created_by: CreatedBy;
 };
 
 /** Body of POST and PATCH /api/v1/numbers. */
 export type VirtualNumberInput = Omit<
   VirtualNumber,
-  "id" | "created_by" | "phone_number_sid" | "account_sid" | "inbound_method"
+  | "id"
+  | "created_by"
+  | "phone_number_sid"
+  | "account_sid"
+  | "inbound_method"
+  | "opt_out_keywords"
 > & {
+  /**
+   * Whether a text of STOP to this number opts the contact out; on when left out.
+   * @example true
+   */
+  opt_out_keywords?: boolean;
   /**
    * The HTTP method of the reply webhook; POST when left out, as on Twilio.
    * @example "POST"
@@ -216,14 +231,25 @@ export type MessagingService = {
    * @example "http://localhost:3000/sms/inbound-fallback"
    */
   inbound_fallback_url: string | null;
+  /**
+   * Whether a text of STOP to one of its numbers opts the contact out of the whole service.
+   * @example true
+   */
+  opt_out_keywords: boolean;
   created_by: CreatedBy;
 };
 
 /** Body of POST and PATCH /api/v1/messaging-services. */
 export type MessagingServiceInput = Omit<
   MessagingService,
-  "sid" | "created_by"
->;
+  "sid" | "created_by" | "opt_out_keywords"
+> & {
+  /**
+   * Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.
+   * @example true
+   */
+  opt_out_keywords?: boolean;
+};
 
 /** Body of POST /api/v1/messaging-services: the service, and the SID to give it. */
 export type MessagingServiceCreateInput = MessagingServiceInput & {

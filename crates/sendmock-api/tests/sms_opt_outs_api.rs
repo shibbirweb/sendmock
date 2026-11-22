@@ -221,3 +221,49 @@ async fn with_the_providers_switch_off_stop_is_an_ordinary_text() {
     assert_eq!(listed, json!([]));
     assert_eq!(send_status, 201);
 }
+
+// AC: SM-23.3
+#[tokio::test]
+async fn a_number_or_a_messaging_service_with_opt_out_keywords_off_ignores_stop() {
+    let (app_router, _) = build_test_app();
+    let app_number = register_app_number(&app_router).await;
+    let number_path = format!(
+        "/api/v1/numbers/{}",
+        app_number["id"].as_str().unwrap_or_default()
+    );
+    let (number_status, number_off) = call_api(
+        &app_router,
+        "PATCH",
+        &number_path,
+        Some(&json!({ "opt_out_keywords": false })),
+    )
+    .await;
+    text_app(&app_router, CONTACT_NUMBER, "STOP").await;
+    let (_, after_number_off) = call_api(&app_router, "GET", "/api/v1/sms/opt-outs", None).await;
+
+    call_api(
+        &app_router,
+        "PATCH",
+        &number_path,
+        Some(&json!({ "opt_out_keywords": true })),
+    )
+    .await;
+    call_api(
+        &app_router,
+        "POST",
+        "/api/v1/messaging-services",
+        Some(&json!({
+            "friendly_name": "Quiet", "number_ids": [app_number["id"]],
+            "inbound_mode": "defer_to_sender", "inbound_url": null, "inbound_fallback_url": null,
+            "opt_out_keywords": false,
+        })),
+    )
+    .await;
+    text_app(&app_router, CONTACT_NUMBER, "STOP").await;
+    let (_, after_service_off) = call_api(&app_router, "GET", "/api/v1/sms/opt-outs", None).await;
+
+    assert_eq!(number_status, 200, "{number_off}");
+    assert_eq!(number_off["opt_out_keywords"], false);
+    assert_eq!(after_number_off, json!([]));
+    assert_eq!(after_service_off, json!([]));
+}

@@ -29,6 +29,7 @@ import {
   noMessagingService,
   useVirtualNumberForm,
 } from "@/features/numbers/virtual-numbers/use-virtual-number-form";
+import { OptOutKeywordsSwitch } from "@/features/numbers/opt-out-keywords-switch";
 import { VirtualNumberAccountField } from "@/features/numbers/virtual-numbers/virtual-number-account-field";
 import { VirtualNumberInboundFields } from "@/features/numbers/virtual-numbers/virtual-number-inbound-fields";
 import { useMessagingServices } from "@/lib/api/hooks/use-numbers-queries";
@@ -177,6 +178,14 @@ function VirtualNumberForm({
           accountSid={formValues.accountSid}
           onAccountChange={(selectedAccountSid) => {
             updateFormValues({ accountSid: selectedAccountSid });
+          }}
+        />
+        <OptOutKeywordsSwitch
+          switchId={`${fieldIdPrefix}-opt-out-keywords`}
+          hint="A text of STOP to this number opts the contact out, with the provider's switch on."
+          isChecked={formValues.hasOptOutKeywords}
+          onCheckedChange={(isChecked) => {
+            updateFormValues({ hasOptOutKeywords: isChecked });
           }}
         />
       </div>
