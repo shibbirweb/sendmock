@@ -1160,3 +1160,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-22 | EM-25.1 and EM-25.2 built: Mailgun event webhooks carry user variables and delivery status; soft bounces are temporary everywhere. |
 | 2026-11-22 | EM-25.3 to EM-25.5 built: Mailgun's store-and-notify forward, templates listed for their own events, and a picker warning for a mismatch. |
 | 2026-11-22 | The four startup banner snapshots added from CI's output (5 and 8 lines matched the CI log; 12 lines and 24-bit colour written by the same fill). |
+| 2026-11-22 | EM-26.1 built: Mailgun stored messages by provider id in Mailgun's full shape, and `storage` on events. |

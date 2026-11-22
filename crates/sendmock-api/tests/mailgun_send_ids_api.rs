@@ -190,3 +190,77 @@ async fn a_complaint_is_deleted_by_its_percent_encoded_address() {
     assert_eq!(delete_status, 200);
     assert_eq!(fetch_status, 404);
 }
+
+async fn read_mailgun(app_router: &axum::Router, path: &str) -> (u16, Value) {
+    let request = Request::builder()
+        .method("GET")
+        .uri(path)
+        .header("host", "127.0.0.1:8025")
+        .body(Body::empty())
+        .unwrap_or_else(|error| panic!("a valid request: {error}"));
+    let response = app_router
+        .clone()
+        .oneshot(request)
+        .await
+        .unwrap_or_else(|error| panic!("a response: {error}"));
+    let status = response.status().as_u16();
+    let body_bytes = axum::body::to_bytes(response.into_body(), usize::MAX)
+        .await
+        .unwrap_or_else(|error| panic!("a body: {error}"));
+    (
+        status,
+        serde_json::from_slice(&body_bytes).unwrap_or(Value::Null),
+    )
+}
+
+// AC: EM-26.1
+#[tokio::test]
+async fn the_stored_message_is_read_by_the_id_the_send_answered_with_mailguns_fields() {
+    let (app_router, _) = build_test_app();
+    let mut fields = ADDRESS_FIELDS.to_vec();
+    fields.extend([
+        ("text", "Thanks!\n-- \nShop"),
+        ("template", "welcome-email"),
+        ("v:order-id", "A-1001"),
+    ]);
+    let send_answer = send_form(&app_router, MESSAGES_PATH, &fields).await;
+    let answered_id = send_answer["id"].as_str().unwrap_or_default();
+    let bare_id = answered_id.trim_start_matches('<').trim_end_matches('>');
+
+    let (status, stored_message) = read_mailgun(
+        &app_router,
+        &format!("/providers/mailgun/v3/domains/mg.shop.test/messages/{bare_id}"),
+    )
+    .await;
+    let (_, events) = read_mailgun(&app_router, "/providers/mailgun/v3/mg.shop.test/events").await;
+
+    assert_eq!(status, 200, "{stored_message}");
+    for field_name in [
+        "From",
+        "To",
+        "Subject",
+        "Message-Id",
+        "Mime-Version",
+        "body-plain",
+        "stripped-text",
+        "stripped-signature",
+        "message-headers",
+        "content-id-map",
+        "attachments",
+    ] {
+        assert!(
+            stored_message.get(field_name).is_some(),
+            "{field_name}: {stored_message}"
+        );
+    }
+    assert_eq!(stored_message["stripped-signature"], "Shop");
+    assert_eq!(stored_message["X-Mailgun-Template-Name"], "welcome-email");
+    let first_event = &events["items"][0];
+    assert!(
+        first_event["storage"]["url"]
+            .as_str()
+            .is_some_and(|storage_url| storage_url.contains("/v3/domains/mg.shop.test/messages/")),
+        "{first_event}"
+    );
+    assert!(first_event["storage"]["key"].is_string(), "{first_event}");
+}

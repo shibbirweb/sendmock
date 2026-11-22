@@ -21,7 +21,7 @@ use crate::providers::{
 };
 use crate::{OperationContext, OperationError};
 
-const MAILGUN_PROVIDER_KEY: &str = "mailgun";
+pub(super) const MAILGUN_PROVIDER_KEY: &str = "mailgun";
 const ROUTES_PATH: &str = "/v3/routes";
 
 pub(super) fn mailgun_json(status: u16, body: &Value) -> ProviderHttpResponse {

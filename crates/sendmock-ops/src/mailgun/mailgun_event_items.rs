@@ -19,6 +19,8 @@ pub struct MailgunEvent {
 
 /// Everything SendMock keeps about one email sent through Mailgun.
 pub struct MailgunEmailRecords {
+    /// Where the stored-message API reads the email back, as the events' `storage.url`.
+    pub message_url: String,
     pub email: EmailRecord,
     pub provider_send: EmailProviderSendRecord,
     pub timeline: Vec<TimelineRecord>,
@@ -229,6 +231,7 @@ fn describe_event(
         "recipient-domain": recipient.split_once('@').map(|(_, domain)| domain).unwrap_or_default(),
         "tags": email.tags,
         "user-variables": read_stored_user_variables(&records.provider_send),
+        "storage": { "url": records.message_url, "key": email.email_id },
         "message": {
             "headers": {
                 "message-id": message_id,
