@@ -56,6 +56,27 @@ describe("required rules", () => {
     ]);
   });
 
+  test("checks of workflows a normal pull request never starts are never required", async () => {
+    const { readNeverStartedCheckPatterns, selectRequiredChecks } = await import(
+      "./sync-required-checks"
+    );
+
+    const requiredChecks = selectRequiredChecks(
+      [
+        { name: "Web UI", conclusion: "success", app: { id: 15368 } },
+        {
+          name: "Delete the caches of the closed pull request",
+          conclusion: "success",
+          app: { id: 15368 },
+        },
+        { name: "Take the screenshots", conclusion: "success", app: { id: 15368 } },
+      ],
+      readNeverStartedCheckPatterns(),
+    );
+
+    expect(requiredChecks).toEqual([{ context: "Web UI", integration_id: 15368 }]);
+  });
+
   test("the ruleset keeps its other rules and requires the checks and CodeQL", async () => {
     const { buildRequiredRules } = await import("./sync-required-checks");
     const requiredChecks = [{ context: "Web UI", integration_id: 15368 }];

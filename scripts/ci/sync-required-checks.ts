@@ -4,6 +4,10 @@
 // adds a CodeQL alert. Usage: bun scripts/ci/sync-required-checks.ts <pull request> [--apply]
 // (`--apply` needs a repository admin's gh login; without it the change is only printed).
 import { spawnSync } from "node:child_process";
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+
+import { readPullRequestWorkflows } from "./workflow-gates";
 
 const repository = "shibbirweb/sendmock";
 const rulesetName = "Core Protection";
@@ -24,11 +28,48 @@ function runGitHubApi(apiArguments: string[], requestBody?: string): string {
   return result.stdout;
 }
 
-/** Each passed check once, sorted; skipped ones (release-only, label-only) are not required. */
-export function selectRequiredChecks(checkRuns: CheckRun[]): RequiredCheck[] {
+/**
+ * The jobs of workflows that pull request events start but a normal pull request never does:
+ * Cache cleanup runs when one closes, Screenshots on a label. Their checks can pass on a closed
+ * pull request's commit, but requiring them would block every open one. A job named with an
+ * expression matches any text in its place.
+ */
+export function readNeverStartedCheckPatterns(): RegExp[] {
+  const startedFiles = new Set(readPullRequestWorkflows().map((workflow) => workflow.fileName));
+  const patterns: RegExp[] = [];
+  for (const fileName of readdirSync(".github/workflows")) {
+    if (!fileName.endsWith(".yml") || startedFiles.has(fileName)) {
+      continue;
+    }
+    const workflowFile = Bun.YAML.parse(
+      readFileSync(join(".github/workflows", fileName), "utf8"),
+    ) as { on?: Record<string, unknown>; jobs?: Record<string, { name?: string }> };
+    const triggers = workflowFile.on ?? {};
+    if (!("pull_request" in triggers) && !("pull_request_target" in triggers)) {
+      continue;
+    }
+    for (const [jobId, workflowJob] of Object.entries(workflowFile.jobs ?? {})) {
+      const jobNameParts = (workflowJob.name ?? jobId)
+        .split(/\$\{\{.*?\}\}/)
+        .map((namePart) => namePart.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+      patterns.push(new RegExp(`^${jobNameParts.join(".*")}$`));
+    }
+  }
+  return patterns;
+}
+
+/**
+ * Each passed check once, sorted; skipped ones (release-only, label-only) and the checks of
+ * workflows a pull request never starts are not required.
+ */
+export function selectRequiredChecks(
+  checkRuns: CheckRun[],
+  neverStartedPatterns: RegExp[] = [],
+): RequiredCheck[] {
   const requiredChecks = new Map<string, RequiredCheck>();
   for (const checkRun of checkRuns) {
-    if (checkRun.conclusion !== "success" || checkRun.name.includes("${{")) {
+    const isNeverStarted = neverStartedPatterns.some((pattern) => pattern.test(checkRun.name));
+    if (checkRun.conclusion !== "success" || checkRun.name.includes("${{") || isNeverStarted) {
       continue;
     }
     requiredChecks.set(`${checkRun.app.id} ${checkRun.name}`, {
@@ -87,7 +128,7 @@ if (import.meta.main) {
     .split("\n")
     .filter((line) => line !== "")
     .map((line) => JSON.parse(line) as CheckRun);
-  const requiredChecks = selectRequiredChecks(checkRuns);
+  const requiredChecks = selectRequiredChecks(checkRuns, readNeverStartedCheckPatterns());
   const rulesets = JSON.parse(runGitHubApi([`repos/${repository}/rulesets`])) as Ruleset[];
   const rulesetSummary = rulesets.find((ruleset) => ruleset.name === rulesetName);
   if (rulesetSummary === undefined) {
