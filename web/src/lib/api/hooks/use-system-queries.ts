@@ -9,6 +9,7 @@ import type {
   AppSettingsUpdate,
   UpdateCheckResult,
   AppStats,
+  TlsCertificateAuthority,
 } from "@/lib/api/types";
 
 /** Counts for the sidebar and Overview; not asked for until the server serves them. */
@@ -105,5 +106,12 @@ export function useDailyUpdateCheck({ isEnabled }: { isEnabled: boolean }) {
     staleTime: updateCheckIntervalMs,
     refetchInterval: updateCheckIntervalMs,
     retry: false,
+  });
+}
+
+/** The local CA for the HTTPS provider port, fetched when asked for (PL-20.3). */
+export function useDownloadTlsCa() {
+  return useMutation({
+    mutationFn: () => requestApi<TlsCertificateAuthority>("/tls/ca"),
   });
 }

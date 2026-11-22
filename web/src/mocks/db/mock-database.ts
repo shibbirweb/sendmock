@@ -11,6 +11,7 @@ import type {
   HttpResponseRule,
   PaymentDetail,
   MessagingService,
+  ProviderBin,
   PushNotification,
   SavedDelivery,
   SmsMessageDetail,
@@ -25,6 +26,8 @@ import type {
   TemplateRevision,
   WebhookTemplateSummary,
   WebhookVariable,
+  MailgunComplaint,
+  TwilioSubaccount,
 } from "@/lib/api/types";
 import {
   buildHttpBinFixtures,
@@ -79,6 +82,7 @@ import {
 } from "@/mocks/fixtures/verify-fixtures";
 import {
   buildMessagingServiceFixtures,
+  buildTwilioSubaccountFixtures,
   buildVirtualNumberFixtures,
 } from "@/mocks/fixtures/number-fixtures";
 import {
@@ -107,6 +111,9 @@ import {
 } from "@/mocks/fixtures/project-fixtures";
 import type { PaymentSubscriptionRecord } from "@/mocks/payments/subscriptions/payment-subscriptions";
 
+/** A Twilio subaccount as the mock keeps it, with its full token; answers mask it. */
+export type MockTwilioSubaccount = TwilioSubaccount;
+
 /** In-memory state behind the mock API. Lists are kept newest first. */
 export type MockDatabase = {
   /** When the seed state was last applied (creation, reset or seed apply). */
@@ -126,6 +133,8 @@ export type MockDatabase = {
   verifications: VerificationDetail[];
   virtualNumbers: VirtualNumber[];
   messagingServices: MessagingService[];
+  twilioSubaccounts: MockTwilioSubaccount[];
+  mailgunComplaints: MailgunComplaint[];
   smsOutcomeRules: SmsOutcomeRule[];
   emailOutcomeRules: EmailOutcomeRule[];
   messageRules: MessageRuleSets;
@@ -154,6 +163,8 @@ export type MockDatabase = {
   /** Push notifications, newest first (PN-01). */
   pushNotifications: PushNotification[];
   httpBins: HttpBin[];
+  /** Bins attached to providers for their unmatched requests (PL-21). */
+  providerBins: ProviderBin[];
   /** Each bin's response rules in order, by bin id. */
   httpResponseRules: Map<string, HttpResponseRule[]>;
   capturedHttpRequests: CapturedHttpRequest[];
@@ -187,6 +198,14 @@ function buildConfiguration() {
   return {
     virtualNumbers,
     messagingServices: buildMessagingServiceFixtures(virtualNumbers),
+    twilioSubaccounts: buildTwilioSubaccountFixtures(),
+    mailgunComplaints: [
+      {
+        domain: "mg.acme.test",
+        address: "complaint@example.test",
+        created_at: "2026-11-20T09:30:00Z",
+      },
+    ],
     verifyServices,
     webhookEndpoints,
     webhookRules: buildWebhookRuleFixtures(webhookEndpoints),
@@ -196,6 +215,7 @@ function buildConfiguration() {
     webhookVariables: buildWebhookVariableFixtures(),
     savedDeliveries: buildSavedDeliveryFixtures(),
     httpBins,
+    providerBins: [],
     paymentMethods: buildBuiltinPaymentMethods(),
     paymentFlows: buildBuiltinPaymentFlows(),
     paymentSubscriptions: [],

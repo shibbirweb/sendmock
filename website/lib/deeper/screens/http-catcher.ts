@@ -69,6 +69,12 @@ const binDetailEntries: DeeperEntry[] = [
     does: "Sends the request's `http.captured` event to a webhook endpoint now.",
     operationIds: ["postWebhooksEndpointsByEndpointIdSend"],
   },
+  {
+    control: "button: Verify signature",
+    does: "Checks the captured request's webhook signature against a secret: Standard Webhooks, Stripe or a plain HMAC header. Answers valid, or the reason it does not check out.",
+    links: "[CI pipelines](../../advanced/ci-pipelines.md)",
+    operationIds: ["postWebhooksSignaturesVerify"],
+  },
   { control: "tab: Preview", does: "How the message would look in the service the preset copies (here Slack)." },
   { control: "tab: Body", does: "The body as received, formatted when it is JSON or a form." },
   { control: "tab: Headers", does: "Every header received." },

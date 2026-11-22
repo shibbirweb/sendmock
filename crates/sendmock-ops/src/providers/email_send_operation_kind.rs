@@ -241,6 +241,7 @@ async fn save_provider_send(
             provider_message_id: provider_message_id.to_owned(),
             template_id: read_first("template_id"),
             template_data_json: read_first("template_data"),
+            sending_domain: provider_call.path_params.get("domain").cloned(),
         })
         .await?;
     Ok(())

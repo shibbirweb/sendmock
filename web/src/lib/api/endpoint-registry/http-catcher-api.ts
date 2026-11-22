@@ -147,3 +147,31 @@ export const httpCatcherApi: ApiEndpoint[] = tagEndpoints("HTTP Catcher", [
   },
   ...captureEndpoints,
 ]);
+
+/** HTTP Catcher bins attached to providers, for the requests no built-in operation answers (PL-21, A23). */
+export const providerBinApi: ApiEndpoint[] = tagEndpoints("HTTP Catcher", [
+  {
+    method: "GET",
+    path: "/api/v1/provider-bins",
+    summary:
+      "Which HTTP Catcher bin answers each provider's unmatched requests.",
+    response: listOf("ProviderBin"),
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/provider-bins/{area}/{providerKey}",
+    summary:
+      "Send a provider's unmatched requests to an HTTP Catcher bin, made if new.",
+    requestBody: typeRef("ProviderBinAttachment"),
+    response: typeRef("ProviderBin"),
+    errorStatuses: [400, 404],
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/provider-bins/{area}/{providerKey}",
+    summary:
+      "Answer a provider's unmatched requests with its 404 again; the bin stays.",
+    response: null,
+    successStatus: 204,
+  },
+]);

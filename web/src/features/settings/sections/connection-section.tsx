@@ -22,6 +22,7 @@ import { AiAgentsCard } from "@/features/settings/connection/ai-agents-card";
 import { useRequestCustomization } from "@/features/settings/connection/use-request-customization";
 import { useAppLocation } from "@/features/onboarding/use-app-location";
 import { ProviderApisCard } from "@/features/settings/sections/provider-apis-card";
+import { ProviderHttpsCard } from "@/features/settings/sections/provider-https-card";
 import { Pop3AccessCard } from "@/features/settings/sections/pop3-access-card";
 import { SettingsSectionCard } from "@/features/settings/settings-section-card";
 import { useAppInfo } from "@/lib/api/hooks/use-system-queries";
@@ -258,6 +259,7 @@ export function ConnectionSection() {
         </div>
       </SettingsSectionCard>
       <ProviderApisCard />
+      <ProviderHttpsCard />
       {appInfoQuery.data?.pop3_address != null && (
         <Pop3AccessCard
           pop3Address={appInfoQuery.data.pop3_address}

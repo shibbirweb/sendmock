@@ -15,7 +15,14 @@
       "link: Download",
       "textbox: Scenario",
       "button: Validate",
-      "button: Run"
+      "button: Run",
+      "heading: CI file",
+      "paragraph: The setup, the app's URL and the scenarios a pipeline runs with sendmock ci run . Run it here to see the report your CI will show.",
+      "textbox: CI file URL",
+      "button: Import from URL",
+      "textbox: CI file",
+      "button: Validate CI file",
+      "button: Run CI file"
     ],
     "The example has run": [
       "status: Passed: # of # steps in # ms"

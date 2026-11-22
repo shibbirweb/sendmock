@@ -48,24 +48,42 @@ fn read_step(
     })
 }
 
-/// Reads the file and lists its problems; `is_known_step` says which operations exist.
+/// A scenario document as JSON: TOML first, then YAML (which reads JSON too).
+fn read_scenario_document(scenario_text: &str) -> Result<Value, ScenarioProblem> {
+    let toml_error = match scenario_text.parse::<toml::Table>() {
+        Ok(toml_table) => return Ok(serde_json::to_value(toml_table).unwrap_or(Value::Null)),
+        Err(parse_error) => parse_error,
+    };
+    match serde_yaml_ng::from_str::<Value>(scenario_text) {
+        Ok(document @ Value::Object(_)) => Ok(document),
+        _ => Err(ScenarioProblem {
+            step: None,
+            message: format!("Not valid TOML, JSON or YAML: {}", toml_error.message()),
+        }),
+    }
+}
+
+/// Reads the file (TOML, JSON or YAML) and lists its problems; `is_known_step` says which
+/// operations exist.
 pub fn parse_scenario_file(
     scenario_text: &str,
     is_known_step: &dyn Fn(&str) -> bool,
 ) -> ParsedScenario {
-    let parsed_file: Value = match scenario_text.parse::<toml::Table>() {
-        Ok(toml_table) => serde_json::to_value(toml_table).unwrap_or(Value::Null),
-        Err(parse_error) => {
-            return ParsedScenario {
-                name: None,
-                steps: Vec::new(),
-                problems: vec![ScenarioProblem {
-                    step: None,
-                    message: format!("Not valid TOML: {}", parse_error.message()),
-                }],
-            };
-        }
-    };
+    match read_scenario_document(scenario_text) {
+        Ok(parsed_file) => parse_scenario_value(&parsed_file, is_known_step),
+        Err(problem) => ParsedScenario {
+            name: None,
+            steps: Vec::new(),
+            problems: vec![problem],
+        },
+    }
+}
+
+/// A scenario already read as JSON: `name` and `steps`, each with `run`, `with` and `save`.
+pub fn parse_scenario_value(
+    parsed_file: &Value,
+    is_known_step: &dyn Fn(&str) -> bool,
+) -> ParsedScenario {
     let mut problems = Vec::new();
     let raw_steps = parsed_file["steps"].as_array().cloned().unwrap_or_default();
     if raw_steps.is_empty() {

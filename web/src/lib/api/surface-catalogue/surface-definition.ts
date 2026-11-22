@@ -21,7 +21,9 @@ export type StageBPhase =
   | "A7"
   | "A8"
   | "A17"
-  | "A18";
+  | "A18"
+  | "A19"
+  | "A23";
 
 export type OperationSurfaces = {
   /** When the binary starts serving it; the live UI shows Not available yet before (UI-12). */

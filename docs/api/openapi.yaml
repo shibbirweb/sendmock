@@ -85,6 +85,26 @@ paths:
       x-sendmock-cli: sendmock status
       x-sendmock-mcp: sendmock_status
       x-sendmock-ui: Settings > About
+  /api/v1/tls/ca:
+    get:
+      operationId: getTlsCa
+      summary: The local CA to trust for the HTTPS provider port.
+      tags:
+        - System
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TlsCertificateAuthority"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock tls ca
+      x-sendmock-mcp: sendmock_tls_ca
+      x-sendmock-ui: Settings > Connection > Provider APIs over HTTPS > Download the CA
   /api/v1/stats:
     get:
       operationId: getStats
@@ -1407,6 +1427,82 @@ paths:
       x-sendmock-cli: sendmock ai skill
       x-sendmock-mcp: sendmock://docs/skill
       x-sendmock-ui: Settings > Connection > AI agents > Download the skill
+  /api/v1/ci/validate:
+    post:
+      operationId: postCiValidate
+      summary: Check a CI file and its scenarios without running anything.
+      tags:
+        - Automation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CiFileRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CiValidation"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock ci validate <file>
+      x-sendmock-mcp: sendmock_ci_validate
+      x-sendmock-ui: Scenarios > CI file > Validate
+  /api/v1/ci/run:
+    post:
+      operationId: postCiRun
+      summary: Run a CI file's setup and scenarios here and answer the report, with JUnit XML.
+      tags:
+        - Automation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CiFileRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CiReport"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock ci run <file>
+      x-sendmock-mcp: sendmock_ci_run
+      x-sendmock-ui: Scenarios > CI file > Run
+  /api/v1/ci/init:
+    post:
+      operationId: postCiInit
+      summary: The setup, a starter CI file and the pipeline job for a CI system, from this instance.
+      tags:
+        - Automation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CiInitRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CiInitFiles"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock ci init
+      x-sendmock-mcp: sendmock_ci_init
+      x-sendmock-ui: Settings > Setup > Use in CI
   /api/v1/emails:
     get:
       operationId: getEmails
@@ -4017,6 +4113,189 @@ paths:
       x-sendmock-cli: sendmock sms services delete <serviceSid>
       x-sendmock-mcp: sendmock_messaging_service_delete
       x-sendmock-ui: Numbers > Messaging Services > Delete
+  /api/v1/twilio/subaccounts:
+    get:
+      operationId: getTwilioSubaccounts
+      summary: Subaccounts of the Twilio provider's main account, tokens masked.
+      tags:
+        - SMS
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TwilioSubaccount"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms twilio subaccounts list
+      x-sendmock-mcp: sendmock_twilio_subaccount_list
+      x-sendmock-ui: SMS > Providers > Twilio > Accounts
+    post:
+      operationId: postTwilioSubaccounts
+      summary: Add a Twilio subaccount with its own auth token.
+      tags:
+        - SMS
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TwilioSubaccountInput"
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TwilioSubaccount"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms twilio subaccounts create
+      x-sendmock-mcp: sendmock_twilio_subaccount_create
+      x-sendmock-ui: SMS > Providers > Twilio > Accounts > Add subaccount
+  /api/v1/twilio/subaccounts/{accountSid}:
+    patch:
+      operationId: patchTwilioSubaccountsByAccountSid
+      summary: Change a Twilio subaccount's name, status, token or Debugger URL.
+      tags:
+        - SMS
+      parameters:
+        - name: accountSid
+          in: path
+          required: true
+          description: "A Twilio subaccount SID: `AC` and 32 hex digits."
+          schema:
+            type: string
+          example: AC33333333333333333333333333333333
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TwilioSubaccountChanges"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TwilioSubaccount"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms twilio subaccounts update <accountSid>
+      x-sendmock-mcp: sendmock_twilio_subaccount_update
+      x-sendmock-ui: SMS > Providers > Twilio > Accounts > Edit
+    delete:
+      operationId: deleteTwilioSubaccountsByAccountSid
+      summary: Remove a Twilio subaccount; its messages stay.
+      tags:
+        - SMS
+      parameters:
+        - name: accountSid
+          in: path
+          required: true
+          description: "A Twilio subaccount SID: `AC` and 32 hex digits."
+          schema:
+            type: string
+          example: AC33333333333333333333333333333333
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms twilio subaccounts delete <accountSid>
+      x-sendmock-mcp: sendmock_twilio_subaccount_delete
+      x-sendmock-ui: SMS > Providers > Twilio > Accounts > Remove
+  /api/v1/twilio/subaccounts/{accountSid}/auth-token:
+    get:
+      operationId: getTwilioSubaccountsByAccountSidAuthToken
+      summary: Reveal a subaccount's auth token (asked for after a confirmation).
+      tags:
+        - SMS
+      parameters:
+        - name: accountSid
+          in: path
+          required: true
+          description: "A Twilio subaccount SID: `AC` and 32 hex digits."
+          schema:
+            type: string
+          example: AC33333333333333333333333333333333
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TwilioSubaccountTokenReveal"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms twilio subaccounts token <accountSid> --reveal
+      x-sendmock-mcp: null
+      x-sendmock-mcp-exempt: Agents may set secrets but never read them back; the CLI and UI reveal them after a confirmation.
+      x-sendmock-ui: SMS > Providers > Twilio > Accounts > Reveal
+  /api/v1/mailgun/complaints:
+    get:
+      operationId: getMailgunComplaints
+      summary: Addresses on each Mailgun domain's complaints table.
+      tags:
+        - Email
+      parameters:
+        - name: domain
+          in: query
+          required: false
+          description: Only this sending domain's complaints.
+          schema:
+            type: string
+          example: mg.shop.test
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MailgunComplaint"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email mailgun complaints list
+      x-sendmock-mcp: sendmock_email_mailgun_complaint_list
+      x-sendmock-ui: Mail > Providers > Mailgun > Complaints
+  /api/v1/mailgun/complaints/{domain}:
+    delete:
+      operationId: deleteMailgunComplaintsByDomain
+      summary: Clear a Mailgun domain's complaints, so its addresses get mail again.
+      tags:
+        - Email
+      parameters:
+        - name: domain
+          in: path
+          required: true
+          description: A Mailgun sending domain, as in `/v3/{domain}/messages`.
+          schema:
+            type: string
+          example: mg.shop.test
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email mailgun complaints clear <domain>
+      x-sendmock-mcp: sendmock_email_mailgun_complaint_clear
+      x-sendmock-ui: Mail > Providers > Mailgun > Complaints > Clear
   /api/v1/emails/providers:
     get:
       operationId: getEmailsProviders
@@ -4074,7 +4353,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4101,7 +4380,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4136,7 +4415,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4160,7 +4439,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4190,7 +4469,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4220,7 +4499,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4254,7 +4533,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4337,7 +4616,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4364,7 +4643,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4399,7 +4678,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4423,7 +4702,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4453,7 +4732,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4483,7 +4762,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -4517,7 +4796,7 @@ paths:
         - name: providerKey
           in: path
           required: true
-          description: The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
           schema:
             type: string
           example: twilio
@@ -5143,6 +5422,97 @@ paths:
       x-sendmock-cli: sendmock http send <bin>
       x-sendmock-mcp: sendmock_http_send
       x-sendmock-ui: HTTP Catcher > Send a sample request
+  /api/v1/provider-bins:
+    get:
+      operationId: getProviderBins
+      summary: Which HTTP Catcher bin answers each provider's unmatched requests.
+      tags:
+        - HTTP Catcher
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProviderBin"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http provider-bin list
+      x-sendmock-mcp: sendmock_http_provider_bin_list
+      x-sendmock-ui: HTTP Catcher > bin > Answers unmatched requests for
+  /api/v1/provider-bins/{area}/{providerKey}:
+    put:
+      operationId: putProviderBinsByAreaByProviderKey
+      summary: Send a provider's unmatched requests to an HTTP Catcher bin, made if new.
+      tags:
+        - HTTP Catcher
+      parameters:
+        - name: area
+          in: path
+          required: true
+          description: "Where the provider lives: `email`, `sms`, `push` or `payments`."
+          schema:
+            type: string
+          example: sms
+        - name: providerKey
+          in: path
+          required: true
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
+          schema:
+            type: string
+          example: twilio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProviderBinAttachment"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProviderBin"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http provider-bin attach <area> <providerKey>
+      x-sendmock-mcp: sendmock_http_provider_bin_attach
+      x-sendmock-ui: Mail, SMS or Payments > provider > General > Unmatched requests
+    delete:
+      operationId: deleteProviderBinsByAreaByProviderKey
+      summary: Answer a provider's unmatched requests with its 404 again; the bin stays.
+      tags:
+        - HTTP Catcher
+      parameters:
+        - name: area
+          in: path
+          required: true
+          description: "Where the provider lives: `email`, `sms`, `push` or `payments`."
+          schema:
+            type: string
+          example: sms
+        - name: providerKey
+          in: path
+          required: true
+          description: The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.
+          schema:
+            type: string
+          example: twilio
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock http provider-bin detach <area> <providerKey>
+      x-sendmock-mcp: sendmock_http_provider_bin_detach
+      x-sendmock-ui: HTTP Catcher > bin > Detach
   /api/v1/payments:
     get:
       operationId: getPayments
@@ -7909,6 +8279,32 @@ paths:
       x-sendmock-cli: sendmock webhook var preview
       x-sendmock-mcp: sendmock_webhook_variable_preview
       x-sendmock-ui: Webhooks > Variables > variable sheet > Resolves to
+  /api/v1/webhooks/signatures/verify:
+    post:
+      operationId: postWebhooksSignaturesVerify
+      summary: "Check a captured request's webhook signature: Standard Webhooks, Stripe or an HMAC header."
+      tags:
+        - Webhook deliveries
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignatureVerifyRequest"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignatureVerification"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock webhook signature verify
+      x-sendmock-mcp: sendmock_webhook_signature_verify
+      x-sendmock-ui: HTTP Catcher > request > Verify signature
   /api/v1/projects:
     get:
       operationId: getProjects
@@ -8331,6 +8727,20 @@ components:
             - message
       required:
         - error
+    ApiRequestCatcherAnswer:
+      type: object
+      properties:
+        bin_name:
+          type: string
+        rule_name:
+          type:
+            - string
+            - "null"
+          description: Null when the bin's default reply answered.
+      required:
+        - bin_name
+        - rule_name
+      description: The HTTP Catcher bin and rule that answered a provider request no built-in operation answers.
     ApiRequestLinkedMessage:
       type: object
       properties:
@@ -8378,6 +8788,11 @@ components:
             - $ref: "#/components/schemas/ApiRequestLinkedMessage"
             - type: "null"
           description: The SMS or email this request created; null for rejected requests.
+        catcher_answer:
+          anyOf:
+            - $ref: "#/components/schemas/ApiRequestCatcherAnswer"
+            - type: "null"
+          description: The attached bin and rule that answered; null when SendMock answered itself.
         created_at:
           $ref: "#/components/schemas/IsoTimestamp"
       required:
@@ -8391,6 +8806,7 @@ components:
         - response_body
         - duration_ms
         - linked_message
+        - catcher_answer
         - created_at
     ApiStatusClass:
       type: string
@@ -8480,6 +8896,11 @@ components:
           type:
             - string
             - "null"
+        provider_tls_address:
+          type:
+            - string
+            - "null"
+          description: The provider APIs over HTTPS (`--provider-tls-addr`); null when it is off.
         catcher_address:
           type:
             - string
@@ -8509,6 +8930,7 @@ components:
         - smtp_address
         - http_address
         - provider_address
+        - provider_tls_address
         - catcher_address
         - pop3_address
         - database_path
@@ -9126,6 +9548,11 @@ components:
           type: boolean
         duration_ms:
           type: number
+        provider_key:
+          type:
+            - string
+            - "null"
+          description: The provider whose base URL it arrived on; null for `/catch/` and the catch-all port.
         is_read:
           type: boolean
           description: Requests arrive unread; opening one marks it read.
@@ -9151,6 +9578,7 @@ components:
         - matched_rule_name
         - is_simulated_failure
         - duration_ms
+        - provider_key
         - is_read
         - created_at
     CapturedHttpRequestUpdate:
@@ -9349,6 +9777,139 @@ components:
           examples:
             - "12121"
       description: What the customer typed in a flow's steps; only the flow's own steps are read.
+    CiFileRequest:
+      type: object
+      properties:
+        ci_file:
+          type: string
+          description: "The CI file (`format: sendmock.ci`) in JSON or YAML. A setup or scenario named by a path must be inlined first, as `sendmock ci run` does; URLs are downloaded."
+          examples:
+            - |
+              sendmock:
+                format: sendmock.ci
+                format_version: 1
+              scenarios:
+                - name: health
+                  steps:
+                    - run: http
+                      with: { method: GET, url: /api/v1/health }
+      required:
+        - ci_file
+      description: Body of POST /api/v1/ci/run and /ci/validate.
+    CiInitFile:
+      type: object
+      properties:
+        path:
+          type: string
+          description: Relative to the repository's root.
+        content:
+          type: string
+        purpose:
+          type: string
+          description: What it is and what to do with it.
+      required:
+        - path
+        - content
+        - purpose
+      description: One file `sendmock ci init` writes.
+    CiInitFiles:
+      type: object
+      properties:
+        provider:
+          $ref: "#/components/schemas/CiSystem"
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/CiInitFile"
+      required:
+        - provider
+        - files
+      description: Answer of POST /api/v1/ci/init.
+    CiInitRequest:
+      type: object
+      properties:
+        provider:
+          $ref: "#/components/schemas/CiSystem"
+          description: The CI system to write a job for. `sendmock ci init` finds it from the repository.
+          examples:
+            - github_actions
+        setup_url:
+          type:
+            - string
+            - "null"
+          description: Where the pipeline downloads the setup; the written file's path when null.
+          examples:
+            - null
+        app_url:
+          type:
+            - string
+            - "null"
+          description: "The app's base URL in the pipeline [default: http://localhost:8000]."
+          examples:
+            - http://localhost:8000
+      required:
+        - provider
+      description: Body of POST /api/v1/ci/init.
+    CiReport:
+      type: object
+      properties:
+        is_passed:
+          type: boolean
+        started_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+        duration_ms:
+          type: number
+        passed_count:
+          type: number
+        failed_count:
+          type: number
+        scenarios:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScenarioReport"
+        junit_xml:
+          type: string
+          description: "The JUnit XML report: a test suite per scenario and a test case per step."
+        summary_markdown:
+          type: string
+          description: A Markdown summary, as `GITHUB_STEP_SUMMARY` shows it.
+      required:
+        - is_passed
+        - started_at
+        - duration_ms
+        - passed_count
+        - failed_count
+        - scenarios
+        - junit_xml
+        - summary_markdown
+      description: "Answer of POST /api/v1/ci/run: every scenario's steps, and the reports CI systems read."
+    CiSystem:
+      type: string
+      enum:
+        - github_actions
+        - gitlab_ci
+        - circleci
+        - bitbucket_pipelines
+        - azure_pipelines
+        - jenkins
+      description: The CI systems `sendmock ci init` writes a job for.
+    CiValidation:
+      type: object
+      properties:
+        is_valid:
+          type: boolean
+        scenario_count:
+          type: number
+        problems:
+          type: array
+          items:
+            type: string
+          description: Each problem, with the scenario it is in when there is one.
+      required:
+        - is_valid
+        - scenario_count
+        - problems
+      description: Answer of POST /api/v1/ci/validate.
     CreatedBy:
       type: string
       enum:
@@ -10713,6 +11274,37 @@ components:
       required:
         - default_response
       description: Body of `PATCH /http/bins/{binId}`.
+    HttpFollowUpWebhook:
+      type: object
+      properties:
+        url:
+          type: string
+          description: A URL template; empty when an endpoint is chosen.
+          examples:
+            - "{{ request.form.StatusCallback }}"
+        endpoint_id:
+          anyOf:
+            - $ref: "#/components/schemas/Ulid"
+            - type: "null"
+          description: "A webhook endpoint's ID: its URL and retry policy are used instead of `url`."
+          examples:
+            - null
+        template_id:
+          type: string
+          description: The webhook template its body and headers render with; vendor templates sign as the vendor does.
+          examples:
+            - twilio.status_callback
+        delay_ms:
+          type: number
+          description: How long after the answer it is sent, in milliseconds (0 to 600,000).
+          examples:
+            - 1000
+      required:
+        - url
+        - endpoint_id
+        - template_id
+        - delay_ms
+      description: The webhook a response rule sends after it answers.
     HttpForwardRequest:
       type: object
       properties:
@@ -10828,6 +11420,11 @@ components:
           description: The status sent for a simulated failure.
           examples:
             - 503
+        follow_up:
+          anyOf:
+            - $ref: "#/components/schemas/HttpFollowUpWebhook"
+            - type: "null"
+          description: A webhook sent after the rule answers; null for none.
       required:
         - id
         - name
@@ -10840,6 +11437,7 @@ components:
         - delay_max_ms
         - failure_rate_percent
         - failure_status_code
+        - follow_up
       description: One mock response rule; rules are checked in order and the first match answers.
     HttpRulePreviewRequest:
       type: object
@@ -11326,6 +11924,25 @@ components:
         - values
         - supports_one_click
         - warnings
+    MailgunComplaint:
+      type: object
+      properties:
+        domain:
+          type: string
+          description: The sending domain, as in `/v3/{domain}/messages`.
+          examples:
+            - mg.shop.test
+        address:
+          type: string
+          examples:
+            - ana@example.test
+        created_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+      required:
+        - domain
+        - address
+        - created_at
+      description: An address on a Mailgun sending domain's complaints table.
     ManualSendRequest:
       type: object
       properties:
@@ -13989,6 +14606,57 @@ components:
         - name
       additionalProperties: false
       description: "Body of PATCH /api/v1/projects/{projectKey}: the new name."
+    ProviderArea:
+      type: string
+      enum:
+        - email
+        - sms
+        - push
+        - payments
+      description: "Where a provider lives: email and SMS providers (Verify services among them), push services and payment gateways."
+    ProviderBin:
+      type: object
+      properties:
+        area:
+          $ref: "#/components/schemas/ProviderArea"
+          description: The provider's area.
+          examples:
+            - sms
+        provider_key:
+          type: string
+          description: The provider's key.
+          examples:
+            - twilio
+        bin_id:
+          $ref: "#/components/schemas/Ulid"
+          description: The attached bin's ID.
+          examples:
+            - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+        bin_name:
+          type: string
+          description: The attached bin's name.
+          examples:
+            - twilio-gaps
+        attached_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+      required:
+        - area
+        - provider_key
+        - bin_id
+        - bin_name
+        - attached_at
+      description: "An HTTP Catcher bin attached to a provider: requests on its base URL that no built-in operation answers are captured there and answered by the bin's rules."
+    ProviderBinAttachment:
+      type: object
+      properties:
+        bin_name:
+          type: string
+          description: The bin's name; a bin of that name is made when there is none.
+          examples:
+            - twilio-gaps
+      required:
+        - bin_name
+      description: Body of `PUT /api/v1/provider-bins/{area}/{providerKey}`.
     ProviderCredential:
       type: object
       properties:
@@ -15294,6 +15962,99 @@ components:
         - location
         - message
       description: A problem in a setup, by line when the format keeps one and by key path otherwise.
+    SignatureSchemeName:
+      type: string
+      enum:
+        - standard_webhooks
+        - stripe
+        - hmac
+      description: How a webhook is signed.
+    SignatureVerification:
+      type: object
+      properties:
+        is_valid:
+          type: boolean
+        scheme:
+          $ref: "#/components/schemas/SignatureSchemeName"
+        reason:
+          type:
+            - string
+            - "null"
+          description: Why it does not check out; null when it does.
+      required:
+        - is_valid
+        - scheme
+        - reason
+      description: Answer of POST /api/v1/webhooks/signatures/verify.
+    SignatureVerifyRequest:
+      type: object
+      properties:
+        scheme:
+          $ref: "#/components/schemas/SignatureSchemeName"
+          description: "`standard_webhooks`, `stripe` or `hmac`."
+          examples:
+            - standard_webhooks
+        secret:
+          type: string
+          description: The signing secret the app checks with; never logged.
+          examples:
+            - whsec_c2VuZG1vY2stdGVzdC1rZXktMDAwMQ==
+        request_id:
+          type:
+            - string
+            - "null"
+          description: A captured request's ID, from an HTTP Catcher bin; or give `headers` and `body`.
+          examples:
+            - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+          description: The request's headers, when no `request_id` is given.
+          examples:
+            - webhook-id: msg_2b7Q
+              webhook-timestamp: "1767225600"
+              webhook-signature: v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=
+        body:
+          type:
+            - string
+            - "null"
+          description: The request's raw body, exactly as sent, when no `request_id` is given.
+          examples:
+            - '{"type":"order.paid","data":{"order_id":"1042"}}'
+        header:
+          type:
+            - string
+            - "null"
+          description: "For `hmac`: the header holding the digest [default: X-Signature]."
+          examples:
+            - X-Hub-Signature-256
+        encoding:
+          type: string
+          enum:
+            - hex
+            - base64
+          description: "For `hmac`: how the digest is written, as hex digits or in Base 64 [default: hex]."
+          examples:
+            - hex
+        prefix:
+          type:
+            - string
+            - "null"
+          description: "For `hmac`: text before the digest, such as `sha256=` [default: none]."
+          examples:
+            - sha256=
+        tolerance_seconds:
+          type:
+            - number
+            - "null"
+          description: "How far a signed timestamp may be from now, in seconds [default: 300]."
+          examples:
+            - 300
+      required:
+        - scheme
+        - secret
+      description: Body of POST /api/v1/webhooks/signatures/verify.
     SimulatedEmailOutcome:
       type: object
       properties:
@@ -16632,6 +17393,167 @@ components:
         - outcome
         - decline_reason
       description: A test account number or voucher code with its outcome.
+    TlsCertificateAuthority:
+      type: object
+      properties:
+        path:
+          type: string
+          description: Where the CA certificate is on the machine SendMock runs on.
+          examples:
+            - /home/sam/.local/share/sendmock/provider-ca-certificate.pem
+        pem:
+          type: string
+          description: The CA certificate (PEM), to add to a trust store or `NODE_EXTRA_CA_CERTS`.
+          examples:
+            - |
+              -----BEGIN CERTIFICATE-----
+              ...
+              -----END CERTIFICATE-----
+        provider_tls_address:
+          type: string
+          description: The provider APIs over HTTPS.
+          examples:
+            - 127.0.0.1:8027
+      required:
+        - path
+        - pem
+        - provider_tls_address
+      description: SendMock's local CA, to trust for the HTTPS provider port.
+    TwilioAccountStatus:
+      type: string
+      enum:
+        - active
+        - suspended
+        - closed
+      description: A Twilio account's status, as the Accounts API writes it.
+    TwilioSubaccount:
+      type: object
+      properties:
+        account_sid:
+          type: string
+          description: The subaccount SID, `AC` and 32 hex digits.
+          examples:
+            - AC22222222222222222222222222222222
+        friendly_name:
+          type: string
+          description: A name for the subaccount, e.g. the customer it belongs to.
+          examples:
+            - Acme Clinic
+        status:
+          $ref: "#/components/schemas/TwilioAccountStatus"
+          description: "`active`, `suspended` or `closed`; a send under a suspended or closed subaccount is refused."
+          examples:
+            - active
+        auth_token:
+          type: string
+          description: "`••••` and the last four characters; reveal it with the CLI or the provider sheet."
+          examples:
+            - ••••9f2c
+        debugger_url:
+          type:
+            - string
+            - "null"
+          description: Where Twilio Debugger events for this subaccount are sent; null for none.
+          examples:
+            - https://shop.test/twilio/debugger
+        created_by:
+          $ref: "#/components/schemas/CreatedBy"
+        created_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+        updated_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+      required:
+        - account_sid
+        - friendly_name
+        - status
+        - auth_token
+        - debugger_url
+        - created_by
+        - created_at
+        - updated_at
+      description: A subaccount of the Twilio provider's main account; its auth token is masked.
+    TwilioSubaccountChanges:
+      type: object
+      properties:
+        friendly_name:
+          type: string
+          description: A name for the subaccount.
+          examples:
+            - Acme Clinic
+        status:
+          $ref: "#/components/schemas/TwilioAccountStatus"
+          description: Defaults to `active`.
+          examples:
+            - active
+        auth_token:
+          type:
+            - string
+            - "null"
+          description: The subaccount's auth token. Null, empty or the masked value keeps the stored token; a new subaccount without one gets a generated token.
+          examples:
+            - null
+        debugger_url:
+          type:
+            - string
+            - "null"
+          description: Where Twilio Debugger events for this subaccount are sent; null for none.
+          examples:
+            - null
+      required:
+        - friendly_name
+      description: Body of `PATCH /api/v1/twilio/subaccounts/{accountSid}`.
+    TwilioSubaccountInput:
+      type: object
+      properties:
+        account_sid:
+          type:
+            - string
+            - "null"
+          description: "`AC` and 32 hex digits; null makes a new one."
+          examples:
+            - null
+        friendly_name:
+          type: string
+          description: A name for the subaccount.
+          examples:
+            - Acme Clinic
+        status:
+          $ref: "#/components/schemas/TwilioAccountStatus"
+          description: Defaults to `active`.
+          examples:
+            - active
+        auth_token:
+          type:
+            - string
+            - "null"
+          description: The subaccount's auth token. Null, empty or the masked value keeps the stored token; a new subaccount without one gets a generated token.
+          examples:
+            - null
+        debugger_url:
+          type:
+            - string
+            - "null"
+          description: Where Twilio Debugger events for this subaccount are sent; null for none.
+          examples:
+            - null
+      required:
+        - friendly_name
+      description: Body of `POST /api/v1/twilio/subaccounts`.
+    TwilioSubaccountTokenReveal:
+      type: object
+      properties:
+        account_sid:
+          type: string
+          examples:
+            - AC22222222222222222222222222222222
+        auth_token:
+          type: string
+          examples:
+            - example-subaccount-token-9f2c
+      required:
+        - account_sid
+        - auth_token
+      description: A subaccount's auth token, shown in full after a confirmation.
     TwimlMethod:
       type: string
       enum:
@@ -17079,6 +18001,18 @@ components:
           description: The Messaging Service this number belongs to, `MG...`; null for none.
           examples:
             - MG00000000000000000000000000000001
+        phone_number_sid:
+          type: string
+          description: The number's SID in Twilio's IncomingPhoneNumbers API.
+          examples:
+            - PN00000000000000000000000000000001
+        account_sid:
+          type:
+            - string
+            - "null"
+          description: The Twilio account the number belongs to; null for the main account.
+          examples:
+            - null
         created_by:
           $ref: "#/components/schemas/CreatedBy"
       required:
@@ -17092,6 +18026,8 @@ components:
         - inbound_template_id
         - status_callback_url
         - messaging_service_sid
+        - phone_number_sid
+        - account_sid
         - created_by
     VirtualNumberInput:
       type: object

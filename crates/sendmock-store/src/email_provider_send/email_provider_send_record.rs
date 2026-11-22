@@ -8,4 +8,6 @@ pub struct EmailProviderSendRecord {
     pub template_id: Option<String>,
     /// The template's data as JSON.
     pub template_data_json: Option<String>,
+    /// The domain in the send path, such as Mailgun's `/v3/{domain}/messages`.
+    pub sending_domain: Option<String>,
 }

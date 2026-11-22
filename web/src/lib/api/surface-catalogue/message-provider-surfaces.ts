@@ -5,6 +5,18 @@ import {
 
 /** Email and SMS provider definitions (docs/plan/22-configurable-providers.md, EM-18, SM-16). */
 export const messageProviderSurfaces: SurfaceCatalogue = {
+  "GET /api/v1/mailgun/complaints": {
+    phase: "A23",
+    cli: "sendmock email mailgun complaints list",
+    mcp: "sendmock_email_mailgun_complaint_list",
+    ui: "Mail > Providers > Mailgun > Complaints",
+  },
+  "DELETE /api/v1/mailgun/complaints/{domain}": {
+    phase: "A23",
+    cli: "sendmock email mailgun complaints clear <domain>",
+    mcp: "sendmock_email_mailgun_complaint_clear",
+    ui: "Mail > Providers > Mailgun > Complaints > Clear",
+  },
   "GET /api/v1/emails/providers": {
     phase: "4",
     cli: "sendmock email providers list",

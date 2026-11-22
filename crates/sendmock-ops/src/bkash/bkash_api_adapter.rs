@@ -39,14 +39,17 @@ async fn route_bkash_request(bkash_call: &BkashCall<'_>) -> Result<(u16, Value),
         Some("execute") => execute_payment(bkash_call).await?,
         Some("payment/status") => query_payment(bkash_call).await?,
         Some("payment/refund") => refund_payment(bkash_call).await?,
-        _ => {
-            return Ok((
-                404,
-                json!({"statusCode": "404", "statusMessage": "Not Found"}),
-            ));
-        }
+        _ => return Ok(unknown_path_answer()),
     };
     Ok((200, answer))
+}
+
+/// What bKash answers for a path it does not serve.
+fn unknown_path_answer() -> (u16, Value) {
+    (
+        404,
+        json!({"statusCode": "404", "statusMessage": "Not Found"}),
+    )
 }
 
 /// The gateway's secrets and the password and token the request sent, which the request log
@@ -89,7 +92,9 @@ pub async fn answer_bkash_request(
         request,
         body_fields,
     };
-    let (status, body) = route_bkash_request(&bkash_call).await?;
+    let bkash_answer = route_bkash_request(&bkash_call).await?;
+    let is_unknown_path = bkash_answer == unknown_path_answer();
+    let (status, body) = bkash_answer;
     Ok(Some(ProviderOutcome {
         response: ProviderHttpResponse {
             status,
@@ -99,5 +104,6 @@ pub async fn answer_bkash_request(
         provider_key: Some(BKASH_PROVIDER_KEY.to_owned()),
         created_message: None,
         secret_values: collect_secret_values(&bkash_call),
+        is_unknown_path,
     }))
 }

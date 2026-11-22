@@ -107,7 +107,19 @@ fn new_number_record(operation_context: &OperationContext) -> VirtualNumberRecor
         inbound_template_id: None,
         status_callback_url: None,
         messaging_service_sid: None,
+        phone_number_sid: generate_phone_number_sid(operation_context),
+        account_sid: None,
         created_by: operation_context.request.client.as_str().to_owned(),
         created_at_unix_ms: operation_context.clock.now_unix_ms(),
     }
+}
+
+/// `PN` and 32 hex digits, as Twilio writes IncomingPhoneNumber SIDs.
+pub fn generate_phone_number_sid(operation_context: &OperationContext) -> String {
+    let random_source = &operation_context.random_source;
+    format!(
+        "PN{:016x}{:016x}",
+        random_source.next_u64(),
+        random_source.next_u64()
+    )
 }

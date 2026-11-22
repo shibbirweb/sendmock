@@ -40,6 +40,10 @@ impl Operation for GetInfoOperation {
             smtp_address: instance_details.smtp_address.clone(),
             http_address: instance_details.http_address.clone(),
             provider_address: instance_details.provider_address.clone(),
+            provider_tls_address: instance_details
+                .provider_tls
+                .as_ref()
+                .map(|provider_tls| provider_tls.address.clone()),
             catcher_address: instance_details.catcher_address.clone(),
             pop3_address: instance_details.pop3_address.clone(),
             database_path: operation_context.database.location().to_string(),
@@ -81,6 +85,7 @@ mod tests {
                 provider_address: None,
                 catcher_address: None,
                 pop3_address: None,
+                provider_tls: None,
                 is_container: false,
             },
         ))

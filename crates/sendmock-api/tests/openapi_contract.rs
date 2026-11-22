@@ -153,6 +153,9 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_inbound_route_samples(app_router).await);
     samples.extend(prepare_http_catcher_samples(app_router).await);
     samples.extend(prepare_number_samples(app_router).await);
+    samples.extend(prepare_twilio_subaccount_samples(app_router).await);
+    samples.extend(provider_gap_samples());
+    samples.extend(ci_samples());
     samples.extend(prepare_verify_samples(app_router).await);
     samples.extend(prepare_sms_provider_samples(app_router).await);
     samples.extend([
@@ -185,6 +188,7 @@ fn sample_response_rule() -> Value {
         "path_glob": "/hooks*", "filter": null,
         "response": { "status_code": 201, "headers": { "content-type": "application/json" }, "body": "{\"id\": \"{{ request.query.id }}\"}" },
         "delay_min_ms": 0, "delay_max_ms": 0, "failure_rate_percent": 0, "failure_status_code": 503,
+        "follow_up": null,
     })
 }
 
@@ -698,6 +702,93 @@ async fn prepare_number_samples(app_router: &axum::Router) -> Vec<(&'static str,
         (
             "deleteMessagingServicesByServiceSid",
             vec![json!({ "service_sid": deleted_service_sid })],
+        ),
+    ]
+}
+
+/// Two subaccounts: one to edit and reveal, one to delete.
+async fn prepare_twilio_subaccount_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let subaccounts_path = "/api/v1/twilio/subaccounts";
+    let edited_sid = "AC44444444444444444444444444444444";
+    let deleted_sid = "AC55555555555555555555555555555555";
+    for account_sid in [edited_sid, deleted_sid] {
+        post_json(
+            app_router,
+            subaccounts_path,
+            &json!({ "account_sid": account_sid, "friendly_name": "Clinic" }),
+        )
+        .await;
+    }
+    vec![
+        ("getTwilioSubaccounts", vec![json!({})]),
+        (
+            "postTwilioSubaccounts",
+            vec![json!({
+                "account_sid": null, "friendly_name": "Dental", "status": "active",
+                "auth_token": null, "debugger_url": "http://localhost:3000/twilio/debugger",
+            })],
+        ),
+        (
+            "patchTwilioSubaccountsByAccountSid",
+            vec![json!({
+                "account_sid": edited_sid, "friendly_name": "Clinic North", "status": "suspended",
+                "auth_token": null, "debugger_url": null,
+            })],
+        ),
+        (
+            "getTwilioSubaccountsByAccountSidAuthToken",
+            vec![json!({ "account_sid": edited_sid })],
+        ),
+        (
+            "deleteTwilioSubaccountsByAccountSid",
+            vec![json!({ "account_sid": deleted_sid })],
+        ),
+    ]
+}
+
+/// Mailgun complaints, the local CA and provider bins, which need no setup.
+fn provider_gap_samples() -> Vec<(&'static str, Vec<Value>)> {
+    vec![
+        (
+            "getMailgunComplaints",
+            vec![json!({}), json!({ "domain": "mg.shop.test" })],
+        ),
+        ("getTlsCa", vec![json!({})]),
+        (
+            "deleteMailgunComplaintsByDomain",
+            vec![json!({ "domain": "mg.shop.test" })],
+        ),
+        (
+            "putProviderBinsByAreaByProviderKey",
+            vec![json!({ "area": "sms", "provider_key": "twilio", "bin_name": "twilio-gaps" })],
+        ),
+        ("getProviderBins", vec![json!({})]),
+        (
+            "deleteProviderBinsByAreaByProviderKey",
+            vec![json!({ "area": "sms", "provider_key": "twilio" })],
+        ),
+    ]
+}
+
+/// A CI file run against this instance, its check, init's files and a signature check.
+fn ci_samples() -> Vec<(&'static str, Vec<Value>)> {
+    let ci_file = "sendmock:\n  format: sendmock.ci\n  format_version: 1\nscenarios:\n  - name: health\n    steps:\n      - run: http\n        with: { method: GET, url: /api/v1/health }\n";
+    vec![
+        ("postCiValidate", vec![json!({ "ci_file": ci_file })]),
+        ("postCiRun", vec![json!({ "ci_file": ci_file })]),
+        (
+            "postCiInit",
+            vec![json!({ "provider": "github_actions", "setup_url": null, "app_url": null })],
+        ),
+        (
+            "postWebhooksSignaturesVerify",
+            vec![json!({
+                "scheme": "hmac", "secret": "shop-secret", "headers": { "x-signature": "00" },
+                "body": "{}", "header": "X-Signature", "encoding": "hex", "prefix": null,
+                "tolerance_seconds": null,
+            })],
         ),
     ]
 }
@@ -2020,6 +2111,13 @@ fn build_bare_operation_context() -> OperationContext {
             provider_address: None,
             catcher_address: None,
             pop3_address: None,
+            provider_tls: Some(sendmock_ops::ProviderTlsDetails {
+                address: "127.0.0.1:8027".to_owned(),
+                ca_certificate_path: Some("/tmp/sendmock/provider-ca-certificate.pem".to_owned()),
+                ca_certificate_pem: Some(
+                    "-----BEGIN CERTIFICATE-----\nMIIB\n-----END CERTIFICATE-----\n".to_owned(),
+                ),
+            }),
             is_container: false,
         },
     )

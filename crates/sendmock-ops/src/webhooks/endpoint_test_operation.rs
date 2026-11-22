@@ -7,7 +7,7 @@ use super::delivery_queue::{DeliveryOrder, DeliveryTrigger, build_planned_attemp
 use super::delivery_request_plan::DeliveryRequestPlan;
 use super::delivery_view::WebhookDelivery;
 use super::endpoint_inputs::WebhookEndpointReference;
-use super::endpoint_operations::find_stored_endpoint;
+use super::endpoint_operations::find_endpoint_by_id_or_name;
 use super::endpoint_settings::EndpointBodyMode;
 use crate::{
     AppEvent, HttpMethod, Operation, OperationContext, OperationDefinition, OperationError,
@@ -103,7 +103,8 @@ impl Operation for TestWebhookEndpointOperation {
         operation_context: &OperationContext,
         input: WebhookEndpointReference,
     ) -> Result<WebhookDelivery, OperationError> {
-        let stored_endpoint = find_stored_endpoint(operation_context, &input.endpoint_id).await?;
+        let stored_endpoint =
+            find_endpoint_by_id_or_name(operation_context, &input.endpoint_id).await?;
         let test_event = build_test_event(
             &stored_endpoint,
             format!("evt_{}", operation_context.id_generator.generate_id()),

@@ -3,7 +3,6 @@ use std::io;
 use std::time::Duration;
 
 use axum::Router;
-use tokio::net::TcpListener;
 use tokio::sync::watch;
 
 /// How long requests already in flight may take to finish after a shutdown signal.
@@ -11,11 +10,15 @@ pub const SHUTDOWN_GRACE_PERIOD: Duration = Duration::from_secs(10);
 
 /// Serves until `shutdown_signal` resolves, then stops taking connections and lets
 /// in-flight requests finish for up to the grace period.
-pub async fn serve_http(
-    listener: TcpListener,
+pub async fn serve_http<Listener>(
+    listener: Listener,
     app_router: Router,
     shutdown_signal: impl Future<Output = ()> + Send + 'static,
-) -> io::Result<()> {
+) -> io::Result<()>
+where
+    Listener: axum::serve::Listener,
+    Listener::Addr: std::fmt::Debug,
+{
     let (shutdown_requested_sender, mut shutdown_requested_receiver) = watch::channel(false);
     let graceful_shutdown = async move {
         let _ = shutdown_requested_receiver
@@ -37,6 +40,7 @@ pub async fn serve_http(
 #[cfg(test)]
 mod tests {
     use std::sync::Arc;
+    use tokio::net::TcpListener;
 
     use tokio::io::{AsyncReadExt, AsyncWriteExt};
     use tokio::net::TcpStream;

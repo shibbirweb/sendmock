@@ -48,6 +48,16 @@ const variableEntries: DeeperEntry[] = [
     does: "Explains the screen and which value wins.",
   },
   {
+    control:
+      "paragraph: Twilio templates sign with: Twilio provider: the token of the event's subaccount, or of account ACtest# for any other. Set a variable named twilio_auth_token to use your own.",
+    does: "Which Auth Token signs `twilio.status_callback` and `twilio.inbound_sms`: the subaccount's, the main account's, or a `twilio_auth_token` variable.",
+  },
+  {
+    control:
+      "paragraph: Twilio templates sign with: Twilio provider: the token of the event's subaccount, or of the main account for any other. Set a variable named twilio_auth_token to use your own.",
+    does: "The same note while the Twilio provider has no Account SID.",
+  },
+  {
     control: "button: Add variable",
     does: "Opens the variable editor; in it, adds the variable.",
     operationIds: ["postWebhooksVariables"],

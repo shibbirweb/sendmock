@@ -127,4 +127,18 @@ export const settingsSetupEntries: DeeperEntry[] = [
     changes: "Adds, updates and (with Replace) removes configuration; traffic is never touched.",
     operationIds: ["postSetupImport"],
   },
+  { control: "heading: Use in CI", does: "Writes the files a pipeline needs to run your webhook tests with `sendmock ci run`.", links: "[CI pipelines](../../advanced/ci-pipelines.md)" },
+  {
+    control:
+      "paragraph: Run your webhook tests in a pipeline: the setup, a starter CI file and the job, filled in for your CI system. sendmock ci init writes the same files.",
+    does: "Explains Use in CI.",
+  },
+  { control: "combobox: CI system", does: "The CI system the job file is written for, such as GitHub Actions or GitLab CI." },
+  { control: "textbox: Setup URL", does: "An address the pipeline downloads the setup from." },
+  { control: "paragraph: Where the pipeline downloads the setup; empty commits the file instead.", does: "Says what an empty Setup URL does." },
+  {
+    control: "button: Show the files",
+    does: "Shows the setup, the starter CI file and the job file built from this SendMock, each to copy or download.",
+    operationIds: ["postCiInit"],
+  },
 ];

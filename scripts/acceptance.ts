@@ -25,7 +25,7 @@ const testRoots = [
   "examples",
 ];
 const testFilePattern =
-  /(\.test\.tsx?|\.spec\.ts|_test\.rs|\.rs|-test\.sh|done-when\.js|verify\.php|verify\.py)$/;
+  /(\.test\.tsx?|\.spec\.ts|_test\.rs|\.rs|-test\.sh|done-when\.js|verify\.js|verify\.php|verify\.py)$/;
 const ignoredDirectoryNames = new Set(["node_modules", "dist", "target", ".git"]);
 // Its fixtures use real criterion IDs as sample data, not as proof.
 const ignoredFileNames = new Set(["acceptance.test.ts"]);

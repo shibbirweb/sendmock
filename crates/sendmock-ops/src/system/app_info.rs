@@ -14,6 +14,9 @@ pub struct AppInfo {
     /// Always present, null when the provider port is off, as the contract requires.
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub provider_address: Option<String>,
+    /// Always present, null when the provider APIs are not served over HTTPS.
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
+    pub provider_tls_address: Option<String>,
     /// Always present, null when the catch-all catcher port is off.
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub catcher_address: Option<String>,

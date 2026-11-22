@@ -22,6 +22,13 @@ const systemEndpoints = tagEndpoints("System", [
   },
   {
     method: "GET",
+    path: "/api/v1/tls/ca",
+    summary: "The local CA to trust for the HTTPS provider port.",
+    response: typeRef("TlsCertificateAuthority"),
+    errorStatuses: [404],
+  },
+  {
+    method: "GET",
     path: "/api/v1/stats",
     summary: "Counts and rates shown on the Overview.",
     response: typeRef("AppStats"),

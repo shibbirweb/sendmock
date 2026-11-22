@@ -62,10 +62,8 @@ mod tests {
             .map(|operation| operation.definition().operation_id)
             .collect();
 
-        assert_eq!(
-            &operation_ids[..3],
-            ["getHealth", "getInfo", "getSeedStatus"]
-        );
+        assert_eq!(&operation_ids[..3], ["getHealth", "getInfo", "getTlsCa"]);
+        assert!(operation_ids.contains(&"getSeedStatus"));
         assert!(operation_ids.contains(&"getEmails"));
         assert!(
             operation_registry

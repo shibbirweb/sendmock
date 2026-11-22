@@ -122,7 +122,7 @@ impl HttpBinRepository {
             .await
     }
 
-    /// Deletes the bin with its requests and their files.
+    /// Deletes the bin with its requests and their files, and detaches it from its providers.
     pub async fn delete_bin(&self, bin_id: &str) -> Result<bool, StoreError> {
         let bin_id = bin_id.to_owned();
         self.database
@@ -133,6 +133,7 @@ impl HttpBinRepository {
                     [&bin_id],
                 )?;
                 transaction.execute("DELETE FROM http_captured_requests WHERE bin_id = ?1", [&bin_id])?;
+                transaction.execute("DELETE FROM provider_bins WHERE bin_id = ?1", [&bin_id])?;
                 let deleted_count = transaction.execute("DELETE FROM http_bins WHERE id = ?1", [&bin_id])?;
                 transaction.commit()?;
                 Ok(deleted_count > 0)

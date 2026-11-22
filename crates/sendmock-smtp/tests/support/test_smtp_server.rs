@@ -172,6 +172,7 @@ fn build_operation_context() -> io::Result<OperationContext> {
             provider_address: None,
             catcher_address: None,
             pop3_address: None,
+            provider_tls: None,
             is_container: false,
         },
     ))

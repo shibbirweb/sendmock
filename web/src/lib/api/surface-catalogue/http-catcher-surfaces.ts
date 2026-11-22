@@ -128,4 +128,22 @@ export const httpCatcherSurfaces: SurfaceCatalogue = {
     selector: { input: "method", value: "DELETE" },
     cliArguments: { bin: "binPath" },
   },
+  "GET /api/v1/provider-bins": {
+    phase: "A23",
+    cli: "sendmock http provider-bin list",
+    mcp: "sendmock_http_provider_bin_list",
+    ui: "HTTP Catcher > bin > Answers unmatched requests for",
+  },
+  "PUT /api/v1/provider-bins/{area}/{providerKey}": {
+    phase: "A23",
+    cli: "sendmock http provider-bin attach <area> <providerKey>",
+    mcp: "sendmock_http_provider_bin_attach",
+    ui: "Mail, SMS or Payments > provider > General > Unmatched requests",
+  },
+  "DELETE /api/v1/provider-bins/{area}/{providerKey}": {
+    phase: "A23",
+    cli: "sendmock http provider-bin detach <area> <providerKey>",
+    mcp: "sendmock_http_provider_bin_detach",
+    ui: "HTTP Catcher > bin > Detach",
+  },
 };

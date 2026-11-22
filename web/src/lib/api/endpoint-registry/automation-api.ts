@@ -285,7 +285,37 @@ const automationEndpoints = tagEndpoints("Automation", [
   },
 ]);
 
+/** CI files: validate, run here and write the files for a pipeline (WH-15, A19). */
+const ciEndpoints = tagEndpoints("Automation", [
+  {
+    method: "POST",
+    path: "/api/v1/ci/validate",
+    summary: "Check a CI file and its scenarios without running anything.",
+    requestBody: typeRef("CiFileRequest"),
+    response: typeRef("CiValidation"),
+  },
+  {
+    method: "POST",
+    path: "/api/v1/ci/run",
+    summary:
+      "Run a CI file's setup and scenarios here and answer the report, with JUnit XML.",
+    requestBody: typeRef("CiFileRequest"),
+    response: typeRef("CiReport"),
+    errorStatuses: [400],
+  },
+  {
+    method: "POST",
+    path: "/api/v1/ci/init",
+    summary:
+      "The setup, a starter CI file and the pipeline job for a CI system, from this instance.",
+    requestBody: typeRef("CiInitRequest"),
+    response: typeRef("CiInitFiles"),
+    errorStatuses: [400],
+  },
+]);
+
 export const automationApi: ApiEndpoint[] = [
   ...waitEndpoints,
   ...automationEndpoints,
+  ...ciEndpoints,
 ];

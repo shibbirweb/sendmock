@@ -9,6 +9,7 @@ const secretRevealOperations = [
   "GET /api/v1/payments/gateways/{gatewayKey}/credentials/{credentialName}",
   "GET /api/v1/emails/providers/{providerKey}/credentials/{credentialName}",
   "GET /api/v1/sms/providers/{providerKey}/credentials/{credentialName}",
+  "GET /api/v1/twilio/subaccounts/{accountSid}/auth-token",
 ];
 
 const registeredOperationKeys = apiEndpoints.map(
@@ -30,6 +31,8 @@ const stageBPhases = [
   "A8",
   "A17",
   "A18",
+  "A19",
+  "A23",
 ];
 
 describe("surface catalogue", () => {

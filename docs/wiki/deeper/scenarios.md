@@ -104,9 +104,56 @@ Button.
 - **What it changes:** The steps' own effects: sends, waits and checks against this SendMock.
 - **Same action elsewhere:** REST [`POST /api/v1/scenarios/run`](/api/automation/#postScenariosRun), CLI [`sendmock scenario run`](/cli/automation/#scenario-run), MCP [`sendmock_scenario_run`](/mcp/automation/#sendmock_scenario_run)
 
+### 14. CI file
+
+Heading.
+
+- **What it does:** Runs a CI file, the file `sendmock ci run` reads in a pipeline, and shows the report your CI will show.
+- **Links to:** [CI pipelines](../../advanced/ci-pipelines.md)
+
+### 15. The setup, the app's URL and the scenarios a pipeline runs with sendmock ci run . Run it here to see the report your CI will show.
+
+Text.
+
+- **What it does:** Explains the CI file card.
+
+### 16. CI file URL
+
+Field.
+
+- **What it does:** An address to load a CI file from; the browser downloads it.
+
+### 17. Import from URL
+
+Button.
+
+- **What it does:** Downloads the CI file at the address into the text box.
+
+### 18. CI file
+
+Field.
+
+- **What it does:** The CI file's text, in YAML or JSON.
+
+### 19. Validate CI file
+
+Button.
+
+- **What it does:** Checks the CI file without running it and lists any problem by its line or key path.
+- **Same action elsewhere:** REST [`POST /api/v1/ci/validate`](/api/automation/#postCiValidate), CLI [`sendmock ci validate`](/cli/automation/#ci-validate), MCP [`sendmock_ci_validate`](/mcp/automation/#sendmock_ci_validate)
+
+### 20. Run CI file
+
+Button.
+
+- **What it does:** Applies the CI file's setup, runs every scenario against this SendMock and shows each scenario's result, with a JUnit download.
+- **What it changes:** The setup it applies and the steps' own effects: sends, webhooks and checks.
+- **Errors:** A failing step names the scenario, the step and the reason.
+- **Same action elsewhere:** REST [`POST /api/v1/ci/run`](/api/automation/#postCiRun), CLI [`sendmock ci run`](/cli/automation/#ci-run), MCP [`sendmock_ci_run`](/mcp/automation/#sendmock_ci_run)
+
 ## The example has run
 
-### 14. Passed: # of # steps in # ms
+### 21. Passed: # of # steps in # ms
 
 Status.
 

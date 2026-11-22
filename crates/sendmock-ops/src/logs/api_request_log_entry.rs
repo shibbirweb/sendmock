@@ -16,6 +16,16 @@ pub struct ApiRequestLinkedMessage {
     pub sms_thread_id: Option<String>,
 }
 
+/// The HTTP Catcher bin and rule that answered a provider request no built-in operation
+/// answers.
+#[derive(Debug, Clone, PartialEq, Serialize, JsonSchema)]
+pub struct ApiRequestCatcherAnswer {
+    pub bin_name: String,
+    /// Null when the bin's default reply answered.
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
+    pub rule_name: Option<String>,
+}
+
 /// One request to a native or provider API, with the exact response it got.
 #[derive(Debug, Clone, PartialEq, Serialize, JsonSchema)]
 pub struct ApiRequestLogEntry {
@@ -34,6 +44,12 @@ pub struct ApiRequestLogEntry {
         schema_with = "crate::nullable_schema::<ApiRequestLinkedMessage>"
     )]
     pub linked_message: Option<ApiRequestLinkedMessage>,
+    /// The attached bin and rule that answered; null when SendMock answered itself.
+    #[schemars(
+        required,
+        schema_with = "crate::nullable_schema::<ApiRequestCatcherAnswer>"
+    )]
+    pub catcher_answer: Option<ApiRequestCatcherAnswer>,
     pub created_at: String,
 }
 
@@ -55,6 +71,12 @@ impl From<ApiRequestRecord> for ApiRequestLogEntry {
                     kind,
                     id,
                     sms_thread_id: None,
+                }),
+            catcher_answer: request
+                .catcher_answer
+                .map(|catcher_answer| ApiRequestCatcherAnswer {
+                    bin_name: catcher_answer.bin_name,
+                    rule_name: catcher_answer.rule_name,
                 }),
             created_at: format_rfc3339(request.created_at_unix_ms),
         }

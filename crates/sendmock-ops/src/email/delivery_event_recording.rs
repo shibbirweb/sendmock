@@ -3,6 +3,7 @@ use sendmock_store::TimelineRecord;
 use serde_json::{Value, json};
 
 use super::email_summary::EmailSummary;
+use crate::mailgun::record_mailgun_complaint;
 use crate::{AppEventType, OperationContext, OperationError, publish_event};
 
 fn event_type_for(delivery_event: &EmailDeliveryEvent) -> AppEventType {
@@ -64,6 +65,9 @@ pub async fn record_delivery_event(
         .email_repository
         .record_delivery_event(email_id, timeline_entry)
         .await?;
+    if was_recorded && matches!(delivery_event, EmailDeliveryEvent::Complained) {
+        record_mailgun_complaint(operation_context, email_id, recipient_address).await?;
+    }
     let Some(stored_email) = operation_context
         .email_repository
         .find_email(email_id)

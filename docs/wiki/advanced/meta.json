@@ -19,6 +19,7 @@
     "numbers-and-services",
     "chaos",
     "seed-file",
-    "scenarios"
+    "scenarios",
+    "ci-pipelines"
   ]
 }

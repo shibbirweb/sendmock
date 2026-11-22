@@ -2,6 +2,7 @@
   "title": "HTTP Catcher",
   "pages": [
     "index",
-    "responses"
+    "responses",
+    "provider-gaps"
   ]
 }

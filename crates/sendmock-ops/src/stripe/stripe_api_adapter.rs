@@ -17,7 +17,7 @@ use super::stripe_payment_intents::{
     create_payment_intent, retrieve_payment_intent,
 };
 use super::stripe_refunds::{create_refund, retrieve_refund};
-use crate::payments::find_payment_gateway;
+use crate::payments::{PaymentGatewayRecord, find_payment_gateway};
 use crate::providers::{ProviderHttpRequest, ProviderHttpResponse, ProviderOutcome, ProviderRoute};
 use crate::{OperationContext, OperationError};
 
@@ -159,6 +159,29 @@ fn build_stripe_response(
     }
 }
 
+/// The gateway's secrets, the key sent and any card data, which the request log masks.
+fn collect_secret_values(
+    stripe_gateway: &PaymentGatewayRecord,
+    api_key: Option<String>,
+    stripe_call: &StripeCall<'_>,
+) -> Vec<String> {
+    let mut secret_values: Vec<String> = stripe_gateway
+        .fields
+        .credentials
+        .iter()
+        .filter(|credential| credential.is_secret && !credential.value.is_empty())
+        .map(|credential| credential.value.clone())
+        .collect();
+    secret_values.extend(api_key.filter(|api_key| !api_key.is_empty()));
+    secret_values.extend(
+        stripe_call
+            .stripe_fields
+            .collect_texts(&["payment_method_data"]),
+    );
+    secret_values.extend(stripe_call.stripe_fields.collect_texts(&["card"]));
+    secret_values
+}
+
 /// Stripe's API (`api.stripe.com/v1`) from the `stripe` gateway while it is enabled; `None`
 /// for other requests. The key, the gateway's secrets and any card data sent are masked in
 /// the request log.
@@ -193,24 +216,17 @@ pub async fn answer_stripe_request(
         }
         Err(key_error) => Err(key_error),
     };
-    let mut secret_values: Vec<String> = stripe_gateway
-        .fields
-        .credentials
-        .iter()
-        .filter(|credential| credential.is_secret && !credential.value.is_empty())
-        .map(|credential| credential.value.clone())
-        .collect();
-    secret_values.extend(api_key.filter(|api_key| !api_key.is_empty()));
-    secret_values.extend(
-        stripe_call
-            .stripe_fields
-            .collect_texts(&["payment_method_data"]),
-    );
-    secret_values.extend(stripe_call.stripe_fields.collect_texts(&["card"]));
+    let is_unknown_path = stripe_answer.as_ref().err()
+        == Some(&StripeError::unrecognized_url(
+            &request.method.to_ascii_uppercase(),
+            &request.path,
+        ));
+    let secret_values = collect_secret_values(&stripe_gateway, api_key, &stripe_call);
     Ok(Some(ProviderOutcome {
         response: build_stripe_response(operation_context, request, stripe_answer),
         provider_key: Some(STRIPE_PROVIDER_KEY.to_owned()),
         created_message: None,
         secret_values,
+        is_unknown_path,
     }))
 }

@@ -3,6 +3,8 @@ mod serve_arguments;
 
 use clap::{Parser, Subcommand};
 
+use crate::launcher::LastRunAction;
+
 pub use mcp_arguments::McpArguments;
 pub use serve_arguments::ServeArguments;
 
@@ -31,6 +33,16 @@ enum CliCommand {
     /// Serve MCP over stdio for AI agents, with tools that call a running SendMock.
     Mcp(McpArguments),
 
+    /// Print the services the launcher saved last (`--json` too); `clear` deletes them.
+    LastRun {
+        #[command(subcommand)]
+        action: Option<LastRunAction>,
+
+        /// Print JSON
+        #[arg(long)]
+        json: bool,
+    },
+
     /// Print the version and release channel of this binary.
     Version {
         /// Print JSON
@@ -54,6 +66,10 @@ enum CliCommand {
 pub enum BuiltInCommand<'arguments> {
     Serve(&'arguments ServeArguments),
     Mcp(&'arguments McpArguments),
+    LastRun {
+        action: Option<&'arguments LastRunAction>,
+        json: bool,
+    },
     Version {
         json: &'arguments bool,
     },
@@ -68,6 +84,10 @@ impl CliArguments {
         match &self.command {
             Some(CliCommand::Serve(serve_arguments)) => BuiltInCommand::Serve(serve_arguments),
             Some(CliCommand::Mcp(mcp_arguments)) => BuiltInCommand::Mcp(mcp_arguments),
+            Some(CliCommand::LastRun { action, json }) => BuiltInCommand::LastRun {
+                action: action.as_ref(),
+                json: *json,
+            },
             Some(CliCommand::Version { json }) => BuiltInCommand::Version { json },
             Some(CliCommand::Help { all, json }) => BuiltInCommand::Help { all, json },
             None => BuiltInCommand::Serve(&self.serve_arguments),

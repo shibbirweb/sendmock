@@ -205,67 +205,75 @@ Button.
 - **What it does:** Sends the request's `http.captured` event to a webhook endpoint now.
 - **Same action elsewhere:** REST [`POST /api/v1/webhooks/endpoints/{endpointId}/send`](/api/webhook-endpoints/#postWebhooksEndpointsByEndpointIdSend), CLI [`sendmock webhook send`](/cli/webhook-endpoints/#webhook-send), MCP [`sendmock_webhook_send`](/mcp/webhook-endpoints/#sendmock_webhook_send)
 
-### 30. Preview
+### 30. Verify signature
+
+Button.
+
+- **What it does:** Checks the captured request's webhook signature against a secret: Standard Webhooks, Stripe or a plain HMAC header. Answers valid, or the reason it does not check out.
+- **Links to:** [CI pipelines](../../advanced/ci-pipelines.md)
+- **Same action elsewhere:** REST [`POST /api/v1/webhooks/signatures/verify`](/api/webhook-deliveries/#postWebhooksSignaturesVerify), CLI [`sendmock webhook signature verify`](/cli/webhook-deliveries/#webhook-signature-verify), MCP [`sendmock_webhook_signature_verify`](/mcp/webhook-deliveries/#sendmock_webhook_signature_verify)
+
+### 31. Preview
 
 Tab.
 
 - **What it does:** How the message would look in the service the preset copies (here Slack).
 
-### 31. Body
+### 32. Body
 
 Tab.
 
 - **What it does:** The body as received, formatted when it is JSON or a form.
 
-### 32. Headers
+### 33. Headers
 
 Tab.
 
 - **What it does:** Every header received.
 
-### 33. Query
+### 34. Query
 
 Tab.
 
 - **What it does:** The query parameters.
 
-### 34. Response
+### 35. Response
 
 Tab.
 
 - **What it does:** What SendMock answered: status, headers and body, and which rule chose it.
 
-### 35. Incoming webhook APP
+### 36. Incoming webhook APP
 
 Text.
 
 - **What it does:** In the Slack preview: the sender as Slack would show it.
 
-### 36. Email bounced
+### 37. Email bounced
 
 Text.
 
 - **What it does:** In the Slack preview: the message text (here a bounce alert).
 
-### 37. unknown-user@example.com did not get Your verification code .
+### 38. unknown-user@example.com did not get Your verification code .
 
 Text.
 
 - **What it does:** In the Slack preview: the message's details.
 
-### 38. Reason # #.#.# user unknown
+### 39. Reason # #.#.# user unknown
 
 Text.
 
 - **What it does:** In the Slack preview: a field of the message.
 
-### 39. Provider SendMock
+### 40. Provider SendMock
 
 Text.
 
 - **What it does:** In the Slack preview: a field of the message.
 
-### 40. Sent by acme-app worker
+### 41. Sent by acme-app worker
 
 Text.
 
@@ -273,56 +281,56 @@ Text.
 
 ## New bin dialog
 
-### 41. New bin
+### 42. New bin
 
 Heading.
 
 - **What it does:** The New bin dialog.
 
-### 42. Requests to its catch URL are kept here and answered with its reply.
+### 43. Requests to its catch URL are kept here and answered with its reply.
 
 Text.
 
 - **What it does:** Explains a bin.
 
-### 43. Name
+### 44. Name
 
 Field.
 
 - **What it does:** The bin's name, which is also its catch URL's first path part.
 
-### 44. http://#.#.#.#:#/catch/\<name>
+### 45. http://#.#.#.#:#/catch/\<name>
 
 Text.
 
 - **What it does:** The catch URL the bin will have.
 
-### 45. Preset
+### 46. Preset
 
 Drop-down.
 
 - **What it does:** A service to answer as: Slack, Discord, Teams, Google Chat, Telegram, FCM, Expo, OneSignal or generic.
 
-### 46. Answers # \{"ok":true\}.
+### 47. Answers # \{"ok":true\}.
 
 Text.
 
 - **What it does:** What the chosen preset answers.
 
-### 47. Cancel
+### 48. Cancel
 
 Button.
 
 - **What it does:** Closes the dialog without doing anything.
 
-### 48. Add bin
+### 49. Add bin
 
 Button.
 
 - **What it does:** Adds the bin.
 - **Same action elsewhere:** REST [`POST /api/v1/http/bins`](/api/http-catcher/#postHttpBins), CLI [`sendmock http bin create`](/cli/http-catcher/#http-bin-create), MCP [`sendmock_http_bin_create`](/mcp/http-catcher/#sendmock_http_bin_create)
 
-### 49. Close
+### 50. Close
 
 Button.
 
@@ -330,37 +338,37 @@ Button.
 
 ## With no data yet
 
-### 50. slack Slack # No requests yet
+### 51. slack Slack # No requests yet
 
 Button.
 
 - **What it does:** A bin with no requests yet.
 
-### 51. discord Discord # No requests yet
+### 52. discord Discord # No requests yet
 
 Button.
 
 - **What it does:** A bin with no requests yet.
 
-### 52. push Firebase # No requests yet
+### 53. push Firebase # No requests yet
 
 Button.
 
 - **What it does:** A bin with no requests yet.
 
-### 53. analytics # No requests yet
+### 54. analytics # No requests yet
 
 Button.
 
 - **What it does:** A bin with no requests yet.
 
-### 54. uploads # No requests yet
+### 55. uploads # No requests yet
 
 Button.
 
 - **What it does:** A bin with no requests yet.
 
-### 55. No requests caught yet.
+### 56. No requests caught yet.
 
 Text.
 
@@ -368,20 +376,20 @@ Text.
 
 ## When the data cannot load
 
-### 56. Could not load the HTTP bins. Try again
+### 57. Could not load the HTTP bins. Try again
 
 Message.
 
 - **What it does:** Shown when the bins could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 57. Could not load the HTTP bins.
+### 58. Could not load the HTTP bins.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 58. Try again
+### 59. Try again
 
 Button.
 

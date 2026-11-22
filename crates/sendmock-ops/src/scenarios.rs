@@ -4,6 +4,7 @@
 mod saved_scenario_checks;
 mod saved_scenario_operations;
 mod saved_scenario_wire;
+mod scenario_assertions;
 mod scenario_file;
 mod scenario_operations;
 mod scenario_runner;
@@ -15,9 +16,14 @@ pub use saved_scenario_operations::{
     DeleteSavedScenarioOperation, GetSavedScenarioOperation, ListSavedScenariosOperation,
     SaveScenarioOperation, UpdateSavedScenarioOperation,
 };
+pub(crate) use scenario_file::{ParsedScenario, parse_scenario_file, parse_scenario_value};
 pub use scenario_operations::{
     RunSavedScenarioOperation, RunScenarioOperation, ValidateScenarioOperation,
 };
+pub(crate) use scenario_runner::{build_step_operations, run_parsed_scenario};
+#[cfg(test)]
+pub(crate) use scenario_wire::ScenarioStepResult;
+pub use scenario_wire::{ScenarioReport, ScenarioStepStatus};
 
 use crate::OperationRegistry;
 

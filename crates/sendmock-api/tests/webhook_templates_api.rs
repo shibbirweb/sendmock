@@ -76,7 +76,7 @@ async fn every_builtin_template_renders_against_its_sample_and_a_real_message() 
         .filter(|listed_template| listed_template["source"] == "builtin")
         .collect();
 
-    assert_eq!(builtin_templates.len(), 34);
+    assert_eq!(builtin_templates.len(), 35);
     for builtin_template in builtin_templates {
         let template_id = builtin_template["id"].as_str().unwrap_or_default();
         let first_event = builtin_template["events"][0].as_str().unwrap_or_default();
@@ -131,8 +131,12 @@ async fn a_template_detail_shows_its_shape_and_previews_against_a_chosen_email()
     );
 }
 
+/// The built-in Twilio provider's token, which Twilio templates sign with unless a
+/// `twilio_auth_token` variable is set.
+const TWILIO_AUTH_TOKEN: &str = "twilio-test-token";
+
 #[tokio::test]
-async fn the_twilio_template_signs_its_form_fields() {
+async fn the_twilio_template_signs_its_form_fields_with_the_providers_token() {
     let (app_router, _) = build_test_app();
 
     let render_result = render_template(&app_router, "twilio.inbound_sms", json!({})).await;
@@ -147,7 +151,7 @@ async fn the_twilio_template_signs_its_form_fields() {
     let expected_signature = sign_twilio_request(
         "http://localhost:8000/webhooks/preview",
         &Value::Object(form_fields),
-        "",
+        TWILIO_AUTH_TOKEN,
     );
     assert_eq!(
         render_result["headers"]["X-Twilio-Signature"],

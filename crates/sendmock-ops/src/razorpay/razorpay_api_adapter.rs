@@ -103,8 +103,9 @@ pub async fn answer_razorpay_request(
         request,
         body_fields: read_body_fields(request),
     };
-    let (status, body) = route_razorpay_request(&razorpay_call)
-        .await?
+    let razorpay_answer = route_razorpay_request(&razorpay_call).await?;
+    let is_unknown_path = razorpay_answer.as_ref().err() == Some(&RazorpayError::unknown_url());
+    let (status, body) = razorpay_answer
         .unwrap_or_else(|razorpay_error| (razorpay_error.status, razorpay_error.describe()));
     Ok(Some(ProviderOutcome {
         response: ProviderHttpResponse {
@@ -119,5 +120,6 @@ pub async fn answer_razorpay_request(
         provider_key: Some(RAZORPAY_PROVIDER_KEY.to_owned()),
         created_message: None,
         secret_values: collect_secret_values(&razorpay_call),
+        is_unknown_path,
     }))
 }

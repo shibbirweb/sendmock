@@ -90,8 +90,9 @@ describe("CLI and MCP references (WS-07.5)", () => {
     expect(mcpReference.tools.map((tool) => tool.name).sort()).toEqual(
       [...new Set(catalogueTools)].sort(),
     );
-    // The endpoint secret and the gateway and provider credentials (agents never read secrets).
-    expect(mcpReference.exemptions).toHaveLength(4);
+    // The endpoint secret, the gateway and provider credentials and the Twilio subaccount
+    // token (agents never read secrets).
+    expect(mcpReference.exemptions).toHaveLength(5);
   });
 
   test("WS-07.5 flags follow the naming rules", () => {

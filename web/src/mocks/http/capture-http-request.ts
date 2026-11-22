@@ -98,6 +98,7 @@ export function captureHttpRequest(
     matched_rule_name: null,
     is_simulated_failure: false,
     duration_ms: 0,
+    provider_key: null,
     is_read: false,
     created_at: capturedAt.toISOString(),
   };

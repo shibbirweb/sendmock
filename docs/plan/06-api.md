@@ -73,6 +73,10 @@ CORS: `--cors-origins` (default: the official docs site origin, so the website's
 | GET/POST/PATCH/DELETE | `/numbers` | virtual number registry |
 | GET/POST/PATCH/DELETE | `/outcome-rules/sms` | custom outcome numbers; `POST /outcome-rules/sms/{ruleId}/move` with `up` or `down` reorders |
 | GET/POST/PATCH/DELETE | `/messaging-services` | Twilio-style Messaging Services (sender pools) |
+| GET/POST/PATCH/DELETE | `/twilio/subaccounts`, `/twilio/subaccounts/{accountSid}` | subaccounts of the Twilio provider's main account: name, status (`active`, `suspended`, `closed`), auth token (masked in answers; empty or masked on `PATCH` keeps it) and Debugger webhook URL (A23, SM-19) |
+| GET | `/twilio/subaccounts/{accountSid}/auth-token` | reveal a subaccount's token (UI and CLI only, never MCP) |
+| GET | `/mailgun/complaints` | addresses on each Mailgun sending domain's complaints table; `domain` filters (A23, EM-23) |
+| DELETE | `/mailgun/complaints/{domain}` | clear one domain's complaints table |
 | GET/POST/PATCH/DELETE | `/sms/providers`, `/sms/providers/{providerKey}` | SMS provider definitions, as for email providers ([22](22-configurable-providers.md)) |
 | POST | `/sms/providers/{providerKey}/restore`, `/reset`, `/preview` | as for email providers |
 | GET | `/sms/providers/{providerKey}/credentials/{credentialName}` | reveal one secret credential (UI and CLI only) |
@@ -103,6 +107,8 @@ The Twilio Verify wire API itself (`/v2/Services/...`) is served on the provider
 | DELETE | `/http/requests/{requestId}` | delete one captured request with its uploaded files (A17, UI-14) |
 | GET | `/http/requests/{requestId}/files/{fileIndex}` | download a file uploaded in a multipart request |
 | POST | `/http/requests/{requestId}/forward` | resend a captured request to `{ "url": ... }`; returns the status, duration and body it got |
+| GET | `/provider-bins` | which HTTP Catcher bin answers each provider's unmatched requests: area (`email`, `sms`, `push`, `payments`), provider key, bin (A23, PL-21) |
+| PUT/DELETE | `/provider-bins/{area}/{providerKey}` | send the provider's unmatched requests to `{ "bin_name": ... }` (made if new), or answer them with the provider's `404` again; response rules gain `follow_up` (`url` template or `endpoint_id`, `template_id`, `delay_ms`), captured requests `provider_key`, API log entries `catcher_answer` |
 
 ## Payments
 
@@ -207,6 +213,7 @@ These make SendMock useful from any test framework without polling loops:
 | GET | `/info` | version, uptime, listeners (`provider_address`, `catcher_address`, the catch-all catcher port added in Phase 5, and `pop3_address`, added after 1.0 as A6, each null when off), counts, DB size, `is_container` (true when SendMock runs in Docker, so the UI can default to container hostnames), and `available_operations` (the `operationId`s this binary serves, so the UI shows Not available yet for the rest; added to `AppInfo` in Phase 1, [07](07-ui.md#not-available-yet-stage-b)) |
 | GET | `/updates` | opt-in update check against GitHub Releases for the running channel: the newest version, its date, release notes and the upgrade command for the install method; `409` while `update_check_mode` is `off`, `502` when GitHub cannot be reached |
 | GET | `/health` | liveness for Docker/CI (also `sendmock health` CLI for the Docker HEALTHCHECK) |
+| GET | `/tls/ca` | the local CA (path and PEM) to trust for the HTTPS provider port, 404 when SendMock has none (A23, PL-20) |
 
 ## Projects
 

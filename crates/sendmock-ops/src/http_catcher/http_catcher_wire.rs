@@ -99,6 +99,10 @@ pub struct CapturedHttpRequest {
     pub matched_rule_name: Option<String>,
     pub is_simulated_failure: bool,
     pub duration_ms: u32,
+    /// The provider whose base URL it arrived on (PL-21); null for `/catch/` and the
+    /// catch-all port.
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
+    pub provider_key: Option<String>,
     /// Requests arrive unread; opening one marks it read.
     pub is_read: bool,
     pub created_at: String,

@@ -46,6 +46,8 @@ function buildTwilioProvider(): MessageProviderRecord {
         is_secret: false,
       },
       { name: "auth_token", value: "twilio-test-token", is_secret: true },
+      // Where the main account's Twilio Debugger events go (SM-21.2); empty sends none.
+      { name: "debugger_url", value: "", is_secret: false },
     ],
     operations: [
       {

@@ -34,6 +34,7 @@ Pick one on a webhook endpoint to send events in that service's format, signed a
 | --- | --- | --- | --- |
 | `twilio.inbound_sms` | Twilio: inbound SMS | `sms.inbound` | `twilio_auth_token` |
 | `twilio.status_callback` | Twilio: status callback | `sms.status`, `sms.opened` | `twilio_auth_token` |
+| `twilio.debugger` | Twilio: Debugger event | `sms.status` | `twilio_auth_token` |
 | `vonage.inbound` | Vonage: inbound SMS | `sms.inbound` |  |
 | `vonage.dlr` | Vonage: delivery receipt | `sms.status` |  |
 | `plivo.inbound` | Plivo: inbound message | `sms.inbound`, `sms.status` |  |

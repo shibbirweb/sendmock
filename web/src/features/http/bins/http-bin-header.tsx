@@ -15,6 +15,7 @@ import { useHttpBinActions } from "@/features/http/bins/use-http-bin-actions";
 import { useCatchPortUrl, useCatchUrl } from "@/features/http/use-catch-url";
 import type { useHttpCatcherSearch } from "@/features/http/use-http-catcher-search";
 import type { HttpBin } from "@/lib/api/types";
+import { BinProvidersLine } from "@/features/http/provider-bins/bin-providers-line";
 
 const allBinsValue = "all";
 
@@ -139,6 +140,7 @@ export function HttpBinHeader({
           }}
         />
       )}
+      {selectedBin !== null && <BinProvidersLine binId={selectedBin.id} />}
     </header>
   );
 }

@@ -4,6 +4,7 @@ mod app_stats;
 mod get_health_operation;
 mod get_info_operation;
 mod get_stats_operation;
+mod get_tls_ca_operation;
 mod health_status;
 mod payment_stats;
 
@@ -12,4 +13,5 @@ pub use app_stats::{ActivityBucket, AppStats, CurrencyAmount};
 pub use get_health_operation::GetHealthOperation;
 pub use get_info_operation::GetInfoOperation;
 pub use get_stats_operation::GetStatsOperation;
+pub use get_tls_ca_operation::{GetTlsCaOperation, TlsCertificateAuthority};
 pub use health_status::HealthStatus;

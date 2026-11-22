@@ -2,6 +2,8 @@ import { ExternalLinkIcon, LockIcon } from "lucide-react";
 import type * as React from "react";
 
 import { HttpHeadersList } from "@/components/common/http-headers-list";
+import { isTwilioSignedTemplate } from "@/features/webhooks/twilio-signing/describe-twilio-signing";
+import { TwilioSigningSource } from "@/features/webhooks/twilio-signing/twilio-signing-source";
 import type { WebhookTemplateDetail } from "@/lib/api/types";
 import { isSecretVariableName } from "@/lib/webhooks/validate-webhook-variable";
 
@@ -44,6 +46,11 @@ export function TemplateFacts({
                 ))}
           </span>
         </TemplateFact>
+        {isTwilioSignedTemplate(templateDetail.id) && (
+          <TemplateFact label="Signed with">
+            <TwilioSigningSource />
+          </TemplateFact>
+        )}
         <TemplateFact label="Variables">
           {templateDetail.required_variables.length === 0 ? (
             "None needed"

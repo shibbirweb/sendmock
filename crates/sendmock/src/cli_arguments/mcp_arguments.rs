@@ -15,6 +15,10 @@ pub struct McpArguments {
     #[arg(long, env = "SENDMOCK_MCP_EMBEDDED")]
     pub embedded: bool,
 
+    /// With --embedded, start the services the launcher saved last
+    #[arg(long, requires = "embedded")]
+    pub last: bool,
+
     /// The SendMock to talk to [default: from SENDMOCK_HTTP_ADDR, else http://127.0.0.1:8025]
     #[arg(long, env = "SENDMOCK_SERVER", value_name = "URL")]
     pub server: Option<String>,

@@ -96,6 +96,12 @@ function buildMailgunProvider(): MessageProviderRecord {
         path: "/v3/{domain}/messages",
         request_format: "multipart",
       },
+      {
+        kind: "send",
+        method: "POST",
+        path: "/v3/{domain}/messages.mime",
+        request_format: "multipart",
+      },
     ],
     field_mapping: [
       { part: "from", source: "from" },
@@ -107,6 +113,7 @@ function buildMailgunProvider(): MessageProviderRecord {
       { part: "attachments", source: "attachment" },
       { part: "tags", source: "o:tag" },
       { part: "headers", source: "h:*" },
+      { part: "raw", source: "message.content" },
     ],
     validation_rules: requireParts(["from", "to"]),
     success_response: respondWithJson(

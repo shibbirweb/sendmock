@@ -2,10 +2,17 @@ import type { HttpResponseRule } from "@/lib/api/types";
 import { findFirstFilterError } from "@/lib/webhooks/rule-filter/validate-rule-filter";
 
 export const maxResponseDelayMs = 30_000;
+export const maxFollowUpDelayMs = 600_000;
 
 export type ResponseRuleFieldErrors = Partial<
   Record<
-    "name" | "path_glob" | "filter" | "status_code" | "delay" | "failure",
+    | "name"
+    | "path_glob"
+    | "filter"
+    | "status_code"
+    | "delay"
+    | "failure"
+    | "follow_up",
     string
   >
 >;
@@ -52,6 +59,33 @@ export function validateResponseRule(
   ) {
     fieldErrors.failure = "Use 0 to 100% and a status code from 100 to 599";
   }
+  const followUpError = findFollowUpError(responseRule.follow_up);
+  if (followUpError !== null) {
+    fieldErrors.follow_up = followUpError;
+  }
 
   return fieldErrors;
+}
+
+/** The first problem with a rule's follow-up webhook, as the server checks it (PL-21.4). */
+function findFollowUpError(
+  followUp: HttpResponseRule["follow_up"],
+): string | null {
+  if (followUp === null) {
+    return null;
+  }
+  if (followUp.template_id.trim() === "") {
+    return "Choose a template";
+  }
+  if (followUp.endpoint_id === null && followUp.url.trim() === "") {
+    return "Enter a URL or choose an endpoint";
+  }
+  if (
+    !Number.isInteger(followUp.delay_ms) ||
+    followUp.delay_ms < 0 ||
+    followUp.delay_ms > maxFollowUpDelayMs
+  ) {
+    return "Use 0 to 600,000 ms";
+  }
+  return null;
 }

@@ -155,6 +155,7 @@ async function runStep(
 /** Runs a scenario's steps in order, saving outputs for later steps; stops at the first failure. */
 export async function runScenario(
   scenarioText: string,
+  startingValues: ScenarioValues = {},
 ): Promise<ScenarioReport | { problems: string[] }> {
   const parsedScenario = parseScenarioFile(scenarioText);
   if (parsedScenario.problems.length > 0) {
@@ -163,7 +164,7 @@ export async function runScenario(
     };
   }
   const startedAtMs = Date.now();
-  const scenarioValues: ScenarioValues = {};
+  const scenarioValues: ScenarioValues = { ...startingValues };
   const stepResults: ScenarioStepResult[] = [];
   let hasFailed = false;
   for (const [stepIndex, step] of parsedScenario.steps.entries()) {

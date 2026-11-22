@@ -111,6 +111,34 @@ export type HttpResponseRule = {
    * @example 503
    */
   failure_status_code: number;
+  /**
+   * A webhook sent after the rule answers (PL-21.4); null for none.
+   */
+  follow_up: HttpFollowUpWebhook | null;
+};
+
+/** The webhook a response rule sends after it answers (PL-21.4). */
+export type HttpFollowUpWebhook = {
+  /**
+   * A URL template; empty when an endpoint is chosen.
+   * @example "{{ request.form.StatusCallback }}"
+   */
+  url: string;
+  /**
+   * A webhook endpoint's ID: its URL and retry policy are used instead of `url`.
+   * @example null
+   */
+  endpoint_id: Ulid | null;
+  /**
+   * The webhook template its body and headers render with; vendor templates sign as the vendor does.
+   * @example "twilio.status_callback"
+   */
+  template_id: string;
+  /**
+   * How long after the answer it is sent, in milliseconds (0 to 600,000).
+   * @example 1000
+   */
+  delay_ms: number;
 };
 
 /** Body of POST /api/v1/http/bins/{binId}/responses/preview (HC-02.4). */
@@ -165,6 +193,8 @@ export type CapturedHttpRequest = {
   matched_rule_name: string | null;
   is_simulated_failure: boolean;
   duration_ms: number;
+  /** The provider whose base URL it arrived on (PL-21); null for `/catch/` and the catch-all port. */
+  provider_key: string | null;
   /** Requests arrive unread; opening one marks it read. */
   is_read: boolean;
   created_at: IsoTimestamp;

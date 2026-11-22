@@ -1,6 +1,7 @@
 import type { HttpMethod } from "@/lib/api/types";
 import { inboundEmailTemplateDefinitions } from "@/mocks/fixtures/inbound-email-template-definitions";
 import { paymentTemplateDefinitions } from "@/mocks/fixtures/payment-template-definitions";
+import { twilioDebuggerTemplateDefinitions } from "@/mocks/fixtures/twilio-debugger-template-definitions";
 import { whatsappTemplateDefinitions } from "@/mocks/fixtures/whatsapp-template-definitions";
 
 /** The request a template renders: what the gallery detail and previews show. */
@@ -483,6 +484,7 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
   ...inboundEmailTemplateDefinitions,
   ...paymentTemplateDefinitions,
   ...whatsappTemplateDefinitions,
+  ...twilioDebuggerTemplateDefinitions,
 };
 
 /** The definition for a template, native JSON when it has none of its own. */

@@ -12,12 +12,15 @@ import {
 } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProviderCallbacksTab } from "@/features/providers/provider-callbacks-tab";
+import { UnmatchedRequestsSection } from "@/features/http/provider-bins/unmatched-requests-section";
 import { ProviderGeneralTab } from "@/features/providers/provider-general-tab";
 import { ProviderMappingEditor } from "@/features/providers/provider-mapping-editor";
 import { ProviderOperationsEditor } from "@/features/providers/provider-operations-editor";
 import { ProviderPreviewTab } from "@/features/providers/provider-preview-tab";
 import { ProviderResponsesTab } from "@/features/providers/provider-responses-tab";
 import { ProviderTryItTab } from "@/features/providers/provider-try-it-tab";
+import { MailgunComplaintsTab } from "@/features/providers/mailgun-complaints/mailgun-complaints-tab";
+import { TwilioAccountsTab } from "@/features/providers/twilio-accounts/twilio-accounts-tab";
 import { useMessageProviderForm } from "@/features/providers/use-message-provider-form";
 import type {
   MessageProviderArea,
@@ -25,10 +28,19 @@ import type {
 } from "@/lib/api/types";
 
 type ProviderTab =
-  "general" | "requests" | "responses" | "callbacks" | "preview" | "try-it";
+  | "general"
+  | "accounts"
+  | "complaints"
+  | "requests"
+  | "responses"
+  | "callbacks"
+  | "preview"
+  | "try-it";
 
 const providerTabs: { tab: ProviderTab; label: string }[] = [
   { tab: "general", label: "General" },
+  { tab: "accounts", label: "Accounts" },
+  { tab: "complaints", label: "Complaints" },
   { tab: "requests", label: "Requests" },
   { tab: "responses", label: "Responses" },
   { tab: "callbacks", label: "Callbacks" },
@@ -55,6 +67,17 @@ export function MessageProviderSheet({
     onClose,
   );
   const [openTab, setOpenTab] = React.useState<ProviderTab>("general");
+  // Subaccounts are Twilio's, so only the Twilio SMS provider has an Accounts tab (SM-19.4).
+  const hasAccountsTab =
+    providerArea === "sms" && messageProvider.key === "twilio";
+  // Complaints tables are Mailgun's (EM-23.5).
+  const hasComplaintsTab =
+    providerArea === "email" && messageProvider.key === "mailgun";
+  const shownTabs = providerTabs.filter(
+    ({ tab }) =>
+      (tab !== "accounts" || hasAccountsTab) &&
+      (tab !== "complaints" || hasComplaintsTab),
+  );
   const templateErrorCount = providerForm.templateErrors.length;
 
   return (
@@ -90,7 +113,7 @@ export function MessageProviderSheet({
           >
             <div className="overflow-x-auto px-4">
               <TabsList>
-                {providerTabs.map(({ tab, label }) => (
+                {shownTabs.map(({ tab, label }) => (
                   <TabsTrigger key={tab} value={tab}>
                     {label}
                   </TabsTrigger>
@@ -98,12 +121,31 @@ export function MessageProviderSheet({
               </TabsList>
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
-              <TabsContent value="general" className="max-w-2xl">
+              <TabsContent value="general" className="grid max-w-2xl gap-6">
                 <ProviderGeneralTab
                   providerForm={providerForm}
                   savedCredentials={messageProvider.credentials}
                 />
+                <UnmatchedRequestsSection
+                  providerReference={{
+                    area: messageProvider.area,
+                    providerKey: messageProvider.key,
+                  }}
+                  providerName={messageProvider.name}
+                />
               </TabsContent>
+              {hasComplaintsTab && (
+                <TabsContent value="complaints" className="max-w-2xl">
+                  <MailgunComplaintsTab />
+                </TabsContent>
+              )}
+              {hasAccountsTab && (
+                <TabsContent value="accounts" className="max-w-2xl">
+                  <TwilioAccountsTab
+                    savedCredentials={messageProvider.credentials}
+                  />
+                </TabsContent>
+              )}
               <TabsContent value="requests" className="grid max-w-3xl gap-5">
                 <ProviderOperationsEditor providerForm={providerForm} />
                 <ProviderMappingEditor providerForm={providerForm} />

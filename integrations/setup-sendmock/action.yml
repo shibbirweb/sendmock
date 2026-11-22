@@ -1,0 +1,113 @@
+name: Set up SendMock
+description: Install SendMock, start it with a setup file or URL, wait until it is ready, and optionally run a CI file.
+author: MD. Shibbir Ahmed
+branding:
+  icon: mail
+  color: green
+
+inputs:
+  version:
+    description: A release such as 1.4.0, or latest (the newest stable) or beta.
+    default: latest
+  setup:
+    description: A setup file (TOML, JSON or YAML) or an https:// URL, applied before SendMock reports ready.
+    default: ""
+  http-addr:
+    description: Where the web UI, REST API and MCP listen.
+    default: 127.0.0.1:8025
+  smtp-addr:
+    description: Where the SMTP listener listens.
+    default: 127.0.0.1:1025
+  args:
+    description: More flags for sendmock, such as --provider-addr 127.0.0.1:8026.
+    default: ""
+  ci-file:
+    description: A CI file to run with sendmock ci run once SendMock is ready; empty runs nothing.
+    default: ""
+  junit:
+    description: Where sendmock ci run writes the JUnit report.
+    default: sendmock-report.xml
+
+outputs:
+  http-url:
+    description: SendMock's HTTP address, such as http://127.0.0.1:8025.
+    value: ${{ steps.start.outputs.http-url }}
+  smtp-address:
+    description: SendMock's SMTP address, such as 127.0.0.1:1025.
+    value: ${{ steps.start.outputs.smtp-address }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install SendMock
+      shell: bash
+      env:
+        SENDMOCK_VERSION: ${{ inputs.version }}
+      run: |
+        set -euo pipefail
+        case "$(uname -s)" in
+          Linux) os_part="unknown-linux-musl" ;;
+          Darwin) os_part="apple-darwin" ;;
+          *) echo "This action runs on Linux and macOS runners"; exit 1 ;;
+        esac
+        case "$(uname -m)" in
+          x86_64 | amd64) cpu_part="x86_64" ;;
+          arm64 | aarch64) cpu_part="aarch64" ;;
+          *) echo "No SendMock build for $(uname -m)"; exit 1 ;;
+        esac
+        releases_url="https://github.com/shibbirweb/sendmock/releases"
+        case "$SENDMOCK_VERSION" in
+          latest) download_url="$releases_url/latest/download" ;;
+          beta) download_url="$releases_url/download/beta" ;;
+          *) download_url="$releases_url/download/v${SENDMOCK_VERSION#v}" ;;
+        esac
+        archive_name="sendmock-$cpu_part-$os_part.tar.gz"
+        work_directory="$(mktemp -d)"
+        curl -fsSL --retry 3 -o "$work_directory/$archive_name" "$download_url/$archive_name"
+        curl -fsSL --retry 3 -o "$work_directory/SHA256SUMS" "$download_url/SHA256SUMS"
+        (cd "$work_directory" && grep " $archive_name\$" SHA256SUMS | sha256sum --check --status 2>/dev/null \
+          || grep " $archive_name\$" SHA256SUMS | shasum -a 256 --check --status)
+        install_directory="$RUNNER_TOOL_CACHE/sendmock/bin"
+        mkdir -p "$install_directory"
+        tar -xzf "$work_directory/$archive_name" -C "$work_directory"
+        find "$work_directory" -name sendmock -type f -exec install -m 0755 {} "$install_directory/sendmock" \;
+        echo "$install_directory" >> "$GITHUB_PATH"
+        "$install_directory/sendmock" --version
+
+    - name: Start SendMock
+      id: start
+      shell: bash
+      env:
+        SENDMOCK_SETUP: ${{ inputs.setup }}
+        SENDMOCK_DB: memory
+        SENDMOCK_NO_INPUT: "1"
+        HTTP_ADDR: ${{ inputs.http-addr }}
+        SMTP_ADDR: ${{ inputs.smtp-addr }}
+        EXTRA_ARGS: ${{ inputs.args }}
+      run: |
+        set -euo pipefail
+        ready_file="$RUNNER_TEMP/sendmock-ready.json"
+        # shellcheck disable=SC2086
+        nohup sendmock --ready-json --http-addr "$HTTP_ADDR" --smtp-addr "$SMTP_ADDR" $EXTRA_ARGS \
+          > "$ready_file" 2> "$RUNNER_TEMP/sendmock.log" &
+        for _ in $(seq 1 100); do
+          if grep -q http_addr "$ready_file" 2>/dev/null; then
+            echo "http-url=http://$HTTP_ADDR" >> "$GITHUB_OUTPUT"
+            echo "smtp-address=$SMTP_ADDR" >> "$GITHUB_OUTPUT"
+            echo "SendMock is ready on http://$HTTP_ADDR"
+            exit 0
+          fi
+          sleep 0.2
+        done
+        cat "$RUNNER_TEMP/sendmock.log"
+        echo "SendMock did not report ready"
+        exit 1
+
+    - name: Run the CI file
+      if: inputs.ci-file != ''
+      shell: bash
+      env:
+        CI_FILE: ${{ inputs.ci-file }}
+        JUNIT_PATH: ${{ inputs.junit }}
+        HTTP_URL: ${{ steps.start.outputs.http-url }}
+      run: sendmock ci run "$CI_FILE" --server "$HTTP_URL" --junit "$JUNIT_PATH"

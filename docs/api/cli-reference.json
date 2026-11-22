@@ -149,6 +149,187 @@
       ]
     },
     {
+      "command": "sendmock ci init",
+      "slug": "ci-init",
+      "usage": "sendmock ci init [flags]",
+      "summary": "The setup, a starter CI file and the pipeline job for a CI system, from this instance.",
+      "area": "Automation",
+      "area_slug": "automation",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/ci/init",
+          "operation_id": "postCiInit",
+          "summary": "The setup, a starter CI file and the pipeline job for a CI system, from this instance.",
+          "area_slug": "automation",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--provider",
+          "input": {
+            "name": "provider",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<provider>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "github_actions",
+            "gitlab_ci",
+            "circleci",
+            "bitbucket_pipelines",
+            "azure_pipelines",
+            "jenkins"
+          ],
+          "description": "The CI system to write a job for. `sendmock ci init` finds it from the repository.",
+          "example": "github_actions"
+        },
+        {
+          "flag": "--setup-url",
+          "input": {
+            "name": "setup_url",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<setup-url>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Where the pipeline downloads the setup; the written file's path when null.",
+          "example": null
+        },
+        {
+          "flag": "--app-url",
+          "input": {
+            "name": "app_url",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<app-url>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The app's base URL in the pipeline [default: http://localhost:8000].",
+          "example": "http://localhost:8000"
+        }
+      ],
+      "example": "sendmock ci init --provider github_actions --setup-url null --app-url http://localhost:8000",
+      "output": "CiInitFiles",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_ci_init"
+      ],
+      "ui": [
+        "Settings > Setup > Use in CI"
+      ]
+    },
+    {
+      "command": "sendmock ci run",
+      "slug": "ci-run",
+      "usage": "sendmock ci run <file>",
+      "summary": "Run a CI file's setup and scenarios here and answer the report, with JUnit XML.",
+      "area": "Automation",
+      "area_slug": "automation",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/ci/run",
+          "operation_id": "postCiRun",
+          "summary": "Run a CI file's setup and scenarios here and answer the report, with JUnit XML.",
+          "area_slug": "automation",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "file",
+          "input": {
+            "name": "ci_file",
+            "location": "body"
+          },
+          "type": "path",
+          "allowed_values": null,
+          "description": "A file whose text is sent as `ci_file`: The CI file (`format: sendmock.ci`) in JSON or YAML. A setup or scenario named by a path must be inlined first, as `sendmock ci run` does; URLs are downloaded.",
+          "example": "input.txt",
+          "reads_file": true
+        }
+      ],
+      "flags": [],
+      "example": "sendmock ci run input.txt",
+      "output": "CiReport",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_ci_run"
+      ],
+      "ui": [
+        "Scenarios > CI file > Run"
+      ]
+    },
+    {
+      "command": "sendmock ci validate",
+      "slug": "ci-validate",
+      "usage": "sendmock ci validate <file>",
+      "summary": "Check a CI file and its scenarios without running anything.",
+      "area": "Automation",
+      "area_slug": "automation",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/ci/validate",
+          "operation_id": "postCiValidate",
+          "summary": "Check a CI file and its scenarios without running anything.",
+          "area_slug": "automation",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "file",
+          "input": {
+            "name": "ci_file",
+            "location": "body"
+          },
+          "type": "path",
+          "allowed_values": null,
+          "description": "A file whose text is sent as `ci_file`: The CI file (`format: sendmock.ci`) in JSON or YAML. A setup or scenario named by a path must be inlined first, as `sendmock ci run` does; URLs are downloaded.",
+          "example": "input.txt",
+          "reads_file": true
+        }
+      ],
+      "flags": [],
+      "example": "sendmock ci validate input.txt",
+      "output": "CiValidation",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_ci_validate"
+      ],
+      "ui": [
+        "Scenarios > CI file > Validate"
+      ]
+    },
+    {
       "command": "sendmock email attachments",
       "slug": "email-attachments",
       "usage": "sendmock email attachments <emailId> <attachmentIndex>",
@@ -1854,6 +2035,116 @@
       ]
     },
     {
+      "command": "sendmock email mailgun complaints clear",
+      "slug": "email-mailgun-complaints-clear",
+      "usage": "sendmock email mailgun complaints clear <domain> [flags]",
+      "summary": "Clear a Mailgun domain's complaints, so its addresses get mail again.",
+      "area": "Email",
+      "area_slug": "email",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/mailgun/complaints/{domain}",
+          "operation_id": "deleteMailgunComplaintsByDomain",
+          "summary": "Clear a Mailgun domain's complaints, so its addresses get mail again.",
+          "area_slug": "email",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "domain",
+          "input": {
+            "name": "domain",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "A Mailgun sending domain, as in `/v3/{domain}/messages`.",
+          "example": "mg.shop.test",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--yes",
+          "input": null,
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Confirms a destructive command; without it the command stops.",
+          "example": true
+        }
+      ],
+      "example": "sendmock email mailgun complaints clear mg.shop.test --yes",
+      "output": null,
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_email_mailgun_complaint_clear"
+      ],
+      "ui": [
+        "Mail > Providers > Mailgun > Complaints > Clear"
+      ]
+    },
+    {
+      "command": "sendmock email mailgun complaints list",
+      "slug": "email-mailgun-complaints-list",
+      "usage": "sendmock email mailgun complaints list [flags]",
+      "summary": "Addresses on each Mailgun domain's complaints table.",
+      "area": "Email",
+      "area_slug": "email",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/mailgun/complaints",
+          "operation_id": "getMailgunComplaints",
+          "summary": "Addresses on each Mailgun domain's complaints table.",
+          "area_slug": "email",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--domain",
+          "input": {
+            "name": "domain",
+            "location": "query"
+          },
+          "type": "string",
+          "value_label": "<domain>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Only this sending domain's complaints.",
+          "example": "mg.shop.test"
+        }
+      ],
+      "example": "sendmock email mailgun complaints list --domain mg.shop.test",
+      "output": "MailgunComplaint[]",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_email_mailgun_complaint_list"
+      ],
+      "ui": [
+        "Mail > Providers > Mailgun > Complaints"
+      ]
+    },
+    {
       "command": "sendmock email mime",
       "slug": "email-mime",
       "usage": "sendmock email mime <emailId>",
@@ -2239,7 +2530,7 @@
           },
           "type": "string",
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio",
           "reads_file": false
         },
@@ -2310,7 +2601,7 @@
           },
           "type": "string",
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio",
           "reads_file": false
         }
@@ -2405,7 +2696,7 @@
           },
           "type": "string",
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio",
           "reads_file": false
         }
@@ -2562,7 +2853,7 @@
           },
           "type": "string",
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio",
           "reads_file": false
         }
@@ -2610,7 +2901,7 @@
           },
           "type": "string",
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio",
           "reads_file": false
         }
@@ -2658,7 +2949,7 @@
           },
           "type": "string",
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio",
           "reads_file": false
         }
@@ -2706,7 +2997,7 @@
           },
           "type": "string",
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio",
           "reads_file": false
         }
@@ -5058,6 +5349,188 @@
       ]
     },
     {
+      "command": "sendmock http provider-bin attach",
+      "slug": "http-provider-bin-attach",
+      "usage": "sendmock http provider-bin attach <area> <providerKey> [flags]",
+      "summary": "Send a provider's unmatched requests to an HTTP Catcher bin, made if new.",
+      "area": "HTTP Catcher",
+      "area_slug": "http-catcher",
+      "operations": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/provider-bins/{area}/{providerKey}",
+          "operation_id": "putProviderBinsByAreaByProviderKey",
+          "summary": "Send a provider's unmatched requests to an HTTP Catcher bin, made if new.",
+          "area_slug": "http-catcher",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "area",
+          "input": {
+            "name": "area",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "Where the provider lives: `email`, `sms`, `push` or `payments`.",
+          "example": "sms",
+          "reads_file": false
+        },
+        {
+          "name": "providerKey",
+          "input": {
+            "name": "providerKey",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
+          "example": "twilio",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--bin-name",
+          "input": {
+            "name": "bin_name",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<bin-name>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The bin's name; a bin of that name is made when there is none.",
+          "example": "twilio-gaps"
+        }
+      ],
+      "example": "sendmock http provider-bin attach sms twilio --bin-name twilio-gaps",
+      "output": "ProviderBin",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_http_provider_bin_attach"
+      ],
+      "ui": [
+        "Mail, SMS or Payments > provider > General > Unmatched requests"
+      ]
+    },
+    {
+      "command": "sendmock http provider-bin detach",
+      "slug": "http-provider-bin-detach",
+      "usage": "sendmock http provider-bin detach <area> <providerKey> [flags]",
+      "summary": "Answer a provider's unmatched requests with its 404 again; the bin stays.",
+      "area": "HTTP Catcher",
+      "area_slug": "http-catcher",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/provider-bins/{area}/{providerKey}",
+          "operation_id": "deleteProviderBinsByAreaByProviderKey",
+          "summary": "Answer a provider's unmatched requests with its 404 again; the bin stays.",
+          "area_slug": "http-catcher",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "area",
+          "input": {
+            "name": "area",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "Where the provider lives: `email`, `sms`, `push` or `payments`.",
+          "example": "sms",
+          "reads_file": false
+        },
+        {
+          "name": "providerKey",
+          "input": {
+            "name": "providerKey",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
+          "example": "twilio",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--yes",
+          "input": null,
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Confirms a destructive command; without it the command stops.",
+          "example": true
+        }
+      ],
+      "example": "sendmock http provider-bin detach sms twilio --yes",
+      "output": null,
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_http_provider_bin_detach"
+      ],
+      "ui": [
+        "HTTP Catcher > bin > Detach"
+      ]
+    },
+    {
+      "command": "sendmock http provider-bin list",
+      "slug": "http-provider-bin-list",
+      "usage": "sendmock http provider-bin list",
+      "summary": "Which HTTP Catcher bin answers each provider's unmatched requests.",
+      "area": "HTTP Catcher",
+      "area_slug": "http-catcher",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/provider-bins",
+          "operation_id": "getProviderBins",
+          "summary": "Which HTTP Catcher bin answers each provider's unmatched requests.",
+          "area_slug": "http-catcher",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [],
+      "example": "sendmock http provider-bin list",
+      "output": "ProviderBin[]",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_http_provider_bin_list"
+      ],
+      "ui": [
+        "HTTP Catcher > bin > Answers unmatched requests for"
+      ]
+    },
+    {
       "command": "sendmock http response list",
       "slug": "http-response-list",
       "usage": "sendmock http response list <binId>",
@@ -5172,7 +5645,13 @@
             "delay_min_ms": 0,
             "delay_max_ms": 500,
             "failure_rate_percent": 10,
-            "failure_status_code": 503
+            "failure_status_code": 503,
+            "follow_up": {
+              "url": "{{ request.form.StatusCallback }}",
+              "endpoint_id": null,
+              "template_id": "twilio.status_callback",
+              "delay_ms": 1000
+            }
           }
         },
         {
@@ -5191,7 +5670,7 @@
           "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
         }
       ],
-      "example": "sendmock http response preview 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --rule '{\"id\":\"01JB7T9Q2R5W8X3Y6Z1A4B7C9D\",\"name\":\"Rate limit the push API\",\"is_enabled\":true,\"method\":\"POST\",\"path_glob\":\"/v1/*\",\"filter\":{\"all\":[null]},\"response\":{\"status_code\":200,\"headers\":{\"Content-Type\":\"application/json\"},\"body\":\"{\\\"ok\\\": true}\"},\"delay_min_ms\":0,\"delay_max_ms\":500,\"failure_rate_percent\":10,\"failure_status_code\":503}' --request-id 01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+      "example": "sendmock http response preview 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --rule '{\"id\":\"01JB7T9Q2R5W8X3Y6Z1A4B7C9D\",\"name\":\"Rate limit the push API\",\"is_enabled\":true,\"method\":\"POST\",\"path_glob\":\"/v1/*\",\"filter\":{\"all\":[null]},\"response\":{\"status_code\":200,\"headers\":{\"Content-Type\":\"application/json\"},\"body\":\"{\\\"ok\\\": true}\"},\"delay_min_ms\":0,\"delay_max_ms\":500,\"failure_rate_percent\":10,\"failure_status_code\":503,\"follow_up\":{\"url\":\"{{ request.form.StatusCallback }}\",\"endpoint_id\":null,\"template_id\":\"twilio.status_callback\",\"delay_ms\":1000}}' --request-id 01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
       "output": "HttpRulePreviewResult",
       "exit_codes": [
         0,
@@ -15768,7 +16247,7 @@
           },
           "type": "string",
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio",
           "reads_file": false
         },
@@ -15839,7 +16318,7 @@
           },
           "type": "string",
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio",
           "reads_file": false
         }
@@ -15934,7 +16413,7 @@
           },
           "type": "string",
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio",
           "reads_file": false
         }
@@ -16091,7 +16570,7 @@
           },
           "type": "string",
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio",
           "reads_file": false
         }
@@ -16139,7 +16618,7 @@
           },
           "type": "string",
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio",
           "reads_file": false
         }
@@ -16187,7 +16666,7 @@
           },
           "type": "string",
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio",
           "reads_file": false
         }
@@ -16235,7 +16714,7 @@
           },
           "type": "string",
           "allowed_values": null,
-          "description": "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+          "description": "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
           "example": "twilio",
           "reads_file": false
         }
@@ -17435,6 +17914,386 @@
       ]
     },
     {
+      "command": "sendmock sms twilio subaccounts create",
+      "slug": "sms-twilio-subaccounts-create",
+      "usage": "sendmock sms twilio subaccounts create [flags]",
+      "summary": "Add a Twilio subaccount with its own auth token.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/twilio/subaccounts",
+          "operation_id": "postTwilioSubaccounts",
+          "summary": "Add a Twilio subaccount with its own auth token.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--account-sid",
+          "input": {
+            "name": "account_sid",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<account-sid>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "`AC` and 32 hex digits; null makes a new one.",
+          "example": null
+        },
+        {
+          "flag": "--friendly-name",
+          "input": {
+            "name": "friendly_name",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<friendly-name>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "A name for the subaccount.",
+          "example": "Acme Clinic"
+        },
+        {
+          "flag": "--status",
+          "input": {
+            "name": "status",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<status>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "active",
+            "suspended",
+            "closed"
+          ],
+          "description": "Defaults to `active`.",
+          "example": "active"
+        },
+        {
+          "flag": "--auth-token",
+          "input": {
+            "name": "auth_token",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<auth-token>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The subaccount's auth token. Null, empty or the masked value keeps the stored token; a new subaccount without one gets a generated token.",
+          "example": null
+        },
+        {
+          "flag": "--debugger-url",
+          "input": {
+            "name": "debugger_url",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<debugger-url>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Where Twilio Debugger events for this subaccount are sent; null for none.",
+          "example": null
+        }
+      ],
+      "example": "sendmock sms twilio subaccounts create --friendly-name 'Acme Clinic' --account-sid null --status active",
+      "output": "TwilioSubaccount",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_twilio_subaccount_create"
+      ],
+      "ui": [
+        "SMS > Providers > Twilio > Accounts > Add subaccount"
+      ]
+    },
+    {
+      "command": "sendmock sms twilio subaccounts delete",
+      "slug": "sms-twilio-subaccounts-delete",
+      "usage": "sendmock sms twilio subaccounts delete <accountSid> [flags]",
+      "summary": "Remove a Twilio subaccount; its messages stay.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/twilio/subaccounts/{accountSid}",
+          "operation_id": "deleteTwilioSubaccountsByAccountSid",
+          "summary": "Remove a Twilio subaccount; its messages stay.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "accountSid",
+          "input": {
+            "name": "accountSid",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "A Twilio subaccount SID: `AC` and 32 hex digits.",
+          "example": "AC33333333333333333333333333333333",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--yes",
+          "input": null,
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Confirms a destructive command; without it the command stops.",
+          "example": true
+        }
+      ],
+      "example": "sendmock sms twilio subaccounts delete AC33333333333333333333333333333333 --yes",
+      "output": null,
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_twilio_subaccount_delete"
+      ],
+      "ui": [
+        "SMS > Providers > Twilio > Accounts > Remove"
+      ]
+    },
+    {
+      "command": "sendmock sms twilio subaccounts list",
+      "slug": "sms-twilio-subaccounts-list",
+      "usage": "sendmock sms twilio subaccounts list",
+      "summary": "Subaccounts of the Twilio provider's main account, tokens masked.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/twilio/subaccounts",
+          "operation_id": "getTwilioSubaccounts",
+          "summary": "Subaccounts of the Twilio provider's main account, tokens masked.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [],
+      "example": "sendmock sms twilio subaccounts list",
+      "output": "TwilioSubaccount[]",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_twilio_subaccount_list"
+      ],
+      "ui": [
+        "SMS > Providers > Twilio > Accounts"
+      ]
+    },
+    {
+      "command": "sendmock sms twilio subaccounts token",
+      "slug": "sms-twilio-subaccounts-token",
+      "usage": "sendmock sms twilio subaccounts token <accountSid> --reveal",
+      "summary": "Reveal a subaccount's auth token (asked for after a confirmation).",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/twilio/subaccounts/{accountSid}/auth-token",
+          "operation_id": "getTwilioSubaccountsByAccountSidAuthToken",
+          "summary": "Reveal a subaccount's auth token (asked for after a confirmation).",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "accountSid",
+          "input": {
+            "name": "accountSid",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "A Twilio subaccount SID: `AC` and 32 hex digits.",
+          "example": "AC33333333333333333333333333333333",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--reveal",
+          "input": null,
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Prints the secret in plain text instead of masked.",
+          "example": true
+        }
+      ],
+      "example": "sendmock sms twilio subaccounts token AC33333333333333333333333333333333 --reveal",
+      "output": "TwilioSubaccountTokenReveal",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [],
+      "ui": [
+        "SMS > Providers > Twilio > Accounts > Reveal"
+      ]
+    },
+    {
+      "command": "sendmock sms twilio subaccounts update",
+      "slug": "sms-twilio-subaccounts-update",
+      "usage": "sendmock sms twilio subaccounts update <accountSid> [flags]",
+      "summary": "Change a Twilio subaccount's name, status, token or Debugger URL.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/twilio/subaccounts/{accountSid}",
+          "operation_id": "patchTwilioSubaccountsByAccountSid",
+          "summary": "Change a Twilio subaccount's name, status, token or Debugger URL.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "accountSid",
+          "input": {
+            "name": "accountSid",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "A Twilio subaccount SID: `AC` and 32 hex digits.",
+          "example": "AC33333333333333333333333333333333",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--friendly-name",
+          "input": {
+            "name": "friendly_name",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<friendly-name>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "A name for the subaccount.",
+          "example": "Acme Clinic"
+        },
+        {
+          "flag": "--status",
+          "input": {
+            "name": "status",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<status>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "active",
+            "suspended",
+            "closed"
+          ],
+          "description": "Defaults to `active`.",
+          "example": "active"
+        },
+        {
+          "flag": "--auth-token",
+          "input": {
+            "name": "auth_token",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<auth-token>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The subaccount's auth token. Null, empty or the masked value keeps the stored token; a new subaccount without one gets a generated token.",
+          "example": null
+        },
+        {
+          "flag": "--debugger-url",
+          "input": {
+            "name": "debugger_url",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<debugger-url>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Where Twilio Debugger events for this subaccount are sent; null for none.",
+          "example": null
+        }
+      ],
+      "example": "sendmock sms twilio subaccounts update AC33333333333333333333333333333333 --friendly-name 'Acme Clinic' --status active --auth-token null",
+      "output": "TwilioSubaccount",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_twilio_subaccount_update"
+      ],
+      "ui": [
+        "SMS > Providers > Twilio > Accounts > Edit"
+      ]
+    },
+    {
       "command": "sendmock sms wait",
       "slug": "sms-wait",
       "usage": "sendmock sms wait [flags]",
@@ -17666,6 +18525,41 @@
       ],
       "ui": [
         "Settings > About"
+      ]
+    },
+    {
+      "command": "sendmock tls ca",
+      "slug": "tls-ca",
+      "usage": "sendmock tls ca",
+      "summary": "The local CA to trust for the HTTPS provider port.",
+      "area": "System",
+      "area_slug": "system",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/tls/ca",
+          "operation_id": "getTlsCa",
+          "summary": "The local CA to trust for the HTTPS provider port.",
+          "area_slug": "system",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [],
+      "example": "sendmock tls ca",
+      "output": "TlsCertificateAuthority",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_tls_ca"
+      ],
+      "ui": [
+        "Settings > Connection > Provider APIs over HTTPS > Download the CA"
       ]
     },
     {
@@ -21845,6 +22739,188 @@
       ],
       "ui": [
         "Mail, SMS, HTTP > Send to webhook; Webhooks > Composer > Send"
+      ]
+    },
+    {
+      "command": "sendmock webhook signature verify",
+      "slug": "webhook-signature-verify",
+      "usage": "sendmock webhook signature verify [flags]",
+      "summary": "Check a captured request's webhook signature: Standard Webhooks, Stripe or an HMAC header.",
+      "area": "Webhook deliveries",
+      "area_slug": "webhook-deliveries",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/webhooks/signatures/verify",
+          "operation_id": "postWebhooksSignaturesVerify",
+          "summary": "Check a captured request's webhook signature: Standard Webhooks, Stripe or an HMAC header.",
+          "area_slug": "webhook-deliveries",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--scheme",
+          "input": {
+            "name": "scheme",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<scheme>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "standard_webhooks",
+            "stripe",
+            "hmac"
+          ],
+          "description": "`standard_webhooks`, `stripe` or `hmac`.",
+          "example": "standard_webhooks"
+        },
+        {
+          "flag": "--secret",
+          "input": {
+            "name": "secret",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<secret>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The signing secret the app checks with; never logged.",
+          "example": "whsec_c2VuZG1vY2stdGVzdC1rZXktMDAwMQ=="
+        },
+        {
+          "flag": "--request-id",
+          "input": {
+            "name": "request_id",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<request-id>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "A captured request's ID, from an HTTP Catcher bin; or give `headers` and `body`.",
+          "example": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        },
+        {
+          "flag": "--headers",
+          "input": {
+            "name": "headers",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<headers>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "The request's headers, when no `request_id` is given.",
+          "example": {
+            "webhook-id": "msg_2b7Q",
+            "webhook-timestamp": "1767225600",
+            "webhook-signature": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4="
+          }
+        },
+        {
+          "flag": "--body",
+          "input": {
+            "name": "body",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<body>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The request's raw body, exactly as sent, when no `request_id` is given.",
+          "example": "{\"type\":\"order.paid\",\"data\":{\"order_id\":\"1042\"}}"
+        },
+        {
+          "flag": "--header",
+          "input": {
+            "name": "header",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<header>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "For `hmac`: the header holding the digest [default: X-Signature].",
+          "example": "X-Hub-Signature-256"
+        },
+        {
+          "flag": "--encoding",
+          "input": {
+            "name": "encoding",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<encoding>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "hex",
+            "base64"
+          ],
+          "description": "For `hmac`: how the digest is written, as hex digits or in Base 64 [default: hex].",
+          "example": "hex"
+        },
+        {
+          "flag": "--prefix",
+          "input": {
+            "name": "prefix",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<prefix>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "For `hmac`: text before the digest, such as `sha256=` [default: none].",
+          "example": "sha256="
+        },
+        {
+          "flag": "--tolerance-seconds",
+          "input": {
+            "name": "tolerance_seconds",
+            "location": "body"
+          },
+          "type": "number",
+          "value_label": "<tolerance-seconds>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "How far a signed timestamp may be from now, in seconds [default: 300].",
+          "example": 300
+        }
+      ],
+      "example": "sendmock webhook signature verify --scheme standard_webhooks --secret whsec_c2VuZG1vY2stdGVzdC1rZXktMDAwMQ== --body '{\"type\":\"order.paid\",\"data\":{\"order_id\":\"1042\"}}' --header X-Hub-Signature-256",
+      "output": "SignatureVerification",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_webhook_signature_verify"
+      ],
+      "ui": [
+        "HTTP Catcher > request > Verify signature"
       ]
     },
     {

@@ -7,7 +7,7 @@ use crate::{Database, StoreError};
 
 const REQUEST_SELECT: &str = "SELECT r.id, r.bin_id, b.name, r.method, r.url, r.path, r.query_json, r.headers_json, r.body, \
      r.content_type, r.client_ip, r.response_status, r.response_headers_json, r.response_body, r.matched_rule_id, \
-     r.matched_rule_name, r.is_simulated_failure, r.duration_ms, r.created_at, r.is_read \
+     r.matched_rule_name, r.is_simulated_failure, r.duration_ms, r.created_at, r.is_read, r.provider_key \
      FROM http_captured_requests r JOIN http_bins b ON b.id = r.bin_id";
 
 fn read_request_row(row: &Row<'_>) -> rusqlite::Result<CapturedRequestRecord> {
@@ -32,6 +32,7 @@ fn read_request_row(row: &Row<'_>) -> rusqlite::Result<CapturedRequestRecord> {
         duration_ms: row.get(17)?,
         created_at_unix_ms: row.get(18)?,
         is_read: row.get(19)?,
+        provider_key: row.get(20)?,
         files: Vec::new(),
     })
 }
@@ -64,13 +65,13 @@ fn insert_request_rows(
 ) -> rusqlite::Result<()> {
     connection.execute(
         "INSERT INTO http_captured_requests (id, bin_id, method, url, path, query_json, headers_json, body, content_type, client_ip, \
-         response_status, response_headers_json, response_body, matched_rule_id, matched_rule_name, is_simulated_failure, duration_ms, created_at) \
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18)",
+         response_status, response_headers_json, response_body, matched_rule_id, matched_rule_name, is_simulated_failure, duration_ms, created_at, provider_key) \
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19)",
         params![
             request.request_id, request.bin_id, request.method, request.url, request.path, request.query_json,
             request.headers_json, request.body, request.content_type, request.client_ip, request.response_status,
             request.response_headers_json, request.response_body, request.matched_rule_id, request.matched_rule_name,
-            request.is_simulated_failure, request.duration_ms, request.created_at_unix_ms,
+            request.is_simulated_failure, request.duration_ms, request.created_at_unix_ms, request.provider_key,
         ],
     )?;
     for captured_file in &request.files {

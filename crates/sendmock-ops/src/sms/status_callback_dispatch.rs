@@ -15,7 +15,7 @@ async fn claim_due_attempt(
     due_attempt: SmsCallbackAttemptRecord,
     now_unix_ms: i64,
 ) -> Result<Option<SmsCallbackAttemptRecord>, OperationError> {
-    let attempt_repository = &operation_context.sms_callback_attempt_repository;
+    let attempt_repository = &operation_context.sms_delivery_stores.callback_attempts;
     if due_attempt.status == "pending" {
         let was_claimed = attempt_repository
             .start_pending_attempt(&due_attempt.attempt_id)
@@ -51,7 +51,8 @@ pub async fn run_due_status_callbacks(
 ) -> Result<usize, OperationError> {
     let now_unix_ms = operation_context.clock.now_unix_ms();
     let due_attempts = operation_context
-        .sms_callback_attempt_repository
+        .sms_delivery_stores
+        .callback_attempts
         .list_due_attempts(now_unix_ms, max_concurrent_callbacks)
         .await?;
     let mut send_tasks = tokio::task::JoinSet::new();
@@ -79,7 +80,7 @@ pub async fn run_status_callback_dispatcher(
     operation_context: OperationContext,
     max_concurrent_callbacks: u32,
 ) {
-    let attempt_repository = &operation_context.sms_callback_attempt_repository;
+    let attempt_repository = &operation_context.sms_delivery_stores.callback_attempts;
     if let Err(requeue_error) = attempt_repository
         .requeue_in_flight(operation_context.clock.now_unix_ms())
         .await

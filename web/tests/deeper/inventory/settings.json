@@ -69,7 +69,13 @@
       "textbox: Passphrase",
       "paragraph: Only for a file exported with encrypted secrets.",
       "button: Preview",
-      "button: Import"
+      "button: Import",
+      "heading: Use in CI",
+      "paragraph: Run your webhook tests in a pipeline: the setup, a starter CI file and the job, filled in for your CI system. sendmock ci init writes the same files.",
+      "combobox: CI system",
+      "textbox: Setup URL",
+      "paragraph: Where the pipeline downloads the setup; empty commits the file instead.",
+      "button: Show the files"
     ],
     "Projects section": [
       "heading: Projects",
@@ -289,6 +295,9 @@
       "each item, link: …",
       "each item, button: Copy the … base URL",
       "heading: SMS",
+      "heading: Provider APIs over HTTPS",
+      "paragraph: For SDKs that only speak HTTPS, such as Laravel's mailgun mailer. Trust SendMock's local CA once, then point the SDK at this address.",
+      "paragraph: Off. Start SendMock with --provider-tls-addr #.#.#.#:# to serve the provider APIs over HTTPS.",
       "heading: AI agents",
       "paragraph: Let Claude Code, Codex, Cursor, Gemini CLI or VS Code drive SendMock through MCP and the agent skill.",
       "combobox: AI agent",

@@ -71,6 +71,7 @@ pub async fn answer_mailgun_routes_request(
         provider_key: Some(MAILGUN_PROVIDER_KEY.to_owned()),
         created_message: None,
         secret_values: read_api_key(request).into_iter().collect(),
+        is_unknown_path: false,
     }))
 }
 

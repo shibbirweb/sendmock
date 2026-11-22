@@ -40,6 +40,8 @@ clap = { version = "4", features = [
     "env",
     "string",
 ] }
+# The interactive launcher's questions (PL-22); no editor or password prompts.
+dialoguer = { version = "0.12", default-features = false }
 dirs = "7"
 flate2 = { version = "1", default-features = false, features = [
     "rust_backend",

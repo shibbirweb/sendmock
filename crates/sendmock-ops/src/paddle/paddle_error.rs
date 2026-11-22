@@ -17,6 +17,11 @@ impl PaddleError {
         }
     }
 
+    /// A path Paddle does not serve.
+    pub fn unknown_path() -> Self {
+        Self::new(404, "not_found", "The requested URL was not found")
+    }
+
     pub fn authentication_missing() -> Self {
         Self::new(
             401,
