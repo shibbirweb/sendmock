@@ -248,7 +248,7 @@ async fn a_rule_queues_a_signed_follow_up_webhook_to_the_url_in_the_request_afte
     })
     .unwrap_or_default();
     assert_eq!(
-        rendered["headers"]["X-Twilio-Signature"],
+        rendered["headers"]["x-twilio-signature"],
         sign_twilio_request(STATUS_CALLBACK_URL, &form_fields, "twilio-test-token")
     );
 }
