@@ -251,6 +251,8 @@
       "paragraph: email.opened and sms.opened stand in for the recipient reading the message.",
       "paragraph: Opening an email or scrolling an SMS into view counts as the recipient reading it.",
       "switch: Fire opened events when I view messages",
+      "paragraph: Off: viewing an email a rule would send email.opened for is not counted, so browsing never tells your app a customer read it. The viewer offers Count as an open.",
+      "switch: Count views your webhook rules would report",
       "radio: First open only One event per message, like most providers report.",
       "radio: Every open An event each time, for testing open counters."
     ],

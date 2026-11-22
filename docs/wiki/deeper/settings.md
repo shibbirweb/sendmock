@@ -1495,13 +1495,26 @@ Switch.
 - **What it does:** Fires `email.opened` and `sms.opened` when you look at a message in SendMock.
 - **Same action elsewhere:** REST [`PATCH /api/v1/settings`](/api/system/#patchSettings), CLI [`sendmock settings set`](/cli/system/#settings-set), MCP [`sendmock_settings_update`](/mcp/system/#sendmock_settings_update)
 
-### 235. First open only One event per message, like most providers report.
+### 235. Off: viewing an email a rule would send email.opened for is not counted, so browsing never tells your app a customer read it. The viewer offers Count as an open.
+
+Text.
+
+- **What it does:** Explains Count views your webhook rules would report.
+
+### 236. Count views your webhook rules would report
+
+Switch.
+
+- **What it does:** On: viewing an email counts as an open even when a webhook rule would send `email.opened` to your app. Off by default.
+- **Same action elsewhere:** REST [`PATCH /api/v1/settings`](/api/system/#patchSettings), CLI [`sendmock settings set`](/cli/system/#settings-set), MCP [`sendmock_settings_update`](/mcp/system/#sendmock_settings_update)
+
+### 237. First open only One event per message, like most providers report.
 
 Choice.
 
 - **What it does:** One opened event per message.
 
-### 236. Every open An event each time, for testing open counters.
+### 238. Every open An event each time, for testing open counters.
 
 Choice.
 
@@ -1509,61 +1522,61 @@ Choice.
 
 ## Chaos section
 
-### 237. Chaos
+### 239. Chaos
 
 Heading.
 
 - **What it does:** SMTP failures on purpose.
 
-### 238. Make SMTP fail on purpose to test retries and error handling. SMS failures use the failure rate in SMS settings.
+### 240. Make SMTP fail on purpose to test retries and error handling. SMS failures use the failure rate in SMS settings.
 
 Text.
 
 - **What it does:** Explains chaos.
 
-### 239. Reject the next
+### 241. Reject the next
 
 Number field.
 
 - **What it does:** How many of the next messages are refused.
 
-### 240. Counts down as messages arrive. # turns it off.
+### 242. Counts down as messages arrive. # turns it off.
 
 Text.
 
 - **What it does:** Explains the countdown.
 
-### 241. With code
+### 243. With code
 
 Drop-down.
 
 - **What it does:** The SMTP code they are refused with, such as 421 or 554.
 
-### 242. Reject recipients matching
+### 244. Reject recipients matching
 
 Field.
 
 - **What it does:** A glob of recipients refused with 550.
 
-### 243. Glob; matching recipients get # No such user. Leave empty to turn it off.
+### 245. Glob; matching recipients get # No such user. Leave empty to turn it off.
 
 Text.
 
 - **What it does:** Explains the recipient glob.
 
-### 244. Latency per SMTP command
+### 246. Latency per SMTP command
 
 Number field.
 
 - **What it does:** A delay before each SMTP reply.
 
-### 245. The client sees the connection close mid-message and nothing is stored.
+### 247. The client sees the connection close mid-message and nothing is stored.
 
 Text.
 
 - **What it does:** Explains dropping the connection.
 
-### 246. Drop the connection during DATA
+### 248. Drop the connection during DATA
 
 Switch.
 
@@ -1571,50 +1584,50 @@ Switch.
 
 ## OTP patterns section
 
-### 247. OTP patterns
+### 249. OTP patterns
 
 Heading.
 
 - **What it does:** How one-time codes are found.
 - **Links to:** [Advanced: OTP patterns](../advanced/otp-patterns.md).
 
-### 248. Tried in order on every new email and SMS; the first capture group of the first match is the code.
+### 250. Tried in order on every new email and SMS; the first capture group of the first match is the code.
 
 Text.
 
 - **What it does:** Explains the patterns.
 
-### 249. Pattern #
+### 251. Pattern #
 
 Field, in each row.
 
 - **What it does:** A regular expression; its first capture group is the code.
 
-### 250. Remove pattern #
+### 252. Remove pattern #
 
 Button, in each row.
 
 - **What it does:** Removes the pattern.
 
-### 251. Add pattern
+### 253. Add pattern
 
 Button.
 
 - **What it does:** Adds a pattern.
 
-### 252. Restore defaults
+### 254. Restore defaults
 
 Button.
 
 - **What it does:** Brings back the built-in patterns.
 
-### 253. Try a message
+### 255. Try a message
 
 Field.
 
 - **What it does:** Text to try the patterns on.
 
-### 254. Pattern # found #
+### 256. Pattern # found #
 
 Text.
 
@@ -1622,141 +1635,141 @@ Text.
 
 ## Connection section
 
-### 255. Connect your app
+### 257. Connect your app
 
 Heading.
 
 - **What it does:** Snippets for pointing your app at SendMock.
 
-### 256. Point your app at SendMock. Provider SDKs are below, under Provider APIs; recipes are in the docs.
+### 258. Point your app at SendMock. Provider SDKs are below, under Provider APIs; recipes are in the docs.
 
 Text.
 
 - **What it does:** Explains the section.
 - **Links to:** [Connect your app](../connect/index.md).
 
-### 257. Language
+### 259. Language
 
 Drop-down.
 
 - **What it does:** The language or framework of the snippets.
 
-### 258. Where does your app run?
+### 260. Where does your app run?
 
 Drop-down.
 
 - **What it does:** This machine, a container reaching the host, or the same Compose project; shared with the empty states.
 - **Same action elsewhere:** REST [`GET /api/v1/info`](/api/system/#getInfo), CLI [`sendmock status`](/cli/system/#status), MCP [`sendmock_status`](/mcp/system/#sendmock_status)
 
-### 259. SMTP
+### 261. SMTP
 
 Heading.
 
 - **What it does:** The SMTP snippet for the chosen language.
 
-### 260. Copy SMTP snippet
+### 262. Copy SMTP snippet
 
 Button.
 
 - **What it does:** Copies the snippet.
 
-### 261. Email API
+### 263. Email API
 
 Heading.
 
 - **What it does:** The Email API snippet for the chosen language.
 
-### 262. Copy Email API snippet
+### 264. Copy Email API snippet
 
 Button.
 
 - **What it does:** Copies the snippet.
 
-### 263. SMS API
+### 265. SMS API
 
 Heading.
 
 - **What it does:** The SMS API snippet for the chosen language.
 
-### 264. Copy SMS API snippet
+### 266. Copy SMS API snippet
 
 Button.
 
 - **What it does:** Copies the snippet.
 
-### 265. HTTP Catcher (point Slack, push or other webhooks here)
+### 267. HTTP Catcher (point Slack, push or other webhooks here)
 
 Heading.
 
 - **What it does:** The HTTP Catcher (point Slack, push or other webhooks here) snippet for the chosen language.
 
-### 266. Copy HTTP Catcher (point Slack, push or other webhooks here) snippet
+### 268. Copy HTTP Catcher (point Slack, push or other webhooks here) snippet
 
 Button.
 
 - **What it does:** Copies the snippet.
 
-### 267. Mailgun SDK
+### 269. Mailgun SDK
 
 Heading.
 
 - **What it does:** The Mailgun SDK snippet for the chosen language.
 
-### 268. Copy Mailgun SDK snippet
+### 270. Copy Mailgun SDK snippet
 
 Button.
 
 - **What it does:** Copies the snippet.
 
-### 269. Twilio SDK
+### 271. Twilio SDK
 
 Heading.
 
 - **What it does:** The Twilio SDK snippet for the chosen language.
 
-### 270. Copy Twilio SDK snippet
+### 272. Copy Twilio SDK snippet
 
 Button.
 
 - **What it does:** Copies the snippet.
 
-### 271. Provider APIs
+### 273. Provider APIs
 
 Heading.
 
 - **What it does:** Base URLs to give the providers' SDKs.
 
-### 272. Point a provider's SDK at SendMock: use this base URL, or the real path on the provider port (#.#.#.#:#). Change, remove or add providers in Mail > Providers and SMS > Providers.
+### 274. Point a provider's SDK at SendMock: use this base URL, or the real path on the provider port (#.#.#.#:#). Change, remove or add providers in Mail > Providers and SMS > Providers.
 
 Text.
 
 - **What it does:** Explains the base URLs and the provider port.
 
-### 273. Email
+### 275. Email
 
 Heading.
 
 - **What it does:** The email providers' base URLs.
 
-### 274. …
+### 276. …
 
 Link, in each row.
 
 - **What it does:** A provider's name; opens it in Mail > Providers or SMS > Providers.
 
-### 275. Copy the … base URL
+### 277. Copy the … base URL
 
 Button, in each row.
 
 - **What it does:** Copies the provider's base URL.
 
-### 276. SMS
+### 278. SMS
 
 Heading.
 
 - **What it does:** The SMS providers' base URLs.
 
-### 277. Provider APIs over HTTPS
+### 279. Provider APIs over HTTPS
 
 Heading.
 
@@ -1764,81 +1777,81 @@ Heading.
 - **Links to:** [HTTPS for provider SDKs](../connect/https.md).
 - **Same action elsewhere:** REST [`GET /api/v1/tls/ca`](/api/system/#getTlsCa), CLI [`sendmock tls ca`](/cli/system/#tls-ca), MCP [`sendmock_tls_ca`](/mcp/system/#sendmock_tls_ca)
 
-### 278. For SDKs that only speak HTTPS, such as Laravel's mailgun mailer. Trust SendMock's local CA once, then point the SDK at this address.
+### 280. For SDKs that only speak HTTPS, such as Laravel's mailgun mailer. Trust SendMock's local CA once, then point the SDK at this address.
 
 Text.
 
 - **What it does:** Explains when to use the HTTPS address.
 
-### 279. Off. Start SendMock with --provider-tls-addr #.#.#.#:# to serve the provider APIs over HTTPS.
+### 281. Off. Start SendMock with --provider-tls-addr #.#.#.#:# to serve the provider APIs over HTTPS.
 
 Text.
 
 - **What it does:** Shown while HTTPS is off; names the flag that turns it on.
 
-### 280. AI agents
+### 282. AI agents
 
 Heading.
 
 - **What it does:** Setting up an AI coding agent.
 - **Links to:** [AI](../ai/index.md).
 
-### 281. Let Claude Code, Codex, Cursor, Gemini CLI or VS Code drive SendMock through MCP and the agent skill.
+### 283. Let Claude Code, Codex, Cursor, Gemini CLI or VS Code drive SendMock through MCP and the agent skill.
 
 Text.
 
 - **What it does:** Explains the section.
 
-### 282. AI agent
+### 284. AI agent
 
 Drop-down.
 
 - **What it does:** The agent to set up.
 - **Same action elsewhere:** REST [`GET /api/v1/ai/agents`](/api/automation/#getAiAgents), CLI [`sendmock ai install`](/cli/automation/#ai-install), MCP [`sendmock_ai_agents`](/mcp/automation/#sendmock_ai_agents)
 
-### 283. Installed
+### 285. Installed
 
 Choice.
 
 - **What it does:** Shows the commands for an installed SendMock: the agent starts `sendmock mcp`.
 
-### 284. npx (no install)
+### 286. npx (no install)
 
 Choice.
 
 - **What it does:** Shows the commands for SendMock run through npx with nothing installed: the agent starts `npx -y sendmock mcp`, and the install command is `npx sendmock ai install`, which writes that form by itself.
 
-### 285. Install command
+### 287. Install command
 
 Heading.
 
 - **What it does:** The command that sets the agent up.
 
-### 286. Copy install command
+### 288. Copy install command
 
 Button.
 
 - **What it does:** Copies `sendmock ai install` for the chosen agent.
 
-### 287. MCP configuration
+### 289. MCP configuration
 
 Heading.
 
 - **What it does:** The MCP configuration, to add by hand instead.
 
-### 288. Copy mcp configuration
+### 290. Copy mcp configuration
 
 Button.
 
 - **What it does:** Copies the MCP configuration.
 
-### 289. The install command writes the configuration to claude mcp add sendmock -- sendmock mcp and the skill to .claude/skills/sendmock/ , after showing what it will change.
+### 291. The install command writes the configuration to claude mcp add sendmock -- sendmock mcp and the skill to .claude/skills/sendmock/ , after showing what it will change.
 
 Text.
 
 - **What it does:** Says what the install command writes for the chosen agent (here Claude Code).
 
-### 290. Download the skill
+### 292. Download the skill
 
 Link.
 
@@ -1847,98 +1860,98 @@ Link.
 
 ## About section
 
-### 291. About SendMock
+### 293. About SendMock
 
 Heading.
 
 - **What it does:** The version and channel of the running SendMock.
 - **Same action elsewhere:** REST [`GET /api/v1/info`](/api/system/#getInfo), CLI [`sendmock status`](/cli/system/#status), MCP [`sendmock_status`](/mcp/system/#sendmock_status)
 
-### 292. Help and feedback
+### 294. Help and feedback
 
 Heading.
 
 - **What it does:** The help links, as in the Help menu.
 
-### 293. Issue forms open on GitHub with your version, channel, OS and browser filled in; nothing you captured is sent.
+### 295. Issue forms open on GitHub with your version, channel, OS and browser filled in; nothing you captured is sent.
 
 Text.
 
 - **What it does:** Explains what the issue forms carry.
 
-### 294. Documentation
+### 296. Documentation
 
 Link.
 
 - **What it does:** Opens the docs in a new tab.
 
-### 295. Keyboard shortcuts
+### 297. Keyboard shortcuts
 
 Button.
 
 - **What it does:** Opens the list of keyboard shortcuts.
 
-### 296. What's new
+### 298. What's new
 
 Link.
 
 - **What it does:** Opens the changelog.
 
-### 297. Report an issue
+### 299. Report an issue
 
 Link.
 
 - **What it does:** Opens GitHub's bug report form, filled in.
 
-### 298. Request a feature
+### 300. Request a feature
 
 Link.
 
 - **What it does:** Opens GitHub's feature request form, filled in.
 
-### 299. Report a security issue
+### 301. Report a security issue
 
 Link.
 
 - **What it does:** Opens GitHub's private security report form.
 
-### 300. Star on GitHub
+### 302. Star on GitHub
 
 Link.
 
 - **What it does:** Opens the repository.
 
-### 301. Updates
+### 303. Updates
 
 Heading.
 
 - **What it does:** Whether SendMock looks for new releases.
 
-### 302. Off by default: SendMock never calls out unless you choose Manual or Daily. Stable installs are offered stable releases; beta installs betas and stables.
+### 304. Off by default: SendMock never calls out unless you choose Manual or Daily. Stable installs are offered stable releases; beta installs betas and stables.
 
 Text.
 
 - **What it does:** Explains the update check.
 
-### 303. Off SendMock never calls out.
+### 305. Off SendMock never calls out.
 
 Choice.
 
 - **What it does:** Never checks.
 
-### 304. Manual Only when you press Check for updates.
+### 306. Manual Only when you press Check for updates.
 
 Choice.
 
 - **What it does:** Checks only when you ask.
 
-### 305. Daily On start and once a day; a new version shows in the notifications.
+### 307. Daily On start and once a day; a new version shows in the notifications.
 
 Choice.
 
 - **What it does:** Checks on start and once a day.
 
-### 306. Check for updates
+### 308. Check for updates
 
 Button.
 
@@ -1947,14 +1960,14 @@ Button.
 
 ## AI agents through npx
 
-### 307. Nothing to install: the agent starts SendMock with npx -y sendmock mcp , which needs Node.js. On Windows, if the agent cannot start npx, use cmd /c npx -y sendmock mcp .
+### 309. Nothing to install: the agent starts SendMock with npx -y sendmock mcp , which needs Node.js. On Windows, if the agent cannot start npx, use cmd /c npx -y sendmock mcp .
 
 Text.
 
 - **What it does:** Explains the npx form and the Windows workaround.
 - **Links to:** [Install: npx (no install)](../install.md#npx-no-install).
 
-### 308. The install command writes the configuration to claude mcp add sendmock -- npx -y sendmock mcp and the skill to .claude/skills/sendmock/ , after showing what it will change.
+### 310. The install command writes the configuration to claude mcp add sendmock -- npx -y sendmock mcp and the skill to .claude/skills/sendmock/ , after showing what it will change.
 
 Text.
 
@@ -1962,25 +1975,25 @@ Text.
 
 ## Delete all emails dialog
 
-### 309. Delete all emails?
+### 311. Delete all emails?
 
 Heading.
 
 - **What it does:** The confirmation before deleting every email.
 
-### 310. Every captured email, its attachments and its SMTP session link are removed. Configuration stays.
+### 312. Every captured email, its attachments and its SMTP session link are removed. Configuration stays.
 
 Text.
 
 - **What it does:** Says what is deleted.
 
-### 311. Cancel
+### 313. Cancel
 
 Button.
 
 - **What it does:** Closes the confirmation without doing anything.
 
-### 312. Delete all emails
+### 314. Delete all emails
 
 Button.
 
@@ -1989,25 +2002,25 @@ Button.
 
 ## Delete all SMS dialog
 
-### 313. Delete all SMS?
+### 315. Delete all SMS?
 
 Heading.
 
 - **What it does:** The confirmation before deleting every SMS.
 
-### 314. Every captured SMS and WhatsApp message is removed. Numbers and services stay.
+### 316. Every captured SMS and WhatsApp message is removed. Numbers and services stay.
 
 Text.
 
 - **What it does:** Says what is deleted.
 
-### 315. Cancel
+### 317. Cancel
 
 Button.
 
 - **What it does:** Closes the confirmation without doing anything.
 
-### 316. Delete all SMS
+### 318. Delete all SMS
 
 Button.
 
@@ -2016,25 +2029,25 @@ Button.
 
 ## Reset to seed dialog
 
-### 317. Reset to seed?
+### 319. Reset to seed?
 
 Heading.
 
 - **What it does:** The confirmation before a reset.
 
-### 318. All traffic is wiped and the configuration goes back to the seed file. Changes not exported to the seed are lost.
+### 320. All traffic is wiped and the configuration goes back to the seed file. Changes not exported to the seed are lost.
 
 Text.
 
 - **What it does:** Says what a reset does.
 
-### 319. Cancel
+### 321. Cancel
 
 Button.
 
 - **What it does:** Closes the confirmation without doing anything.
 
-### 320. Reset
+### 322. Reset
 
 Button.
 
@@ -2043,20 +2056,20 @@ Button.
 
 ## When the data cannot load
 
-### 321. Could not load the settings. Try again
+### 323. Could not load the settings. Try again
 
 Message.
 
 - **What it does:** Shown when the settings could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 322. Could not load the settings.
+### 324. Could not load the settings.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 323. Try again
+### 325. Try again
 
 Button.
 
