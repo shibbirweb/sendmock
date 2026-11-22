@@ -40,10 +40,15 @@ export function selectDependabotPullRequests(
     .map((pullRequest) => `#${pullRequest.number} ${pullRequest.title}`);
 }
 
+/**
+ * The alerts open on develop, the branch every release is prepared from: an alert fixed there
+ * but still open on main until the promotion must not stop the release that ships its fix.
+ */
+export const releasedBranchAlertsPath =
+  "/code-scanning/alerts?state=open&ref=refs/heads/develop&per_page=100";
+
 async function fetchCodeScanningAlerts(): Promise<string[]> {
-  const openAlerts = await fetchGitHubJson<CodeScanningAlert[]>(
-    "/code-scanning/alerts?state=open&ref=refs/heads/main&per_page=100",
-  );
+  const openAlerts = await fetchGitHubJson<CodeScanningAlert[]>(releasedBranchAlertsPath);
   return openAlerts.map(
     (alert) =>
       `#${alert.number} ${alert.rule.id} in ${alert.most_recent_instance.location.path}`,

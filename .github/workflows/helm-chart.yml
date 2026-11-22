@@ -5,10 +5,6 @@ name: Helm chart
 
 on:
   pull_request:
-    paths:
-      - packaging/helm/**
-      - Dockerfile
-      - .github/workflows/helm-chart.yml
   push:
     branches:
       - develop
@@ -33,20 +29,46 @@ env:
     --set resources.requests.memory=64Mi
 
 jobs:
-  chart:
-    name: Lint, render and install on kind
+  changes:
+    name: Changed paths
     runs-on: ubuntu-latest
+    outputs:
+      is_affected: ${{ steps.changed-paths.outputs.is_affected }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            .github/actions
+            scripts/ci
 
-      - uses: azure/setup-helm@v5
+      - id: changed-paths
+        uses: ./.github/actions/changed-paths
+        with:
+          run-every-job: ${{ github.event_name != 'pull_request' }}
+          paths: |
+            packaging/helm/**
+            Dockerfile
+            .github/workflows/helm-chart.yml
 
-      - name: Lint with the defaults and with every option
+  chart:
+    name: Lint, render and install on kind
+    needs: changes
+    runs-on: ubuntu-latest
+    steps:
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/checkout@v7
+
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: azure/setup-helm@v5
+
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Lint with the defaults and with every option
         run: |
           helm lint "$CHART"
           helm lint "$CHART" $EVERY_OPTION
 
-      - name: Render with every option
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Render with every option
         run: |
           helm template sendmock "$CHART" $EVERY_OPTION > rendered.yaml
           for expected in "kind: PersistentVolumeClaim" "kind: Ingress" "SENDMOCK_PROVIDER_ADDR" \
@@ -54,9 +76,11 @@ jobs:
             grep -q "$expected" rendered.yaml || { echo "::error::rendered chart lacks $expected"; exit 1; }
           done
 
-      - uses: docker/setup-buildx-action@v4
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: docker/setup-buildx-action@v4
 
-      - name: Build the image from this commit
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Build the image from this commit
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -65,19 +89,23 @@ jobs:
           cache-from: type=gha,scope=amd64
           cache-to: type=gha,mode=max,scope=helm-chart
 
-      - uses: helm/kind-action@v1
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: helm/kind-action@v1
 
-      - name: The rendered chart is valid for the cluster's API
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: The rendered chart is valid for the cluster's API
         run: kubectl apply --dry-run=server -f rendered.yaml
 
-      - name: Install the chart with persistence
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Install the chart with persistence
         run: |
           kind load docker-image sendmock:chart-test --name chart-testing
           helm install sendmock "$CHART" --wait --timeout 3m \
             --set image.repository=sendmock --set image.tag=chart-test \
             --set image.pullPolicy=Never --set persistence.enabled=true
 
-      - name: Healthy, and an email over SMTP is caught
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Healthy, and an email over SMTP is caught
         run: |
           kubectl port-forward service/sendmock 8025:8025 1025:1025 > port-forward.log 2>&1 &
           for _ in $(seq 1 30); do
@@ -91,5 +119,24 @@ jobs:
           test "$email_count" = "1"
 
       - name: Pod log
-        if: failure()
+        if: ${{ (failure()) && needs.changes.outputs.is_affected == 'true' }}
         run: kubectl logs deployment/sendmock --tail=100 || true
+
+  # A required check like every job above: it fails unless each job passed or was skipped.
+  passed:
+    name: Helm chart passed
+    if: always()
+    needs:
+      - changes
+      - chart
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job passed or was skipped
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          failed_jobs="$(echo "$JOB_RESULTS" | jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | "\(.key): \(.value.result)"')"
+          if [ -n "$failed_jobs" ]; then
+            echo "::error::Not every job passed: $failed_jobs"
+            exit 1
+          fi

@@ -7,14 +7,6 @@ name: Email provider SDKs
 
 on:
   pull_request:
-    paths:
-      - crates/sendmock-ops/src/providers/**
-      - crates/sendmock-ops/src/email/**
-      - crates/sendmock-ops/builtin/**
-      - crates/sendmock-mail/**
-      - examples/email-providers/**
-      - .github/actions/**
-      - .github/workflows/email-provider-sdks.yml
   push:
     branches:
       - develop
@@ -29,23 +21,62 @@ on:
       - .github/workflows/email-provider-sdks.yml
   workflow_dispatch:
   workflow_call:
+    inputs:
+      run_every_job:
+        description: Run every job without reading the pull request's changes (a calling workflow decides)
+        type: boolean
+        default: true
+      skip_every_job:
+        description: Report every job with its steps skipped, when the calling workflow has nothing to do
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      is_affected: ${{ steps.changed-paths.outputs.is_affected }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            .github/actions
+            scripts/ci
+
+      - id: changed-paths
+        uses: ./.github/actions/changed-paths
+        with:
+          run-every-job: ${{ github.event_name != 'pull_request' || inputs.run_every_job == true }}
+          skip-every-job: ${{ inputs.skip_every_job == true }}
+          paths: |
+            crates/sendmock-ops/src/providers/**
+            crates/sendmock-ops/src/email/**
+            crates/sendmock-ops/builtin/**
+            crates/sendmock-mail/**
+            examples/email-providers/**
+            .github/actions/**
+            .github/workflows/email-provider-sdks.yml
+
   sdks:
     name: Six email provider SDKs offline
+    needs: changes
     runs-on: ubuntu-latest
     env:
       SENDMOCK_URL: http://127.0.0.1:8025
       SENDMOCK_PROVIDER_URL: http://127.0.0.1:8026
     steps:
-      - uses: actions/checkout@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/checkout@v7
 
-      - uses: oven-sh/setup-bun@v2
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: oven-sh/setup-bun@v2
 
-      - name: Live UI the binary embeds
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Live UI the binary embeds
         working-directory: web
         env:
           VITE_API_MODE: live
@@ -53,45 +84,74 @@ jobs:
           bun install --frozen-lockfile
           bun run build
 
-      - name: Toolchain from rust-toolchain.toml
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Toolchain from rust-toolchain.toml
         run: rustup toolchain install
 
-      - uses: Swatinem/rust-cache@v2
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: Swatinem/rust-cache@v2
         with:
           save-if: ${{ github.event_name != 'pull_request' }}
 
-      - name: Release build
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Release build
         run: cargo build --release --locked -p sendmock
 
-      - uses: ./.github/actions/start-sendmock-offline
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: ./.github/actions/start-sendmock-offline
         with:
           extra-args: --provider-tls-addr 127.0.0.1:8027
 
-      - uses: actions/setup-node@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/setup-node@v7
         with:
           node-version: "22"
 
-      - name: Send with SendGrid, Mailgun, Postmark, Resend, SES v2 and Brevo SDKs
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Send with SendGrid, Mailgun, Postmark, Resend, SES v2 and Brevo SDKs
         working-directory: examples/email-providers/node
         run: bun install && node done-when.js
 
-      - uses: shivammathur/setup-php@v2
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
           tools: composer
 
       # AC: EM-23.6
-      - name: Mailgun PHP SDK reads events and manages complaints
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Mailgun PHP SDK reads events and manages complaints
         working-directory: examples/email-providers/php-mailgun
         run: composer install --no-interaction --quiet && php send-and-verify.php
 
       # AC: PL-20.5
-      - name: Laravel's mailgun mailer sends over HTTPS with the local CA trusted
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Laravel's mailgun mailer sends over HTTPS with the local CA trusted
         working-directory: examples/email-providers/php-laravel-mailgun-https
         run: ./send-over-https-test.sh
 
-      - uses: ./.github/actions/check-sendmock-offline
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: ./.github/actions/check-sendmock-offline
 
       - name: SendMock log
-        if: failure()
+        if: ${{ (failure()) && needs.changes.outputs.is_affected == 'true' }}
         run: cat sendmock.log
+
+  # A required check like every job above: it fails unless each job passed or was skipped.
+  passed:
+    name: Email provider SDKs passed
+    if: always()
+    needs:
+      - changes
+      - sdks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job passed or was skipped
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          failed_jobs="$(echo "$JOB_RESULTS" | jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | "\(.key): \(.value.result)"')"
+          if [ -n "$failed_jobs" ]; then
+            echo "::error::Not every job passed: $failed_jobs"
+            exit 1
+          fi

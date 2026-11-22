@@ -23,12 +23,6 @@ on:
   push:
     branches: [develop]
   pull_request:
-    paths:
-      - Dockerfile
-      - .dockerignore
-      - .github/workflows/docker-edge.yml
-      - scripts/docker-image-test.sh
-      - scripts/docker-published-check.sh
 
 permissions:
   contents: read
@@ -46,9 +40,33 @@ env:
   RELEASE_CHANNEL: ${{ inputs.channel || 'edge' }}
 
 jobs:
+  changes:
+    name: Changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      is_affected: ${{ steps.changed-paths.outputs.is_affected }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            .github/actions
+            scripts/ci
+
+      - id: changed-paths
+        uses: ./.github/actions/changed-paths
+        with:
+          run-every-job: ${{ github.event_name != 'pull_request' }}
+          paths: |
+            Dockerfile
+            .dockerignore
+            .github/workflows/docker-edge.yml
+            scripts/docker-image-test.sh
+            scripts/docker-published-check.sh
+
   image:
     name: Image for ${{ matrix.platform }} (${{ matrix.variant }})
-    runs-on: ${{ matrix.runner }}
+    needs: changes
+    runs-on: ${{ needs.changes.outputs.is_affected == 'true' && matrix.runner || 'ubuntu-latest' }}
     permissions:
       contents: read
       packages: write
@@ -61,13 +79,16 @@ jobs:
           - { platform: linux/amd64, architecture: amd64, runner: ubuntu-latest, variant: debug, build_target: debug }
           - { platform: linux/arm64, architecture: arm64, runner: ubuntu-24.04-arm, variant: debug, build_target: debug }
     steps:
-      - uses: actions/checkout@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.commit_sha || github.sha }}
 
-      - uses: docker/setup-buildx-action@v4
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: docker/setup-buildx-action@v4
 
-      - name: Build for testing
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Build for testing
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -79,11 +100,12 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.architecture }}
           cache-to: type=gha,mode=max,scope=${{ matrix.architecture }}
 
-      - name: Non-root, data in /data, healthy, the notice, mounted config and templates, a clean stop and the size
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Non-root, data in /data, healthy, the notice, mounted config and templates, a clean stop and the size
         run: scripts/docker-image-test.sh sendmock:test ${{ matrix.variant }}
 
       - name: Log in to GHCR
-        if: env.IS_PUBLISHING == 'true'
+        if: ${{ (env.IS_PUBLISHING == 'true') && needs.changes.outputs.is_affected == 'true' }}
         uses: docker/login-action@v4
         with:
           registry: ghcr.io
@@ -91,7 +113,7 @@ jobs:
           password: ${{ github.token }}
 
       - name: Push by digest, with an SBOM and provenance
-        if: env.IS_PUBLISHING == 'true'
+        if: ${{ (env.IS_PUBLISHING == 'true') && needs.changes.outputs.is_affected == 'true' }}
         id: push
         uses: docker/build-push-action@v7
         with:
@@ -105,7 +127,7 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.architecture }}
 
       - name: Keep the digest for the manifest
-        if: env.IS_PUBLISHING == 'true'
+        if: ${{ (env.IS_PUBLISHING == 'true') && needs.changes.outputs.is_affected == 'true' }}
         env:
           IMAGE_DIGEST: ${{ steps.push.outputs.digest }}
         run: |
@@ -113,7 +135,7 @@ jobs:
           touch "$RUNNER_TEMP/digests/${IMAGE_DIGEST#sha256:}"
 
       - uses: actions/upload-artifact@v7
-        if: env.IS_PUBLISHING == 'true'
+        if: ${{ (env.IS_PUBLISHING == 'true') && needs.changes.outputs.is_affected == 'true' }}
         with:
           name: digest-${{ matrix.variant }}-${{ matrix.architecture }}
           path: ${{ runner.temp }}/digests/*
@@ -124,24 +146,28 @@ jobs:
   # here, then checked by the same script the manifest job runs after a real push.
   publish-rehearsal:
     name: Signed, with an SBOM and provenance, under 25 MB (rehearsal on a local registry)
+    needs: changes
     if: inputs.image_tags == ''
     runs-on: ubuntu-latest
     services:
       registry:
-        image: registry:2
+        image: ${{ needs.changes.outputs.is_affected == 'true' && 'registry:2' || '' }}
         ports:
           - 5000:5000
     env:
       REHEARSAL_IMAGE: localhost:5000/sendmock
     steps:
-      - uses: actions/checkout@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/checkout@v7
 
       # The builder shares the runner's network, so it reaches the registry on localhost.
-      - uses: docker/setup-buildx-action@v4
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: docker/setup-buildx-action@v4
         with:
           driver-opts: network=host
 
-      - name: Push by digest, with an SBOM and provenance
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Push by digest, with an SBOM and provenance
         id: push
         uses: docker/build-push-action@v7
         with:
@@ -153,14 +179,17 @@ jobs:
           provenance: mode=max
           cache-from: type=gha,scope=amd64
 
-      - name: The tag, as the manifest job makes it
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: The tag, as the manifest job makes it
         env:
           IMAGE_DIGEST: ${{ steps.push.outputs.digest }}
         run: docker buildx imagetools create -t "$REHEARSAL_IMAGE:rehearsal" "$REHEARSAL_IMAGE@$IMAGE_DIGEST"
 
-      - uses: sigstore/cosign-installer@v3
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: sigstore/cosign-installer@v3
 
-      - name: Sign it with a key made in this job
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Sign it with a key made in this job
         id: sign
         env:
           COSIGN_PASSWORD: ""
@@ -171,7 +200,8 @@ jobs:
           cosign sign --yes --key cosign.key --tlog-upload=false "$REHEARSAL_IMAGE@$manifest_digest"
 
       # AC: DS-02.5
-      - name: The tag is signed, carries an SBOM and provenance, and is under 25 MB
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: The tag is signed, carries an SBOM and provenance, and is under 25 MB
         env:
           MANIFEST_DIGEST: ${{ steps.sign.outputs.manifest_digest }}
           EXPECTED_PLATFORMS: linux/amd64
@@ -181,7 +211,7 @@ jobs:
   manifest:
     name: Tag, sign and check it (${{ matrix.variant }})
     if: inputs.image_tags != ''
-    needs: image
+    needs: [changes, image]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -195,26 +225,30 @@ jobs:
       HAS_DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN != '' }}
       TAG_SUFFIX: ${{ matrix.variant == 'debug' && '-debug' || '' }}
     steps:
-      - uses: actions/checkout@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.commit_sha || github.sha }}
 
-      - uses: actions/download-artifact@v8
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/download-artifact@v8
         with:
           pattern: digest-${{ matrix.variant }}-*
           path: ${{ runner.temp }}/digests
           merge-multiple: true
 
-      - uses: docker/setup-buildx-action@v4
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: docker/setup-buildx-action@v4
 
-      - uses: docker/login-action@v4
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
       - name: Log in to Docker Hub
-        if: env.HAS_DOCKERHUB_TOKEN == 'true'
+        if: ${{ (env.HAS_DOCKERHUB_TOKEN == 'true') && needs.changes.outputs.is_affected == 'true' }}
         uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -224,13 +258,14 @@ jobs:
       # breaks `docker pull` for everyone, so it is created public first. Its overview page is
       # packaging/docker/README.md.
       - name: The Docker Hub repository exists and is public
-        if: env.HAS_DOCKERHUB_TOKEN == 'true'
+        if: ${{ (env.HAS_DOCKERHUB_TOKEN == 'true') && needs.changes.outputs.is_affected == 'true' }}
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: bash scripts/docker-hub-repository.sh "${DOCKERHUB_IMAGE#docker.io/}" packaging/docker/README.md
 
-      - name: The tags for both platforms
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: The tags for both platforms
         working-directory: ${{ runner.temp }}/digests
         run: |
           tags=()
@@ -240,9 +275,11 @@ jobs:
           done
           docker buildx imagetools create "${tags[@]}" $(printf "$GHCR_IMAGE@sha256:%s " *)
 
-      - uses: sigstore/cosign-installer@v3
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: sigstore/cosign-installer@v3
 
-      - name: Sign it without a stored key (GitHub OIDC)
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Sign it without a stored key (GitHub OIDC)
         id: sign
         run: |
           first_tag="${IMAGE_TAGS%% *}$TAG_SUFFIX"
@@ -252,7 +289,29 @@ jobs:
           if [ "$HAS_DOCKERHUB_TOKEN" = "true" ]; then cosign sign --yes "$DOCKERHUB_IMAGE@$manifest_digest"; fi
 
       # AC: DS-02.5
-      - name: Every tag is signed by this workflow, carries an SBOM and provenance, and is under 25 MB
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Every tag is signed by this workflow, carries an SBOM and provenance, and is under 25 MB
         env:
           MANIFEST_DIGEST: ${{ steps.sign.outputs.manifest_digest }}
         run: bash scripts/docker-published-check.sh "$GHCR_IMAGE" "$MANIFEST_DIGEST" "$IMAGE_TAGS" "$TAG_SUFFIX"
+
+  # A required check like every job above: it fails unless each job passed or was skipped.
+  passed:
+    name: Docker image passed
+    if: always()
+    needs:
+      - changes
+      - image
+      - publish-rehearsal
+      - manifest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job passed or was skipped
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          failed_jobs="$(echo "$JOB_RESULTS" | jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | "\(.key): \(.value.result)"')"
+          if [ -n "$failed_jobs" ]; then
+            echo "::error::Not every job passed: $failed_jobs"
+            exit 1
+          fi

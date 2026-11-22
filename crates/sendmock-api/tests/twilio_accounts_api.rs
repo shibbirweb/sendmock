@@ -80,7 +80,11 @@ async fn create_subaccount_over_the_provider_port(
         Some(&main_auth()),
     )
     .await;
-    assert_eq!(status, 201, "{created_account}");
+    // The answer holds the new account's auth token, so a failure prints nothing from it.
+    assert_eq!(
+        status, 201,
+        "creating the subaccount {friendly_name} failed"
+    );
     created_account
 }
 

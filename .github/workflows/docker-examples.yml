@@ -17,25 +17,46 @@ on:
         type: string
         default: ""
   pull_request:
-    paths:
-      - Dockerfile
-      - examples/docker/**
-      - docs/wiki/connect/docker.md
-      - .github/workflows/docker-examples.yml
 
 permissions:
   contents: read
 
 jobs:
-  compose:
-    name: The Compose example
+  changes:
+    name: Changed paths
     runs-on: ubuntu-latest
+    outputs:
+      is_affected: ${{ steps.changed-paths.outputs.is_affected }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            .github/actions
+            scripts/ci
 
-      - uses: docker/setup-buildx-action@v4
+      - id: changed-paths
+        uses: ./.github/actions/changed-paths
+        with:
+          run-every-job: ${{ github.event_name != 'pull_request' }}
+          paths: |
+            Dockerfile
+            examples/docker/**
+            docs/wiki/connect/docker.md
+            .github/workflows/docker-examples.yml
 
-      - name: The image from this commit, under the name the example uses
+  compose:
+    name: The Compose example
+    needs: changes
+    runs-on: ubuntu-latest
+    steps:
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/checkout@v7
+
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: docker/setup-buildx-action@v4
+
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: The image from this commit, under the name the example uses
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -44,7 +65,8 @@ jobs:
           cache-from: type=gha,scope=amd64
 
       # AC: DS-02.6
-      - name: The app waits for SendMock's health check, then its email and SMS are read back
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: The app waits for SendMock's health check, then its email and SMS are read back
         working-directory: examples/docker
         run: |
           # Failures are written as annotations, which the public checks API shows without the log.
@@ -69,17 +91,19 @@ jobs:
 
   service-container:
     name: SendMock as a service container
+    needs: changes
     if: inputs.image != ''
     runs-on: ubuntu-latest
     services:
       sendmock:
-        image: ${{ inputs.image }}
+        image: ${{ needs.changes.outputs.is_affected == 'true' && inputs.image || '' }}
         ports:
           - 1025:1025
           - 8025:8025
     steps:
       # AC: DS-02.6
-      - name: The runner waited for the health check, so mail sent right away is read back
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: The runner waited for the health check, so mail sent right away is read back
         env:
           MAIL_HOST: 127.0.0.1
           MAIL_PORT: 1025
@@ -87,3 +111,23 @@ jobs:
           printf 'From: ci@example.test\r\nTo: user@example.com\r\nSubject: From a service container\r\n\r\nHello.\r\n' > message.eml
           curl -fsS "smtp://$MAIL_HOST:$MAIL_PORT" --mail-from ci@example.test --mail-rcpt user@example.com -T message.eml
           curl -fsS "http://127.0.0.1:8025/api/v1/wait/email?to=user@example.com&timeout=10s" | jq -e '.subject == "From a service container"'
+
+  # A required check like every job above: it fails unless each job passed or was skipped.
+  passed:
+    name: Docker examples passed
+    if: always()
+    needs:
+      - changes
+      - compose
+      - service-container
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job passed or was skipped
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          failed_jobs="$(echo "$JOB_RESULTS" | jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | "\(.key): \(.value.result)"')"
+          if [ -n "$failed_jobs" ]; then
+            echo "::error::Not every job passed: $failed_jobs"
+            exit 1
+          fi

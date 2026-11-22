@@ -79,7 +79,11 @@ describe("Docker Desktop extension", () => {
     expect(releaseJobs["docker-extension"]?.if).toBe(
       "inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')",
     );
-    expect(releaseJobs["docker-extension"]?.needs).toEqual(["plan", "docker"]);
+    expect(releaseJobs["docker-extension"]?.needs).toEqual([
+      "changes",
+      "plan",
+      "docker",
+    ]);
     expect(composeText).toMatch(/image: ghcr\.io\/shibbirweb\/sendmock$/m);
     expect(releaseWorkflowText).toContain(
       "image: ghcr.io/shibbirweb/sendmock:$VERSION",
