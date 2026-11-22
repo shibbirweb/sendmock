@@ -184,12 +184,13 @@ fn find_route_clash(
         })
 }
 
+/// A part may be read from several sources (Mailgun's user variables come from `v:*` and
+/// `X-Mailgun-Variables`); only the same part from the same source twice is refused.
 fn find_field_mapping_problem(provider: &MessageProviderDefinition) -> Option<String> {
-    let mut seen_parts = HashSet::new();
-    let duplicate_part = provider
-        .field_mapping
-        .iter()
-        .find(|field_mapping| !seen_parts.insert(field_mapping.part.as_str()));
+    let mut seen_mappings = HashSet::new();
+    let duplicate_mapping = provider.field_mapping.iter().find(|field_mapping| {
+        !seen_mappings.insert((field_mapping.part.as_str(), field_mapping.source.trim()))
+    });
     if provider
         .field_mapping
         .iter()
@@ -197,7 +198,13 @@ fn find_field_mapping_problem(provider: &MessageProviderDefinition) -> Option<St
     {
         return Some("Every mapped part needs a source".to_owned());
     }
-    duplicate_part.map(|field_mapping| format!("{} is mapped twice", field_mapping.part))
+    duplicate_mapping.map(|field_mapping| {
+        format!(
+            "{} is mapped from {} twice",
+            field_mapping.part,
+            field_mapping.source.trim()
+        )
+    })
 }
 
 /// Template errors (unknown functions or filters, a `{{` without `}}`) in the message id and
@@ -261,7 +268,7 @@ mod tests {
     use sendmock_core::{FixedClock, SeededRandomSource};
 
     use super::*;
-    use crate::providers::builtin_sms_providers;
+    use crate::providers::{ProviderFieldMapping, builtin_email_providers, builtin_sms_providers};
 
     fn find_builtin(provider_key: &str) -> MessageProviderDefinition {
         builtin_sms_providers()
@@ -270,28 +277,56 @@ mod tests {
             .unwrap_or_else(|| panic!("{provider_key} is shipped"))
     }
 
-    // AC: SM-16.8
+    // AC: SM-16.8 PL-26.4
     #[test]
     fn every_shipped_provider_passes_the_save_rules() {
         let template_functions = StandardTemplateFunctions::new(
             Arc::new(FixedClock::new(0)),
             Arc::new(SeededRandomSource::new(7)),
         );
-        let shipped_providers = builtin_sms_providers();
 
-        for provider in &shipped_providers {
+        for shipped_providers in [builtin_sms_providers(), builtin_email_providers()] {
+            assert_shipped_providers_pass(&template_functions, &shipped_providers);
+        }
+    }
+
+    fn assert_shipped_providers_pass(
+        template_functions: &StandardTemplateFunctions,
+        shipped_providers: &[MessageProviderDefinition],
+    ) {
+        for provider in shipped_providers {
             assert_eq!(
-                find_field_problem(provider, &shipped_providers),
+                find_field_problem(provider, shipped_providers),
                 None,
                 "{}",
                 provider.key
             );
             assert!(
-                find_template_errors(&template_functions, provider).is_empty(),
+                find_template_errors(template_functions, provider).is_empty(),
                 "{}",
                 provider.key
             );
         }
+    }
+
+    // AC: EM-24.2
+    #[test]
+    fn a_part_may_have_several_sources_but_not_the_same_source_twice() {
+        let mut provider = builtin_email_providers()
+            .into_iter()
+            .find(|provider| provider.key == "mailgun")
+            .unwrap_or_else(|| panic!("mailgun is shipped"));
+        assert_eq!(find_field_mapping_problem(&provider), None);
+
+        provider.field_mapping.push(ProviderFieldMapping {
+            part: "user_variables".to_owned(),
+            source: "v:*".to_owned(),
+        });
+
+        assert_eq!(
+            find_field_mapping_problem(&provider),
+            Some("user_variables is mapped from v:* twice".to_owned())
+        );
     }
 
     // AC: SM-16.4

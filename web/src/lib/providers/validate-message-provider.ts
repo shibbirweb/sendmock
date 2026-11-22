@@ -33,6 +33,25 @@ function findDuplicate(names: string[]): string | undefined {
   );
 }
 
+/**
+ * A part may be read from several sources (Mailgun's user variables come from
+ * `v:*` and `X-Mailgun-Variables`); only the same part from the same source
+ * twice is refused.
+ */
+export function findFieldMappingDuplicate(
+  fieldMappings: { part: string; source: string }[],
+): string | undefined {
+  const mappingKeys = fieldMappings.map(
+    (fieldMapping) => `${fieldMapping.part}\u0000${fieldMapping.source.trim()}`,
+  );
+  const duplicateKey = findDuplicate(mappingKeys);
+  if (duplicateKey === undefined) {
+    return undefined;
+  }
+  const [part, source] = duplicateKey.split("\u0000");
+  return `${part} is mapped from ${source} twice`;
+}
+
 /** `/v3/{domain}/messages` and `/v3/{name}/messages` are the same route. */
 function normalizeRoute(method: string, path: string): string {
   return `${method} ${path.replace(/\{[^}]*\}/g, "{}")}`;
@@ -151,12 +170,9 @@ export function validateMessageProvider(
   } else {
     fieldErrors.operations = findRouteClash(providerInput, areaProviders);
   }
-  const duplicatePart = findDuplicate(
-    providerInput.field_mapping.map((fieldMapping) => fieldMapping.part),
+  fieldErrors.field_mapping = findFieldMappingDuplicate(
+    providerInput.field_mapping,
   );
-  if (duplicatePart !== undefined) {
-    fieldErrors.field_mapping = `${duplicatePart} is mapped twice`;
-  }
   if (
     providerInput.field_mapping.some(
       (fieldMapping) => fieldMapping.source.trim() === "",
