@@ -49,6 +49,10 @@ grep -q '<failure message=' broken-report.xml
 echo "3. SENDMOCK_SETUP from a URL, then sendmock ci run --server"
 python3 -m http.server 8099 --bind 127.0.0.1 --directory "$example_directory" > /dev/null 2>&1 &
 static_server_pid=$!
+for _ in $(seq 1 50); do
+  curl -fsS -o /dev/null http://127.0.0.1:8099/sendmock.setup.yml && break
+  sleep 0.2
+done
 SENDMOCK_SETUP="http://127.0.0.1:8099/sendmock.setup.yml" SENDMOCK_DB=memory \
   "$sendmock_binary" --http-addr 127.0.0.1:8025 --smtp-addr 127.0.0.1:1025 > sendmock-server.log 2>&1 &
 sendmock_pid=$!

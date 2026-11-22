@@ -188,6 +188,7 @@ fn sample_response_rule() -> Value {
         "path_glob": "/hooks*", "filter": null,
         "response": { "status_code": 201, "headers": { "content-type": "application/json" }, "body": "{\"id\": \"{{ request.query.id }}\"}" },
         "delay_min_ms": 0, "delay_max_ms": 0, "failure_rate_percent": 0, "failure_status_code": 503,
+        "follow_up": null,
     })
 }
 

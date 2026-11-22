@@ -126,11 +126,11 @@ Text.
 
 - **What it does:** Your app's number in the conversation and how many messages it holds.
 
-### 18. Today
+### 18. Day
 
 Heading.
 
-- **What it does:** A day separator; messages are grouped by the day they were sent.
+- **What it does:** A day separator (Today, Yesterday, a weekday or a date); messages are grouped by the day they were sent.
 
 ### 19. #:#
 

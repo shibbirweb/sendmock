@@ -38,9 +38,9 @@ export type InventoryOptions = {
 };
 
 /**
- * Digits become `#`, a clock time `#:#`, a release version `#.#.#` (a beta's too) and a month
- * name `Month`, so a crawl at another hour, in another month or on a release branch reads the
- * same.
+ * Digits become `#`, a clock time `#:#`, a release version `#.#.#` (a beta's too), a month
+ * name `Month` and a whole text naming a day (`Today`, `Yesterday`, a weekday) `Day`, so a crawl
+ * at another hour, in another month or on a release branch reads the same.
  */
 export function normalizeName(name: string): string {
   return name
@@ -52,7 +52,11 @@ export function normalizeName(name: string): string {
       /\b(Jan(uary)?|Feb(ruary)?|Mar(ch)?|Apr(il)?|May|June?|July?|Aug(ust)?|Sep(tember)?|Oct(ober)?|Nov(ember)?|Dec(ember)?)\b/g,
       "Month",
     )
-    .trim();
+    .trim()
+    .replace(
+      /^(Today|Yesterday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$/,
+      "Day",
+    );
 }
 
 function readNodeText(node: AriaNode): string {

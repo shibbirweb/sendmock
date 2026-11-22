@@ -121,8 +121,8 @@ const smsConversationEntries: DeeperEntry[] = [
     does: "Your app's number in the conversation and how many messages it holds.",
   },
   {
-    control: "heading: Today",
-    does: "A day separator; messages are grouped by the day they were sent.",
+    control: "heading: Day",
+    does: "A day separator (Today, Yesterday, a weekday or a date); messages are grouped by the day they were sent.",
   },
   {
     control: "link: #:#",
