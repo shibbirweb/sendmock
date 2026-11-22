@@ -4,7 +4,7 @@ import {
   Wait,
 } from "testcontainers";
 
-export const defaultSendMockImage = "ghcr.io/shibbirweb/sendmock:1.3.1";
+export const defaultSendMockImage = "ghcr.io/shibbirweb/sendmock:1.4.0-beta.1";
 const smtpPort = 1025;
 const httpPort = 8025;
 const providerPort = 8026;
