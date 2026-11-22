@@ -49,7 +49,10 @@ pass "the database is /data/sendmock.db and it knows it runs in a container"
 curl -fsS "http://127.0.0.1:$host_port/" | grep -q 'id="root"' || fail "the embedded UI is served"
 pass "the embedded UI is served"
 
-docker logs "$container_id" | grep -q "without UI auth" || fail "it prints the notice about listening without UI auth"
+# Read the whole log first: under pipefail, `docker logs | grep -q` fails when grep stops at the
+# match and docker logs is killed by SIGPIPE.
+container_logs="$(docker logs "$container_id" 2>&1)"
+grep -q "without UI auth" <<< "$container_logs" || fail "it prints the notice about listening without UI auth"
 pass "it prints the notice about listening without UI auth"
 
 docker stop --time 15 "$container_id" > /dev/null
