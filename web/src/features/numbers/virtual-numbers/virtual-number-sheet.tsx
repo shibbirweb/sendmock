@@ -29,6 +29,7 @@ import {
   noMessagingService,
   useVirtualNumberForm,
 } from "@/features/numbers/virtual-numbers/use-virtual-number-form";
+import { VirtualNumberAccountField } from "@/features/numbers/virtual-numbers/virtual-number-account-field";
 import { VirtualNumberInboundFields } from "@/features/numbers/virtual-numbers/virtual-number-inbound-fields";
 import { useMessagingServices } from "@/lib/api/hooks/use-numbers-queries";
 import type { VirtualNumber } from "@/lib/api/types";
@@ -171,6 +172,13 @@ function VirtualNumberForm({
             </SelectContent>
           </Select>
         </FormField>
+        <VirtualNumberAccountField
+          fieldId={`${fieldIdPrefix}-account`}
+          accountSid={formValues.accountSid}
+          onAccountChange={(selectedAccountSid) => {
+            updateFormValues({ accountSid: selectedAccountSid });
+          }}
+        />
       </div>
       <SheetFooter className="flex-row justify-end border-t">
         <Button type="button" variant="ghost" onClick={onDone}>

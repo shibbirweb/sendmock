@@ -32,6 +32,9 @@ struct SeedVirtualNumber {
     /// The SID of the Messaging Service whose pool the number is in.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     messaging_service: Option<String>,
+    /// The SID of the subaccount that owns the number; left out, the main account.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    account_sid: Option<String>,
 }
 
 fn default_channels() -> Vec<String> {
@@ -64,6 +67,7 @@ impl VirtualNumberSeedAdapter {
             "inbound_template_id": seed_number.inbound_template,
             "status_callback_url": seed_number.status_callback,
             "messaging_service_sid": seed_number.messaging_service,
+            "account_sid": seed_number.account_sid,
         }))?;
         let is_new_number = existing_number.is_none();
         let mut seeded_number =
@@ -99,6 +103,7 @@ impl VirtualNumberSeedAdapter {
                         inbound_template: stored_number.inbound_template_id,
                         status_callback: stored_number.status_callback_url,
                         messaging_service: stored_number.messaging_service_sid,
+                        account_sid: stored_number.account_sid,
                     })?,
                 })
             })

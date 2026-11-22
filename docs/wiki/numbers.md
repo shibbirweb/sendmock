@@ -45,6 +45,7 @@ The number sheet:
 - **Inbound messages:** **Webhook URL**, **Method** (POST or GET), **Fallback URL** and **Format** (Twilio, Vonage, Plivo, ... or native JSON). Leave the URL empty and only [webhook rules](./webhooks/rules.md) receive incoming messages; when a rule on `sms.inbound` also exists, both receive them, and the sheet says so.
 - **Default status callback**.
 - **Messaging Service:** none or one; a number belongs to at most one.
+- **Twilio account:** the main account or one of its [subaccounts](./sms/providers.md#twilio-subaccounts). Inbound messages to the number carry that account's `AccountSid` and are signed with its token. In the CLI, `sendmock numbers add --account-sid AC...`; in a setup file, `account_sid` on the `[[numbers]]` item. Left out, the main account.
 
 Delete asks first and removes the number from its service.
 
@@ -57,6 +58,8 @@ A table: name, SID (copy), sender pool (number chips), inbound handling and acti
 | **Send a webhook** | go to the service's **Request URL**, with its **Fallback URL** |
 | **Defer to sender's webhook** | go to each number's own inbound URL |
 | **Drop the message** | are stored but not sent anywhere |
+
+To keep the SID your app is configured with, give it when you add the service: `sendmock sms services create --sid MG... --friendly-name Notifications --inbound-mode defer_to_sender` (or `sid` in the API body). Left out, SendMock makes one.
 
 Delete asks first and leaves the numbers unassigned.
 

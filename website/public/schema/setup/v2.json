@@ -1202,6 +1202,13 @@
       "additionalProperties": false,
       "description": "`[[numbers]]`, matched by `number`; applied after the Messaging Services it joins.",
       "properties": {
+        "account_sid": {
+          "description": "The SID of the subaccount that owns the number; left out, the main account.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "channels": {
           "default": [
             "sms"

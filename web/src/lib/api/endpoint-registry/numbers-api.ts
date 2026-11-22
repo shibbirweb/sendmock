@@ -142,10 +142,10 @@ const numberEndpoints = tagEndpoints("Numbers", [
     method: "POST",
     path: "/api/v1/messaging-services",
     summary: "Add a Messaging Service.",
-    requestBody: typeRef("MessagingServiceInput"),
+    requestBody: typeRef("MessagingServiceCreateInput"),
     response: typeRef("MessagingService"),
     successStatus: 201,
-    errorStatuses: [400],
+    errorStatuses: [400, 409],
   },
   {
     method: "PATCH",

@@ -19,8 +19,9 @@ impl NumberChannel {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Deserialize, JsonSchema)]
 pub enum InboundWebhookMethod {
+    #[default]
     #[serde(rename = "POST")]
     Post,
     #[serde(rename = "GET")]
@@ -67,7 +68,8 @@ pub struct VirtualNumberInput {
     /// Reply webhook (Twilio "A message comes in"); null means rules only.
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub inbound_url: Option<String>,
-    /// The HTTP method of the reply webhook.
+    /// The HTTP method of the reply webhook; POST when left out, as on Twilio.
+    #[serde(default)]
     pub inbound_method: InboundWebhookMethod,
     /// Called when the reply webhook fails, with `ErrorCode` and `ErrorUrl` added.
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
@@ -81,6 +83,11 @@ pub struct VirtualNumberInput {
     /// The Messaging Service this number belongs to, `MG...`; null for none.
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub messaging_service_sid: Option<String>,
+    /// The Twilio account that owns the number: the main account or a subaccount, `AC...`;
+    /// left out or null, the main account. Inbound messages to it carry this account.
+    #[serde(default)]
+    #[schemars(schema_with = "crate::nullable_schema::<String>")]
+    pub account_sid: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
@@ -113,6 +120,18 @@ pub struct MessagingServiceInput {
     /// Called when `inbound_url` fails.
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub inbound_fallback_url: Option<String>,
+}
+
+/// Body of `POST /api/v1/messaging-services`: the service, and the SID to give it.
+#[derive(Debug, Clone, Deserialize, JsonSchema)]
+pub struct MessagingServiceCreateInput {
+    /// The SID to give the service, `MG` and 32 hex digits, so an app's configured SID
+    /// works unchanged; left out, a new one is generated.
+    #[serde(default)]
+    #[schemars(schema_with = "crate::nullable_schema::<String>")]
+    pub sid: Option<String>,
+    #[serde(flatten)]
+    pub service: MessagingServiceInput,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]

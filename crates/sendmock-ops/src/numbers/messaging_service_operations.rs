@@ -1,8 +1,9 @@
-use super::messaging_service_builder::build_messaging_service;
+use super::messaging_service_builder::{build_messaging_service, is_messaging_service_sid};
 use super::number_inputs::{
-    MessagingServiceInput, MessagingServiceReference, MessagingServiceUpdate,
+    MessagingServiceCreateInput, MessagingServiceReference, MessagingServiceUpdate,
 };
 use super::number_views::MessagingService;
+use super::registry_fields::{field_error, read_optional_text};
 use crate::{
     HttpMethod, NoContent, NoInput, Operation, OperationContext, OperationDefinition,
     OperationError, SuccessStatus,
@@ -46,7 +47,7 @@ impl Operation for ListMessagingServicesOperation {
 pub struct CreateMessagingServiceOperation;
 
 impl Operation for CreateMessagingServiceOperation {
-    type Input = MessagingServiceInput;
+    type Input = MessagingServiceCreateInput;
     type Output = MessagingService;
 
     fn definition(&self) -> OperationDefinition {
@@ -66,15 +67,44 @@ impl Operation for CreateMessagingServiceOperation {
     async fn execute(
         &self,
         operation_context: &OperationContext,
-        input: MessagingServiceInput,
+        input: MessagingServiceCreateInput,
     ) -> Result<MessagingService, OperationError> {
-        let new_service = build_messaging_service(operation_context, input, None).await?;
+        let chosen_sid = read_free_service_sid(operation_context, input.sid).await?;
+        let mut new_service =
+            build_messaging_service(operation_context, input.service, None).await?;
+        if let Some(chosen_sid) = chosen_sid {
+            new_service.service_sid = chosen_sid;
+        }
         let stored_service = operation_context
             .messaging_service_repository
             .save_service(new_service)
             .await?;
         Ok(MessagingService::from(stored_service))
     }
+}
+
+/// The SID asked for, checked as Twilio writes it and not taken; none when left out.
+async fn read_free_service_sid(
+    operation_context: &OperationContext,
+    service_sid: Option<String>,
+) -> Result<Option<String>, OperationError> {
+    let Some(service_sid) = read_optional_text(service_sid) else {
+        return Ok(None);
+    };
+    if !is_messaging_service_sid(&service_sid) {
+        return Err(field_error("sid", "sid must be MG and 32 hex digits"));
+    }
+    let existing_service = operation_context
+        .messaging_service_repository
+        .find_service(&service_sid)
+        .await?;
+    if existing_service.is_some() {
+        return Err(OperationError::Conflict {
+            code: "messaging_service_exists",
+            message: format!("A Messaging Service with SID {service_sid} already exists"),
+        });
+    }
+    Ok(Some(service_sid))
 }
 
 pub struct UpdateMessagingServiceOperation;

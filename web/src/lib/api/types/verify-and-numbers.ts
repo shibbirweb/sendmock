@@ -167,8 +167,19 @@ export type VirtualNumber = {
 /** Body of POST and PATCH /api/v1/numbers. */
 export type VirtualNumberInput = Omit<
   VirtualNumber,
-  "id" | "created_by" | "phone_number_sid" | "account_sid"
->;
+  "id" | "created_by" | "phone_number_sid" | "account_sid" | "inbound_method"
+> & {
+  /**
+   * The HTTP method of the reply webhook; POST when left out, as on Twilio.
+   * @example "POST"
+   */
+  inbound_method?: InboundWebhookMethod;
+  /**
+   * The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.
+   * @example null
+   */
+  account_sid?: string | null;
+};
 
 /** What a Messaging Service does with inbound messages to its numbers. */
 export type MessagingServiceInboundMode =
@@ -213,6 +224,15 @@ export type MessagingServiceInput = Omit<
   MessagingService,
   "sid" | "created_by"
 >;
+
+/** Body of POST /api/v1/messaging-services: the service, and the SID to give it. */
+export type MessagingServiceCreateInput = MessagingServiceInput & {
+  /**
+   * The SID to give the service, `MG` and 32 hex digits, so an app's configured SID works unchanged; left out, a new one is generated.
+   * @example "MG00000000000000000000000000000001"
+   */
+  sid?: string | null;
+};
 
 /** Body of `POST /verify/{verificationSid}/force`. */
 export type VerificationForceRequest = {

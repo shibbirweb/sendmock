@@ -11445,6 +11445,18 @@
       },
       "properties": [
         {
+          "name": "sid",
+          "input": {
+            "name": "sid",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The SID to give the service, `MG` and 32 hex digits, so an app's configured SID works unchanged; left out, a new one is generated.",
+          "example": "MG00000000000000000000000000000001"
+        },
+        {
           "name": "friendly_name",
           "input": {
             "name": "friendly_name",
@@ -11514,6 +11526,16 @@
       "input_schema": {
         "type": "object",
         "properties": {
+          "sid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The SID to give the service, `MG` and 32 hex digits, so an app's configured SID works unchanged; left out, a new one is generated.",
+            "examples": [
+              "MG00000000000000000000000000000001"
+            ]
+          },
           "friendly_name": {
             "type": "string",
             "description": "A name for the service.",
@@ -11588,8 +11610,8 @@
           "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
         ],
         "inbound_mode": "webhook",
-        "inbound_url": "http://localhost:3000/sms/inbound",
-        "inbound_fallback_url": "http://localhost:3000/sms/inbound-fallback"
+        "sid": "MG00000000000000000000000000000001",
+        "inbound_url": "http://localhost:3000/sms/inbound"
       },
       "output": "MessagingService",
       "cli": [
@@ -12026,6 +12048,33 @@
       },
       "properties": [
         {
+          "name": "inbound_method",
+          "input": {
+            "name": "inbound_method",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "POST",
+            "GET"
+          ],
+          "description": "The HTTP method of the reply webhook; POST when left out, as on Twilio.",
+          "example": "POST"
+        },
+        {
+          "name": "account_sid",
+          "input": {
+            "name": "account_sid",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.",
+          "example": null
+        },
+        {
           "name": "number",
           "input": {
             "name": "number",
@@ -12077,21 +12126,6 @@
           "allowed_values": null,
           "description": "Reply webhook (Twilio \"A message comes in\"); null means rules only.",
           "example": "http://localhost:3000/sms/inbound"
-        },
-        {
-          "name": "inbound_method",
-          "input": {
-            "name": "inbound_method",
-            "location": "body"
-          },
-          "type": "string",
-          "is_required": false,
-          "allowed_values": [
-            "POST",
-            "GET"
-          ],
-          "description": "The HTTP method of the reply webhook.",
-          "example": "POST"
         },
         {
           "name": "inbound_fallback_url",
@@ -12157,6 +12191,23 @@
       "input_schema": {
         "type": "object",
         "properties": {
+          "inbound_method": {
+            "$ref": "#/$defs/InboundWebhookMethod",
+            "description": "The HTTP method of the reply webhook; POST when left out, as on Twilio.",
+            "examples": [
+              "POST"
+            ]
+          },
+          "account_sid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.",
+            "examples": [
+              null
+            ]
+          },
           "number": {
             "type": "string",
             "description": "E.164, without a channel prefix; `channels` says whether WhatsApp works.",
@@ -12191,13 +12242,6 @@
             "description": "Reply webhook (Twilio \"A message comes in\"); null means rules only.",
             "examples": [
               "http://localhost:3000/sms/inbound"
-            ]
-          },
-          "inbound_method": {
-            "$ref": "#/$defs/InboundWebhookMethod",
-            "description": "The HTTP method of the reply webhook.",
-            "examples": [
-              "POST"
             ]
           },
           "inbound_fallback_url": {
@@ -12272,8 +12316,7 @@
           "sms"
         ],
         "inbound_method": "POST",
-        "inbound_url": "http://localhost:3000/sms/inbound",
-        "inbound_fallback_url": "http://localhost:3000/sms/inbound-fallback"
+        "account_sid": null
       },
       "output": "VirtualNumber",
       "cli": [

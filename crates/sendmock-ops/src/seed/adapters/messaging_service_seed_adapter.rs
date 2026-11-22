@@ -3,7 +3,7 @@ use sendmock_store::MessagingServiceRecord;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-use crate::numbers::{MessagingServiceInput, build_messaging_service};
+use crate::numbers::{MessagingServiceInput, build_messaging_service, is_messaging_service_sid};
 use crate::seed::seed_section_adapter::{
     CREATED_BY_SEED, SeedItem, impl_seed_section_adapter, read_seed_table, to_api_input,
     write_seed_table,
@@ -28,15 +28,6 @@ struct SeedMessagingService {
 
 fn default_inbound_mode() -> String {
     "defer_to_sender".to_owned()
-}
-
-/// `MG` and 32 hex digits, as Twilio writes Messaging Service SIDs.
-fn is_messaging_service_sid(service_sid: &str) -> bool {
-    service_sid.len() == 34
-        && service_sid.starts_with("MG")
-        && service_sid[2..]
-            .chars()
-            .all(|character| character.is_ascii_hexdigit())
 }
 
 pub struct MessagingServiceSeedAdapter;

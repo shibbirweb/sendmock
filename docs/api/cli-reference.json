@@ -7238,6 +7238,39 @@
       "arguments": [],
       "flags": [
         {
+          "flag": "--inbound-method",
+          "input": {
+            "name": "inbound_method",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<inbound-method>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "POST",
+            "GET"
+          ],
+          "description": "The HTTP method of the reply webhook; POST when left out, as on Twilio.",
+          "example": "POST"
+        },
+        {
+          "flag": "--account-sid",
+          "input": {
+            "name": "account_sid",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<account-sid>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.",
+          "example": null
+        },
+        {
           "flag": "--number",
           "input": {
             "name": "number",
@@ -7303,24 +7336,6 @@
           "example": "http://localhost:3000/sms/inbound"
         },
         {
-          "flag": "--inbound-method",
-          "input": {
-            "name": "inbound_method",
-            "location": "body"
-          },
-          "type": "string",
-          "value_label": "<inbound-method>",
-          "is_required": true,
-          "is_repeatable": false,
-          "takes_json": false,
-          "allowed_values": [
-            "POST",
-            "GET"
-          ],
-          "description": "The HTTP method of the reply webhook.",
-          "example": "POST"
-        },
-        {
           "flag": "--inbound-fallback-url",
           "input": {
             "name": "inbound_fallback_url",
@@ -7381,7 +7396,7 @@
           "example": "MG00000000000000000000000000000001"
         }
       ],
-      "example": "sendmock numbers add --number +15550001111 --label 'Support line' --channel sms --inbound-method POST --inbound-url http://localhost:3000/sms/inbound --inbound-fallback-url http://localhost:3000/sms/inbound-fallback",
+      "example": "sendmock numbers add --number +15550001111 --label 'Support line' --channel sms --inbound-method POST --account-sid null",
       "output": "VirtualNumber",
       "exit_codes": [
         0,
@@ -7531,11 +7546,11 @@
             "name": "number",
             "location": "body"
           },
-          "type": "string",
+          "type": "object",
           "value_label": "<number>",
           "is_required": false,
           "is_repeatable": false,
-          "takes_json": false,
+          "takes_json": true,
           "allowed_values": null,
           "description": "E.164, without a channel prefix; `channels` says whether WhatsApp works.",
           "example": "+15550001111"
@@ -7546,30 +7561,27 @@
             "name": "label",
             "location": "body"
           },
-          "type": "string",
+          "type": "object",
           "value_label": "<label>",
           "is_required": false,
           "is_repeatable": false,
-          "takes_json": false,
+          "takes_json": true,
           "allowed_values": null,
           "description": "A name for the number, e.g. the app or feature that uses it.",
           "example": "Support line"
         },
         {
-          "flag": "--channel",
+          "flag": "--channels",
           "input": {
             "name": "channels",
             "location": "body"
           },
-          "type": "string[]",
-          "value_label": "<channel>",
+          "type": "object",
+          "value_label": "<channels>",
           "is_required": false,
-          "is_repeatable": true,
-          "takes_json": false,
-          "allowed_values": [
-            "sms",
-            "whatsapp"
-          ],
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
           "description": "Where the number works: `sms`, `whatsapp` or both.",
           "example": [
             "sms"
@@ -7589,24 +7601,6 @@
           "allowed_values": null,
           "description": "Reply webhook (Twilio \"A message comes in\"); null means rules only.",
           "example": "http://localhost:3000/sms/inbound"
-        },
-        {
-          "flag": "--inbound-method",
-          "input": {
-            "name": "inbound_method",
-            "location": "body"
-          },
-          "type": "string",
-          "value_label": "<inbound-method>",
-          "is_required": false,
-          "is_repeatable": false,
-          "takes_json": false,
-          "allowed_values": [
-            "POST",
-            "GET"
-          ],
-          "description": "The HTTP method of the reply webhook.",
-          "example": "POST"
         },
         {
           "flag": "--inbound-fallback-url",
@@ -7667,9 +7661,39 @@
           "allowed_values": null,
           "description": "The Messaging Service this number belongs to, `MG...`; null for none.",
           "example": "MG00000000000000000000000000000001"
+        },
+        {
+          "flag": "--inbound-method",
+          "input": {
+            "name": "inbound_method",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<inbound-method>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "",
+          "example": {}
+        },
+        {
+          "flag": "--account-sid",
+          "input": {
+            "name": "account_sid",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<account-sid>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "",
+          "example": ""
         }
       ],
-      "example": "sendmock numbers update 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --number +15550001111 --label 'Support line'",
+      "example": "sendmock numbers update 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --inbound-url http://localhost:3000/sms/inbound --inbound-fallback-url http://localhost:3000/sms/inbound-fallback",
       "output": "VirtualNumber",
       "exit_codes": [
         0,
@@ -17747,6 +17771,21 @@
       "arguments": [],
       "flags": [
         {
+          "flag": "--sid",
+          "input": {
+            "name": "sid",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<sid>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The SID to give the service, `MG` and 32 hex digits, so an app's configured SID works unchanged; left out, a new one is generated.",
+          "example": "MG00000000000000000000000000000001"
+        },
+        {
           "flag": "--friendly-name",
           "input": {
             "name": "friendly_name",
@@ -17828,7 +17867,7 @@
           "example": "http://localhost:3000/sms/inbound-fallback"
         }
       ],
-      "example": "sendmock sms services create --friendly-name Notifications --number-id 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --inbound-mode webhook --inbound-url http://localhost:3000/sms/inbound --inbound-fallback-url http://localhost:3000/sms/inbound-fallback",
+      "example": "sendmock sms services create --friendly-name Notifications --number-id 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --inbound-mode webhook --sid MG00000000000000000000000000000001 --inbound-url http://localhost:3000/sms/inbound",
       "output": "MessagingService",
       "exit_codes": [
         0,

@@ -4099,6 +4099,7 @@ expression: command_descriptions
     "summary": "Add a number.",
     "arguments": [],
     "flags": [
+      "--account-sid",
       "--channel",
       "--inbound-fallback-url",
       "--inbound-method",
@@ -4133,6 +4134,7 @@ expression: command_descriptions
       "numberId"
     ],
     "flags": [
+      "--account-sid",
       "--channel",
       "--inbound-fallback-url",
       "--inbound-method",
@@ -4209,7 +4211,8 @@ expression: command_descriptions
       "--inbound-fallback-url",
       "--inbound-mode",
       "--inbound-url",
-      "--number-id"
+      "--number-id",
+      "--sid"
     ],
     "operations": [
       {

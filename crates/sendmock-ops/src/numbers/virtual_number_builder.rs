@@ -2,6 +2,7 @@ use sendmock_store::VirtualNumberRecord;
 
 use super::number_inputs::{NumberChannel, VirtualNumberInput};
 use super::registry_fields::{field_error, is_e164, read_optional_text, read_optional_url};
+use crate::twilio_accounts::TwilioAccountDirectory;
 use crate::{OperationContext, OperationError};
 
 /// The number as it will be stored, checked as the form checks it: E.164, not registered by
@@ -23,6 +24,7 @@ pub async fn build_virtual_number(
     let channels = read_channels(&input.channels)?;
     let messaging_service_sid =
         read_existing_service_sid(operation_context, input.messaging_service_sid).await?;
+    let account_sid = read_known_account_sid(operation_context, input.account_sid).await?;
     Ok(VirtualNumberRecord {
         number: e164_number,
         label,
@@ -36,8 +38,28 @@ pub async fn build_virtual_number(
         inbound_template_id: read_optional_text(input.inbound_template_id),
         status_callback_url: read_optional_url("status_callback_url", input.status_callback_url)?,
         messaging_service_sid,
+        account_sid,
         ..existing_number.unwrap_or_else(|| new_number_record(operation_context))
     })
+}
+
+/// The owning account as stored: a known subaccount's SID, or none for the main account.
+async fn read_known_account_sid(
+    operation_context: &OperationContext,
+    account_sid: Option<String>,
+) -> Result<Option<String>, OperationError> {
+    let Some(account_sid) = read_optional_text(account_sid) else {
+        return Ok(None);
+    };
+    let account_directory = TwilioAccountDirectory::load(operation_context).await?;
+    match account_directory.find_account(&account_sid) {
+        None => Err(field_error(
+            "account_sid",
+            "No Twilio account or subaccount with this SID",
+        )),
+        Some(found_account) if found_account.is_main => Ok(None),
+        Some(_) => Ok(Some(account_sid)),
+    }
 }
 
 async fn read_unregistered_number(

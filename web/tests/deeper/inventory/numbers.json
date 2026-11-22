@@ -45,6 +45,8 @@
       "textbox: Default status callback",
       "paragraph: Used when a send from this number has no StatusCallback.",
       "combobox: Messaging Service",
+      "combobox: Twilio account",
+      "paragraph: Inbound messages to the number carry this account's SID and are signed with its token.",
       "button: Cancel",
       "button: Add number",
       "button: Close"
@@ -65,6 +67,8 @@
       "textbox: Default status callback",
       "paragraph: Used when a send from this number has no StatusCallback.",
       "combobox: Messaging Service",
+      "combobox: Twilio account",
+      "paragraph: Inbound messages to the number carry this account's SID and are signed with its token.",
       "button: Cancel",
       "button: Save changes",
       "button: Close"

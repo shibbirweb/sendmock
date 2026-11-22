@@ -4160,7 +4160,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/MessagingServiceInput"
+              $ref: "#/components/schemas/MessagingServiceCreateInput"
       responses:
         "201":
           description: Created.
@@ -4170,6 +4170,8 @@ paths:
                 $ref: "#/components/schemas/MessagingService"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock sms services create
@@ -12940,16 +12942,16 @@ components:
         - inbound_url
         - inbound_fallback_url
         - created_by
-    MessagingServiceInboundMode:
-      type: string
-      enum:
-        - webhook
-        - defer_to_sender
-        - drop
-      description: What a Messaging Service does with inbound messages to its numbers.
-    MessagingServiceInput:
+    MessagingServiceCreateInput:
       type: object
       properties:
+        sid:
+          type:
+            - string
+            - "null"
+          description: The SID to give the service, `MG` and 32 hex digits, so an app's configured SID works unchanged; left out, a new one is generated.
+          examples:
+            - MG00000000000000000000000000000001
         friendly_name:
           type: string
           description: A name for the service.
@@ -12983,11 +12985,18 @@ components:
             - http://localhost:3000/sms/inbound-fallback
       required:
         - friendly_name
-        - number_ids
+        - inbound_fallback_url
         - inbound_mode
         - inbound_url
-        - inbound_fallback_url
-      description: Body of POST and PATCH /api/v1/messaging-services.
+        - number_ids
+      description: "Body of POST /api/v1/messaging-services: the service, and the SID to give it."
+    MessagingServiceInboundMode:
+      type: string
+      enum:
+        - webhook
+        - defer_to_sender
+        - drop
+      description: What a Messaging Service does with inbound messages to its numbers.
     MessagingServiceInputPatch:
       type: object
       properties:
@@ -18798,6 +18807,18 @@ components:
     VirtualNumberInput:
       type: object
       properties:
+        inbound_method:
+          $ref: "#/components/schemas/InboundWebhookMethod"
+          description: The HTTP method of the reply webhook; POST when left out, as on Twilio.
+          examples:
+            - POST
+        account_sid:
+          type:
+            - string
+            - "null"
+          description: The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.
+          examples:
+            - null
         number:
           type: string
           description: E.164, without a channel prefix; `channels` says whether WhatsApp works.
@@ -18822,11 +18843,6 @@ components:
           description: Reply webhook (Twilio "A message comes in"); null means rules only.
           examples:
             - http://localhost:3000/sms/inbound
-        inbound_method:
-          $ref: "#/components/schemas/InboundWebhookMethod"
-          description: The HTTP method of the reply webhook.
-          examples:
-            - POST
         inbound_fallback_url:
           type:
             - string
@@ -18856,33 +18872,33 @@ components:
           examples:
             - MG00000000000000000000000000000001
       required:
-        - number
-        - label
         - channels
-        - inbound_url
-        - inbound_method
         - inbound_fallback_url
         - inbound_template_id
-        - status_callback_url
+        - inbound_url
+        - label
         - messaging_service_sid
+        - number
+        - status_callback_url
       description: Body of POST and PATCH /api/v1/numbers.
     VirtualNumberInputPatch:
       type: object
       properties:
         number:
-          type: string
+          type: object
+          properties: {}
           description: E.164, without a channel prefix; `channels` says whether WhatsApp works.
           examples:
             - "+15550001111"
         label:
-          type: string
+          type: object
+          properties: {}
           description: A name for the number, e.g. the app or feature that uses it.
           examples:
             - Support line
         channels:
-          type: array
-          items:
-            $ref: "#/components/schemas/NumberChannel"
+          type: object
+          properties: {}
           description: "Where the number works: `sms`, `whatsapp` or both."
           examples:
             - - sms
@@ -18893,11 +18909,6 @@ components:
           description: Reply webhook (Twilio "A message comes in"); null means rules only.
           examples:
             - http://localhost:3000/sms/inbound
-        inbound_method:
-          $ref: "#/components/schemas/InboundWebhookMethod"
-          description: The HTTP method of the reply webhook.
-          examples:
-            - POST
         inbound_fallback_url:
           type:
             - string
@@ -18926,6 +18937,16 @@ components:
           description: The Messaging Service this number belongs to, `MG...`; null for none.
           examples:
             - MG00000000000000000000000000000001
+        inbound_method:
+          anyOf:
+            - type: object
+              properties: {}
+            - type: object
+              properties: {}
+        account_sid:
+          type:
+            - string
+            - "null"
     WebhookDelivery:
       type: object
       properties:

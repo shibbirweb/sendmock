@@ -255,20 +255,32 @@ Drop-down.
 
 - **What it does:** The pool the number belongs to, if any.
 
-### 39. Cancel
+### 39. Twilio account
+
+Drop-down.
+
+- **What it does:** The Twilio account that owns the number: the main account or one of its subaccounts. Inbound messages to the number carry that account's SID and are signed with its token.
+
+### 40. Inbound messages to the number carry this account's SID and are signed with its token.
+
+Text.
+
+- **What it does:** Explains what the account changes.
+
+### 41. Cancel
 
 Button.
 
 - **What it does:** Closes the editor without saving.
 
-### 40. Add number
+### 42. Add number
 
 Button.
 
 - **What it does:** Adds the number.
 - **Same action elsewhere:** REST [`POST /api/v1/numbers`](/api/numbers/#postNumbers), CLI [`sendmock numbers add`](/cli/numbers/#numbers-add), MCP [`sendmock_number_upsert`](/mcp/numbers/#sendmock_number_upsert)
 
-### 41. Close
+### 43. Close
 
 Button.
 
@@ -276,110 +288,122 @@ Button.
 
 ## Number editor
 
-### 42. Edit number
+### 44. Edit number
 
 Heading.
 
 - **What it does:** The number editor, for an existing number.
 
-### 43. A fake number your app owns, set up like a provider console.
+### 45. A fake number your app owns, set up like a provider console.
 
 Text.
 
 - **What it does:** Explains the editor.
 
-### 44. Number
+### 46. Number
 
 Field.
 
 - **What it does:** The number in E.164 form, such as `+15550001111`.
 
-### 45. Label
+### 47. Label
 
 Field.
 
 - **What it does:** A name for it.
 
-### 46. SMS
+### 48. SMS
 
 Checkbox.
 
 - **What it does:** It sends and receives SMS.
 
-### 47. WhatsApp
+### 49. WhatsApp
 
 Checkbox.
 
 - **What it does:** It sends and receives WhatsApp messages.
 
-### 48. Webhook URL
+### 50. Webhook URL
 
 Field.
 
 - **What it does:** Where an inbound message to the number is posted, as Twilio's reply webhook; the TwiML answer is read.
 
-### 49. Leave empty to deliver inbound messages through webhook rules only.
+### 51. Leave empty to deliver inbound messages through webhook rules only.
 
 Text.
 
 - **What it does:** Explains an empty webhook URL.
 
-### 50. Method
+### 52. Method
 
 Drop-down.
 
 - **What it does:** POST or GET for the webhook.
 
-### 51. Format
+### 53. Format
 
 Drop-down.
 
 - **What it does:** The webhook's format, Twilio's by default.
 
-### 52. Fallback URL
+### 54. Fallback URL
 
 Field.
 
 - **What it does:** Called when the webhook URL fails.
 
-### 53. Called with ErrorCode and ErrorUrl when the webhook URL fails.
+### 55. Called with ErrorCode and ErrorUrl when the webhook URL fails.
 
 Text.
 
 - **What it does:** Explains the fallback, as Twilio does it.
 
-### 54. Default status callback
+### 56. Default status callback
 
 Field.
 
 - **What it does:** Where status callbacks go for sends that give none.
 
-### 55. Used when a send from this number has no StatusCallback.
+### 57. Used when a send from this number has no StatusCallback.
 
 Text.
 
 - **What it does:** Explains the default status callback.
 
-### 56. Messaging Service
+### 58. Messaging Service
 
 Drop-down.
 
 - **What it does:** The pool the number belongs to, if any.
 
-### 57. Cancel
+### 59. Twilio account
+
+Drop-down.
+
+- **What it does:** The Twilio account that owns the number: the main account or one of its subaccounts. Inbound messages to the number carry that account's SID and are signed with its token.
+
+### 60. Inbound messages to the number carry this account's SID and are signed with its token.
+
+Text.
+
+- **What it does:** Explains what the account changes.
+
+### 61. Cancel
 
 Button.
 
 - **What it does:** Closes the editor without saving.
 
-### 58. Save changes
+### 62. Save changes
 
 Button.
 
 - **What it does:** Saves the number.
 - **Same action elsewhere:** REST [`PATCH /api/v1/numbers/{numberId}`](/api/numbers/#patchNumbersByNumberId), CLI [`sendmock numbers update`](/cli/numbers/#numbers-update), MCP [`sendmock_number_upsert`](/mcp/numbers/#sendmock_number_upsert)
 
-### 59. Close
+### 63. Close
 
 Button.
 
@@ -387,20 +411,20 @@ Button.
 
 ## When the data cannot load
 
-### 60. Could not load the numbers. Try again
+### 64. Could not load the numbers. Try again
 
 Message.
 
 - **What it does:** Shown when the numbers could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 61. Could not load the numbers.
+### 65. Could not load the numbers.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 62. Try again
+### 66. Try again
 
 Button.
 

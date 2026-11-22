@@ -25,10 +25,13 @@ export type VirtualNumberFormValues = {
   inboundTemplateId: string;
   statusCallbackUrl: string;
   messagingServiceSid: string;
+  accountSid: string;
 };
 
 /** Select value for "no Messaging Service" (Select items cannot be empty). */
 export const noMessagingService = "none";
+/** Select value for the main Twilio account, which numbers store as no account. */
+export const mainTwilioAccount = "main";
 const defaultInboundTemplateId = "twilio.inbound_sms";
 
 function toFormValues(
@@ -46,6 +49,7 @@ function toFormValues(
     statusCallbackUrl: virtualNumber?.status_callback_url ?? "",
     messagingServiceSid:
       virtualNumber?.messaging_service_sid ?? noMessagingService,
+    accountSid: virtualNumber?.account_sid ?? mainTwilioAccount,
   };
 }
 
@@ -71,6 +75,10 @@ function toNumberInput(
       formValues.messagingServiceSid === noMessagingService
         ? null
         : formValues.messagingServiceSid,
+    account_sid:
+      formValues.accountSid === mainTwilioAccount
+        ? null
+        : formValues.accountSid,
   };
 }
 
