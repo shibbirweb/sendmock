@@ -23,6 +23,7 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ### Changed
 
+- **More MCP tools by default:** `sendmock mcp` now also exposes the `numbers`, `outcomes` (outcome rules), `setup` and `logs` toolsets without `--toolsets`, so an agent can set up numbers, Messaging Services, outcome rules and setup files and read the HTTP request log. Outcome rules moved from `rules` to `outcomes` and setup tools from `admin` to `setup`. A call to a tool whose toolset is off now answers with the `--toolsets` value to add.
 - **One local CA per machine:** a server started with `--db memory` and `--provider-tls-addr` now keeps its local CA in SendMock's data folder, like every other server, instead of a temporary folder, so the CA you trusted once stays valid.
 - **Viewing an email no longer reports an open to your app by default:** when a webhook rule would send `email.opened`, opening the email in Mail is not counted as an open; the viewer says so and offers Count as an open. **Count views your webhook rules would report** in Settings > Email brings back the old behaviour.
 - **Email template keys are checked:** a `[[email.templates]]` item with an unknown key, such as `template_id`, is refused by setup validate and import with the key named, instead of importing as an empty template.

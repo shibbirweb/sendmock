@@ -12565,7 +12565,7 @@
     },
     {
       "name": "sendmock_outcome_rule_create",
-      "toolset": "rules",
+      "toolset": "outcomes",
       "summary": "Add an email outcome rule. Add an SMS outcome rule.",
       "area": "Outcome rules",
       "area_slug": "outcome-rules",
@@ -12868,7 +12868,7 @@
     },
     {
       "name": "sendmock_outcome_rule_delete",
-      "toolset": "rules",
+      "toolset": "outcomes",
       "summary": "Delete an email outcome rule. Delete an SMS outcome rule.",
       "area": "Outcome rules",
       "area_slug": "outcome-rules",
@@ -12971,7 +12971,7 @@
     },
     {
       "name": "sendmock_outcome_rule_list",
-      "toolset": "rules",
+      "toolset": "outcomes",
       "summary": "Email outcome rules, checked from top to bottom. SMS outcome rules, checked from top to bottom.",
       "area": "Outcome rules",
       "area_slug": "outcome-rules",
@@ -13053,7 +13053,7 @@
     },
     {
       "name": "sendmock_outcome_rule_move",
-      "toolset": "rules",
+      "toolset": "outcomes",
       "summary": "Move an email outcome rule up or down. Move an SMS outcome rule up or down.",
       "area": "Outcome rules",
       "area_slug": "outcome-rules",
@@ -13184,7 +13184,7 @@
     },
     {
       "name": "sendmock_outcome_rule_test",
-      "toolset": "rules",
+      "toolset": "outcomes",
       "summary": "Which custom rule, magic address or profile decides an address's outcome. Which custom rule, magic number or profile decides a number's outcome.",
       "area": "Outcome rules",
       "area_slug": "outcome-rules",
@@ -13331,7 +13331,7 @@
     },
     {
       "name": "sendmock_outcome_rule_update",
-      "toolset": "rules",
+      "toolset": "outcomes",
       "summary": "Change an email outcome rule; send only the changed keys. Change an SMS outcome rule; send only the changed keys.",
       "area": "Outcome rules",
       "area_slug": "outcome-rules",
@@ -21526,7 +21526,7 @@
     },
     {
       "name": "sendmock_setup_export",
-      "toolset": "admin",
+      "toolset": "setup",
       "summary": "The configuration as a versioned setup file in TOML, JSON or YAML.",
       "area": "Setup",
       "area_slug": "setup",
@@ -21702,7 +21702,7 @@
     },
     {
       "name": "sendmock_setup_import",
-      "toolset": "admin",
+      "toolset": "setup",
       "summary": "Apply a setup from its text or a URL, merging or replacing; 422 with the errors and nothing applied when it is invalid.",
       "area": "Setup",
       "area_slug": "setup",
@@ -21946,7 +21946,7 @@
     },
     {
       "name": "sendmock_setup_migrate",
-      "toolset": "admin",
+      "toolset": "setup",
       "summary": "A setup file upgraded to this build's format version, without applying it.",
       "area": "Setup",
       "area_slug": "setup",
@@ -22081,7 +22081,7 @@
     },
     {
       "name": "sendmock_setup_validate",
-      "toolset": "admin",
+      "toolset": "setup",
       "summary": "Check a setup without applying it, with what an import would add, change and remove.",
       "area": "Setup",
       "area_slug": "setup",
