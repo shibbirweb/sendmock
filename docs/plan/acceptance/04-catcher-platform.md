@@ -291,3 +291,15 @@ Phase 5. Plan: [30-phase-5.md](../30-phase-5.md) (W8).
 - [x] PL-22.5 `sendmock --last`, `sendmock serve --last` and `sendmock mcp --embedded --last` start with the saved choice and never ask, flags given with them win for that run, and with nothing saved they start with the defaults and say so on stderr.
 - [x] PL-22.6 Every listener flag still starts several services in one command, and `sendmock --services smtp,catcher,pop3` (`SENDMOCK_SERVICES`) starts the HTTP port and the named services on their saved or default addresses without asking; an unknown name is refused with the list of names, and address flags given with it win.
 - [x] PL-22.7 `sendmock last-run` prints the saved choice (`--json` too) and `sendmock last-run clear` deletes it, and the docs describe the launcher, `--last` and `--no-input`.
+
+## PL-23 Startup banner
+
+1.5.0 (A27), planned 2026-11-22 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a27-startup-banner-pl-23) (A27).
+
+- [ ] PL-23.1 A server command (`sendmock`, `sendmock serve`, `--last`, `--services`) with stdout on a terminal prints the banner first, before the launcher's questions, the database, the listeners and the first log line: the website footer's SendMock wordmark drawn in braille dots, with `v` and the version right-aligned under it.
+- [ ] PL-23.2 The wordmark is the tallest that fits the terminal's width, from 5 to 12 lines (8 lines and 71 columns in an 80-column terminal); a terminal too narrow for 5 lines, one whose width cannot be read, or one that cannot show braille (no UTF-8 locale on Unix; a console code page other than 65001 outside Windows Terminal) gets one line, `SendMock v<version>`, instead.
+- [ ] PL-23.3 The wordmark is mint at the top and fades toward its foot, in 24-bit colour when `COLORTERM` is `truecolor` or `24bit`, in 256 colours otherwise, and without colour with `NO_COLOR` or `TERM=dumb`.
+- [ ] PL-23.4 Nothing is printed when stdout is not a terminal, with `--ready-json` or `--log-format json`, for `sendmock mcp` and `sendmock mcp --embedded`, for client commands and for `--version`, so their output is unchanged.
+- [ ] PL-23.5 `--no-banner`, `SENDMOCK_NO_BANNER=1` and `banner = false` in `sendmock.toml` turn the banner off.
+- [ ] PL-23.6 The outline in the binary is exported from `website/components/footer-wordmark/sendmock-wordmark-path.ts` by a script, a test fails when the two differ, and the banner adds no dependency and keeps the binary size and startup time budgets.
+- [ ] PL-23.7 The Configuration guide shows the banner and how to turn it off, the CLI reference lists `--no-banner`, and the changelog says where to see it.

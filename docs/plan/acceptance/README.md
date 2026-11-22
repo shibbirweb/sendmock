@@ -57,7 +57,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 138 / 155 features, 698 / 798 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 138 / 156 features, 698 / 805 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -150,6 +150,7 @@ On top of its own criteria, a feature is done only when:
 | [PL-20](04-catcher-platform.md#pl-20-https-on-the-provider-port) | HTTPS on the provider port | 1.4.0 (A23) | 5 | Accepted |
 | [PL-21](04-catcher-platform.md#pl-21-http-catcher-bins-on-a-providers-own-url) | HTTP Catcher bins on a provider's own URL | 1.4.0 (A23) | 7 | Accepted |
 | [PL-22](04-catcher-platform.md#pl-22-interactive-launcher) | Interactive launcher | 1.4.0 (A24) | 7 | Accepted |
+| [PL-23](04-catcher-platform.md#pl-23-startup-banner) | Startup banner | 1.5.0 (A27) | 7 | Not started |
 | [PN-01](09-push.md#pn-01-push-notifications) | Push notifications | 0.1.0-beta.1 (A7) | 6 | Accepted |
 | [ST-01](10-storage.md#st-01-s3-compatible-storage-api) | S3-compatible storage API | 2.0.0 (A25) | 7 | Not started |
 | [ST-02](10-storage.md#st-02-storage-screen-and-every-surface) | Storage screen and every surface | 2.0.0 (A25) | 6 | Not started |
