@@ -303,3 +303,39 @@ Phase 5. Plan: [30-phase-5.md](../30-phase-5.md) (W8).
 - [ ] PL-23.5 `--no-banner`, `SENDMOCK_NO_BANNER=1` and `banner = false` in `sendmock.toml` turn the banner off.
 - [ ] PL-23.6 The outline in the binary is exported from `website/components/footer-wordmark/sendmock-wordmark-path.ts` by a script, a test fails when the two differ, and the banner adds no dependency and keeps the binary size and startup time budgets.
 - [ ] PL-23.7 The Configuration guide shows the banner and how to turn it off, the CLI reference lists `--no-banner`, and the changelog says where to see it.
+
+## PL-24 Provider ports on by default
+
+1.5.0 (A28), planned 2026-11-22 from a user's report on 1.4.0 (owner request). Plan: [32-after-1-0.md](../32-after-1-0.md#a28-plug-and-play-for-mailgun-and-twilio-apps-em-24-to-em-27-sm-22-to-sm-24-pl-24-to-pl-27-ai-08) (A28).
+
+- [ ] PL-24.1 `sendmock serve` starts the provider port on `127.0.0.1:8026` by default, `--provider-addr none` (and the variable and config key) turns it off, and the Docker image and Helm chart keep their own settings (R-01).
+- [ ] PL-24.2 When port 8026 is busy, SendMock says so and starts without the provider port instead of failing.
+- [ ] PL-24.3 `sendmock status`, `GET /api/v1/info` and the MCP status tool warn when the provider port is off.
+
+## PL-25 Trust the local CA everywhere
+
+1.5.0 (A28), planned 2026-11-22 from a user's report on 1.4.0 (owner request). Plan: [32-after-1-0.md](../32-after-1-0.md#a28-plug-and-play-for-mailgun-and-twilio-apps-em-24-to-em-27-sm-22-to-sm-24-pl-24-to-pl-27-ai-08) (A28).
+
+- [ ] PL-25.1 `sendmock trust` adds the local CA to the system store on macOS, Windows and Linux (R-05).
+- [ ] PL-25.2 It finds the runtime bundles that ignore the system store (Herd and Homebrew PHP, Python certifi, Java cacerts), writes a combined bundle and points the runtime at it, or appends only where that is safe, and prints the `NODE_EXTRA_CA_CERTS` and `SSL_CERT_FILE` lines for the rest.
+- [ ] PL-25.3 `sendmock trust` can run again safely, `--check` reports what trusts the CA, and `--undo` removes what it added.
+- [ ] PL-25.4 After `sendmock trust`, Laravel's `mailgun` mailer on Herd PHP reaches the HTTPS provider port with no other change, and the docs show using an existing local CA (mkcert) with `--provider-tls-cert`.
+
+## PL-26 Setup and configuration that agree
+
+1.5.0 (A28), planned 2026-11-22 from a user's report on 1.4.0 (owner request). Plan: [32-after-1-0.md](../32-after-1-0.md#a28-plug-and-play-for-mailgun-and-twilio-apps-em-24-to-em-27-sm-22-to-sm-24-pl-24-to-pl-27-ai-08) (A28).
+
+- [ ] PL-26.1 `setup validate` runs the same checks as `setup import`, so a file validate passes always imports (R-13).
+- [ ] PL-26.2 A merge import never says it deletes data and asks to confirm only when something is removed, naming what (R-16).
+- [ ] PL-26.3 `reset` prints what it cleared and what it kept, and `reset --config` also removes configuration and restores the built-in providers after a confirmation with the counts; its help says what each does (R-12).
+- [ ] PL-26.4 PATCH on providers, numbers and the other configuration merges a partial body into the stored object, and a masked or missing secret keeps the stored value (R-19).
+- [ ] PL-26.5 An endpoint preview fills defaults for every field it is not given (R-20).
+
+## PL-27 Stack presets
+
+1.5.0 (A28), planned 2026-11-22 from a user's report on 1.4.0 (owner request). Plan: [32-after-1-0.md](../32-after-1-0.md#a28-plug-and-play-for-mailgun-and-twilio-apps-em-24-to-em-27-sm-22-to-sm-24-pl-24-to-pl-27-ai-08) (A28).
+
+- [ ] PL-27.1 `sendmock preset laravel-mailgun-twilio --app-url <url>` starts or confirms the SMTP and provider ports, runs `sendmock trust`, and configures Mailgun (the mappings, template lookup, a signing key) and Twilio (account SID and token, a Debugger URL, the test numbers).
+- [ ] PL-27.2 It creates the webhook endpoints and rules for opened, bounced, complained and inbound mail at the app's paths, each changeable with a flag, and prints the `.env` block with the generated keys.
+- [ ] PL-27.3 `--import-numbers <csv>` adds numbers with their subaccount, label and Messaging Service.
+- [ ] PL-27.4 A preset is a setup file plus steps, run the same from the CLI, REST, MCP and the UI, and running it twice changes nothing the second time.

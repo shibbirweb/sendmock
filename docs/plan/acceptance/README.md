@@ -57,7 +57,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 138 / 156 features, 698 / 805 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 138 / 168 features, 698 / 854 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -84,6 +84,10 @@ On top of its own criteria, a feature is done only when:
 | [EM-21](01-email.md#em-21-pop3-read-access) | POP3 read access | 0.1.0-beta.1 (A6) | 6 | Accepted |
 | [EM-22](01-email.md#em-22-where-a-simulated-reply-goes) | Where a simulated reply goes | Phase 5 (W20) | 5 | Accepted |
 | [EM-23](01-email.md#em-23-mailgun-events-and-complaints-apis) | Mailgun events and complaints APIs | 1.4.0 (A23) | 6 | Accepted |
+| [EM-24](01-email.md#em-24-mailgun-sends-and-ids) | Mailgun sends and ids | 1.5.0 (A28) | 5 | Not started |
+| [EM-25](01-email.md#em-25-mailgun-webhooks-as-mailgun-sends-them) | Mailgun webhooks as Mailgun sends them | 1.5.0 (A28) | 5 | Not started |
+| [EM-26](01-email.md#em-26-stored-messages-and-local-email-templates) | Stored messages and local email templates | 1.5.0 (A28) | 4 | Not started |
+| [EM-27](01-email.md#em-27-simulating-email-events-with-the-apps-data) | Simulating email events with the app's data | 1.5.0 (A28) | 3 | Not started |
 | [SM-01](02-sms-verify.md#sm-01-native-sms-api) | Native SMS API | Phase 2 | 5 | Accepted |
 | [SM-02](02-sms-verify.md#sm-02-twilio-messages-api) | Twilio Messages API | Phase 2 | 4 | Accepted |
 | [SM-03](02-sms-verify.md#sm-03-twilio-messaging-services) | Twilio Messaging Services | UI in U1, backend Phase 2 | 4 | Accepted |
@@ -105,6 +109,9 @@ On top of its own criteria, a feature is done only when:
 | [SM-19](02-sms-verify.md#sm-19-twilio-accounts-and-subaccounts) | Twilio accounts and subaccounts | 1.4.0 (A23) | 8 | Accepted |
 | [SM-20](02-sms-verify.md#sm-20-twilio-phone-numbers-api) | Twilio phone numbers API | 1.4.0 (A23) | 5 | Accepted |
 | [SM-21](02-sms-verify.md#sm-21-twilio-debugger-webhook) | Twilio Debugger webhook | 1.4.0 (A23) | 4 | Accepted |
+| [SM-22](02-sms-verify.md#sm-22-twilio-accounts-in-every-place) | Twilio accounts in every place | 1.5.0 (A28) | 6 | Not started |
+| [SM-23](02-sms-verify.md#sm-23-opt-out-keywords) | Opt-out keywords | 1.5.0 (A28) | 4 | Not started |
+| [SM-24](02-sms-verify.md#sm-24-statuses-set-by-hand) | Statuses set by hand | 1.5.0 (A28) | 2 | Not started |
 | [VF-01](02-sms-verify.md#vf-01-verify-services) | Verify services | UI in U1, backend Phase 2 | 3 | Accepted |
 | [VF-02](02-sms-verify.md#vf-02-start-a-verification-and-deliver-the-code) | Start a verification and deliver the code | Phase 2 | 5 | Accepted |
 | [VF-03](02-sms-verify.md#vf-03-check-a-verification) | Check a verification | Phase 2 | 4 | Accepted |
@@ -151,6 +158,10 @@ On top of its own criteria, a feature is done only when:
 | [PL-21](04-catcher-platform.md#pl-21-http-catcher-bins-on-a-providers-own-url) | HTTP Catcher bins on a provider's own URL | 1.4.0 (A23) | 7 | Accepted |
 | [PL-22](04-catcher-platform.md#pl-22-interactive-launcher) | Interactive launcher | 1.4.0 (A24) | 7 | Accepted |
 | [PL-23](04-catcher-platform.md#pl-23-startup-banner) | Startup banner | 1.5.0 (A27) | 7 | Not started |
+| [PL-24](04-catcher-platform.md#pl-24-provider-ports-on-by-default) | Provider ports on by default | 1.5.0 (A28) | 3 | Not started |
+| [PL-25](04-catcher-platform.md#pl-25-trust-the-local-ca-everywhere) | Trust the local CA everywhere | 1.5.0 (A28) | 4 | Not started |
+| [PL-26](04-catcher-platform.md#pl-26-setup-and-configuration-that-agree) | Setup and configuration that agree | 1.5.0 (A28) | 5 | Not started |
+| [PL-27](04-catcher-platform.md#pl-27-stack-presets) | Stack presets | 1.5.0 (A28) | 4 | Not started |
 | [PN-01](09-push.md#pn-01-push-notifications) | Push notifications | 0.1.0-beta.1 (A7) | 6 | Accepted |
 | [ST-01](10-storage.md#st-01-s3-compatible-storage-api) | S3-compatible storage API | 2.0.0 (A25) | 7 | Not started |
 | [ST-02](10-storage.md#st-02-storage-screen-and-every-surface) | Storage screen and every surface | 2.0.0 (A25) | 6 | Not started |
@@ -165,6 +176,7 @@ On top of its own criteria, a feature is done only when:
 | [AI-05](05-ai.md#ai-05-agent-skill-and-sendmock-ai-install) | Agent skill and `sendmock ai install` | Waiting on others (left over from 1.0.0: AI-05.8); before: Phase 4 (skill, install), Phase 5 (plugin, evals, MCP registry listings) | 9 | In progress |
 | [AI-06](05-ai.md#ai-06-llmstxt) | llms.txt | Phase 4 | 1 | Accepted |
 | [AI-07](05-ai.md#ai-07-saved-scenarios) | Saved scenarios | 1.3.0 (A18) | 4 | Accepted |
+| [AI-08](05-ai.md#ai-08-agents-and-docs-for-provider-apps) | Agents and docs for provider apps | 1.5.0 (A28) | 4 | Not started |
 | [UI-01](06-ui.md#ui-01-app-shell) | App shell | Phase U0 | 5 | Accepted |
 | [UI-02](06-ui.md#ui-02-mock-layer) | Mock layer | Phase U0 | 5 | Accepted |
 | [UI-03](06-ui.md#ui-03-overview-dashboard) | Overview dashboard | Phase U1 | 5 | Accepted |
