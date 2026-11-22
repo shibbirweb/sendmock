@@ -7,8 +7,9 @@ use std::time::{Duration, Instant};
 
 use serde_json::{Map, Value};
 
-use super::scenario_file::{ScenarioStep, parse_scenario_file};
-use super::scenario_values::{evaluate_assertion, fill_step_input, fill_template};
+use super::scenario_assertions::run_assert_step;
+use super::scenario_file::{ParsedScenario, ScenarioStep, parse_scenario_file};
+use super::scenario_values::fill_step_input;
 use super::scenario_wire::{ScenarioReport, ScenarioStepResult, ScenarioStepStatus};
 use crate::sms::RecordedHttpRequest;
 use crate::{
@@ -77,6 +78,19 @@ fn read_status_code(operation_error: &OperationError) -> u16 {
     }
 }
 
+/// An answer whose success flag (`is_valid`, `is_passed`) is false fails the step, with the
+/// answer's `reason` when it gives one.
+fn read_false_flag(operation: &dyn ErasedOperation, output: &Value) -> Option<String> {
+    let flag_field = operation.definition().success_flag_field?;
+    if output[flag_field] != Value::Bool(false) {
+        return None;
+    }
+    Some(match output["reason"].as_str() {
+        Some(reason) => format!("{flag_field} is false: {reason}"),
+        None => format!("{flag_field} is false"),
+    })
+}
+
 async fn run_operation_step(
     operation_context: &OperationContext,
     operation: &dyn ErasedOperation,
@@ -97,7 +111,10 @@ async fn run_operation_step(
         .execute_answer(operation_context, Value::Object(step_input))
         .await
     {
-        Ok(OperationAnswer::Json(output)) => StepOutcome::passed(output),
+        Ok(OperationAnswer::Json(output)) => match read_false_flag(operation, &output) {
+            Some(reason) => StepOutcome::failed(output, reason),
+            None => StepOutcome::passed(output),
+        },
         Ok(OperationAnswer::File(file_answer)) => StepOutcome::passed(Value::from(
             String::from_utf8_lossy(&file_answer.bytes).into_owned(),
         )),
@@ -192,25 +209,10 @@ async fn run_step(
             tokio::time::sleep(Duration::from_secs_f64(seconds).min(LONGEST_SLEEP)).await;
             StepOutcome::passed(Value::Null)
         }
-        (None, "assert") => {
-            let assertion_text = step
-                .with
-                .get("that")
-                .and_then(Value::as_str)
-                .unwrap_or_default();
-            let filled_text = match fill_template(saved_values, assertion_text) {
-                Value::String(text) => text,
-                other_value => other_value.to_string(),
-            };
-            if evaluate_assertion(&filled_text) {
-                StepOutcome::passed(Value::from(filled_text))
-            } else {
-                StepOutcome::failed(
-                    Value::from(filled_text.clone()),
-                    format!("Not true: {filled_text}"),
-                )
-            }
-        }
+        (None, "assert") => match run_assert_step(saved_values, &step.with, &input_fields) {
+            Ok(output) => StepOutcome::passed(output),
+            Err((output, reason)) => StepOutcome::failed(output, reason),
+        },
         (None, _) => run_http_step(operation_context, &input_fields).await,
     };
     (step_input, outcome)
@@ -220,13 +222,15 @@ fn read_elapsed_ms(started_at: Instant) -> u64 {
     u64::try_from(started_at.elapsed().as_millis()).unwrap_or(u64::MAX)
 }
 
-/// Runs the steps in order; once one fails the rest are skipped.
+/// Runs the steps in order; once one fails the rest are skipped. `starting_values` are read
+/// as saved outputs, such as a CI file's `app_url`.
 async fn run_steps(
     operation_context: &OperationContext,
     step_operations: &BTreeMap<String, Arc<dyn ErasedOperation>>,
     steps: &[ScenarioStep],
+    starting_values: Map<String, Value>,
 ) -> Vec<ScenarioStepResult> {
-    let mut saved_values = Map::new();
+    let mut saved_values = starting_values;
     let mut step_results = Vec::new();
     let mut has_failed = false;
     for (step_index, step) in steps.iter().enumerate() {
@@ -279,10 +283,32 @@ pub async fn run_scenario(
             field: Some("scenario".to_owned()),
         });
     }
+    Ok(run_parsed_scenario(
+        operation_context,
+        &step_operations,
+        parsed_scenario,
+        Map::new(),
+    )
+    .await)
+}
+
+/// Runs a scenario already checked for problems, with values its steps can read.
+pub async fn run_parsed_scenario(
+    operation_context: &OperationContext,
+    step_operations: &BTreeMap<String, Arc<dyn ErasedOperation>>,
+    parsed_scenario: ParsedScenario,
+    starting_values: Map<String, Value>,
+) -> ScenarioReport {
     let started_at = Instant::now();
     let started_at_unix_ms = operation_context.clock.now_unix_ms();
-    let step_results = run_steps(operation_context, &step_operations, &parsed_scenario.steps).await;
-    Ok(ScenarioReport {
+    let step_results = run_steps(
+        operation_context,
+        step_operations,
+        &parsed_scenario.steps,
+        starting_values,
+    )
+    .await;
+    ScenarioReport {
         name: parsed_scenario
             .name
             .unwrap_or_else(|| "scenario".to_owned()),
@@ -292,5 +318,5 @@ pub async fn run_scenario(
         started_at: sendmock_core::format_rfc3339(started_at_unix_ms),
         duration_ms: read_elapsed_ms(started_at),
         steps: step_results,
-    })
+    }
 }

@@ -16,6 +16,7 @@ import {
 import { MockResponseFields } from "@/features/http/responses/mock-response-fields";
 import { ResponseRuleMatchFields } from "@/features/http/responses/response-rule-match-fields";
 import { ResponseRulePreview } from "@/features/http/responses/response-rule-preview";
+import { ResponseRuleFollowUpFields } from "@/features/http/responses/response-rule-follow-up-fields";
 import { ResponseRuleTimingFields } from "@/features/http/responses/response-rule-timing-fields";
 import {
   toResponseRule,
@@ -107,6 +108,15 @@ export function ResponseRuleSheet({
               formValues={formValues}
               fieldErrors={fieldErrors}
               onChange={updateFormValues}
+            />
+            <ResponseRuleFollowUpFields
+              followUp={formValues.followUp}
+              errorMessage={fieldErrors.follow_up}
+              onChange={(changedFollowUp) => {
+                updateFormValues({
+                  followUp: { ...formValues.followUp, ...changedFollowUp },
+                });
+              }}
             />
             <Separator />
             <ResponseRulePreview

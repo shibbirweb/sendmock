@@ -1,0 +1,11 @@
+{
+  "name": "sendmock/example-sms-twilio-php-numbers",
+  "description": "Buys a number, puts it in a Messaging Service and sends through it against SendMock with the official Twilio PHP SDK.",
+  "type": "project",
+  "license": "MIT",
+  "require": {
+    "php": ">=8.1",
+    "ext-curl": "*",
+    "twilio/sdk": "8.14.0"
+  }
+}

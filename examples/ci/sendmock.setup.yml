@@ -1,0 +1,12 @@
+sendmock:
+  format: sendmock.setup
+  format_version: 2
+webhook:
+  endpoints:
+    - name: Shop app
+      url: http://127.0.0.1:8000/webhooks/sendmock
+      secret: ${SHOP_WEBHOOK_SECRET}
+      retry_policy: { max_attempts: 1, backoff_seconds: [1], retry_on_client_errors: false }
+http:
+  bins:
+    - name: shop-outgoing

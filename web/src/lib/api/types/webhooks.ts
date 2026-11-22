@@ -4,3 +4,4 @@ export type * from "@/lib/api/types/webhook-rules";
 export type * from "@/lib/api/types/webhook-deliveries";
 export type * from "@/lib/api/types/webhook-variables";
 export type * from "@/lib/api/types/webhook-templates";
+export type * from "@/lib/api/types/webhook-signatures";

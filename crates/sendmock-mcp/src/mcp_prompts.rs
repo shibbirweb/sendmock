@@ -12,7 +12,7 @@ struct PromptRecipe {
     workflow: &'static str,
 }
 
-const PROMPT_RECIPES: [PromptRecipe; 10] = [
+const PROMPT_RECIPES: [PromptRecipe; 12] = [
     PromptRecipe {
         name: "setup-email-capture",
         description: "Point the app's mail at SendMock and send a test.",
@@ -92,6 +92,33 @@ const PROMPT_RECIPES: [PromptRecipe; 10] = [
         arguments: &[("docs_url", "The vendor's API documentation.", true)],
         workflow: "Read {docs_url}. Create the provider with sendmock_sms_provider_create, set its requests, status names and error codes with sendmock_sms_provider_update, check sendmock_sms_provider_preview, send a test request, and export with sendmock_seed_export.",
     },
+    PromptRecipe {
+        name: "fill-provider-gap",
+        description: "Answer a vendor endpoint SendMock does not implement, on the same base URL.",
+        arguments: &[
+            (
+                "provider",
+                "The provider's key, such as twilio or stripe.",
+                true,
+            ),
+            (
+                "endpoint",
+                "The method and path the app calls, such as POST /2010-04-01/Accounts/{AccountSid}/Calls.json.",
+                true,
+            ),
+        ],
+        workflow: "The app calls {endpoint} on {provider}, which SendMock does not answer yet. Attach a bin to {provider} with sendmock_http_provider_bin_attach (area email, sms, push or payments; the bin is made if new). Read the vendor's documented answer for {endpoint}, then add a rule with sendmock_http_response_set: the method, a path glob for the endpoint, that answer as the response, and, if the vendor calls the app back, a follow_up webhook with the vendor's template (such as twilio.status_callback, which signs as Twilio does) and the callback URL from the request (such as {{ request.form.StatusCallback }}). Check the rule with sendmock_http_response_preview, call the endpoint from the app, and confirm it with sendmock_http_wait, sendmock_logs_http and sendmock_webhook_delivery_list. Export with sendmock_seed_export to keep it.",
+    },
+    PromptRecipe {
+        name: "setup-ci",
+        description: "Run this app's webhook tests in its CI pipeline with SendMock.",
+        arguments: &[(
+            "provider",
+            "The CI system: github_actions, gitlab_ci, circleci, bitbucket_pipelines, azure_pipelines or jenkins.",
+            false,
+        )],
+        workflow: "Add SendMock webhook tests to this repository's pipeline ({provider}). Call sendmock_ci_init with the CI system the repository uses (look for .github/workflows, .gitlab-ci.yml, .circleci, bitbucket-pipelines.yml, azure-pipelines.yml or a Jenkinsfile) and write the three files it answers. In the CI file, set app_url to where the app listens in the pipeline and give each scenario the checks the app needs: the app's answer to a signed provider webhook, a retry after a failure, a replay handled once, and for webhooks the app sends, http.request.wait, webhook.signature.verify and an assert with a JSONPath. Check the file with sendmock_ci_validate, run it once with sendmock_ci_run, then add the step that starts the app to the job.",
+    },
 ];
 
 pub fn list_prompts() -> Vec<Prompt> {
@@ -153,7 +180,7 @@ mod tests {
             build_prompt_messages("setup-inbound-webhook", &arguments).unwrap_or_default();
         let missing = build_prompt_messages("add-payment-gateway", &Map::new());
 
-        assert_eq!(list_prompts().len(), 10);
+        assert_eq!(list_prompts().len(), 12);
         let message_text = serde_json::to_string(&messages).unwrap_or_default();
         assert!(message_text.contains("twilio template"), "{message_text}");
         assert!(message_text.contains("http://localhost:3000/sms"));
@@ -186,6 +213,28 @@ mod tests {
                     recipe.name
                 );
             }
+        }
+    }
+
+    // AC: PL-21.6
+    #[test]
+    fn the_fill_provider_gap_prompt_walks_through_a_bin_a_rule_and_a_follow_up() {
+        let arguments: Map<String, Value> = serde_json::from_value(serde_json::json!({
+            "provider": "twilio",
+            "endpoint": "POST /2010-04-01/Accounts/{AccountSid}/Calls.json",
+        }))
+        .unwrap_or_default();
+
+        let messages = build_prompt_messages("fill-provider-gap", &arguments).unwrap_or_default();
+
+        let message_text = serde_json::to_string(&messages).unwrap_or_default();
+        for expected_text in [
+            "sendmock_http_provider_bin_attach",
+            "sendmock_http_response_set",
+            "follow_up",
+            "Calls.json on twilio",
+        ] {
+            assert!(message_text.contains(expected_text), "{expected_text}");
         }
     }
 }

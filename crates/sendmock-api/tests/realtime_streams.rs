@@ -31,6 +31,7 @@ async fn start_server() -> std::io::Result<SocketAddr> {
             provider_address: None,
             catcher_address: None,
             pop3_address: None,
+            provider_tls: None,
             is_container: false,
         },
     );

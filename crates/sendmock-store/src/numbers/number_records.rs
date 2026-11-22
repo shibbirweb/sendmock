@@ -13,6 +13,10 @@ pub struct VirtualNumberRecord {
     pub inbound_template_id: Option<String>,
     pub status_callback_url: Option<String>,
     pub messaging_service_sid: Option<String>,
+    /// `PN` and 32 hex digits, as Twilio's IncomingPhoneNumbers API names the number.
+    pub phone_number_sid: String,
+    /// The Twilio account the number belongs to; `None` for the main account.
+    pub account_sid: Option<String>,
     pub created_by: String,
     pub created_at_unix_ms: i64,
 }

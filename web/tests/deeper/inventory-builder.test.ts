@@ -115,6 +115,13 @@ describe("the Deeper inventory crawl (WS-10.3)", () => {
     ).toEqual(["Month #, #, #:# from #.#.#.#"]);
   });
 
+  test("WS-10.3 a day heading reads the same whatever the hour of the crawl", () => {
+    expect(normalizeName("Today")).toBe("Day");
+    expect(normalizeName("Yesterday")).toBe("Day");
+    expect(normalizeName("Monday")).toBe("Day");
+    expect(normalizeName("Today's downloads")).toBe("Today's downloads");
+  });
+
   test("WS-10.3 a beta version reads the same as a stable one, so a release branch crawls the same", () => {
     expect(normalizeName("Live · demo data, version 1.3.0-beta.1")).toBe(
       "Live · demo data, version #.#.#",

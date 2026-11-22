@@ -42,6 +42,8 @@ impl Operation for WaitForHttpRequestOperation {
             is_read_only: true,
             cli_usage: "sendmock http wait",
             mcp_tool: "sendmock_http_wait",
+            // CI scenarios read better with the request named: `http.request.wait`.
+            mcp_aliases: &["sendmock_http_request_wait"],
             ..OperationDefinition::DEFAULTS
         }
     }

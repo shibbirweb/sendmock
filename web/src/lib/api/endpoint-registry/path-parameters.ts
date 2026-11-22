@@ -13,6 +13,11 @@ export type PathParameterDoc = {
 const exampleUlid = "01JB7T9Q2R5W8X3Y6Z1A4B7C9D";
 
 export const pathParameterDocs: Record<string, PathParameterDoc> = {
+  area: {
+    description:
+      "Where the provider lives: `email`, `sms`, `push` or `payments`.",
+    example: "sms",
+  },
   attachmentIndex: {
     description:
       "Position of the file in the email's `attachments`, starting at 0.",
@@ -95,7 +100,7 @@ export const pathParameterDocs: Record<string, PathParameterDoc> = {
   },
   providerKey: {
     description:
-      "The email or SMS provider's key, e.g. `sendgrid` or `twilio`, from its providers list.",
+      "The provider's key, e.g. `sendgrid`, `twilio` or `stripe`, from its providers list.",
     example: "twilio",
   },
   requestId: {
@@ -128,6 +133,14 @@ export const pathParameterDocs: Record<string, PathParameterDoc> = {
     description:
       "The service SID: `MG...` for a Messaging Service, `VA...` for a Verify service.",
     example: "MG00000000000000000000000000000001",
+  },
+  domain: {
+    description: "A Mailgun sending domain, as in `/v3/{domain}/messages`.",
+    example: "mg.shop.test",
+  },
+  accountSid: {
+    description: "A Twilio subaccount SID: `AC` and 32 hex digits.",
+    example: "AC33333333333333333333333333333333",
   },
   sessionId: {
     description: "The SMTP session's ID, from `GET /api/v1/logs/smtp`.",

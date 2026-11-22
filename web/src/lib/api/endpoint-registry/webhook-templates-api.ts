@@ -182,7 +182,21 @@ const variableEndpoints = tagEndpoints("Webhook variables", [
   },
 ]);
 
+/** Checks a webhook's signature as the receiving app should (WH-15.5, A19). */
+const signatureEndpoints = tagEndpoints("Webhook deliveries", [
+  {
+    method: "POST",
+    path: "/api/v1/webhooks/signatures/verify",
+    summary:
+      "Check a captured request's webhook signature: Standard Webhooks, Stripe or an HMAC header.",
+    requestBody: typeRef("SignatureVerifyRequest"),
+    response: typeRef("SignatureVerification"),
+    errorStatuses: [404],
+  },
+]);
+
 export const webhookTemplatesApi: ApiEndpoint[] = [
   ...templateEndpoints,
   ...variableEndpoints,
+  ...signatureEndpoints,
 ];

@@ -40,6 +40,14 @@ pub fn format_rfc5322(unix_ms: i64) -> String {
 }
 
 /// Reads `YYYY-MM-DDTHH:MM:SS`, optional fractional seconds, and `Z` or a `+HH:MM` offset.
+/// An RFC 2822 date, as Mailgun's events filters take one (`Thu, 13 Oct 2011 18:02:00 +0000`),
+/// to Unix milliseconds.
+pub fn parse_rfc2822(date_text: &str) -> Option<i64> {
+    chrono::DateTime::parse_from_rfc2822(date_text.trim())
+        .ok()
+        .map(|parsed_date| parsed_date.timestamp_millis())
+}
+
 pub fn parse_rfc3339(timestamp_text: &str) -> Option<i64> {
     let (date_text, time_text) = timestamp_text.trim().split_once(['T', 't', ' '])?;
     let mut date_parts = date_text.split('-');

@@ -4,7 +4,7 @@ use super::onesignal_notifications_api::answer_onesignal_notification;
 use crate::providers::{ProviderHttpRequest, ProviderHttpResponse, ProviderOutcome, ProviderRoute};
 use crate::{OperationContext, OperationError};
 
-const PUSH_PROVIDER_KEYS: [&str; 3] = ["fcm", "expo", "onesignal"];
+pub(crate) const PUSH_PROVIDER_KEYS: [&str; 3] = ["fcm", "expo", "onesignal"];
 
 /// Answers the request as one push provider, or `None` when it is not that provider's API.
 async fn answer_as_provider(
@@ -42,6 +42,7 @@ pub async fn answer_push_api(
                 provider_key: Some(provider_key.to_owned()),
                 created_message: None,
                 secret_values: Vec::new(),
+                is_unknown_path: false,
             }));
         }
     }

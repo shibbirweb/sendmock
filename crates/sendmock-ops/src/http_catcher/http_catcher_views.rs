@@ -52,6 +52,7 @@ pub fn present_captured_request(request_record: CapturedRequestRecord) -> Captur
         matched_rule_name: request_record.matched_rule_name,
         is_simulated_failure: request_record.is_simulated_failure,
         duration_ms: request_record.duration_ms,
+        provider_key: request_record.provider_key,
         is_read: request_record.is_read,
     }
 }

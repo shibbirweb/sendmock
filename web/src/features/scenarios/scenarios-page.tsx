@@ -2,6 +2,7 @@ import { PlayIcon, ShieldCheckIcon } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
+import { CiFileCard } from "@/features/scenarios/ci/ci-file-card";
 import { ScenarioFileActions } from "@/features/scenarios/scenario-file-actions";
 import { scenarioExamples } from "@/features/scenarios/scenario-examples";
 import { ScenarioReportView } from "@/features/scenarios/scenario-report";
@@ -120,6 +121,7 @@ export function ScenariosPage() {
             )}
           </div>
         </div>
+        <CiFileCard />
       </div>
     </div>
   );

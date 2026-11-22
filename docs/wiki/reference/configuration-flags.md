@@ -14,6 +14,10 @@ Each setting can come from a flag, a `SENDMOCK_*` environment variable or a key 
 | `--smtp-addr <HOST:PORT>` | `SENDMOCK_SMTP_ADDR` | `smtp_addr` | `127.0.0.1:1025` | Address for the SMTP listener. |
 | `--smtps-addr <HOST:PORT>` | `SENDMOCK_SMTPS_ADDR` | `smtps_addr` |  | Address for the SMTPS listener (TLS from the first byte); off unless set. |
 | `--provider-addr <HOST:PORT>` | `SENDMOCK_PROVIDER_ADDR` | `provider_addr` |  | Address that serves the provider APIs at their real paths, for SDKs with a swapped base URL; off unless set. |
+| `--provider-tls-addr <HOST:PORT>` | `SENDMOCK_PROVIDER_TLS_ADDR` | `provider_tls_addr` |  | Address that serves the provider APIs over HTTPS, next to --provider-addr; off unless set. |
+| `--provider-tls-cert <FILE>` | `SENDMOCK_PROVIDER_TLS_CERT` | `provider_tls_cert` | one from SendMock's local CA | Certificate (PEM) for --provider-tls-addr. |
+| `--provider-tls-key <FILE>` | `SENDMOCK_PROVIDER_TLS_KEY` | `provider_tls_key` |  | Private key (PEM) for `--provider-tls-cert`. |
+| `--provider-tls-names <NAMES>` | `SENDMOCK_PROVIDER_TLS_NAMES` | `provider_tls_names` |  | More names for the local CA's certificate, besides localhost, 127.0.0.1 and ::1 (comma-separated). |
 | `--catcher-addr <HOST:PORT>` | `SENDMOCK_CATCHER_ADDR` | `catcher_addr` |  | Address that captures every request at any path in the HTTP catcher, the first path segment naming the bin; off unless set. |
 | `--pop3-addr <HOST:PORT>` | `SENDMOCK_POP3_ADDR` | `pop3_addr` |  | Address for the POP3 listener, which serves the captured mail per project; off unless set. |
 | `--pop3-auth <MODE>` | `SENDMOCK_POP3_AUTH` | `pop3_auth` | `accept-any` | POP3 login: `accept-any` or `file:<path>` with `user:password` lines; the username picks the project. |
@@ -42,3 +46,9 @@ Each setting can come from a flag, a `SENDMOCK_*` environment variable or a key 
 | `--log-format <LOG_FORMAT>` | `SENDMOCK_LOG_FORMAT` | `log_format` | `human` | Log output: readable lines, or one JSON object per line for log collectors. |
 | `--log-level <LOG_LEVEL>` | `SENDMOCK_LOG_LEVEL` | `log_level` | `info` | Lowest log level shown. |
 | `--seed <FILE>` | `SENDMOCK_SEED` | `seed` | ./sendmock.seed.toml when present | Seed file with the configuration to start from. |
+| `--setup <PATH\|URL>` | `SENDMOCK_SETUP` |  |  | A setup file (TOML, JSON or YAML) or an https:// URL to one, applied at startup before SendMock reports ready. |
+| `--setup-sha256 <HEX>` | `SENDMOCK_SETUP_SHA256` |  |  | The SHA-256 the --setup download must have. |
+| `--setup-header <HEADER>` | `SENDMOCK_SETUP_HEADERS` |  |  | Headers for a private --setup URL, as `Name: value` (repeat, or one per line in the variable); never logged. |
+| `--last` |  |  |  | Start the services the launcher saved last, without asking; flags given with it win. |
+| `--services <LIST>` | `SENDMOCK_SERVICES` |  |  | Start these services on their saved or default addresses, without asking: smtp, smtps, provider, provider-tls, catcher, pop3 (comma-separated). |
+| `--no-input` | `SENDMOCK_NO_INPUT` |  |  | Never ask questions, even at a terminal. |

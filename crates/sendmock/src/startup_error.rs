@@ -47,8 +47,14 @@ pub enum StartupError {
         problems: String,
     },
 
+    #[error("The setup {location} could not be applied: {reason}")]
+    Setup { location: String, reason: String },
+
     #[error(transparent)]
     SmtpTls(#[from] sendmock_smtp::TlsSetupError),
+
+    #[error("Could not set up HTTPS for the provider APIs: {0}")]
+    ProviderTls(String),
 
     #[error("Could not start the server runtime: {0}")]
     Runtime(io::Error),
@@ -57,13 +63,15 @@ pub enum StartupError {
 impl StartupError {
     pub fn exit_code(&self) -> ExitCode {
         match self {
-            Self::Config(_) | Self::UnreadableSeed { .. } | Self::InvalidSeed { .. } => {
-                ExitCode::from(USAGE_ERROR_EXIT_CODE)
-            }
+            Self::Config(_)
+            | Self::UnreadableSeed { .. }
+            | Self::InvalidSeed { .. }
+            | Self::Setup { .. } => ExitCode::from(USAGE_ERROR_EXIT_CODE),
             Self::PortInUse { .. }
             | Self::Listen { .. }
             | Self::Database(_)
             | Self::SmtpTls(_)
+            | Self::ProviderTls(_)
             | Self::Runtime(_) => ExitCode::from(ERROR_EXIT_CODE),
         }
     }

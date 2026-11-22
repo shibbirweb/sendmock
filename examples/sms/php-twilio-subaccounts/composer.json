@@ -1,0 +1,11 @@
+{
+  "name": "sendmock/example-sms-twilio-php-subaccounts",
+  "description": "Creates a Twilio subaccount, sends under it and checks its signed status callbacks against SendMock with the official Twilio PHP SDK.",
+  "type": "project",
+  "license": "MIT",
+  "require": {
+    "php": ">=8.1",
+    "ext-curl": "*",
+    "twilio/sdk": "8.14.0"
+  }
+}

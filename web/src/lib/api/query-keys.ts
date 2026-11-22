@@ -72,6 +72,12 @@ export const queryKeys = {
     virtualNumbers: ["numbers", "virtual-numbers"] as const,
     messagingServices: ["numbers", "messaging-services"] as const,
   },
+  twilio: {
+    subaccounts: ["twilio", "subaccounts"] as const,
+  },
+  mailgun: {
+    complaints: ["mailgun", "complaints"] as const,
+  },
   webhooks: {
     all: ["webhooks"] as const,
     endpoints: ["webhooks", "endpoints"] as const,
@@ -140,6 +146,7 @@ export const queryKeys = {
   httpCatcher: {
     all: ["http-catcher"] as const,
     bins: ["http-catcher", "bins"] as const,
+    providerBins: ["http-catcher", "provider-bins"] as const,
     requests: (binId: string | null) =>
       ["http-catcher", "requests", binId] as const,
     request: (requestId: string) =>

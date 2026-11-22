@@ -5,7 +5,7 @@ description: Test and debug email, SMS, payments, HTTP calls and webhooks locall
 
 # SendMock
 
-Written for SendMock 1.3.1. SendMock catches what an app sends (email over SMTP or a provider API, SMS, push notifications, payments, HTTP calls) and sends back what providers send (status callbacks, inbound messages, payment notifications), all on this machine.
+Written for SendMock 1.4.0. SendMock catches what an app sends (email over SMTP or a provider API, SMS, push notifications, payments, HTTP calls) and sends back what providers send (status callbacks, inbound messages, payment notifications), all on this machine.
 
 ## First step
 
@@ -71,6 +71,30 @@ Add an email API SendMock does not ship, from its API docs.
 ### add-sms-provider
 
 The same for an SMS vendor: `sendmock_sms_provider_create`, `sendmock_sms_provider_update` (with its status names and its error code for each delivery outcome), `sendmock_sms_provider_preview`, a test request, then `sendmock_seed_export`.
+
+### Twilio subaccounts
+
+For an app with one Twilio subaccount per customer: `sendmock_twilio_subaccount_create` with the subaccount's SID (or none for a new one), a name and an `${ENV_VAR}` token the user keeps, `sendmock_twilio_subaccount_list` to check it (tokens stay masked; the user reveals one with `sendmock sms twilio subaccounts token <accountSid> --reveal`). The app can also create and fetch subaccounts through Twilio's Accounts API on the provider port. Callbacks for a message sent under a subaccount are signed with its token; a suspended or closed subaccount refuses sends.
+
+### Mailgun events and complaints
+
+An app on Mailgun can read `GET /v3/{domain}/events` and manage `/v3/{domain}/complaints` on the provider port. `sendmock_email_simulate` with `complained` puts the address on the domain's complaints table, so the app's suppression handling can be tested; `sendmock_email_mailgun_complaint_list` shows the tables and `sendmock_email_mailgun_complaint_clear` empties one (ask the user first).
+
+### Fill a missing vendor endpoint
+
+When the app calls a vendor endpoint SendMock does not implement (a `404` from the provider port, such as Twilio's `Calls.json`):
+
+1. `sendmock_http_provider_bin_attach` with the provider's area (`email`, `sms`, `push` or `payments`), its key and a bin name: the provider's unmatched requests now go to that bin, on the same base URL, and built-in endpoints still answer first.
+2. Read the vendor's documented answer, then `sendmock_http_response_set` on the bin with a rule: the method, a path glob (`/2010-04-01/Accounts/*/Calls.json`), that answer, and, if the vendor calls the app back, a `follow_up` webhook with the vendor's template (`twilio.status_callback` signs as Twilio does) and the callback URL from the request (`{{ request.form.StatusCallback }}`), or an endpoint.
+3. `sendmock_http_response_preview` to check the rule, call the endpoint from the app, then `sendmock_http_wait`, `sendmock_logs_http` and `sendmock_webhook_delivery_list` to confirm the answer and the callback. `sendmock_seed_export` keeps it.
+
+### ci-setup
+
+To test the app's webhooks in its CI pipeline:
+
+1. `sendmock_ci_init` with the repository's CI system (`github_actions`, `gitlab_ci`, `circleci`, `bitbucket_pipelines`, `azure_pipelines` or `jenkins`) answers three files: the setup (`sendmock.setup.yml`), a starter CI file (`sendmock.ci.yml`) and the job. Write them; `sendmock ci init` in the repository does the same.
+2. Edit the CI file: `app_url` is where the app listens in the pipeline, and each scenario checks one behaviour, such as `webhook.endpoint.test` then `webhook.delivery.wait` for a signed webhook the app must accept, or `http.request.wait`, `webhook.signature.verify` and an `assert` with `path` and `equals` for a webhook the app sends to an HTTP Catcher bin.
+3. `sendmock_ci_validate` checks it, `sendmock_ci_run` runs it here and answers the report, and in the pipeline `sendmock ci run sendmock.ci.yml --junit sendmock-report.xml` exits `0`, `5` when a scenario fails or `2` when a file is invalid.
 
 ### Capture outgoing HTTP calls
 

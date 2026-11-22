@@ -12,12 +12,12 @@ test("UI-11.6 the Scenarios screen validates and runs an example step by step", 
   await page
     .getByRole("menuitem", { name: "Pay a Stripe checkout with a test card" })
     .click();
-  await page.getByRole("button", { name: "Validate" }).click();
+  await page.getByRole("button", { name: "Validate", exact: true }).click();
   await expect(page.getByRole("region", { name: "Validation" })).toContainText(
     "Valid: 4 steps in stripe-checkout.",
   );
 
-  await page.getByRole("button", { name: "Run" }).click();
+  await page.getByRole("button", { name: "Run", exact: true }).click();
   const runReport = page.getByRole("region", { name: "Run report" });
   await expect(runReport.getByRole("status")).toContainText(
     "Passed: 4 of 4 steps",

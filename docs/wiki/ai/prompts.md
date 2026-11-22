@@ -19,6 +19,7 @@ Agents that support MCP prompts show these in their prompt picker (in Claude Cod
 | `add-payment-gateway` | add a gateway (and its method and flow when needed) from the provider's docs, preview it, run a test checkout and confirm your app gets the redirect and notification |
 | `add-email-provider` | add an email API from its docs: requests, field mapping, checks and answers, checked in the preview and exported to the seed file |
 | `add-sms-provider` | add an SMS vendor from its docs, with its status names and error codes, checked in the preview and exported to the seed file |
+| `fill-provider-gap` | answer a vendor endpoint SendMock does not implement on the provider's own base URL: attach a bin, add a rule with the vendor's documented answer and its signed callback, then check it |
 
 ## Related
 

@@ -29,6 +29,37 @@ pub struct ServeArguments {
     #[arg(long, env = "SENDMOCK_PROVIDER_ADDR", value_name = "HOST:PORT")]
     pub provider_addr: Option<SocketAddr>,
 
+    /// Address that serves the provider APIs over HTTPS, next to --provider-addr; off unless set
+    #[arg(long, env = "SENDMOCK_PROVIDER_TLS_ADDR", value_name = "HOST:PORT")]
+    pub provider_tls_addr: Option<SocketAddr>,
+
+    /// Certificate (PEM) for --provider-tls-addr [default: one from SendMock's local CA]
+    #[arg(
+        long,
+        env = "SENDMOCK_PROVIDER_TLS_CERT",
+        value_name = "FILE",
+        requires = "provider_tls_key"
+    )]
+    pub provider_tls_cert: Option<PathBuf>,
+
+    /// Private key (PEM) for `--provider-tls-cert`
+    #[arg(
+        long,
+        env = "SENDMOCK_PROVIDER_TLS_KEY",
+        value_name = "FILE",
+        requires = "provider_tls_cert"
+    )]
+    pub provider_tls_key: Option<PathBuf>,
+
+    /// More names for the local CA's certificate, besides localhost, 127.0.0.1 and ::1 (comma-separated)
+    #[arg(
+        long,
+        env = "SENDMOCK_PROVIDER_TLS_NAMES",
+        value_name = "NAMES",
+        value_delimiter = ','
+    )]
+    pub provider_tls_names: Vec<String>,
+
     /// Address that captures every request at any path in the HTTP catcher, the first path segment naming the bin; off unless set
     #[arg(long, env = "SENDMOCK_CATCHER_ADDR", value_name = "HOST:PORT")]
     pub catcher_addr: Option<SocketAddr>,
@@ -175,4 +206,38 @@ pub struct ServeArguments {
     /// Seed file with the configuration to start from [default: ./sendmock.seed.toml when present]
     #[arg(long = "seed", env = "SENDMOCK_SEED", value_name = "FILE")]
     pub seed_file_path: Option<PathBuf>,
+
+    /// A setup file (TOML, JSON or YAML) or an https:// URL to one, applied at startup before SendMock reports ready
+    #[arg(long = "setup", env = "SENDMOCK_SETUP", value_name = "PATH|URL")]
+    pub setup_location: Option<String>,
+
+    /// The SHA-256 the --setup download must have
+    #[arg(long, env = "SENDMOCK_SETUP_SHA256", value_name = "HEX")]
+    pub setup_sha256: Option<String>,
+
+    /// Headers for a private --setup URL, as `Name: value` (repeat, or one per line in the variable); never logged
+    #[arg(
+        long = "setup-header",
+        env = "SENDMOCK_SETUP_HEADERS",
+        hide_env_values = true,
+        value_name = "HEADER",
+        value_delimiter = '\n'
+    )]
+    pub setup_headers: Vec<String>,
+
+    /// Start the services the launcher saved last, without asking; flags given with it win
+    #[arg(long)]
+    pub last: bool,
+
+    /// Start these services on their saved or default addresses, without asking: smtp, smtps, provider, provider-tls, catcher, pop3 (comma-separated)
+    #[arg(long, env = "SENDMOCK_SERVICES", value_name = "LIST")]
+    pub services: Option<String>,
+
+    /// Never ask questions, even at a terminal
+    #[arg(
+        long,
+        env = "SENDMOCK_NO_INPUT",
+        value_parser = clap::builder::FalseyValueParser::new()
+    )]
+    pub no_input: bool,
 }

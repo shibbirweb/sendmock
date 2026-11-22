@@ -36,6 +36,11 @@ import { smsHandlers } from "@/mocks/handlers/sms-handlers";
 import { smsThreadHandlers } from "@/mocks/handlers/sms-thread-handlers";
 import { smsSendHandlers } from "@/mocks/handlers/sms-send-handlers";
 import { systemHandlers } from "@/mocks/handlers/system-handlers";
+import { tlsHandlers } from "@/mocks/handlers/tls-handlers";
+import { ciHandlers } from "@/mocks/handlers/ci-handlers";
+import { providerBinHandlers } from "@/mocks/handlers/provider-bin-handlers";
+import { twilioSubaccountHandlers } from "@/mocks/handlers/twilio-subaccount-handlers";
+import { mailgunComplaintHandlers } from "@/mocks/handlers/mailgun-complaint-handlers";
 import { verifyHandlers } from "@/mocks/handlers/verify-handlers";
 import { webhookDeliveryHandlers } from "@/mocks/handlers/webhook-delivery-handlers";
 import { webhookEndpointHandlers } from "@/mocks/handlers/webhook-endpoint-handlers";
@@ -77,6 +82,11 @@ export const mockHandlers = [
   ...smsHandlers,
   ...verifyHandlers,
   ...numbersHandlers,
+  ...twilioSubaccountHandlers,
+  ...providerBinHandlers,
+  ...ciHandlers,
+  ...mailgunComplaintHandlers,
+  ...tlsHandlers,
   ...outcomeRulesHandlers,
   ...logsHandlers,
   ...httpBinHandlers,

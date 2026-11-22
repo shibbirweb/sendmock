@@ -37,7 +37,16 @@ export type ApiRequestLogEntry = {
   duration_ms: number;
   /** The SMS or email this request created; null for rejected requests. */
   linked_message: ApiRequestLinkedMessage | null;
+  /** The attached bin and rule that answered; null when SendMock answered itself. */
+  catcher_answer: ApiRequestCatcherAnswer | null;
   created_at: IsoTimestamp;
+};
+
+/** The HTTP Catcher bin and rule that answered a provider request no built-in operation answers. */
+export type ApiRequestCatcherAnswer = {
+  bin_name: string;
+  /** Null when the bin's default reply answered. */
+  rule_name: string | null;
 };
 
 export type ApiRequestLinkedMessage = {
@@ -171,6 +180,8 @@ export type AppInfo = {
   smtp_address: string;
   http_address: string;
   provider_address: string | null;
+  /** The provider APIs over HTTPS (`--provider-tls-addr`); null when it is off (PL-20). */
+  provider_tls_address: string | null;
   /** The catch-all catcher port (`--catcher-addr`); null when it is off. */
   catcher_address: string | null;
   /** The POP3 listener (`--pop3-addr`), which serves the captured mail per project; null when it is off (EM-21). */
@@ -454,4 +465,23 @@ export type UpdateCheckResult = {
 /** Answer of `GET /health`. */
 export type HealthStatus = {
   status: "ok";
+};
+
+/** SendMock's local CA, to trust for the HTTPS provider port (PL-20). */
+export type TlsCertificateAuthority = {
+  /**
+   * Where the CA certificate is on the machine SendMock runs on.
+   * @example "/home/sam/.local/share/sendmock/provider-ca-certificate.pem"
+   */
+  path: string;
+  /**
+   * The CA certificate (PEM), to add to a trust store or `NODE_EXTRA_CA_CERTS`.
+   * @example "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----\n"
+   */
+  pem: string;
+  /**
+   * The provider APIs over HTTPS.
+   * @example "127.0.0.1:8027"
+   */
+  provider_tls_address: string;
 };

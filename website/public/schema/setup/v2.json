@@ -326,6 +326,39 @@
       ],
       "type": "string"
     },
+    "HttpFollowUpWebhook": {
+      "description": "The webhook a rule sends after it answers.",
+      "properties": {
+        "delay_ms": {
+          "default": 0,
+          "description": "How long after the answer it is sent, in milliseconds (0 to 600,000).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "endpoint_id": {
+          "default": null,
+          "description": "A webhook endpoint's ID: its URL and retry policy are used instead of `url`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "template_id": {
+          "description": "The webhook template its body and headers render with, such as `twilio.status_callback`;\nvendor templates sign as the vendor does.",
+          "type": "string"
+        },
+        "url": {
+          "default": "",
+          "description": "A URL template, such as `{{ request.form.StatusCallback }}`; empty when an endpoint is\nchosen.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "template_id"
+      ],
+      "type": "object"
+    },
     "HttpMockResponse": {
       "description": "What a bin or rule answers.",
       "properties": {
@@ -389,6 +422,18 @@
             }
           ],
           "description": "Header and body conditions; null matches every request."
+        },
+        "follow_up": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HttpFollowUpWebhook"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "A webhook sent after the rule answers; null for none."
         },
         "id": {
           "type": "string"
@@ -569,6 +614,16 @@
         "auto_success",
         "auto_decline",
         "random"
+      ],
+      "type": "string"
+    },
+    "ProviderArea": {
+      "description": "Where a provider lives: email and SMS providers (Verify services among them), push services\nand payment gateways.",
+      "enum": [
+        "email",
+        "sms",
+        "push",
+        "payments"
       ],
       "type": "string"
     },
@@ -935,6 +990,30 @@
       ],
       "type": "object"
     },
+    "SeedProviderBin": {
+      "additionalProperties": false,
+      "description": "`[[http.provider_bins]]`, matched by `area` and `provider`: the bin that answers the\nprovider's unmatched requests, made when no bin has its name.",
+      "properties": {
+        "area": {
+          "$ref": "#/$defs/ProviderArea",
+          "description": "`email`, `sms`, `push` or `payments`."
+        },
+        "bin": {
+          "description": "The bin's name.",
+          "type": "string"
+        },
+        "provider": {
+          "description": "The provider's key, such as `twilio`.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "area",
+        "provider",
+        "bin"
+      ],
+      "type": "object"
+    },
     "SeedSavedDelivery": {
       "additionalProperties": false,
       "description": "`[[webhook.saved]]`, matched by `name`: the request as saved, without signature headers,\nwhich are made on every send. Saved deliveries survive reset, as they do in the UI.",
@@ -1050,6 +1129,37 @@
       "required": [
         "name",
         "tag"
+      ],
+      "type": "object"
+    },
+    "SeedTwilioSubaccount": {
+      "additionalProperties": false,
+      "description": "`[[sms.twilio_subaccounts]]`, matched by `sid`. The token is an `${ENV_VAR}` reference or\nan encrypted secret, never the token itself.",
+      "properties": {
+        "auth_token": {
+          "description": "Left empty (an unset `${ENV_VAR}`), an existing subaccount keeps its token and a new\none gets a generated token.",
+          "type": "string"
+        },
+        "debugger_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "sid": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/TwilioAccountStatus",
+          "default": "active"
+        }
+      },
+      "required": [
+        "sid",
+        "name"
       ],
       "type": "object"
     },
@@ -1265,6 +1375,15 @@
       ],
       "type": "string"
     },
+    "TwilioAccountStatus": {
+      "description": "A Twilio account's status, as the Accounts API writes it.",
+      "enum": [
+        "active",
+        "suspended",
+        "closed"
+      ],
+      "type": "string"
+    },
     "UpdateCheckMode": {
       "description": "When SendMock looks for a newer release: `off` never calls out, `manual` only on\nrequest, `daily` on start and once a day.",
       "enum": [
@@ -1328,6 +1447,12 @@
         "bins": {
           "items": {
             "$ref": "#/$defs/SeedHttpBin"
+          },
+          "type": "array"
+        },
+        "provider_bins": {
+          "items": {
+            "$ref": "#/$defs/SeedProviderBin"
           },
           "type": "array"
         }
@@ -1457,6 +1582,12 @@
         "providers": {
           "items": {
             "$ref": "#/$defs/SeedMessageProvider"
+          },
+          "type": "array"
+        },
+        "twilio_subaccounts": {
+          "items": {
+            "$ref": "#/$defs/SeedTwilioSubaccount"
           },
           "type": "array"
         }

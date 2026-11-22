@@ -1,4 +1,17 @@
 {
   "title": "Connect your app",
-  "pages": ["index", "php", "node", "python", "go", "java", "rust", "ruby", "dotnet", "docker", "kubernetes"]
+  "pages": [
+    "index",
+    "php",
+    "node",
+    "python",
+    "go",
+    "java",
+    "rust",
+    "ruby",
+    "dotnet",
+    "https",
+    "docker",
+    "kubernetes"
+  ]
 }

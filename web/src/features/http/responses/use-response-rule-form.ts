@@ -5,6 +5,11 @@ import {
   type NameValueRow,
   toNameValueRows,
 } from "@/components/common/name-value-rows-editor";
+import {
+  type FollowUpFormValues,
+  toFollowUp,
+  toFollowUpFormValues,
+} from "@/features/http/responses/follow-up-form-values";
 import type {
   HttpMethod,
   HttpMockResponse,
@@ -38,6 +43,7 @@ export type ResponseRuleFormValues = MockResponseFormValues & {
   delayMaxMs: string;
   failureRatePercent: string;
   failureStatusCode: string;
+  followUp: FollowUpFormValues;
 };
 
 export function toMockResponseFormValues(
@@ -83,6 +89,7 @@ function toFormValues(
     delayMaxMs: String(editedRule?.delay_max_ms ?? 0),
     failureRatePercent: String(editedRule?.failure_rate_percent ?? 0),
     failureStatusCode: String(editedRule?.failure_status_code ?? 500),
+    followUp: toFollowUpFormValues(editedRule?.follow_up ?? null),
   };
 }
 
@@ -102,6 +109,7 @@ export function toResponseRule(
     delay_max_ms: Number(formValues.delayMaxMs),
     failure_rate_percent: Number(formValues.failureRatePercent),
     failure_status_code: Number(formValues.failureStatusCode),
+    follow_up: toFollowUp(formValues.followUp),
   };
 }
 

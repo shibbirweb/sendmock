@@ -223,7 +223,10 @@ async fn a_callback_cut_off_by_a_restart_is_sent_again() {
     let fixture = build_fixture(Vec::new()).await;
     let sms_id = fixture.send_native_sms().await;
     let first_attempts = fixture.wait_for_callback_attempts(&sms_id, 2).await;
-    let attempt_repository = &fixture.operation_context.sms_callback_attempt_repository;
+    let attempt_repository = &fixture
+        .operation_context
+        .sms_delivery_stores
+        .callback_attempts;
     attempt_repository
         .insert_attempt(SmsCallbackAttemptRecord {
             attempt_id: "01INFLIGHT".to_owned(),

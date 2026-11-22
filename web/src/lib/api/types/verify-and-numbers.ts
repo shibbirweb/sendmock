@@ -151,11 +151,24 @@ export type VirtualNumber = {
    * @example "MG00000000000000000000000000000001"
    */
   messaging_service_sid: string | null;
+  /**
+   * The number's SID in Twilio's IncomingPhoneNumbers API.
+   * @example "PN00000000000000000000000000000001"
+   */
+  phone_number_sid: string;
+  /**
+   * The Twilio account the number belongs to; null for the main account.
+   * @example null
+   */
+  account_sid: string | null;
   created_by: CreatedBy;
 };
 
 /** Body of POST and PATCH /api/v1/numbers. */
-export type VirtualNumberInput = Omit<VirtualNumber, "id" | "created_by">;
+export type VirtualNumberInput = Omit<
+  VirtualNumber,
+  "id" | "created_by" | "phone_number_sid" | "account_sid"
+>;
 
 /** What a Messaging Service does with inbound messages to its numbers. */
 export type MessagingServiceInboundMode =

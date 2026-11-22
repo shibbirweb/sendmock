@@ -36,7 +36,18 @@ pub struct InstanceDetails {
     pub catcher_address: Option<String>,
     /// The POP3 listener (`--pop3-addr`), when on.
     pub pop3_address: Option<String>,
+    /// The provider APIs over HTTPS (`--provider-tls-addr`), when on.
+    pub provider_tls: Option<ProviderTlsDetails>,
     pub is_container: bool,
+}
+
+/// The HTTPS provider listener and, when SendMock made its certificate, the local CA to trust.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProviderTlsDetails {
+    pub address: String,
+    /// `None` when `--provider-tls-cert` gives the certificate.
+    pub ca_certificate_path: Option<String>,
+    pub ca_certificate_pem: Option<String>,
 }
 
 #[cfg(test)]

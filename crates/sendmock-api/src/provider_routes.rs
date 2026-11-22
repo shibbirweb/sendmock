@@ -1,18 +1,21 @@
+use std::net::SocketAddr;
 use std::time::Instant;
 
 use axum::Router;
 use axum::body::{Body, to_bytes};
-use axum::extract::{Path, Request, State};
+use axum::extract::{ConnectInfo, Path, Request, State};
 use axum::http::{HeaderMap, HeaderName, HeaderValue, StatusCode};
 use axum::response::{IntoResponse, Response};
 use axum::routing::any;
 use sendmock_ops::{
-    CompletedApiRequest, OperationContext, PROJECT_HEADER, ProviderHttpRequest, ProviderOutcome,
-    ProviderRequestLogEntry, ProviderRoute, answer_provider_request, find_named_project,
-    find_whatsapp_media_download, record_provider_request,
+    CompletedApiRequest, OperationContext, PROJECT_HEADER, ProviderGapOrigin, ProviderHttpRequest,
+    ProviderOutcome, ProviderRequestLogEntry, ProviderRoute, answer_provider_gap,
+    answer_provider_request, find_named_project, find_whatsapp_media_download,
+    record_provider_request,
 };
 
 use crate::api_error_response::ApiErrorResponse;
+use crate::provider_gap_response::{LoggedProviderRequest, answer_with_bin};
 use crate::request_body_decoding::decode_request_body;
 
 /// Provider requests larger than this are refused before they are read, as the REST routes do.
@@ -106,6 +109,13 @@ pub async fn answer_provider_http_request(
     request: Request,
 ) -> Response {
     let started_at = Instant::now();
+    let client_ip = request
+        .extensions()
+        .get::<ConnectInfo<SocketAddr>>()
+        .map_or_else(
+            || "127.0.0.1".to_owned(),
+            |connect_info| connect_info.0.ip().to_string(),
+        );
     let (request_parts, request_body) = request.into_parts();
     let (path_project, provider_path) = split_project_prefix(provider_path);
     let project_context =
@@ -126,7 +136,29 @@ pub async fn answer_provider_http_request(
         headers: request_headers.iter().cloned().collect(),
         body: request_bytes,
     };
-    match find_whatsapp_media_download(operation_context, &provider_request).await {
+    let logged_path = request_parts.uri.path_and_query().map_or_else(
+        || request_parts.uri.path().to_owned(),
+        |path_and_query| path_and_query.as_str().to_owned(),
+    );
+    let logged_request = LoggedProviderRequest {
+        provider_request,
+        logged_path,
+        request_headers,
+        started_at,
+    };
+    answer_read_request(operation_context, provider_route, logged_request, client_ip).await
+}
+
+/// The answer to a request already read: a WhatsApp media download, the built-in answer, or
+/// the attached bin's when no built-in operation serves the path.
+async fn answer_read_request(
+    operation_context: &OperationContext,
+    provider_route: ProviderRoute<'_>,
+    logged_request: LoggedProviderRequest,
+    client_ip: String,
+) -> Response {
+    let provider_request = &logged_request.provider_request;
+    match find_whatsapp_media_download(operation_context, provider_request).await {
         Ok(Some((mime_type, media_content))) => {
             return build_media_response(&mime_type, media_content);
         }
@@ -134,21 +166,41 @@ pub async fn answer_provider_http_request(
         Err(operation_error) => return ApiErrorResponse::from(operation_error).into_response(),
     }
     let provider_outcome =
-        match answer_provider_request(operation_context, provider_route, &provider_request).await {
+        match answer_provider_request(operation_context, provider_route, provider_request).await {
             Ok(provider_outcome) => provider_outcome,
             Err(operation_error) => return ApiErrorResponse::from(operation_error).into_response(),
         };
-    let completed_request = CompletedApiRequest {
-        method: provider_request.method,
-        path: request_parts.uri.path_and_query().map_or_else(
-            || request_parts.uri.path().to_owned(),
-            |path_and_query| path_and_query.as_str().to_owned(),
+    let gap_origin = ProviderGapOrigin {
+        url: format!(
+            "http://{}{}",
+            provider_request.host().unwrap_or("localhost"),
+            logged_request.logged_path
         ),
-        request_headers,
-        request_body: provider_request.body,
+        client_ip,
+    };
+    match answer_provider_gap(
+        operation_context,
+        &provider_outcome,
+        provider_request,
+        gap_origin,
+    )
+    .await
+    {
+        Ok(Some(gap_answer)) => {
+            return answer_with_bin(operation_context, gap_answer, logged_request).await;
+        }
+        Ok(None) => {}
+        Err(operation_error) => return ApiErrorResponse::from(operation_error).into_response(),
+    }
+    let completed_request = CompletedApiRequest {
+        method: logged_request.provider_request.method,
+        path: logged_request.logged_path,
+        request_headers: logged_request.request_headers,
+        request_body: logged_request.provider_request.body,
         response_status: provider_outcome.response.status,
         response_body: provider_outcome.response.body.clone().into_bytes(),
-        duration_ms: u64::try_from(started_at.elapsed().as_millis()).unwrap_or(u64::MAX),
+        duration_ms: u64::try_from(logged_request.started_at.elapsed().as_millis())
+            .unwrap_or(u64::MAX),
     };
     record_outcome(operation_context, &provider_outcome, completed_request).await;
     build_http_response(provider_outcome)
@@ -226,6 +278,7 @@ async fn record_outcome(
             .unwrap_or_else(|| "unknown".to_owned()),
         created_message: provider_outcome.created_message.clone(),
         secret_values: provider_outcome.secret_values.clone(),
+        catcher_answer: None,
     };
     if let Err(record_error) =
         record_provider_request(operation_context, log_entry, completed_request).await

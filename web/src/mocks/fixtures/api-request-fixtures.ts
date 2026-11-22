@@ -12,7 +12,7 @@ import { readSmsThreadId } from "@/mocks/fixtures/sms-thread-id";
 
 type ApiRequestSpec = Omit<
   ApiRequestLogEntry,
-  "id" | "created_at" | "linked_message"
+  "id" | "created_at" | "linked_message" | "catcher_answer"
 > & { minutesAgo: number };
 
 const twilioMessagesPath =
@@ -126,6 +126,7 @@ export function buildApiRequestLogFixtures(
       ...requestFields,
       id: createMockUlid(minutesAgoInMs(requestMinutesAgo)),
       linked_message: null,
+      catcher_answer: null,
       created_at: minutesAgo(requestMinutesAgo),
     }),
   );

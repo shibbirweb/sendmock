@@ -46,6 +46,19 @@
     ]
   },
   {
+    "id": "twilio.debugger",
+    "name": "Twilio: Debugger event",
+    "service": "Twilio",
+    "category": "sms-provider",
+    "events": [
+      "sms.status"
+    ],
+    "description": "Twilio: Debugger event payload, matching the provider's documented format.",
+    "required_variables": [
+      "twilio_auth_token"
+    ]
+  },
+  {
     "id": "vonage.inbound",
     "name": "Vonage: inbound SMS",
     "service": "Vonage",

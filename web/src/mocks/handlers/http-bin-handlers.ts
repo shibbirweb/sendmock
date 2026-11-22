@@ -92,6 +92,9 @@ export const httpBinHandlers = [
         (capturedRequest) => capturedRequest.bin_id !== params.binId,
       );
     mockDatabase.httpResponseRules.delete(String(params.binId));
+    mockDatabase.providerBins = mockDatabase.providerBins.filter(
+      (providerBin) => providerBin.bin_id !== params.binId,
+    );
 
     return new HttpResponse(null, { status: 204 });
   }),

@@ -1,21 +1,27 @@
-import { CopyIcon, ForwardIcon, WebhookIcon } from "lucide-react";
+import {
+  CopyIcon,
+  ForwardIcon,
+  ShieldCheckIcon,
+  WebhookIcon,
+} from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { ForwardRequestDialog } from "@/features/http/requests/forward-request-dialog";
+import { VerifySignatureDialog } from "@/features/http/requests/verify-signature-dialog";
 import { SendToWebhookDialog } from "@/features/webhooks/send/send-to-webhook-dialog";
 import type { CapturedHttpRequest, HttpMethod } from "@/lib/api/types";
 import { buildCurlCommand } from "@/lib/webhooks/build-curl-command";
 
-/** Copy as cURL, Forward to URL and Send to webhook (HC-01.5, HC-01.7). */
+/** Copy as cURL, Forward to URL, Send to webhook and Verify signature (HC-01.5, HC-01.7, WH-15.5). */
 export function CapturedRequestActions({
   capturedRequest,
 }: {
   capturedRequest: CapturedHttpRequest;
 }) {
   const [openDialog, setOpenDialog] = React.useState<
-    "forward" | "webhook" | null
+    "forward" | "webhook" | "signature" | null
   >(null);
 
   return (
@@ -58,6 +64,24 @@ export function CapturedRequestActions({
         <WebhookIcon />
         Send to webhook
       </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => {
+          setOpenDialog("signature");
+        }}
+      >
+        <ShieldCheckIcon />
+        Verify signature
+      </Button>
+      {openDialog === "signature" && (
+        <VerifySignatureDialog
+          capturedRequest={capturedRequest}
+          onClose={() => {
+            setOpenDialog(null);
+          }}
+        />
+      )}
       {openDialog === "forward" && (
         <ForwardRequestDialog
           capturedRequest={capturedRequest}

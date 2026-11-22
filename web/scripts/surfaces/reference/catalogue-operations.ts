@@ -20,7 +20,7 @@ export type CatalogueOperation = {
 
 /** POSTs that compute an answer without changing anything. */
 const readOnlyActionPattern =
-  /\/(preview|render|test|match|validate|link-check|spam-check|setup\/export|migrate)$/;
+  /\/(preview|render|test|match|validate|link-check|spam-check|setup\/export|migrate|ci\/init|signatures\/verify)$/;
 
 /** Action POSTs the pattern matches that send a real request and store a delivery. */
 const sendingActionPaths = new Set([

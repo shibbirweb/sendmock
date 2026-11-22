@@ -1,0 +1,65 @@
+name: CI pipeline example
+
+on:
+  pull_request:
+    paths:
+      - crates/**
+      - examples/ci/**
+      - .github/workflows/ci-examples.yml
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - crates/**
+      - examples/ci/**
+      - .github/workflows/ci-examples.yml
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-examples-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci-example:
+    name: sendmock ci run on the example shop
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Live UI the binary embeds
+        working-directory: web
+        env:
+          VITE_API_MODE: live
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+
+      - name: Toolchain from rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          save-if: ${{ github.event_name != 'pull_request' }}
+
+      - name: Release build
+        run: cargo build --release --locked -p sendmock
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: Run the example both ways, and a broken app
+        env:
+          SENDMOCK_BINARY: ${{ github.workspace }}/target/release/sendmock
+        run: examples/ci/run-ci-example-test.sh
+
+      - name: SendMock log
+        if: failure()
+        run: cat sendmock-server.log || true

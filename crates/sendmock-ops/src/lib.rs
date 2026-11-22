@@ -2,6 +2,7 @@
 
 pub mod ai;
 mod bkash;
+mod ci;
 mod custom_gateways;
 mod demo;
 mod email;
@@ -13,6 +14,7 @@ mod input_shape;
 mod instance_details;
 mod integrations;
 mod logs;
+mod mailgun;
 mod message_providers;
 mod message_rules;
 mod no_input;
@@ -32,6 +34,7 @@ mod paypal;
 mod pop3_mailbox;
 mod present_value;
 mod projects;
+mod provider_bins;
 mod providers;
 mod push;
 mod razorpay;
@@ -50,10 +53,15 @@ mod sslcommerz;
 mod stripe;
 mod subscriptions;
 mod system;
+mod twilio_accounts;
 mod updates;
 mod verify;
 mod webhooks;
 
+pub use ci::{
+    CI_FORMAT_NAME, CI_FORMAT_VERSION, CiFile, CiFileRequest, CiInitFile, CiInitFiles,
+    CiInitRequest, CiReport, CiSystem, CiValidation, build_ci_json_schema, parse_ci_file,
+};
 pub use demo::{DemoDataError, DemoLoadOutcome, load_demo_data};
 pub use email::mailpit;
 pub use email::{
@@ -67,18 +75,19 @@ pub use events::{
     publish_email_inbound, publish_email_received, publish_event,
 };
 pub use http_catcher::{
-    CapturedHttpRequest, CatchAnswer, HttpBin, HttpMockResponse, IncomingHttpRequest,
-    capture_http_request,
+    CapturedHttpRequest, CatchAnswer, HttpBin, HttpFollowUpWebhook, HttpMockResponse,
+    IncomingHttpRequest, capture_http_request,
 };
 pub use inbound_routes::{InboundRoute, InboundRouteAction, InboundRouteFilter};
 pub use input_coercion::build_input_from_text;
 pub use input_shape::{InputShape, ScalarType, accepts_null, describe_input_shape};
-pub use instance_details::{InstanceDetails, ReleaseChannel};
+pub use instance_details::{InstanceDetails, ProviderTlsDetails, ReleaseChannel};
 pub use integrations::{GetIntegrationOperation, IntegrationSnippet};
 pub use logs::{
     ApiRequestLinkedMessage, ApiRequestLogEntry, CompletedApiRequest, ProviderRequestLogEntry,
     RequestLogSettings, SmtpSessionLogEntry, record_api_request, record_provider_request,
 };
+pub use mailgun::MailgunComplaint;
 pub use message_providers::{
     MessageProviderInput, MessageProviderPreview, MessageProviderView, ProviderCredentialReveal,
     ProviderSampleRequest, WhatsappWebhookVerification, WhatsappWebhookVerificationRequest,
@@ -110,6 +119,9 @@ pub use pop3_mailbox::{
     read_pop3_message,
 };
 pub use projects::{PROJECT_HEADER, Project, find_named_project};
+pub use provider_bins::{
+    ProviderArea, ProviderBin, ProviderGapAnswer, ProviderGapOrigin, answer_provider_gap,
+};
 pub use providers::{
     MessageProviderDefinition, ProviderHttpRequest, ProviderHttpResponse, ProviderOutcome,
     ProviderRoute, answer_provider_request, builtin_email_providers, builtin_sms_providers,
@@ -159,8 +171,9 @@ pub use smtp_chaos::{SmtpChaos, read_smtp_chaos, take_chaos_rejection};
 pub use smtp_delivery::{SmtpMessage, record_smtp_session, store_smtp_message};
 pub use system::{
     ActivityBucket, AppInfo, AppStats, CurrencyAmount, GetHealthOperation, GetInfoOperation,
-    GetStatsOperation, HealthStatus,
+    GetStatsOperation, GetTlsCaOperation, HealthStatus, TlsCertificateAuthority,
 };
+pub use twilio_accounts::{TwilioSubaccount, TwilioSubaccountTokenReveal};
 pub use updates::{
     AvailableRelease, GetUpdatesOperation, InstallMethod, PublishedRelease, ReleaseSource,
     UpdateCheckResult, UpdateChecker,
@@ -184,6 +197,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     let mut operation_registry = OperationRegistry::default();
     operation_registry.register(GetHealthOperation);
     operation_registry.register(GetInfoOperation);
+    operation_registry.register(GetTlsCaOperation);
     operation_registry.register(GetSeedStatusOperation);
     operation_registry.register(ExportSeedOperation);
     operation_registry.register(ValidateSeedOperation);
@@ -201,10 +215,14 @@ pub fn build_operation_registry() -> OperationRegistry {
     push::register_push_operations(&mut operation_registry);
     inbound_routes::register_inbound_route_operations(&mut operation_registry);
     http_catcher::register_http_catcher_operations(&mut operation_registry);
+    provider_bins::register_provider_bin_operations(&mut operation_registry);
     scenarios::register_scenario_operations(&mut operation_registry);
+    ci::register_ci_operations(&mut operation_registry);
     subscriptions::register_subscription_operations(&mut operation_registry);
     ai::register_ai_operations(&mut operation_registry);
     numbers::register_number_operations(&mut operation_registry);
+    twilio_accounts::register_twilio_account_operations(&mut operation_registry);
+    mailgun::register_mailgun_operations(&mut operation_registry);
     verify::register_verify_operations(&mut operation_registry);
     message_providers::register_sms_provider_operations(&mut operation_registry);
     webhooks::register_webhook_operations(&mut operation_registry);

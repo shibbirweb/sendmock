@@ -1,0 +1,29 @@
+# AC: WH-15.9
+sendmock:
+  format: sendmock.ci
+  format_version: 1
+setup: sendmock.setup.yml
+app_url: http://127.0.0.1:8000
+scenarios:
+  - name: the shop accepts SendMock's signed webhook
+    steps:
+      - run: webhook.endpoint.test
+        with: { endpoint_id: Shop app }
+      - run: webhook.delivery.wait
+        with: { endpoint: Shop app, status: succeeded, timeout: 5s }
+        save: delivery
+      - run: assert
+        with: { that: "{{ delivery.response.status_code }} == 200" }
+  - name: the shop sends a signed order.paid webhook
+    steps:
+      - run: http
+        with: { method: POST, url: "{{ app_url }}/orders", json: { item: "mug" } }
+      - run: http.request.wait
+        with: { bin: shop-outgoing, method: POST, timeout: 5s }
+        save: sent
+      - run: webhook.signature.verify
+        with: { scheme: standard_webhooks, secret: whsec_c2hvcC1vdXRnb2luZy1rZXk=, request_id: "{{ sent.id }}" }
+      - run: assert
+        with: { json: "{{ sent.body }}", path: "$.type", equals: order.paid }
+report:
+  junit: sendmock-report.xml

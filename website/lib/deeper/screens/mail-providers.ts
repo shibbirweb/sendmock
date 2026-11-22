@@ -2,6 +2,7 @@ import type { DeeperEntry, DeeperPage } from "../deeper-types";
 import { buildProviderEditorSetupEntries } from "./provider-editor-entries";
 import { buildProviderEditorResponseEntries } from "./provider-editor-response-entries";
 import { buildProviderListEntries } from "./provider-list-entries";
+import { buildUnmatchedRequestEntries } from "./unmatched-request-entries";
 
 const emailProviderArea = {
   messageWord: "email",
@@ -62,6 +63,7 @@ export const mailProvidersPage: DeeperPage = {
     ...buildProviderListEntries(emailProviderArea),
     ...sendGridEntries,
     ...buildProviderEditorSetupEntries(emailProviderArea),
+    ...buildUnmatchedRequestEntries("SendGrid"),
     ...buildProviderEditorResponseEntries(emailProviderArea),
   ],
 };

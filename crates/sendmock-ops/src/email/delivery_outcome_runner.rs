@@ -9,6 +9,7 @@ use sendmock_store::EmailRecord;
 use super::delivery_event_recording::record_delivery_event;
 use super::out_of_office_reply::send_out_of_office_reply;
 use crate::inbound_routes::start_inbound_routes;
+use crate::mailgun::suppress_complained_recipients;
 use crate::message_rules::{apply_tag_rules, start_forward_rules};
 use crate::{
     AppSettings, EmailOutcomeProfile, OperationContext, OperationError, load_email_outcome_rules,
@@ -45,7 +46,9 @@ pub async fn complete_email_intake(
     let stored_email = tagged_email.as_ref().unwrap_or(stored_email);
     publish_email_received(operation_context, stored_email);
     start_forward_rules(operation_context, stored_email).await?;
-    if stored_email.direction != "outbound" {
+    if stored_email.direction != "outbound"
+        || suppress_complained_recipients(operation_context, stored_email).await?
+    {
         return Ok(());
     }
     let recipient_addresses: Vec<String> = stored_email

@@ -18,6 +18,7 @@ export const testHelperSurfaces: SurfaceCatalogue = {
     phase: "4",
     cli: "sendmock http wait",
     mcp: "sendmock_http_wait",
+    mcpAliases: ["sendmock_http_request_wait"],
     ui: "HTTP Catcher (new requests appear live)",
   },
   "GET /api/v1/wait/webhook": {
@@ -73,6 +74,32 @@ export const testHelperSurfaces: SurfaceCatalogue = {
     ui: "Scenarios > Run",
     selector: { input: "scenario_id", isGiven: false },
     cliArguments: { file: "scenario" },
+  },
+  "POST /api/v1/ci/validate": {
+    phase: "A19",
+    cli: "sendmock ci validate <file>",
+    mcp: "sendmock_ci_validate",
+    ui: "Scenarios > CI file > Validate",
+    cliArguments: { file: "ci_file" },
+  },
+  "POST /api/v1/ci/run": {
+    phase: "A19",
+    cli: "sendmock ci run <file>",
+    mcp: "sendmock_ci_run",
+    ui: "Scenarios > CI file > Run",
+    cliArguments: { file: "ci_file" },
+  },
+  "POST /api/v1/ci/init": {
+    phase: "A19",
+    cli: "sendmock ci init",
+    mcp: "sendmock_ci_init",
+    ui: "Settings > Setup > Use in CI",
+  },
+  "POST /api/v1/webhooks/signatures/verify": {
+    phase: "A19",
+    cli: "sendmock webhook signature verify",
+    mcp: "sendmock_webhook_signature_verify",
+    ui: "HTTP Catcher > request > Verify signature",
   },
   "GET /api/v1/scenarios": {
     phase: "A18",

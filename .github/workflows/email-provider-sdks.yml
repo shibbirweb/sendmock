@@ -64,6 +64,8 @@ jobs:
         run: cargo build --release --locked -p sendmock
 
       - uses: ./.github/actions/start-sendmock-offline
+        with:
+          extra-args: --provider-tls-addr 127.0.0.1:8027
 
       - uses: actions/setup-node@v7
         with:
@@ -72,6 +74,21 @@ jobs:
       - name: Send with SendGrid, Mailgun, Postmark, Resend, SES v2 and Brevo SDKs
         working-directory: examples/email-providers/node
         run: bun install && node done-when.js
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          tools: composer
+
+      # AC: EM-23.6
+      - name: Mailgun PHP SDK reads events and manages complaints
+        working-directory: examples/email-providers/php-mailgun
+        run: composer install --no-interaction --quiet && php send-and-verify.php
+
+      # AC: PL-20.5
+      - name: Laravel's mailgun mailer sends over HTTPS with the local CA trusted
+        working-directory: examples/email-providers/php-laravel-mailgun-https
+        run: ./send-over-https-test.sh
 
       - uses: ./.github/actions/check-sendmock-offline
 

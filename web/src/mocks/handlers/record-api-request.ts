@@ -33,6 +33,7 @@ export function recordNativeApiRequest({
     response_body: JSON.stringify(responseBody),
     duration_ms: 1,
     linked_message: linkedMessage,
+    catcher_answer: null,
     created_at: new Date().toISOString(),
   });
 

@@ -91,6 +91,8 @@ export const numbersHandlers = [
       ...numberInput,
       label: numberInput.label.trim(),
       messaging_service_sid: null,
+      phone_number_sid: createProviderId("PN"),
+      account_sid: null,
       id: createMockUlid(),
       created_by: "ui",
     };

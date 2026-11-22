@@ -5,7 +5,7 @@ use rusqlite::{OptionalExtension, Row, params};
 use super::VirtualNumberRecord;
 use crate::{Database, StoreError};
 
-const NUMBER_COLUMNS: &str = "id, number, label, channels, inbound_url, inbound_method, inbound_fallback_url, inbound_template_id, status_callback_url, messaging_service_sid, created_by, created_at";
+const NUMBER_COLUMNS: &str = "id, number, label, channels, inbound_url, inbound_method, inbound_fallback_url, inbound_template_id, status_callback_url, messaging_service_sid, created_by, created_at, phone_number_sid, account_sid";
 const CHANNEL_SEPARATOR: &str = ",";
 
 #[derive(Clone)]
@@ -36,6 +36,14 @@ impl VirtualNumberRepository {
         number_id: &str,
     ) -> Result<Option<VirtualNumberRecord>, StoreError> {
         self.find_where("id", number_id).await
+    }
+
+    /// The number with this `PN` SID, if any.
+    pub async fn find_by_phone_number_sid(
+        &self,
+        phone_number_sid: &str,
+    ) -> Result<Option<VirtualNumberRecord>, StoreError> {
+        self.find_where("phone_number_sid", phone_number_sid).await
     }
 
     /// The registered number with this E.164 value, if any.
@@ -71,7 +79,7 @@ impl VirtualNumberRepository {
         self.database
             .write(move |connection| {
                 connection.execute(
-                    &format!("INSERT INTO virtual_numbers ({NUMBER_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)"),
+                    &format!("INSERT INTO virtual_numbers ({NUMBER_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)"),
                     params![
                         new_number.number_id,
                         new_number.number,
@@ -85,6 +93,8 @@ impl VirtualNumberRepository {
                         new_number.messaging_service_sid,
                         new_number.created_by,
                         new_number.created_at_unix_ms,
+                        new_number.phone_number_sid,
+                        new_number.account_sid,
                     ],
                 )?;
                 Ok(())
@@ -151,5 +161,7 @@ fn read_number_row(row: &Row<'_>) -> rusqlite::Result<VirtualNumberRecord> {
         messaging_service_sid: row.get(9)?,
         created_by: row.get(10)?,
         created_at_unix_ms: row.get(11)?,
+        phone_number_sid: row.get::<_, Option<String>>(12)?.unwrap_or_default(),
+        account_sid: row.get(13)?,
     })
 }

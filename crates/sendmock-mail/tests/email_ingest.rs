@@ -137,6 +137,24 @@ async fn extracts_codes_links_and_tags_on_arrival() {
     );
 }
 
+// AC: EM-05.6
+#[tokio::test]
+async fn finds_a_code_that_is_only_in_the_subject() {
+    let fixture = build_fixture();
+    let raw_message = "From: no-reply@shop.test\r\nTo: sam@example.test\r\nSubject: 909582 is your App login code\r\n\r\nSign in to continue.\r\n".to_owned();
+
+    let email_id = ingest(&fixture, raw_message.into_bytes(), &["sam@example.test"]).await;
+
+    let email = fixture
+        .email_repository
+        .find_email(&email_id)
+        .await
+        .unwrap_or_else(|error| panic!("a read: {error:?}"))
+        .unwrap_or_else(|| panic!("the email is missing"));
+    assert_eq!(email.otp_codes, ["909582"]);
+    assert_eq!(email.snippet, "Sign in to continue.");
+}
+
 // AC: EM-03.1
 #[tokio::test]
 async fn keeps_the_raw_message_byte_for_byte() {

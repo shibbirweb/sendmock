@@ -2,7 +2,7 @@ use schemars::JsonSchema;
 use sendmock_store::WebhookEndpointRecord;
 use sendmock_webhooks::WebhookSecret;
 use serde::{Deserialize, Serialize};
-use serde_json::{Value, json};
+use serde_json::Value;
 
 use crate::seed::seed_section_adapter::{
     CREATED_BY_SEED, SeedItem, impl_seed_section_adapter, read_seed_table, write_changed_fields,
@@ -12,8 +12,9 @@ use crate::seed::seed_sections::WEBHOOK_ENDPOINTS_SECTION;
 use crate::setup::SetupSecretWriter;
 use crate::webhooks::{
     DeleteWebhookEndpointOperation, EndpointRequestSettings, WebhookEndpointInput,
-    WebhookEndpointReference, choose_detached_template, read_request_settings,
-    validate_endpoint_input, write_detached_template, write_request_settings,
+    WebhookEndpointReference, choose_detached_template, default_request_settings,
+    read_request_settings, validate_endpoint_input, write_detached_template,
+    write_request_settings,
 };
 use crate::{Operation, OperationContext, OperationError};
 
@@ -47,29 +48,6 @@ fn default_template() -> String {
 }
 
 /// What a new endpoint starts with in the UI.
-fn default_request_settings() -> Value {
-    json!({
-        "method": "POST",
-        "headers": {},
-        "extra_fields": {},
-        "template_id": "native",
-        "template_mode": "linked",
-        "timeout_ms": 10_000,
-        "retry_policy": {
-            "max_attempts": 5,
-            "backoff_seconds": [1, 5, 30, 120, 600],
-            "retry_on_client_errors": false,
-        },
-        "query_params": [],
-        "body_mode": "template",
-        "body_fields": [],
-        "fields_encoding": "json",
-        "raw_content_type": "application/json",
-        "raw_body": "",
-        "render_mode": "strict",
-    })
-}
-
 fn invalid_field(field_name: &str, message: String) -> OperationError {
     OperationError::InvalidInput {
         message,

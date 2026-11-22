@@ -302,3 +302,31 @@ async fn ses_v2_raw_content_is_stored_as_sent_with_the_sender_and_recipients_fro
     assert_eq!(refused.status, 400, "{}", refused.body_text);
     assert_eq!(count_emails(&app_router).await, 1);
 }
+
+// AC: EM-08.1 PL-20.5
+#[tokio::test]
+async fn mailgun_messages_mime_stores_the_whole_message_with_the_recipients_from_to() {
+    let (app_router, _) = build_test_app();
+    let boundary = "mailgun-mime-boundary";
+    let raw_message = "From: Shop <shop@mg.example.test>\r\nTo: sam@example.test\r\nSubject: Sent as MIME\r\nMessage-ID: <mime-1@shop.test>\r\nContent-Type: text/plain\r\n\r\nYour order shipped";
+    let form_body = format!(
+        "--{boundary}\r\nContent-Disposition: form-data; name=\"to\"\r\n\r\nsam@example.test\r\n\
+         --{boundary}\r\nContent-Disposition: form-data; name=\"message\"; filename=\"message.mime\"\r\nContent-Type: message/rfc822\r\n\r\n{raw_message}\r\n--{boundary}--\r\n"
+    );
+
+    let reply = send_provider_request(
+        &app_router,
+        "/providers/mailgun/v3/mg.example.test/messages.mime",
+        &format!("multipart/form-data; boundary={boundary}"),
+        form_body.into_bytes(),
+    )
+    .await;
+
+    assert_eq!(reply.status, 200, "{}", reply.body_text);
+    assert_eq!(reply.body["message"], "Queued. Thank you.");
+    let email = read_newest_email(&app_router).await;
+    assert_eq!(email["source"], "mailgun");
+    assert_eq!(email["subject"], "Sent as MIME");
+    assert_eq!(email["from"]["address"], "shop@mg.example.test");
+    assert_eq!(read_addresses(&email["to"]), vec!["sam@example.test"]);
+}

@@ -1,0 +1,5 @@
+{
+  "name": "sendmock-example-ci",
+  "private": true,
+  "type": "module"
+}

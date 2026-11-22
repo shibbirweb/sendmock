@@ -30,6 +30,7 @@ mod endpoint_test_operation;
 mod endpoint_validation;
 mod endpoint_view;
 mod file_template_library;
+mod follow_up_delivery;
 mod manual_send_operation;
 mod metrics_inputs;
 mod metrics_loading;
@@ -55,6 +56,7 @@ mod saved_delivery_send_operation;
 mod saved_delivery_template_operation;
 mod saved_delivery_view;
 mod secret_value_masking;
+mod signature_verify_operation;
 mod signed_body_functions;
 mod template_catalogue;
 mod template_context;
@@ -105,7 +107,7 @@ pub use endpoint_secret_operations::{
     RevealWebhookEndpointSecretOperation, RevealedEndpointSecret,
     RotateWebhookEndpointSecretOperation,
 };
-pub(crate) use endpoint_settings::EndpointRequestSettings;
+pub(crate) use endpoint_settings::{EndpointRequestSettings, default_request_settings};
 pub(crate) use endpoint_template::{choose_detached_template, write_detached_template};
 pub use endpoint_test_operation::TestWebhookEndpointOperation;
 pub(crate) use endpoint_validation::validate_endpoint_input;
@@ -114,6 +116,7 @@ pub(crate) use endpoint_view::{read_request_settings, write_request_settings};
 pub use file_template_library::{
     FileTemplateLibrary, LoadedTemplateDirectory, load_template_directory,
 };
+pub(crate) use follow_up_delivery::{FollowUpOrder, FollowUpTarget, queue_follow_up_delivery};
 pub use manual_send_operation::SendWebhookOperation;
 pub(crate) use metrics_loading::{load_delivery_samples, load_metered_endpoints};
 pub use metrics_operation::GetWebhookMetricsOperation;
@@ -244,5 +247,7 @@ pub fn register_webhook_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(ImportWebhookTemplateOperation);
     operation_registry.register(ExportWebhookTemplateOperation);
     operation_registry.register(GetWebhookTemplateReferenceOperation);
+    operation_registry.register(VerifyWebhookSignatureOperation);
 }
+pub use signature_verify_operation::VerifyWebhookSignatureOperation;
 pub(crate) use signed_body_functions::SignedBodyFunctions;

@@ -142,6 +142,14 @@ export function VirtualNumbersPanel() {
                       <span className="text-xs text-muted-foreground">
                         {virtualNumber.label}
                       </span>
+                      <span
+                        className="font-mono text-[10px] text-muted-foreground"
+                        title="The number's SID in Twilio's IncomingPhoneNumbers API"
+                      >
+                        {virtualNumber.phone_number_sid}
+                        {virtualNumber.account_sid !== null &&
+                          ` · ${virtualNumber.account_sid}`}
+                      </span>
                     </span>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">

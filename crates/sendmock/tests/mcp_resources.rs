@@ -162,7 +162,7 @@ fn every_prompt_is_listed_and_returns_its_workflow() -> io::Result<()> {
         .flatten()
         .filter_map(|listed| listed["name"].as_str())
         .collect();
-    assert_eq!(prompt_names.len(), 10, "{prompt_names:?}");
+    assert_eq!(prompt_names.len(), 12, "{prompt_names:?}");
     assert!(prompt_names.contains(&"add-payment-gateway"));
     let message_text = prompt["messages"][0]["content"]["text"]
         .as_str()

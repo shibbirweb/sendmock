@@ -46,6 +46,9 @@ pub struct CapturedRequestRecord {
     pub is_simulated_failure: bool,
     pub duration_ms: u32,
     pub created_at_unix_ms: i64,
+    /// The provider whose base URL the request arrived on; `None` for `/catch/` and the
+    /// catch-all port.
+    pub provider_key: Option<String>,
     /// Requests arrive unread; opening one in the UI marks it read.
     pub is_read: bool,
     pub files: Vec<CapturedFileRecord>,

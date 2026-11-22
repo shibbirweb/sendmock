@@ -2,6 +2,7 @@
 
 mod ai_install;
 mod catcher_listener;
+mod ci_command;
 mod cli_arguments;
 mod client_command;
 mod config;
@@ -17,11 +18,13 @@ mod http_response_recording;
 mod http_setup_fetcher;
 mod http_webhook_sender;
 mod instance_details_builder;
+mod launcher;
 mod listener_binding;
 mod logging;
 mod mcp_command;
 mod pop3_startup;
 mod provider_listeners;
+mod provider_tls;
 #[cfg(test)]
 mod reference_pages;
 mod retention_task;
@@ -33,6 +36,7 @@ mod shutdown_signal;
 mod smtp_startup;
 mod spamd_client;
 mod startup_error;
+mod startup_setup;
 mod template_directory_task;
 mod tls_provider;
 mod update_check_task;
@@ -56,22 +60,35 @@ fn main() -> ExitCode {
         return sendmail_shim::run_sendmail_shim(&sendmail_arguments);
     }
     let operation_registry = build_operation_registry();
-    let root_command = ai_install::add_install_flags(
+    let root_command = ci_command::add_ci_flags(ai_install::add_install_flags(
         CliArguments::command().subcommands(build_operation_commands(&operation_registry)),
-    );
+    ));
     let root_matches = root_command.clone().get_matches();
     if let Some(matched_operation) = find_matched_operation(&operation_registry, &root_matches) {
-        if matched_operation.operation.definition().operation_id
-            == ai_install::AI_AGENTS_OPERATION_ID
-        {
-            return ai_install::run_ai_install(&matched_operation);
+        match matched_operation.operation.definition().operation_id {
+            ai_install::AI_AGENTS_OPERATION_ID => {
+                return ai_install::run_ai_install(&matched_operation);
+            }
+            ci_command::CI_RUN_OPERATION_ID => {
+                return ci_command::run_ci_run_command(&matched_operation);
+            }
+            ci_command::CI_INIT_OPERATION_ID => {
+                return ci_command::run_ci_init_command(&matched_operation);
+            }
+            _ => {}
         }
         return client_command::run_client_command(&matched_operation);
     }
     let cli_arguments = CliArguments::from_arg_matches(&root_matches)
         .unwrap_or_else(|parse_error| parse_error.exit());
     match cli_arguments.built_in_command() {
-        BuiltInCommand::Serve(serve_arguments) => server_startup::start_server(serve_arguments),
+        BuiltInCommand::Serve(serve_arguments) => match launcher::prepare_launch(serve_arguments) {
+            launcher::LaunchPlan::Start(launched_arguments) => {
+                server_startup::start_server(&launched_arguments)
+            }
+            launcher::LaunchPlan::Stop(exit_code) => exit_code,
+        },
+        BuiltInCommand::LastRun { action, json } => launcher::run_last_run_command(action, json),
         BuiltInCommand::Mcp(mcp_arguments) => mcp_command::run_mcp_command(mcp_arguments),
         BuiltInCommand::Version { json } => version_output::print_version(*json),
         BuiltInCommand::Help { all, json } => {

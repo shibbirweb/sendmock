@@ -9,6 +9,7 @@ mod email_provider_send;
 mod email_response;
 mod http_catcher;
 mod inbound_route;
+mod mailgun_complaint;
 mod message_open;
 mod message_provider;
 mod message_rule;
@@ -31,6 +32,7 @@ mod sms_callback_attempt;
 mod sms_reply_webhook;
 mod smtp_session;
 mod store_error;
+mod twilio_subaccount;
 mod verify;
 mod webhook_delivery;
 mod webhook_endpoint;
@@ -41,7 +43,9 @@ mod webhook_variable;
 pub use activity_stats::{
     ActivityStatsRepository, HourlyActivityRecord, HourlyCountRecord, MessageTotalsRecord,
 };
-pub use api_request::{ApiRequestFilter, ApiRequestPage, ApiRequestRecord, ApiRequestRepository};
+pub use api_request::{
+    ApiRequestFilter, ApiRequestPage, ApiRequestRecord, ApiRequestRepository, CatcherAnswerRecord,
+};
 pub use database::{CheckpointProgress, Database};
 pub use database_location::DatabaseLocation;
 pub use email::{
@@ -55,9 +59,10 @@ pub use email_provider_send::{
 pub use email_response::{EmailResponseRecord, EmailResponseRepository};
 pub use http_catcher::{
     CapturedFileRecord, CapturedRequestRecord, CapturedRequestRepository, HttpBinRecord,
-    HttpBinRepository,
+    HttpBinRepository, ProviderBinRecord, ProviderBinRepository,
 };
 pub use inbound_route::{InboundRouteRecord, InboundRouteRepository};
+pub use mailgun_complaint::{MailgunComplaintRecord, MailgunComplaintRepository};
 pub use message_open::{MessageOpenRecord, OpenRecording};
 pub use message_provider::{MessageProviderRecord, MessageProviderRepository};
 pub use message_rule::{MessageRuleKind, MessageRuleRecord, MessageRuleRepository};
@@ -100,6 +105,7 @@ pub use smtp_session::{
     SmtpSessionFilter, SmtpSessionPage, SmtpSessionRecord, SmtpSessionRepository,
 };
 pub use store_error::StoreError;
+pub use twilio_subaccount::{TwilioSubaccountRecord, TwilioSubaccountRepository};
 pub use verify::{
     VerificationFilter, VerificationPage, VerificationRecord, VerificationRepository,
     VerificationTimelineRecord, VerifyServiceRecord, VerifyServiceRepository,

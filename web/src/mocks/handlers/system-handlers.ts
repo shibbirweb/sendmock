@@ -27,6 +27,7 @@ export function buildMockAppInfo(): AppInfo {
     smtp_address: `${listenHost}:1025`,
     http_address: `${listenHost}:8025`,
     provider_address: null,
+    provider_tls_address: null,
     catcher_address: null,
     pop3_address: null,
     database_path: "(in-browser demo data)",

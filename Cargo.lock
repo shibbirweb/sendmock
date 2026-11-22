@@ -481,6 +481,7 @@ checksum = "e96a4956774c13c126a8b5af4daa79384f4d826534c95a02d76afb39e2ab64e3"
 dependencies = [
  "encode_unicode",
  "libc",
+ "unicode-width",
  "windows-sys 0.61.2",
 ]
 
@@ -636,6 +637,16 @@ name = "deranged"
 version = "0.5.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9e9de72ce2ad1f90dc62fa25f0f430ef85eb4b0d8fa0be4f30373bc40a21d28e"
+
+[[package]]
+name = "dialoguer"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "25f104b501bf2364e78d0d3974cbc774f738f5865306ed128e1e0d7499c0ad96"
+dependencies = [
+ "console",
+ "shell-words",
+]
 
 [[package]]
 name = "digest"
@@ -3074,11 +3085,13 @@ checksum = "8a7852d02fc848982e0c167ef163aaff9cd91dc640ba85e263cb1ce46fae51cd"
 
 [[package]]
 name = "sendmock"
-version = "1.3.1"
+version = "1.4.0"
 dependencies = [
  "axum",
  "clap",
+ "dialoguer",
  "dirs 7.0.0",
+ "rcgen",
  "reqwest",
  "rusqlite",
  "rustls",
@@ -3095,9 +3108,11 @@ dependencies = [
  "sendmock-webhooks",
  "serde",
  "serde_json",
+ "serde_yaml_ng",
  "tempfile",
  "thiserror 2.0.21",
  "tokio",
+ "tokio-rustls",
  "toml 1.1.8+spec-1.1.0",
  "tracing",
  "tracing-subscriber",
@@ -3105,7 +3120,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-api"
-version = "1.3.1"
+version = "1.4.0"
 dependencies = [
  "axum",
  "base64 0.23.1",
@@ -3136,7 +3151,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-cli"
-version = "1.3.1"
+version = "1.4.0"
 dependencies = [
  "clap",
  "insta",
@@ -3152,7 +3167,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-core"
-version = "1.3.1"
+version = "1.4.0"
 dependencies = [
  "base64 0.23.1",
  "chrono",
@@ -3169,7 +3184,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-mail"
-version = "1.3.1"
+version = "1.4.0"
 dependencies = [
  "base64 0.23.1",
  "mail-parser",
@@ -3186,7 +3201,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-mcp"
-version = "1.3.1"
+version = "1.4.0"
 dependencies = [
  "base64 0.23.1",
  "insta",
@@ -3200,7 +3215,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-ops"
-version = "1.3.1"
+version = "1.4.0"
 dependencies = [
  "base64 0.23.1",
  "hmac",
@@ -3227,7 +3242,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-payments"
-version = "1.3.1"
+version = "1.4.0"
 dependencies = [
  "hmac",
  "md-5",
@@ -3236,7 +3251,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-pop3"
-version = "1.3.1"
+version = "1.4.0"
 dependencies = [
  "sendmock-core",
  "sendmock-ops",
@@ -3248,7 +3263,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-sms"
-version = "1.3.1"
+version = "1.4.0"
 dependencies = [
  "roxmltree",
  "sendmock-core",
@@ -3257,7 +3272,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-smtp"
-version = "1.3.1"
+version = "1.4.0"
 dependencies = [
  "base64 0.23.1",
  "hmac",
@@ -3277,7 +3292,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-store"
-version = "1.3.1"
+version = "1.4.0"
 dependencies = [
  "rusqlite",
  "sendmock-core",
@@ -3291,7 +3306,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-tray"
-version = "1.3.1"
+version = "1.4.0"
 dependencies = [
  "serde_json",
  "tao",
@@ -3300,7 +3315,7 @@ dependencies = [
 
 [[package]]
 name = "sendmock-webhooks"
-version = "1.3.1"
+version = "1.4.0"
 dependencies = [
  "base64 0.23.1",
  "hmac",
@@ -3460,6 +3475,12 @@ checksum = "f40ca3c46823713e0d4209592e8d6e826aa57e928f09752619fc696c499637f6"
 dependencies = [
  "lazy_static",
 ]
+
+[[package]]
+name = "shell-words"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dc6fe69c597f9c37bfeeeeeb33da3530379845f10be461a66d16d03eca2ded77"
 
 [[package]]
 name = "shellexpand"
@@ -4189,6 +4210,12 @@ name = "unicode-segmentation"
 version = "1.13.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c6f5d3c3b1bf09027a88a6bc961fc00497d651009560b5463668dc81b0fa87a8"
+
+[[package]]
+name = "unicode-width"
+version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ca718471876992059f251e33aafc334346ada08042b7661dd1fe313a9bced557"
 
 [[package]]
 name = "unsafe-libyaml"

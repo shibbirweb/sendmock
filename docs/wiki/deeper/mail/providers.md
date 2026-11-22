@@ -311,13 +311,43 @@ Text.
 
 - **What it does:** Explains Check credentials.
 
-### 48. Cancel
+### 48. Unmatched requests
+
+Heading.
+
+- **What it does:** Sends the requests SendMock does not answer on SendGrid's base URL to an HTTP Catcher bin, which answers them with its rules.
+- **Links to:** [Provider gaps](../../http/provider-gaps.md)
+
+### 49. Requests on SendGrid's base URL that SendMock does not answer. Send them to a bin to answer them with its rules and follow-up webhooks.
+
+Text.
+
+- **What it does:** Explains Unmatched requests: built-in operations still answer first.
+
+### 50. Where SendGrid's unmatched requests go
+
+Drop-down.
+
+- **What it does:** Chooses the bin that answers them, or none (they get `404`). A provider has one bin at most; a bin can serve several providers.
+- **What it changes:** Attaches or detaches the bin right away, with no restart.
+- **Same action elsewhere:** REST [`PUT /api/v1/provider-bins/{area}/{providerKey}`](/api/http-catcher/#putProviderBinsByAreaByProviderKey), CLI [`sendmock http provider-bin attach`](/cli/http-catcher/#http-provider-bin-attach), MCP [`sendmock_http_provider_bin_attach`](/mcp/http-catcher/#sendmock_http_provider_bin_attach)
+- **Same action elsewhere:** REST [`DELETE /api/v1/provider-bins/{area}/{providerKey}`](/api/http-catcher/#deleteProviderBinsByAreaByProviderKey), CLI [`sendmock http provider-bin detach`](/cli/http-catcher/#http-provider-bin-detach), MCP [`sendmock_http_provider_bin_detach`](/mcp/http-catcher/#sendmock_http_provider_bin_detach)
+
+### 51. Create a bin for this provider
+
+Button.
+
+- **What it does:** Creates a bin named after the provider and attaches it, so you can add a rule for the endpoint next.
+- **What it changes:** Adds an HTTP Catcher bin.
+- **Same action elsewhere:** REST [`PUT /api/v1/provider-bins/{area}/{providerKey}`](/api/http-catcher/#putProviderBinsByAreaByProviderKey), CLI [`sendmock http provider-bin attach`](/cli/http-catcher/#http-provider-bin-attach), MCP [`sendmock_http_provider_bin_attach`](/mcp/http-catcher/#sendmock_http_provider_bin_attach)
+
+### 52. Cancel
 
 Button.
 
 - **What it does:** Closes the dialog or editor without saving.
 
-### 49. Save provider
+### 53. Save provider
 
 Button.
 
@@ -325,7 +355,7 @@ Button.
 - **Errors:** A template that does not render, or a path another provider already answers, is refused with the reason.
 - **Same action elsewhere:** REST [`PATCH /api/v1/emails/providers/{providerKey}`](/api/email-providers/#patchEmailsProvidersByProviderKey), CLI [`sendmock email providers update`](/cli/email-providers/#email-providers-update), MCP [`sendmock_email_provider_update`](/mcp/email-providers/#sendmock_email_provider_update)
 
-### 50. Close
+### 54. Close
 
 Button.
 
@@ -333,109 +363,109 @@ Button.
 
 ## Provider editor, Requests tab
 
-### 51. The paths as the provider's API has them; use \{name\} for a part that changes, like /v#/\{domain\}/messages .
+### 55. The paths as the provider's API has them; use \{name\} for a part that changes, like /v#/\{domain\}/messages .
 
 Text.
 
 - **What it does:** Explains request paths and their `{name}` parts.
 
-### 52. Request # kind
+### 56. Request # kind
 
 Drop-down.
 
 - **What it does:** What the request does: send one email, send a batch, or another operation the provider has.
 
-### 53. Request # method
+### 57. Request # method
 
 Drop-down.
 
 - **What it does:** The HTTP method it answers.
 
-### 54. Request # path
+### 58. Request # path
 
 Field.
 
 - **What it does:** The path it answers.
 
-### 55. Request # format
+### 59. Request # format
 
 Drop-down.
 
 - **What it does:** The body format the provider's SDK sends: JSON, a form or multipart.
 
-### 56. Remove request #
+### 60. Remove request #
 
 Button.
 
 - **What it does:** Removes the request.
 
-### 57. Add request
+### 61. Add request
 
 Button.
 
 - **What it does:** Adds a request the provider answers.
 
-### 58. A JSON path ( personalizations[*].to[*].email ), a form field ( To ) or h:* for every field with a prefix. Anything unmapped is kept as metadata.
+### 62. A JSON path ( personalizations[*].to[*].email ), a form field ( To ) or h:* for every field with a prefix. Anything unmapped is kept as metadata.
 
 Text.
 
 - **What it does:** Explains the field mapping sources.
 
-### 59. Mapping # part
+### 63. Mapping # part
 
 Drop-down.
 
 - **What it does:** Which part of the stored email the field fills, such as the recipients or the subject.
 
-### 60. Mapping # source
+### 64. Mapping # source
 
 Field.
 
 - **What it does:** Where in the request that part is read from.
 
-### 61. Remove mapping #
+### 65. Remove mapping #
 
 Button.
 
 - **What it does:** Removes the mapping.
 
-### 62. Map a part
+### 66. Map a part
 
 Button.
 
 - **What it does:** Adds a mapping.
 
-### 63. Check # part
+### 67. Check # part
 
 Drop-down.
 
 - **What it does:** The part a request check looks at.
 
-### 64. Check # kind
+### 68. Check # kind
 
 Drop-down.
 
 - **What it does:** What the check requires, such as present or at most a length.
 
-### 65. Check # max length
+### 69. Check # max length
 
 Number field.
 
 - **What it does:** The longest value the check allows.
 
-### 66. Check # error
+### 70. Check # error
 
 Drop-down.
 
 - **What it does:** Which error response a request failing the check gets.
 
-### 67. Remove check #
+### 71. Remove check #
 
 Button.
 
 - **What it does:** Removes the check.
 
-### 68. Add check
+### 72. Add check
 
 Button.
 
@@ -443,109 +473,109 @@ Button.
 
 ## Provider editor, Responses tab
 
-### 69. Templates read request , message , error and credentials ; the Preview tab lists every value with an example.
+### 73. Templates read request , message , error and credentials ; the Preview tab lists every value with an example.
 
 Text.
 
 - **What it does:** Explains what response templates can read.
 
-### 70. Message id
+### 74. Message id
 
 Field.
 
 - **What it does:** The template for the provider's id of each message.
 
-### 71. The provider's id for each message, e.g. SM\{\{ random_hex(#) \}\}.
+### 75. The provider's id for each message, e.g. SM\{\{ random_hex(#) \}\}.
 
 Text.
 
 - **What it does:** Gives an example message id template.
 
-### 72. Success response
+### 76. Success response
 
 Heading.
 
 - **What it does:** The answer to an accepted request.
 
-### 73. Success response status
+### 77. Success response status
 
 Number field.
 
 - **What it does:** Its HTTP status.
 
-### 74. Success response header # name
+### 78. Success response header # name
 
 Field.
 
 - **What it does:** A response header's name.
 
-### 75. Success response header # value
+### 79. Success response header # value
 
 Field.
 
 - **What it does:** That header's value template.
 
-### 76. Remove Success response header #
+### 80. Remove Success response header #
 
 Button.
 
 - **What it does:** Removes the header.
 
-### 77. Add header
+### 81. Add header
 
 Button.
 
 - **What it does:** Adds a response header.
 
-### 78. Success response body
+### 82. Success response body
 
 Field.
 
 - **What it does:** The body template.
 
-### 79. Error response # kind
+### 83. Error response # kind
 
 Drop-down.
 
 - **What it does:** The error it answers: invalid input, unauthorized, a failed check, and so on.
 
-### 80. Remove error response #
+### 84. Remove error response #
 
 Button.
 
 - **What it does:** Removes the error response.
 
-### 81. Error response # status
+### 85. Error response # status
 
 Number field.
 
 - **What it does:** Its HTTP status.
 
-### 82. Error response # header # name
+### 86. Error response # header # name
 
 Field.
 
 - **What it does:** A header's name.
 
-### 83. Error response # header # value
+### 87. Error response # header # value
 
 Field.
 
 - **What it does:** That header's value template.
 
-### 84. Remove Error response # header #
+### 88. Remove Error response # header #
 
 Button.
 
 - **What it does:** Removes the header.
 
-### 85. Error response # body
+### 89. Error response # body
 
 Field.
 
 - **What it does:** The error body template, in the provider's real error shape.
 
-### 86. Add an error response
+### 90. Add an error response
 
 Button.
 
@@ -553,44 +583,44 @@ Button.
 
 ## Provider editor, Callbacks tab
 
-### 87. Callback template
+### 91. Callback template
 
 Drop-down.
 
 - **What it does:** The webhook template status callbacks are sent with.
 - **Links to:** [Webhooks > Templates](../../webhooks/templates.md).
 
-### 88. The webhook template its status callbacks and inbound messages are sent with; edit it in Webhooks > Templates.
+### 92. The webhook template its status callbacks and inbound messages are sent with; edit it in Webhooks > Templates.
 
 Text.
 
 - **What it does:** Explains the callback template.
 
-### 89. The provider's name for each SendMock status, as its callbacks and fetch answers show it.
+### 93. The provider's name for each SendMock status, as its callbacks and fetch answers show it.
 
 Text.
 
 - **What it does:** Explains the status names below.
 
-### 90. delivered
+### 94. delivered
 
 Field.
 
 - **What it does:** The provider's name for a delivered email, as its event webhooks show it.
 
-### 91. bounced
+### 95. bounced
 
 Field.
 
 - **What it does:** Its name for a bounce.
 
-### 92. complained
+### 96. complained
 
 Field.
 
 - **What it does:** Its name for a spam complaint.
 
-### 93. opened
+### 97. opened
 
 Field.
 
@@ -598,87 +628,87 @@ Field.
 
 ## Provider editor, Preview tab
 
-### 94. Sample request
+### 98. Sample request
 
 Heading.
 
 - **What it does:** The request the preview sends.
 
-### 95. A send built from the field mapping. Edit it to try another request.
+### 99. A send built from the field mapping. Edit it to try another request.
 
 Text.
 
 - **What it does:** Explains the sample.
 
-### 96. Sample method
+### 100. Sample method
 
 Drop-down.
 
 - **What it does:** The sample's method.
 
-### 97. Sample path
+### 101. Sample path
 
 Field.
 
 - **What it does:** The sample's path.
 
-### 98. Sample body
+### 102. Sample body
 
 Field.
 
 - **What it does:** The sample's body.
 
-### 99. Stored message
+### 103. Stored message
 
 Heading.
 
 - **What it does:** The email SendMock would store for the sample.
 - **Same action elsewhere:** REST [`POST /api/v1/emails/providers/{providerKey}/preview`](/api/email-providers/#postEmailsProvidersByProviderKeyPreview), CLI [`sendmock email providers preview`](/cli/email-providers/#email-providers-preview), MCP [`sendmock_email_provider_preview`](/mcp/email-providers/#sendmock_email_provider_preview)
 
-### 100. Response
+### 104. Response
 
 Heading.
 
 - **What it does:** The response the sample would get.
 
-### 101. Search the reference
+### 105. Search the reference
 
 Field.
 
 - **What it does:** Filters the template reference: the values, functions and filters templates can use.
 
-### 102. Values
+### 106. Values
 
 Heading.
 
 - **What it does:** The values a template can read, with an example of each.
 
-### 103. Expand …
+### 107. Expand …
 
 Button, in each row.
 
 - **What it does:** Shows the fields inside a value, such as the parts of `request` or `message`.
 
-### 104. …
+### 108. …
 
 Button, in each row.
 
 - **What it does:** Inserts the value, function or filter into the template field you were editing.
 
-### 105. Functions
+### 109. Functions
 
 Heading.
 
 - **What it does:** The functions a template can call.
 
-### 106. Filters
+### 110. Filters
 
 Heading.
 
 - **What it does:** The filters a template can use.
 - **Links to:** [Template filters](../../reference/template-filters.md).
 
-### 107. … \}\}
+### 111. … \}\}
 
 Button, in each row.
 
@@ -686,25 +716,25 @@ Button, in each row.
 
 ## Provider editor, Try it tab
 
-### 108. Copy sdk base url (provider port)
+### 112. Copy sdk base url (provider port)
 
 Button.
 
 - **What it does:** Copies the base URL to give the provider's SDK when the provider port is on.
 
-### 109. Copy base url on the main port
+### 113. Copy base url on the main port
 
 Button.
 
 - **What it does:** Copies the base URL under `/providers/<key>/` on the main port.
 
-### 110. Copy a curl command
+### 114. Copy a curl command
 
 Button.
 
 - **What it does:** Copies a curl command that sends the sample request.
 
-### 111. The provider port answers once it is on ( --provider-addr ). The preview shows what this request gets back: #. Settings > Connection has the snippets for each language.
+### 115. The provider port answers once it is on ( --provider-addr ). The preview shows what this request gets back: #. Settings > Connection has the snippets for each language.
 
 Text.
 
@@ -712,20 +742,20 @@ Text.
 
 ## When the data cannot load
 
-### 112. Could not load the providers. Try again
+### 116. Could not load the providers. Try again
 
 Message.
 
 - **What it does:** Shown when the list could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 113. Could not load the providers.
+### 117. Could not load the providers.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 114. Try again
+### 118. Try again
 
 Button.
 

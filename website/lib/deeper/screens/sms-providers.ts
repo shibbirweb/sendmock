@@ -2,6 +2,7 @@ import type { DeeperEntry, DeeperPage } from "../deeper-types";
 import { buildProviderEditorSetupEntries } from "./provider-editor-entries";
 import { buildProviderEditorResponseEntries } from "./provider-editor-response-entries";
 import { buildProviderListEntries } from "./provider-list-entries";
+import { buildUnmatchedRequestEntries } from "./unmatched-request-entries";
 
 const smsProviderArea = {
   messageWord: "SMS",
@@ -30,6 +31,16 @@ const twilioEntries: DeeperEntry[] = [
     control: "button: Reveal auth_token",
     does: "Shows the Auth Token once, after you confirm.",
     operationIds: ["getSmsProvidersByProviderKeyCredentialsByCredentialName"],
+  },
+  {
+    control: "button: Reveal debugger_url",
+    does: "Shows the Debugger webhook URL once, after you confirm.",
+    operationIds: ["getSmsProvidersByProviderKeyCredentialsByCredentialName"],
+  },
+  {
+    control: "tab: Accounts",
+    does: "Twilio subaccounts: add, suspend, close or delete one, and reveal its Auth Token.",
+    operationIds: ["getTwilioSubaccounts"],
   },
   {
     control: "textbox: queued",
@@ -126,6 +137,7 @@ export const smsProvidersPage: DeeperPage = {
     ...buildProviderListEntries(smsProviderArea),
     ...twilioEntries,
     ...buildProviderEditorSetupEntries(smsProviderArea),
+    ...buildUnmatchedRequestEntries("Twilio"),
     ...buildProviderEditorResponseEntries(smsProviderArea),
   ],
 };

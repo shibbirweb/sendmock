@@ -16,6 +16,47 @@ Ports, database path, auth, relay SMTP and retention. Precedence, highest first:
 
 Every flag, with its variable, key and default, is in [Configuration flags](./reference/configuration-flags.md).
 
+## Choose what starts: the launcher
+
+Run `sendmock` alone in a terminal and it asks which services to start: the web UI, REST API and MCP (always on), SMTP (always on), SMTPS, the provider APIs over HTTP and HTTPS, the HTTP Catcher's catch-all port and POP3, each with its address.
+
+1. Tick the services with Space and press Enter.
+2. Press Enter again on **Run**, or choose **Change ports** to edit each address (a port in use or chosen twice is named, with the next free one offered), **Reset to defaults** or **Cancel**.
+
+SendMock saves the choice to `last-run.toml` in its config folder (next to `sendmock.toml`; `SENDMOCK_LAST_RUN_FILE` moves it) and prints the same start as a `sendmock serve` command for scripts. The next time, the list starts with that choice ticked, so Enter twice starts it again. The file holds addresses only, never secrets; a corrupt file or one from a newer SendMock is ignored with a warning.
+
+SendMock asks only when you type `sendmock` alone with a terminal on both ends. With any command or option, in a pipe, with `CI` set, or with `--no-input` (`SENDMOCK_NO_INPUT=1`, which the Docker image sets) it asks nothing and starts as before.
+
+Start without questions:
+
+- the saved choice; flags given with it win for that run:
+
+```bash
+sendmock --last
+```
+
+- the saved choice for an agent's embedded SendMock:
+
+```bash
+sendmock mcp --embedded --last
+```
+
+- named services on their saved or default addresses (`smtp`, `smtps`, `provider`, `provider-tls`, `catcher`, `pop3`; `SENDMOCK_SERVICES` too):
+
+```bash
+sendmock --services smtp,catcher,pop3
+```
+
+See or clear the saved choice:
+
+```bash
+sendmock last-run
+```
+
+```bash
+sendmock last-run clear
+```
+
 ## What SendMock starts with: `sendmock.seed.toml`
 
 Endpoints, rules, templates, variables, numbers, Messaging Services, Verify services and payment setup. **Reset to seed** in Settings (or `POST /api/v1/reset`) deletes all traffic and restores this file, so every test run starts from the same state.
@@ -66,11 +107,28 @@ The sections, each a list of items unless noted:
 | `[[email.providers]]`, `[[sms.providers]]` | custom and edited providers | `key` |
 | `[[payments.flows]]`, `[[payments.methods]]`, `[[payments.gateways]]` | payment flows, methods and gateways | `key` |
 | `[[http.bins]]` | HTTP Catcher bins with their mock responses | `name` |
+| `[[http.provider_bins]]` | the bin that answers each provider's unmatched requests | `area` and `provider` |
 | `[[scenarios]]` | saved scenarios, with their `[[scenarios.steps]]` | `name` |
 
 The JSON Schema of each format version is published at [`/schema/setup/v2.json`](/schema/setup/v2.json), so an editor checks a file as you write it. In JSON and YAML the sections nest under their group (`{"webhook": {"endpoints": [...]}}`).
 
 Secrets are `${ENV_VAR}` references, read from the environment on import, or, with `--include-secrets`, text starting `encrypted:v1:` that only the export's passphrase opens. A setup never holds traffic or the options in `sendmock.toml` (ports, database path, auth), which belong to each machine.
+
+### Load a setup at startup: `--setup`
+
+`--setup` (`SENDMOCK_SETUP`) applies a setup file, or an `https://` URL to one, when SendMock starts, merged over the seed file. SendMock reports ready (`--ready-json`, `/api/v1/health/ready`) only after it is applied, and a setup that cannot be downloaded or does not validate stops the start with the reason. A CI service container needs only this variable:
+
+```yaml
+services:
+  sendmock:
+    image: ghcr.io/shibbirweb/sendmock:1
+    ports: ["8025:8025", "1025:1025"]
+    env:
+      SENDMOCK_DB: memory
+      SENDMOCK_SETUP: https://raw.githubusercontent.com/acme/shop/main/sendmock.setup.yml
+```
+
+The download follows the same limits as **Settings > Setup > Import from a URL**: `https://` only (plain `http://` for loopback and private addresses), at most 1 MB, 10 seconds and 3 redirects. `--setup-sha256` (`SENDMOCK_SETUP_SHA256`) pins the file's SHA-256, `--setup-header` (`SENDMOCK_SETUP_HEADERS`, one `Name: value` per line) adds headers for a private URL, and `SENDMOCK_SETUP_PASSPHRASE` opens its encrypted secrets.
 
 ## How much is kept: `--max-emails`, `--max-sms` and `--max-age`
 

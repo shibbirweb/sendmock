@@ -14,7 +14,17 @@ pub struct ApiRequestRecord {
     pub duration_ms: u64,
     /// `email` or `sms`, with the id of what the request created.
     pub linked_message: Option<(String, String)>,
+    /// The HTTP Catcher bin and rule that answered a provider request no built-in operation
+    /// answers.
+    pub catcher_answer: Option<CatcherAnswerRecord>,
     pub created_at_unix_ms: i64,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CatcherAnswerRecord {
+    pub bin_name: String,
+    /// `None` when the bin's default reply answered.
+    pub rule_name: Option<String>,
 }
 
 /// Which requests to list; every field narrows the list.
