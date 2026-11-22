@@ -5,8 +5,7 @@ use rusqlite::{OptionalExtension, Row, params};
 use super::EmailProviderSendRecord;
 use crate::{Database, StoreError};
 
-const SEND_COLUMNS: &str =
-    "email_id, provider_key, provider_message_id, template_id, template_data, sending_domain";
+const SEND_COLUMNS: &str = "email_id, provider_key, provider_message_id, template_id, template_data, sending_domain, user_variables";
 
 /// Provider sends beside their emails; they go when their email goes.
 #[derive(Clone)]
@@ -22,6 +21,7 @@ fn read_send_row(row: &Row<'_>) -> rusqlite::Result<EmailProviderSendRecord> {
         template_id: row.get(3)?,
         template_data_json: row.get(4)?,
         sending_domain: row.get(5)?,
+        user_variables_json: row.get(6)?,
     })
 }
 
@@ -38,7 +38,7 @@ impl EmailProviderSendRepository {
             .write(move |connection| {
                 connection.execute(
                     &format!(
-                        "INSERT OR REPLACE INTO email_provider_sends ({SEND_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6)"
+                        "INSERT OR REPLACE INTO email_provider_sends ({SEND_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)"
                     ),
                     params![
                         provider_send.email_id,
@@ -47,6 +47,7 @@ impl EmailProviderSendRepository {
                         provider_send.template_id,
                         provider_send.template_data_json,
                         provider_send.sending_domain,
+                        provider_send.user_variables_json,
                     ],
                 )?;
                 Ok(())

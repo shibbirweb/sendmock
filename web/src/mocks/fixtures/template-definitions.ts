@@ -228,7 +228,7 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
     "url": "{{ data.url }}",{% endif %}
     "message": {
       "headers": {
-        "message-id": "{{ data.message_id | default(data.id) }}",
+        "message-id": "{{ (data.provider_message_id or data.message_id or data.id) | regex_replace('^<|>$', '') }}",
         "from": "{{ data.from.address }}",
         "to": "{{ data.to[0].address }}",
         "subject": "{{ data.subject }}"

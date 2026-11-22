@@ -36,6 +36,20 @@ fn read_addresses(addresses: &[StoredEmailAddress]) -> Vec<String> {
 
 /// The parts the request leaves out are read from the raw message, as the provider takes the
 /// sender, recipients and subject from its headers when the request does not name them.
+/// Mailgun reads a raw message's user variables from this header, as from the form field.
+const MAILGUN_VARIABLES_HEADER: &str = "X-Mailgun-Variables";
+
+fn read_header_values(
+    headers: &std::collections::BTreeMap<String, Vec<String>>,
+    header_name: &str,
+) -> Vec<String> {
+    headers
+        .iter()
+        .filter(|(stored_name, _)| stored_name.eq_ignore_ascii_case(header_name))
+        .flat_map(|(_, header_values)| header_values.clone())
+        .collect()
+}
+
 pub fn fill_parts_from_raw_message(part_values: &mut BTreeMap<String, Vec<String>>) {
     let Some(Ok(raw_message)) = decode_raw_part(part_values) else {
         return;
@@ -48,6 +62,10 @@ pub fn fill_parts_from_raw_message(part_values: &mut BTreeMap<String, Vec<String
         ("subject", vec![parsed_email.subject.clone()]),
         ("text", parsed_email.text_body.into_iter().collect()),
         ("html", parsed_email.html_body.into_iter().collect()),
+        (
+            "user_variables",
+            read_header_values(&parsed_email.headers, MAILGUN_VARIABLES_HEADER),
+        ),
     ];
     for (part, raw_values) in raw_parts {
         let raw_values: Vec<String> = raw_values

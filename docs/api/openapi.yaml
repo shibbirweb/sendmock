@@ -10239,6 +10239,15 @@ components:
           anyOf:
             - $ref: "#/components/schemas/EmailTemplateData"
             - type: "null"
+        provider_message_id:
+          type:
+            - string
+            - "null"
+          description: The id the provider's send answered, such as Mailgun's `<...@domain>`; null for mail that did not come through a provider's API.
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: The send's user variables, such as Mailgun's `v:` fields; empty when it had none.
         response_to:
           anyOf:
             - $ref: "#/components/schemas/EmailResponseLink"
@@ -10316,6 +10325,7 @@ components:
         - open_count
         - opened_at
         - project
+        - provider_message_id
         - received_at
         - reply_to
         - response_kind
@@ -10331,6 +10341,7 @@ components:
         - template
         - text_body
         - to
+        - user_variables
     EmailDirection:
       type: string
       enum:
@@ -15256,6 +15267,7 @@ components:
         - tags
         - template_id
         - template_data
+        - user_variables
         - raw
         - body
         - media_urls

@@ -10,6 +10,7 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ### Added
 
+- **Mailgun template sends and user variables:** a Mailgun send with `template` and no body is accepted and keeps its template name and data. `v:` fields and `X-Mailgun-Variables` (also inside `/messages.mime`) are kept as the email's user variables, shown in the email API and read by webhook templates as `data.user_variables`. The id the send answered is kept as `provider_message_id`, and the `mailgun.events` webhook sends it, so your app can match the webhook to its send. See Mail providers, Mailgun templates, variables and message ids.
 - **Startup banner:** starting SendMock in a terminal (`sendmock`, `sendmock serve`, `--last`, `--services`) first prints its wordmark in braille dots with the version under it, sized to the terminal's width and in colour where the terminal supports it. Pipes, files, `--ready-json`, `--log-format json` and `sendmock mcp` print exactly what they did before. Turn it off with `--no-banner`, `SENDMOCK_NO_BANNER=1` or `banner = false` in `sendmock.toml`; see the Configuration guide, The startup banner.
 
 ### Changed
@@ -22,6 +23,7 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ### Fixed
 
+- **Percent-encoded paths on the provider port:** an address in a provider path, such as `DELETE /v3/{domain}/complaints/user%40example.org`, now finds the item as the unencoded address does.
 - **Secure tokens for demo Twilio subaccounts:** in the website's demo and the web UI's mock mode, a new Twilio subaccount's auth token and SID now come from the browser's cryptographically secure random source instead of `Math.random()`.
 
 ## [1.4.0] - 2026-11-22

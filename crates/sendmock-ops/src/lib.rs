@@ -127,7 +127,8 @@ pub use provider_bins::{
 pub use providers::{
     MessageProviderDefinition, ProviderHttpRequest, ProviderHttpResponse, ProviderOutcome,
     ProviderRoute, answer_provider_request, builtin_email_providers, builtin_sms_providers,
-    find_whatsapp_media_download, load_sms_provider_definitions, sign_twilio_request,
+    decode_path_segments, find_whatsapp_media_download, load_sms_provider_definitions,
+    sign_twilio_request,
 };
 pub use push::{PushFilterQuery, PushListQuery, PushNotification, PushReference, PushWaitQuery};
 pub use request_client::{REQUEST_CLIENT_HEADER, RequestClient};

@@ -61,6 +61,7 @@ pub use link_check_operation::CheckEmailLinksOperation;
 pub use link_checker::{LinkChecker, LinkProbe};
 pub use lookup_operations::{GetLinksOperation, GetOtpOperation, WaitForEmailOperation};
 pub(crate) use native_send_request::{NativeSendAttachment, NativeSendRequest, read_bare_address};
+pub(crate) use read_email_operations::read_stored_user_variables;
 pub use read_email_operations::{
     CheckListUnsubscribeOperation, GetEmailMimeOperation, GetEmailOperation,
     GetEmailTimelineOperation, GetLatestEmailOperation, ListEmailsOperation,

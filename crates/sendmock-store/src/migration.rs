@@ -186,4 +186,8 @@ pub const EMBEDDED_MIGRATIONS: &[Migration] = &[
         schema_version: 44,
         sql: include_str!("../migrations/0044_provider_bins.sql"),
     },
+    Migration {
+        schema_version: 45,
+        sql: include_str!("../migrations/0045_email_provider_send_user_variables.sql"),
+    },
 ];

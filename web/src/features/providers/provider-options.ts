@@ -47,6 +47,7 @@ export const messagePartsByArea: Record<
     "tags",
     "template_id",
     "template_data",
+    "user_variables",
     "raw",
   ],
   sms: [

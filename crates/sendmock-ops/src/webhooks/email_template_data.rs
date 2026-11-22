@@ -8,7 +8,7 @@ use sendmock_mail::{decompress_raw_message, parse_email};
 use sendmock_store::EmailRecord;
 use serde_json::{Map, Value, json};
 
-use crate::email::{EmailAddress, EmailSummary};
+use crate::email::{EmailAddress, EmailSummary, read_stored_user_variables};
 use crate::{OperationContext, OperationError};
 
 /// Larger attachments are named and linked but not inlined, so a webhook body stays small.
@@ -59,6 +59,34 @@ pub async fn build_email_template_data(
             _ => Map::new(),
         };
     let cc: Vec<EmailAddress> = stored_email.cc.iter().map(EmailAddress::from).collect();
+    let provider_send = operation_context
+        .email_stores
+        .sends
+        .find_send(&stored_email.email_id)
+        .await?;
+    email_data.extend([
+        (
+            "provider_message_id".to_owned(),
+            json!(provider_send.as_ref().map(|send| &send.provider_message_id)),
+        ),
+        (
+            "user_variables".to_owned(),
+            Value::Object(
+                provider_send
+                    .as_ref()
+                    .map(read_stored_user_variables)
+                    .unwrap_or_default(),
+            ),
+        ),
+        (
+            "template_id".to_owned(),
+            json!(
+                provider_send
+                    .as_ref()
+                    .and_then(|send| send.template_id.as_ref())
+            ),
+        ),
+    ]);
     email_data.extend([
         ("message_id".to_owned(), json!(stored_email.message_id)),
         ("cc".to_owned(), json!(cc)),

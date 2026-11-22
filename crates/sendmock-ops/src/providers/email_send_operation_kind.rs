@@ -11,6 +11,7 @@ use super::provider_call::ProviderCall;
 use super::raw_message_part::decode_raw_part;
 use super::request_checks::{ProviderFailure, find_rule_failure};
 use super::send_operation_kind::ProviderAnswer;
+use super::user_variables::read_user_variables;
 use crate::email::{NativeSendRequest, complete_email_intake, read_bare_address};
 use crate::{OperationContext, OperationError, read_ingest_options};
 
@@ -242,6 +243,10 @@ async fn save_provider_send(
             template_id: read_first("template_id"),
             template_data_json: read_first("template_data"),
             sending_domain: provider_call.path_params.get("domain").cloned(),
+            user_variables_json: part_values
+                .get("user_variables")
+                .and_then(|variable_values| read_user_variables(variable_values))
+                .map(|user_variables| serde_json::Value::Object(user_variables).to_string()),
         })
         .await?;
     Ok(())

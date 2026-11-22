@@ -153,6 +153,8 @@ export function buildEmailFixture(emailSpec: EmailFixtureSpec): EmailFixture {
     smtp_session_id: null,
     smtp_auth_user: null,
     template: emailSpec.template ?? null,
+    provider_message_id: null,
+    user_variables: {},
     direction: "outbound",
     response_kind: null,
     response_to: null,

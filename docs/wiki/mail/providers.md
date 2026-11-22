@@ -84,6 +84,13 @@ The provider port answers Mailgun's events and complaints APIs for each sending 
 
 A complaint made in SendMock (Simulate, the `complaint@` address or an outcome rule) about an email sent through Mailgun puts the address on that domain's table. A later Mailgun send to it is accepted but not delivered: it is recorded as a `failed` event with reason `suppress-complaint`, as Mailgun does. The **Complaints** tab on Mail > Providers > Mailgun lists every domain's table and clears it.
 
+## Mailgun templates, variables and message ids
+
+- **Template sends:** a send with `template` (and `t:variables`) needs no `text` or `html`, as on Mailgun. The email keeps the template's name and data, shown on its **Template** tab; a local email template with the same name gives it a subject and bodies.
+- **User variables:** `v:` fields (`v:order-id=A-1001`) and the `X-Mailgun-Variables` header, as a form field or inside a `/messages.mime` message, are kept with the email as its user variables. The email API shows them as `user_variables`, and webhook templates read them as `data.user_variables`.
+- **Message ids:** the id the send answers (`<...@your-domain>`) is kept with the email as `provider_message_id`, shown by the email API and read by templates as `data.provider_message_id`. The built-in `mailgun.events` template sends it as `message-id`, without the angle brackets as Mailgun does, so your app can match the webhook to the send. `data.message_id` stays the email's own `Message-Id` header.
+- **Addresses in paths:** an address in a path can be percent-encoded (`/complaints/user%40example.org`), as Mailgun's SDKs send it.
+
 ## Customize
 
 The full walkthrough, from the provider's API docs to a working provider: [Advanced: create an email provider](../advanced/email-provider.md).

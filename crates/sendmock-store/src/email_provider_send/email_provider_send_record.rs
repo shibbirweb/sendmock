@@ -10,4 +10,6 @@ pub struct EmailProviderSendRecord {
     pub template_data_json: Option<String>,
     /// The domain in the send path, such as Mailgun's `/v3/{domain}/messages`.
     pub sending_domain: Option<String>,
+    /// The send's user variables as one JSON object, such as Mailgun's `v:` fields.
+    pub user_variables_json: Option<String>,
 }
