@@ -19,6 +19,7 @@ Each recipe starts from a real situation, uses only built-in features (no setup 
 | [SSLCommerz and bKash](./sslcommerz-bkash-checkout.md) | pay with a test wallet, get the redirect and the IPN |
 | [Slack and push](./slack-and-push.md) | keep alerts and push notifications away from real people |
 | [Replay a failed webhook](./replay-a-failed-webhook.md) | see why your handler failed, fix it, send it again |
+| [SDKs without a base URL setting](./sdks-without-a-base-url.md) | point the Twilio PHP, Node and Python and the Mailgun PHP and Node SDKs at SendMock |
 | [Share your setup](./share-your-setup.md) | give your team and CI the same endpoints, rules and numbers |
 
 When the built-ins are not enough, see [Advanced](../advanced/index.md).

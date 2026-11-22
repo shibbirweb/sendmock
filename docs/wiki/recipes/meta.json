@@ -14,6 +14,7 @@
     "sslcommerz-bkash-checkout",
     "slack-and-push",
     "replay-a-failed-webhook",
+    "sdks-without-a-base-url",
     "share-your-setup"
   ]
 }
