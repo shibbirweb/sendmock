@@ -11091,6 +11091,8 @@ components:
             - string
             - "null"
           description: The HTML body.
+          examples:
+            - <p>Hi {{ first_name }}, thanks for joining.</p>
       required:
         - id
         - subject
@@ -11102,14 +11104,23 @@ components:
       properties:
         subject:
           type: string
+          description: The subject, used when the send gives none; can use the template data.
+          examples:
+            - Welcome, {{ first_name }}
         text:
           type:
             - string
             - "null"
+          description: The plain-text body; at least one of `text` and `html`.
+          examples:
+            - Hi {{ first_name }}, thanks for joining.
         html:
           type:
             - string
             - "null"
+          description: The HTML body.
+          examples:
+            - <p>Hi {{ first_name }}, thanks for joining.</p>
     EmailTemplateData:
       type: object
       properties:
@@ -16175,11 +16186,15 @@ components:
         config:
           type: boolean
           description: Also remove every configured item, put the settings and providers back to what SendMock ships with, and forget the seed.
+          examples:
+            - false
         confirm_removed_count:
           type:
             - number
             - "null"
           description: "With `config`: how many configured items the reset said it would remove."
+          examples:
+            - 12
       description: Body of `POST /api/v1/reset`; with no body, a reset that keeps the configuration.
     ResetSummary:
       type: object

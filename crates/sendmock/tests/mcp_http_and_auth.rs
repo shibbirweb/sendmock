@@ -26,8 +26,11 @@ fn post_to_mcp(http_addr: &str, json_rpc_message: &str, extra_headers: &str) -> 
     let mut response_text = String::new();
     let mut read_buffer = [0_u8; 4096];
     // A notification is answered 202 with no body, a refusal 4xx; a request waits for its
-    // result, whose server-sent event ends with a blank line, however many chunks it takes.
-    while !(response_text.contains("\"result\"") && response_text.ends_with("\n\n"))
+    // result, whose server-sent event ends with a blank line, however many chunks it takes
+    // (chunked framing adds only `\r\n` lines, never a blank one).
+    while !response_text
+        .find("\"result\"")
+        .is_some_and(|result_index| response_text[result_index..].contains("\n\n"))
         && !response_text.starts_with("HTTP/1.1 4")
         && !response_text.starts_with("HTTP/1.1 202")
     {

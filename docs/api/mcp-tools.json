@@ -6269,7 +6269,7 @@
           "is_required": false,
           "allowed_values": null,
           "description": "The HTML body.",
-          "example": ""
+          "example": "<p>Hi {{ first_name }}, thanks for joining.</p>"
         }
       ],
       "input_schema": {
@@ -6306,7 +6306,7 @@
             ],
             "description": "The HTML body.",
             "examples": [
-              ""
+              "<p>Hi {{ first_name }}, thanks for joining.</p>"
             ]
           }
         },
@@ -6319,7 +6319,7 @@
         "id": "welcome-email",
         "subject": "Welcome, {{ first_name }}",
         "text": "Hi {{ first_name }}, thanks for joining.",
-        "html": ""
+        "html": "<p>Hi {{ first_name }}, thanks for joining.</p>"
       },
       "output": "EmailTemplate",
       "cli": [
@@ -6471,8 +6471,8 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "",
-          "example": ""
+          "description": "The subject, used when the send gives none; can use the template data.",
+          "example": "Welcome, {{ first_name }}"
         },
         {
           "name": "text",
@@ -6483,8 +6483,8 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "",
-          "example": ""
+          "description": "The plain-text body; at least one of `text` and `html`.",
+          "example": "Hi {{ first_name }}, thanks for joining."
         },
         {
           "name": "html",
@@ -6495,8 +6495,8 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "",
-          "example": ""
+          "description": "The HTML body.",
+          "example": "<p>Hi {{ first_name }}, thanks for joining.</p>"
         }
       ],
       "input_schema": {
@@ -6511,9 +6511,9 @@
           },
           "subject": {
             "type": "string",
-            "description": "",
+            "description": "The subject, used when the send gives none; can use the template data.",
             "examples": [
-              ""
+              "Welcome, {{ first_name }}"
             ]
           },
           "text": {
@@ -6521,9 +6521,9 @@
               "string",
               "null"
             ],
-            "description": "",
+            "description": "The plain-text body; at least one of `text` and `html`.",
             "examples": [
-              ""
+              "Hi {{ first_name }}, thanks for joining."
             ]
           },
           "html": {
@@ -6531,9 +6531,9 @@
               "string",
               "null"
             ],
-            "description": "",
+            "description": "The HTML body.",
             "examples": [
-              ""
+              "<p>Hi {{ first_name }}, thanks for joining.</p>"
             ]
           }
         },
@@ -6543,8 +6543,8 @@
       },
       "example_arguments": {
         "template_id": "slack.incoming_webhook",
-        "subject": "",
-        "text": ""
+        "subject": "Welcome, {{ first_name }}",
+        "text": "Hi {{ first_name }}, thanks for joining."
       },
       "output": "EmailTemplate",
       "cli": [
@@ -19848,7 +19848,7 @@
           "is_required": false,
           "allowed_values": null,
           "description": "With `config`: how many configured items the reset said it would remove.",
-          "example": 0
+          "example": 12
         }
       ],
       "input_schema": {
@@ -19868,14 +19868,14 @@
             ],
             "description": "With `config`: how many configured items the reset said it would remove.",
             "examples": [
-              0
+              12
             ]
           }
         }
       },
       "example_arguments": {
         "config": false,
-        "confirm_removed_count": 0
+        "confirm_removed_count": 12
       },
       "output": "ResetSummary",
       "cli": [

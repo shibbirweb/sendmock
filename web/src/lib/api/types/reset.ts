@@ -5,9 +5,13 @@ export type ResetRequest = {
   /**
    * Also remove every configured item, put the settings and providers back to
    * what SendMock ships with, and forget the seed.
+   * @example false
    */
   config?: boolean;
-  /** With `config`: how many configured items the reset said it would remove. */
+  /**
+   * With `config`: how many configured items the reset said it would remove.
+   * @example 12
+   */
   confirm_removed_count?: number | null;
 };
 

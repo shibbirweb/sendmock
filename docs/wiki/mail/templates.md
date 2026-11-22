@@ -7,6 +7,19 @@ description: Local stand-ins for your provider's email templates, so template se
 
 Apps that send through SendGrid dynamic templates, Postmark templates, Brevo templates or Mailgun templates send only a template id or name and its data; the provider holds the template. **Mail > Templates** keeps a local stand-in under the same id, so a template send is stored with the subject and bodies the provider would have sent, rendered from the send's template data with the same template language as [webhook templates](../webhooks/templates.md).
 
+## What it solves
+
+- **Template sends store an empty email.** Without a stand-in, a send that names only a template id has no subject or body to show; with one, it is stored as the provider would have sent it.
+- **Apps that look a template up first.** Code that reads Mailgun's template before sending it gets an answer instead of a `404`.
+
+## How it connects
+
+| From | To |
+| --- | --- |
+| a SendGrid, Postmark, Brevo or Mailgun send that names a template | the template with that id here, rendered with the send's data |
+| Mailgun's `GET /v3/{domain}/templates/{name}` on the provider port | the template with that name, in Mailgun's shape |
+| the `[[email.templates]]` section of a setup file | the same templates, kept in your repository |
+
 ## Use it
 
 1. Open **Mail > Templates** and press **New template**.
@@ -16,11 +29,17 @@ Apps that send through SendGrid dynamic templates, Postmark templates, Brevo tem
 
 Click a template to change its subject or bodies, or to delete it. Emails already stored keep the bodies they were sent with.
 
-## Mailgun's template API
+## Everything on this screen
+
+A table of templates: id, subject and which bodies it has. **New template** and a click on a row open a sheet with the **Id** (fixed once saved), **Subject**, **Text body** and **HTML body**, with **Save** and **Delete**. Every control, one by one, is in the Deeper pages.
+
+## Customize
+
+### Mailgun's template API
 
 The provider port answers `GET /v3/{domain}/templates/{name}` from these templates in Mailgun's shape, with the template's text or HTML as its active version (also with `active=yes`); a name without a template answers `404` as Mailgun does. Apps that look a template up before sending it work unchanged.
 
-## In the seed and setup files
+### In the seed and setup files
 
 The same templates are the `[[email.templates]]` section of the [seed and setup files](../advanced/seed-file.md):
 

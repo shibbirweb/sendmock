@@ -4556,10 +4556,10 @@
           "takes_json": false,
           "allowed_values": null,
           "description": "The HTML body.",
-          "example": ""
+          "example": "<p>Hi {{ first_name }}, thanks for joining.</p>"
         }
       ],
-      "example": "sendmock email templates create --id welcome-email --subject 'Welcome, {{ first_name }}' --text 'Hi {{ first_name }}, thanks for joining.' --html ''",
+      "example": "sendmock email templates create --id welcome-email --subject 'Welcome, {{ first_name }}' --text 'Hi {{ first_name }}, thanks for joining.' --html '<p>Hi {{ first_name }}, thanks for joining.</p>'",
       "output": "EmailTemplate",
       "exit_codes": [
         0,
@@ -4713,8 +4713,8 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "",
-          "example": ""
+          "description": "The subject, used when the send gives none; can use the template data.",
+          "example": "Welcome, {{ first_name }}"
         },
         {
           "flag": "--text",
@@ -4728,8 +4728,8 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "",
-          "example": ""
+          "description": "The plain-text body; at least one of `text` and `html`.",
+          "example": "Hi {{ first_name }}, thanks for joining."
         },
         {
           "flag": "--html",
@@ -4743,11 +4743,11 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "",
-          "example": ""
+          "description": "The HTML body.",
+          "example": "<p>Hi {{ first_name }}, thanks for joining.</p>"
         }
       ],
-      "example": "sendmock email templates update slack.incoming_webhook --subject '' --text ''",
+      "example": "sendmock email templates update slack.incoming_webhook --subject 'Welcome, {{ first_name }}' --text 'Hi {{ first_name }}, thanks for joining.'",
       "output": "EmailTemplate",
       "exit_codes": [
         0,
@@ -13682,10 +13682,10 @@
           "takes_json": false,
           "allowed_values": null,
           "description": "With `config`: how many configured items the reset said it would remove.",
-          "example": 0
+          "example": 12
         }
       ],
-      "example": "sendmock reset --yes --no-config --confirm-removed-count 0",
+      "example": "sendmock reset --yes --no-config --confirm-removed-count 12",
       "output": "ResetSummary",
       "exit_codes": [
         0,

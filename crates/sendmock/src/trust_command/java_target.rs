@@ -71,6 +71,14 @@ impl TrustTarget for JavaTarget {
     }
 
     fn remove(&self, _local_ca: &LocalCa) -> Result<String, String> {
+        // On Debian and Ubuntu, rebuilding the system bundle also rebuilds Java's cacerts, so
+        // removing the CA from the Linux folder may already have taken the alias out.
+        if !self
+            .run_keytool(&["-list", "-alias", KEYSTORE_ALIAS])
+            .is_success
+        {
+            return Ok(format!("Java's cacerts no longer holds {KEYSTORE_ALIAS}."));
+        }
         let outcome = self.run_keytool(&["-delete", "-alias", KEYSTORE_ALIAS]);
         if !outcome.is_success {
             return Err(outcome.output_text.trim().to_owned());

@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 
 const guidePage = readFileSync(
-  "docs/wiki/recipes/sdks-without-a-base-url.md",
+  "docs/wiki/connect/sdks-without-a-base-url.md",
   "utf8",
 );
 const connectIndex = readFileSync("docs/wiki/connect/index.md", "utf8");
