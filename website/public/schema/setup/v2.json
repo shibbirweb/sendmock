@@ -326,6 +326,39 @@
       ],
       "type": "string"
     },
+    "HttpFollowUpWebhook": {
+      "description": "The webhook a rule sends after it answers.",
+      "properties": {
+        "delay_ms": {
+          "default": 0,
+          "description": "How long after the answer it is sent, in milliseconds (0 to 600,000).",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "endpoint_id": {
+          "default": null,
+          "description": "A webhook endpoint's ID: its URL and retry policy are used instead of `url`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "template_id": {
+          "description": "The webhook template its body and headers render with, such as `twilio.status_callback`;\nvendor templates sign as the vendor does.",
+          "type": "string"
+        },
+        "url": {
+          "default": "",
+          "description": "A URL template, such as `{{ request.form.StatusCallback }}`; empty when an endpoint is\nchosen.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "template_id"
+      ],
+      "type": "object"
+    },
     "HttpMockResponse": {
       "description": "What a bin or rule answers.",
       "properties": {
@@ -389,6 +422,18 @@
             }
           ],
           "description": "Header and body conditions; null matches every request."
+        },
+        "follow_up": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HttpFollowUpWebhook"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "A webhook sent after the rule answers; null for none."
         },
         "id": {
           "type": "string"
@@ -569,6 +614,16 @@
         "auto_success",
         "auto_decline",
         "random"
+      ],
+      "type": "string"
+    },
+    "ProviderArea": {
+      "description": "Where a provider lives: email and SMS providers (Verify services among them), push services\nand payment gateways.",
+      "enum": [
+        "email",
+        "sms",
+        "push",
+        "payments"
       ],
       "type": "string"
     },
@@ -932,6 +987,30 @@
       "required": [
         "key",
         "name"
+      ],
+      "type": "object"
+    },
+    "SeedProviderBin": {
+      "additionalProperties": false,
+      "description": "`[[http.provider_bins]]`, matched by `area` and `provider`: the bin that answers the\nprovider's unmatched requests, made when no bin has its name.",
+      "properties": {
+        "area": {
+          "$ref": "#/$defs/ProviderArea",
+          "description": "`email`, `sms`, `push` or `payments`."
+        },
+        "bin": {
+          "description": "The bin's name.",
+          "type": "string"
+        },
+        "provider": {
+          "description": "The provider's key, such as `twilio`.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "area",
+        "provider",
+        "bin"
       ],
       "type": "object"
     },
@@ -1368,6 +1447,12 @@
         "bins": {
           "items": {
             "$ref": "#/$defs/SeedHttpBin"
+          },
+          "type": "array"
+        },
+        "provider_bins": {
+          "items": {
+            "$ref": "#/$defs/SeedProviderBin"
           },
           "type": "array"
         }
