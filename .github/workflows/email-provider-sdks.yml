@@ -112,6 +112,12 @@ jobs:
         working-directory: examples/email-providers/node
         run: bun install && node done-when.js
 
+      # AC: EM-24.5
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Mailgun Node SDK sends with a template and variables, and the webhook carries them
+        working-directory: examples/email-providers/node
+        run: node mailgun-template-variables.js
+
       - if: needs.changes.outputs.is_affected == 'true'
         uses: shivammathur/setup-php@v2
         with:
@@ -123,6 +129,12 @@ jobs:
         name: Mailgun PHP SDK reads events and manages complaints
         working-directory: examples/email-providers/php-mailgun
         run: composer install --no-interaction --quiet && php send-and-verify.php
+
+      # AC: EM-24.5
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Mailgun PHP SDK sends with a template and variables, and the webhook carries them
+        working-directory: examples/email-providers/php-mailgun
+        run: php send-template-and-verify.php
 
       # AC: PL-20.5
       - if: needs.changes.outputs.is_affected == 'true'
