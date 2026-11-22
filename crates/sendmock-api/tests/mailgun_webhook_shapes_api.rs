@@ -221,3 +221,31 @@ async fn an_inbound_rule_on_mailgun_routes_fires_for_inbound_mail_and_replies() 
     assert_eq!(inbound_deliveries.len(), 1, "{inbound_email}");
     assert_eq!(reply_deliveries.len(), 1, "{reply}");
 }
+
+// AC: EM-27.1
+#[tokio::test]
+async fn a_simulated_bounce_merges_the_given_user_variables_into_the_signed_webhook() {
+    let (fixture, endpoint_id) = build_mailgun_fixture().await;
+    let email_id = send_with_user_variables(&fixture).await;
+
+    let (status, simulated) = fixture
+        .post(
+            &format!("/api/v1/emails/{email_id}/simulate"),
+            &json!({
+                "event": "bounced",
+                "webhook_endpoint_ids": [endpoint_id],
+                "user_variables": { "order-id": "A-2002", "campaign": "spring" },
+            }),
+        )
+        .await;
+    wait_for_email_delivery(&fixture, &email_id).await;
+    fixture.run_due().await;
+    let webhook: Value = serde_json::from_str(&fixture.last_sent_body()).unwrap_or(Value::Null);
+
+    assert_eq!(status, 204, "{simulated}");
+    assert_eq!(
+        webhook["event-data"]["user-variables"],
+        json!({ "customer_id": 42, "order-id": "A-2002", "campaign": "spring" }),
+        "{webhook}"
+    );
+}

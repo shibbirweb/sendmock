@@ -9153,6 +9153,11 @@ components:
           description: Fires `email.opened` and `sms.opened` when you open a message in the UI.
           examples:
             - true
+        count_views_with_webhook_rules:
+          type: boolean
+          description: "On: a view counts as an open even when a webhook rule would send `email.opened` to your app. Off (the default): such a view is not counted."
+          examples:
+            - false
         opened_event_mode:
           type: string
           enum:
@@ -9261,6 +9266,7 @@ components:
         - is_magic_numbers_enabled
         - is_magic_addresses_enabled
         - fire_opened_events_on_view
+        - count_views_with_webhook_rules
         - opened_event_mode
         - chaos_smtp_reject_next_count
         - chaos_smtp_reject_code
@@ -9368,6 +9374,11 @@ components:
           description: Fires `email.opened` and `sms.opened` when you open a message in the UI.
           examples:
             - true
+        count_views_with_webhook_rules:
+          type: boolean
+          description: "On: a view counts as an open even when a webhook rule would send `email.opened` to your app. Off (the default): such a view is not counted."
+          examples:
+            - false
         opened_event_mode:
           type: string
           enum:
@@ -10270,6 +10281,12 @@ components:
           items:
             $ref: "#/components/schemas/WebhookRequestEdit"
           description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.
+          examples:
+            - order_id: A-1001
       required:
         - url
       description: Body of `POST /emails/{emailId}/clicks`.
@@ -10500,6 +10517,12 @@ components:
           items:
             $ref: "#/components/schemas/WebhookRequestEdit"
           description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.
+          examples:
+            - order_id: A-1001
       required:
         - to
       description: Body of POST /api/v1/emails/{emailId}/forward (simulate the recipient forwarding).
@@ -10558,6 +10581,12 @@ components:
           items:
             $ref: "#/components/schemas/WebhookRequestEdit"
           description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.
+          examples:
+            - order_id: A-1001
       description: "Body of POST /api/v1/emails/inbound: an incoming email from fields, or raw MIME in `raw`."
     EmailOutcomeKind:
       type: string
@@ -10781,6 +10810,12 @@ components:
           items:
             $ref: "#/components/schemas/WebhookRequestEdit"
           description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.
+          examples:
+            - order_id: A-1001
       description: Body of POST /api/v1/emails/{emailId}/reply (simulate the recipient replying).
     EmailResponseKind:
       type: string
@@ -12071,6 +12106,12 @@ components:
           items:
             $ref: "#/components/schemas/WebhookRequestEdit"
           description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.
+          examples:
+            - order_id: A-1001
       required:
         - body
         - from
@@ -13222,6 +13263,12 @@ components:
           items:
             $ref: "#/components/schemas/WebhookRequestEdit"
           description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.
+          examples:
+            - order_id: A-1001
       description: Body of `POST /emails/{emailId}/open` and `POST /sms/{smsId}/open`.
     OpenRecord:
       type: object
@@ -14863,6 +14910,12 @@ components:
           items:
             $ref: "#/components/schemas/WebhookRequestEdit"
           description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.
+          examples:
+            - order_id: A-1001
       required:
         - action
       description: Body of POST /api/v1/payments/{paymentId}/simulate.
@@ -16038,6 +16091,12 @@ components:
           items:
             $ref: "#/components/schemas/WebhookRequestEdit"
           description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.
+          examples:
+            - order_id: A-1001
       description: Optional body of POST /api/v1/samples/email (`sendmock email send-test`).
     SaveAsTemplateRequest:
       type: object
@@ -16756,6 +16815,12 @@ components:
           items:
             $ref: "#/components/schemas/WebhookRequestEdit"
           description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.
+          examples:
+            - order_id: A-1001
       required:
         - event
     SmsApi:
@@ -17412,6 +17477,12 @@ components:
           items:
             $ref: "#/components/schemas/WebhookRequestEdit"
           description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.
+          examples:
+            - order_id: A-1001
       required:
         - status
       description: "Body of `POST /sms/{smsId}/status`: a manual status change."

@@ -54,6 +54,23 @@ pub async fn find_firing_rules(
     Ok(firing_rules)
 }
 
+/// Whether an enabled rule on the event would send a webhook for the email, to an enabled
+/// endpoint; a view the user did not mean as the recipient's open is then not counted (EM-27.2).
+pub async fn would_rules_fire_for_email(
+    operation_context: &OperationContext,
+    stored_email: &sendmock_store::EmailRecord,
+    event_type: &str,
+) -> Result<bool, OperationError> {
+    let stored_rules = operation_context
+        .webhook_rule_repository
+        .list_rules()
+        .await?;
+    let rule_message = super::rule_messages::build_email_rule_message(stored_email);
+    let firing_rules =
+        find_firing_rules(operation_context, stored_rules, event_type, &rule_message).await?;
+    Ok(!firing_rules.is_empty())
+}
+
 /// Queues one delivery per enabled rule that fires, in rule order, to enabled endpoints
 /// (WH-02.1, WH-02.4). Answers how many were queued.
 pub async fn fire_matching_rules(

@@ -301,6 +301,11 @@ export type AppSettings = {
    */
   fire_opened_events_on_view: boolean;
   /**
+   * On: a view counts as an open even when a webhook rule would send `email.opened` to your app. Off (the default): such a view is not counted (EM-27.2).
+   * @example false
+   */
+  count_views_with_webhook_rules: boolean;
+  /**
    * `first_open` fires on the first view only, `every_open` on each view.
    * @example "first_open"
    */

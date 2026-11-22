@@ -8,6 +8,7 @@ use super::email_access::find_email_or_not_found;
 use super::email_inputs::EmailReference;
 use super::email_summary::EmailSummary;
 use crate::opens::{add_open_fields, build_open_record, choose_open_recording};
+use crate::webhooks::would_rules_fire_for_email;
 use crate::{
     AppEventType, HttpMethod, NoContent, OpenRecord, OpenSource, Operation, OperationContext,
     OperationDefinition, OperationError, SuccessStatus, publish_event,
@@ -52,13 +53,19 @@ impl Operation for RecordEmailOpenOperation {
         input: EmailOpenRequest,
     ) -> Result<NoContent, OperationError> {
         let operation_context = &input.webhook_choice.apply_to(operation_context).await?;
-        find_email_or_not_found(operation_context, &input.email_id).await?;
+        let stored_email = find_email_or_not_found(operation_context, &input.email_id).await?;
         let open_source = input.source.unwrap_or_default();
         let email_open = build_open_record(operation_context, open_source, input.user_agent)?;
         let app_settings = operation_context.settings_store.current().await?;
         let Some(open_recording) = choose_open_recording(open_source, &app_settings) else {
             return Ok(NoContent);
         };
+        let is_view_reported_by_rules = open_source == OpenSource::Ui
+            && !app_settings.count_views_with_webhook_rules
+            && would_rules_fire_for_email(operation_context, &stored_email, "email.opened").await?;
+        if is_view_reported_by_rules {
+            return Ok(NoContent);
+        }
         let timeline_entry = TimelineRecord {
             kind: "opened".to_owned(),
             happened_at_unix_ms: email_open.opened_at_unix_ms,

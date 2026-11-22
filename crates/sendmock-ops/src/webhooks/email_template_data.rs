@@ -211,7 +211,15 @@ pub async fn read_email_event_data(
     if let (Some(email_fields), Some(event_fields)) =
         (email_data.as_object_mut(), event_data.as_object())
     {
+        let mut user_variables = match email_fields.get("user_variables") {
+            Some(Value::Object(stored_variables)) => stored_variables.clone(),
+            _ => Map::new(),
+        };
+        if let Some(Value::Object(given_variables)) = event_fields.get("user_variables") {
+            user_variables.extend(given_variables.clone());
+        }
         email_fields.extend(event_fields.clone());
+        email_fields.insert("user_variables".to_owned(), Value::Object(user_variables));
     }
     Ok(Some(email_data))
 }

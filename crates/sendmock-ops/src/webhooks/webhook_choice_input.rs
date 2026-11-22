@@ -30,6 +30,11 @@ pub struct WebhookChoiceInput {
     /// Payloads edited for this action, by endpoint: each body is sent as written instead of
     /// the rendered one. Leave it out to send the rendered payloads.
     pub webhook_requests: Option<Vec<WebhookRequestEdit>>,
+    /// User variables for this action's webhooks, such as your app's order id, merged over the
+    /// email's own (Mailgun's `user-variables`, `data.user_variables` in templates), before
+    /// each payload is signed.
+    #[serde(default)]
+    pub user_variables: Option<serde_json::Map<String, serde_json::Value>>,
 }
 
 impl WebhookChoiceInput {
@@ -41,6 +46,10 @@ impl WebhookChoiceInput {
         operation_context: &OperationContext,
     ) -> Result<OperationContext, OperationError> {
         let mut action_context = operation_context.clone();
+        action_context.request.user_variables = self
+            .user_variables
+            .clone()
+            .filter(|user_variables| !user_variables.is_empty());
         if self.webhook_endpoint_ids.is_none() && self.webhook_requests.is_none() {
             return Ok(action_context);
         }

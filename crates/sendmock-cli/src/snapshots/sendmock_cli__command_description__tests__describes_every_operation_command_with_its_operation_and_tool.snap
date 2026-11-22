@@ -457,6 +457,7 @@ expression: command_descriptions
     ],
     "flags": [
       "--bounce-type",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],
@@ -483,6 +484,7 @@ expression: command_descriptions
     "flags": [
       "--source",
       "--user-agent",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],
@@ -531,6 +533,7 @@ expression: command_descriptions
       "--source",
       "--url",
       "--user-agent",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],
@@ -700,6 +703,7 @@ expression: command_descriptions
       "--include-original",
       "--reply-all",
       "--subject",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],
@@ -730,6 +734,7 @@ expression: command_descriptions
       "--include-original",
       "--subject",
       "--to",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],
@@ -847,6 +852,7 @@ expression: command_descriptions
       "--subject",
       "--text",
       "--to",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],
@@ -1335,6 +1341,7 @@ expression: command_descriptions
     ],
     "flags": [
       "--error-code",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],
@@ -1361,6 +1368,7 @@ expression: command_descriptions
     "flags": [
       "--source",
       "--user-agent",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],
@@ -1410,6 +1418,7 @@ expression: command_descriptions
       "--media",
       "--template-id",
       "--to",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],
@@ -2270,6 +2279,7 @@ expression: command_descriptions
       "--dispute-evidence",
       "--dispute-outcome",
       "--refund-amount-minor",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],
@@ -6605,6 +6615,7 @@ expression: command_descriptions
       "--html",
       "--subject",
       "--to",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],

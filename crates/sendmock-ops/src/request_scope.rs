@@ -10,6 +10,9 @@ pub struct RequestScope {
     pub project_key: String,
     /// The webhook endpoints this request's events go to instead of the rule matches.
     pub webhook_choice: Option<WebhookChoice>,
+    /// User variables a simulated event carries, such as the app's ids, merged over the
+    /// email's own in its webhooks (EM-27.1).
+    pub user_variables: Option<serde_json::Map<String, serde_json::Value>>,
 }
 
 impl Default for RequestScope {
@@ -18,6 +21,7 @@ impl Default for RequestScope {
             client: RequestClient::default(),
             project_key: sendmock_store::DEFAULT_PROJECT_KEY.to_owned(),
             webhook_choice: None,
+            user_variables: None,
         }
     }
 }

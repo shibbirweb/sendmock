@@ -711,6 +711,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock email click 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --url 'https://app.test/verify?token=abc123' --source api --user-agent 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)'",
@@ -1184,6 +1201,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock email forward 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --to support@inbound.app.test --body 'Can you look at this one?' --from user@example.test",
@@ -1734,6 +1768,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock email inbound --from 'Sam <sam@customer.test>' --to support@inbound.app.test",
@@ -2358,6 +2409,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock email open 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --source api --user-agent 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)'",
@@ -3572,6 +3640,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock email reply 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --body 'Thanks, that fixed it!' --from user@example.test",
@@ -3949,6 +4034,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock email simulate 01JB7T9Q2R5W8X3Y6Z1A4B7C9D bounced --bounce-type hard --webhook 01JB7T9Q2RENDPOINT00000000",
@@ -11934,6 +12036,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock payments simulate 01JB7T9Q2R5W8X3Y6Z1A4B7C9D refund --decline-reason insufficient_funds --refund-amount-minor 500",
@@ -13933,6 +14052,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock sample email --to user@example.test --subject 'Hello from SendMock'",
@@ -14933,6 +15069,21 @@
           "allowed_values": null,
           "description": "Fires `email.opened` and `sms.opened` when you open a message in the UI.",
           "example": true
+        },
+        {
+          "flag": "--count-views-with-webhook-rules",
+          "input": {
+            "name": "count_views_with_webhook_rules",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "On: a view counts as an open even when a webhook rule would send `email.opened` to your app. Off (the default): such a view is not counted.",
+          "example": false
         },
         {
           "flag": "--opened-event-mode",
@@ -16026,6 +16177,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock sms inbound --from +8801700000000 --to +15550001111 --body STOP --channel sms --webhook 01JB7T9Q2RENDPOINT00000000",
@@ -16389,6 +16557,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock sms open 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --source api --user-agent 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)'",
@@ -18036,6 +18221,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock sms status 01JB7T9Q2R5W8X3Y6Z1A4B7C9D delivered --error-code 30003 --webhook 01JB7T9Q2RENDPOINT00000000",

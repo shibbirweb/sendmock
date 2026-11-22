@@ -10,9 +10,18 @@ use crate::email::EmailSummary;
 pub fn publish_event(
     operation_context: &OperationContext,
     event_type: AppEventType,
-    data: Value,
+    mut data: Value,
 ) -> RecordedEvent {
     let created_at_unix_ms = operation_context.clock.now_unix_ms();
+    if let (Some(user_variables), Some(data_fields)) = (
+        &operation_context.request.user_variables,
+        data.as_object_mut(),
+    ) {
+        data_fields.insert(
+            "user_variables".to_owned(),
+            Value::Object(user_variables.clone()),
+        );
+    }
     operation_context.event_bus.publish(RecordedEvent {
         sequence: 0,
         created_at_unix_ms,

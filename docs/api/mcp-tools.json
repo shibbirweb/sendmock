@@ -928,6 +928,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -990,6 +1004,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -1566,6 +1590,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -1649,6 +1687,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -1913,6 +1961,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -1994,6 +2056,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -2715,6 +2787,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -2770,6 +2856,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -5201,6 +5297,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -5277,6 +5387,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -5847,6 +5967,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -5906,6 +6040,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -18028,6 +18172,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -18108,6 +18266,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -19490,6 +19658,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -19552,6 +19734,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -20621,6 +20813,18 @@
           "example": true
         },
         {
+          "name": "count_views_with_webhook_rules",
+          "input": {
+            "name": "count_views_with_webhook_rules",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "On: a view counts as an open even when a webhook rule would send `email.opened` to your app. Off (the default): such a view is not counted.",
+          "example": false
+        },
+        {
           "name": "opened_event_mode",
           "input": {
             "name": "opened_event_mode",
@@ -20961,6 +21165,13 @@
             "description": "Fires `email.opened` and `sms.opened` when you open a message in the UI.",
             "examples": [
               true
+            ]
+          },
+          "count_views_with_webhook_rules": {
+            "type": "boolean",
+            "description": "On: a view counts as an open even when a webhook rule would send `email.opened` to your app. Off (the default): such a view is not counted.",
+            "examples": [
+              false
             ]
           },
           "opened_event_mode": {
@@ -22477,6 +22688,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -22532,6 +22757,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -25149,6 +25384,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -25207,6 +25456,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -25429,6 +25688,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -25514,6 +25787,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },

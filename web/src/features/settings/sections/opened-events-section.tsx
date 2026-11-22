@@ -6,6 +6,7 @@ import type { AppSettings } from "@/lib/api/types";
 
 const openedEventKeys = [
   "fire_opened_events_on_view",
+  "count_views_with_webhook_rules",
   "opened_event_mode",
 ] as const;
 
@@ -33,6 +34,14 @@ export function OpenedEventsSection({
         isChecked={draftValues.fire_opened_events_on_view}
         onCheckedChange={(isEnabled) => {
           updateDraft({ fire_opened_events_on_view: isEnabled });
+        }}
+      />
+      <SettingsSwitchRow
+        label="Count views your webhook rules would report"
+        description="Off: viewing an email a rule would send email.opened for is not counted, so browsing never tells your app a customer read it. The viewer offers Count as an open."
+        isChecked={draftValues.count_views_with_webhook_rules}
+        onCheckedChange={(isEnabled) => {
+          updateDraft({ count_views_with_webhook_rules: isEnabled });
         }}
       />
       <RadioCardGroup

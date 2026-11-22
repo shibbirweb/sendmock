@@ -136,6 +136,7 @@ pub use rule_operations::{
 };
 pub use rule_preview_operation::PreviewWebhookRuleOperation;
 pub(crate) use rule_subscriber::find_firing_rules;
+pub(crate) use rule_subscriber::would_rules_fire_for_email;
 pub use rule_subscriber::{
     deliver_recorded_event, fire_matching_rules, run_webhook_rule_subscriber,
 };

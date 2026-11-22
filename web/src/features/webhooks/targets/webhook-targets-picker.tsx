@@ -10,6 +10,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  type NameValueRow,
+  NameValueRowsEditor,
+} from "@/components/common/name-value-rows-editor";
 import { Input } from "@/components/ui/input";
 import type {
   WebhookPickerChoice,
@@ -49,6 +53,8 @@ export type WebhookTargetsPickerRequest = {
   initialEndpointIds: string[];
   /** Payloads edited earlier for this action. */
   initialRequestEdits: WebhookRequestEdit[];
+  /** User variables chosen earlier for this action. */
+  initialUserVariables?: Record<string, string>;
   /** The confirm button, e.g. "Use these" or "Simulate". */
   confirmLabel: string;
   onConfirm: (pickerChoice: WebhookPickerChoice) => void;
@@ -147,10 +153,22 @@ export function WebhookTargetsPicker({
     React.useState<WebhookPayloadRequest | null>(null);
   const [shownRequest, setShownRequest] =
     React.useState<WebhookTargetsPickerRequest | null>(null);
+  const [userVariableRows, setUserVariableRows] = React.useState<
+    NameValueRow[]
+  >([]);
   if (pickerRequest !== null && pickerRequest !== shownRequest) {
     setShownRequest(pickerRequest);
     setCheckedEndpointIds(pickerRequest.initialEndpointIds);
     setRequestEdits(pickerRequest.initialRequestEdits);
+    setUserVariableRows(
+      Object.entries(pickerRequest.initialUserVariables ?? {}).map(
+        ([rowName, rowValue], rowIndex) => ({
+          rowId: rowIndex,
+          rowName,
+          rowValue,
+        }),
+      ),
+    );
     setSearchText("");
   }
   const enabledEndpoints = (endpointsQuery.data ?? []).filter(
@@ -231,6 +249,14 @@ export function WebhookTargetsPicker({
             });
           }}
         />
+        <NameValueRowsEditor
+          legend="User variables"
+          rowLabel="User variable"
+          namePlaceholder="order_id"
+          emptyText="None. Add your app's ids, such as an order id, to every webhook this action sends."
+          rows={userVariableRows}
+          onChange={setUserVariableRows}
+        />
         <DialogFooter>
           <p className="mr-auto self-center text-xs text-muted-foreground">
             {checkedEndpointIds.length === 0
@@ -250,6 +276,14 @@ export function WebhookTargetsPicker({
                 endpointIds,
                 requestEdits: requestEdits.filter((requestEdit) =>
                   endpointIds.includes(requestEdit.endpoint_id),
+                ),
+                userVariables: Object.fromEntries(
+                  userVariableRows
+                    .filter((variableRow) => variableRow.rowName.trim() !== "")
+                    .map((variableRow) => [
+                      variableRow.rowName.trim(),
+                      variableRow.rowValue,
+                    ]),
                 ),
               });
               onClose();
