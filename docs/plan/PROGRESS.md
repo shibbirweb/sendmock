@@ -1154,3 +1154,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-22 | PL-26.1 to PL-26.3 built: validate reads items as import does, merge imports need no --yes, reset answers a summary and takes --config. |
 | 2026-11-22 | PL-26.4 and PL-26.5 built: configuration PATCHes merge partial bodies; the endpoint preview fills defaults. |
 | 2026-11-22 | EM-24.1 to EM-24.4 built: Mailgun template sends, user variables and provider message ids kept and sent; provider paths percent-decoded. |
+| 2026-11-22 | Surface parity on #371 failed: the catalogue read setup import as not destructive once `--yes` left its CLI line; `confirmsOnServer` marks it (MCP `destructive_hint`), matching the binary. |

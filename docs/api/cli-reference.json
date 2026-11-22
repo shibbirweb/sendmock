@@ -15187,9 +15187,21 @@
           "allowed_values": null,
           "description": "For `replace` imports: how many items the validation said would be removed; the import is refused when it differs.",
           "example": null
+        },
+        {
+          "flag": "--yes",
+          "input": null,
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Confirms a destructive command; without it the command stops.",
+          "example": true
         }
       ],
-      "example": "sendmock setup import input.txt --url null --sha256 null",
+      "example": "sendmock setup import input.txt --url null --sha256 null --yes",
       "output": "SetupValidation",
       "exit_codes": [
         0,

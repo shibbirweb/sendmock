@@ -106,7 +106,8 @@ export function isDestructiveOperation(
   return (
     (catalogueOperation.entry.method === "DELETE" &&
       catalogueOperation.entry.path.startsWith("/api/")) ||
-    catalogueOperation.surfaces.cli.includes("--yes")
+    catalogueOperation.surfaces.cli.includes("--yes") ||
+    catalogueOperation.surfaces.confirmsOnServer === true
   );
 }
 

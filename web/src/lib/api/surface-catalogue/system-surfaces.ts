@@ -119,6 +119,7 @@ export const systemSurfaces: SurfaceCatalogue = {
     mcp: "sendmock_setup_import",
     ui: "Settings > Setup > Import a setup",
     cliArguments: { file: "setup_text" },
+    confirmsOnServer: true,
   },
   "POST /api/v1/setup/migrate": {
     phase: "A18",

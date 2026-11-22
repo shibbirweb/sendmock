@@ -50,6 +50,11 @@ export type OperationSurfaces = {
   cliArguments?: Record<string, string>;
   /** Flags the naming rules get wrong, by input, e.g. `{ timeout: "--wait" }`. */
   cliFlags?: Record<string, string>;
+  /**
+   * Removes data although the CLI asks no `--yes`, as the server confirms each removal
+   * itself (setup import's `confirm_removed_count`, PL-26.2); MCP marks it destructive.
+   */
+  confirmsOnServer?: boolean;
 };
 
 export type OperationSelector =
