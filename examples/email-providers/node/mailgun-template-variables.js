@@ -1,6 +1,6 @@
 // AC: EM-24.5
 // mailgun.js sends with a stored template and with `v:` variables, as an app tags its mail with
-// its own ids; then a simulated open's `mailgun.events` webhook must carry those variables and
+// its own ids; then a simulated delivery's `mailgun.events` webhook must carry those variables and
 // the message id the SDK got back, so the app can match the webhook to its send.
 import { once } from "node:events";
 import { createServer } from "node:http";
@@ -121,7 +121,7 @@ if (stripBrackets(emailDetail.provider_message_id ?? "") !== stripBrackets(sent.
   throw new Error(`Stored ${emailDetail.provider_message_id}, the SDK got ${sent.id}`);
 }
 await callSendMock("POST", `/emails/${emailId}/simulate`, {
-  event: "opened",
+  event: "delivered",
   webhook_endpoint_ids: [endpoint.id],
 });
 const webhook = await waitForWebhook(receivedBodies);

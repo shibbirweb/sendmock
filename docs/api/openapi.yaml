@@ -13092,11 +13092,6 @@ components:
           description: The SID to give the service, `MG` and 32 hex digits, so an app's configured SID works unchanged; left out, a new one is generated.
           examples:
             - MG00000000000000000000000000000001
-        opt_out_keywords:
-          type: boolean
-          description: Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.
-          examples:
-            - true
         friendly_name:
           type: string
           description: A name for the service.
@@ -13128,6 +13123,11 @@ components:
           description: Called when `inbound_url` fails.
           examples:
             - http://localhost:3000/sms/inbound-fallback
+        opt_out_keywords:
+          type: boolean
+          description: Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.
+          examples:
+            - true
       required:
         - friendly_name
         - inbound_fallback_url
@@ -13146,25 +13146,19 @@ components:
       type: object
       properties:
         friendly_name:
-          type: object
-          properties: {}
+          type: string
           description: A name for the service.
           examples:
             - Notifications
         number_ids:
-          type: object
-          properties: {}
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
           description: The virtual numbers in the sender pool, by ID.
           examples:
             - - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
         inbound_mode:
-          anyOf:
-            - type: object
-              properties: {}
-            - type: object
-              properties: {}
-            - type: object
-              properties: {}
+          $ref: "#/components/schemas/MessagingServiceInboundMode"
           description: "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`."
           examples:
             - webhook
@@ -13184,6 +13178,9 @@ components:
             - http://localhost:3000/sms/inbound-fallback
         opt_out_keywords:
           type: boolean
+          description: Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.
+          examples:
+            - true
     MimePart:
       type: object
       properties:
@@ -19170,23 +19167,6 @@ components:
     VirtualNumberInput:
       type: object
       properties:
-        opt_out_keywords:
-          type: boolean
-          description: Whether a text of STOP to this number opts the contact out; on when left out.
-          examples:
-            - true
-        inbound_method:
-          $ref: "#/components/schemas/InboundWebhookMethod"
-          description: The HTTP method of the reply webhook; POST when left out, as on Twilio.
-          examples:
-            - POST
-        account_sid:
-          type:
-            - string
-            - "null"
-          description: The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.
-          examples:
-            - null
         number:
           type: string
           description: E.164, without a channel prefix; `channels` says whether WhatsApp works.
@@ -19239,34 +19219,50 @@ components:
           description: The Messaging Service this number belongs to, `MG...`; null for none.
           examples:
             - MG00000000000000000000000000000001
+        inbound_method:
+          $ref: "#/components/schemas/InboundWebhookMethod"
+          description: The HTTP method of the reply webhook; POST when left out, as on Twilio.
+          examples:
+            - POST
+        account_sid:
+          type:
+            - string
+            - "null"
+          description: The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.
+          examples:
+            - null
+        opt_out_keywords:
+          type: boolean
+          description: Whether a text of STOP to this number opts the contact out; on when left out.
+          examples:
+            - true
       required:
+        - number
+        - label
         - channels
+        - inbound_url
         - inbound_fallback_url
         - inbound_template_id
-        - inbound_url
-        - label
-        - messaging_service_sid
-        - number
         - status_callback_url
+        - messaging_service_sid
       description: Body of POST and PATCH /api/v1/numbers.
     VirtualNumberInputPatch:
       type: object
       properties:
         number:
-          type: object
-          properties: {}
+          type: string
           description: E.164, without a channel prefix; `channels` says whether WhatsApp works.
           examples:
             - "+15550001111"
         label:
-          type: object
-          properties: {}
+          type: string
           description: A name for the number, e.g. the app or feature that uses it.
           examples:
             - Support line
         channels:
-          type: object
-          properties: {}
+          type: array
+          items:
+            $ref: "#/components/schemas/NumberChannel"
           description: "Where the number works: `sms`, `whatsapp` or both."
           examples:
             - - sms
@@ -19305,18 +19301,23 @@ components:
           description: The Messaging Service this number belongs to, `MG...`; null for none.
           examples:
             - MG00000000000000000000000000000001
-        opt_out_keywords:
-          type: boolean
         inbound_method:
-          anyOf:
-            - type: object
-              properties: {}
-            - type: object
-              properties: {}
+          $ref: "#/components/schemas/InboundWebhookMethod"
+          description: The HTTP method of the reply webhook; POST when left out, as on Twilio.
+          examples:
+            - POST
         account_sid:
           type:
             - string
             - "null"
+          description: The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.
+          examples:
+            - null
+        opt_out_keywords:
+          type: boolean
+          description: Whether a text of STOP to this number opts the contact out; on when left out.
+          examples:
+            - true
     WebhookDelivery:
       type: object
       properties:

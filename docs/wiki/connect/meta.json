@@ -11,6 +11,7 @@
     "ruby",
     "dotnet",
     "https",
+    "sdks-without-a-base-url",
     "docker",
     "kubernetes"
   ]

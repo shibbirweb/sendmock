@@ -11,7 +11,8 @@ const mailgunSigningLine =
   "# Webhook signing key: the mailgun_signing_key webhook variable (sendmock webhooks variables list).";
 const twilioSigningLine =
   "# Webhooks are signed with the auth token; a subaccount's number signs with the subaccount's token.";
-const twilioRecipeLine = "(see Recipes, SDKs without a base URL setting)";
+const twilioRecipeLine =
+  "(see Connect your app, SDKs without a base URL setting)";
 
 /**
  * Mailgun's settings for a stack, word for word as the server's

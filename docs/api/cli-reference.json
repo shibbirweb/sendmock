@@ -7270,54 +7270,6 @@
       "arguments": [],
       "flags": [
         {
-          "flag": "--opt-out-keywords",
-          "input": {
-            "name": "opt_out_keywords",
-            "location": "body"
-          },
-          "type": "boolean",
-          "value_label": null,
-          "is_required": false,
-          "is_repeatable": false,
-          "takes_json": false,
-          "allowed_values": null,
-          "description": "Whether a text of STOP to this number opts the contact out; on when left out.",
-          "example": true
-        },
-        {
-          "flag": "--inbound-method",
-          "input": {
-            "name": "inbound_method",
-            "location": "body"
-          },
-          "type": "string",
-          "value_label": "<inbound-method>",
-          "is_required": false,
-          "is_repeatable": false,
-          "takes_json": false,
-          "allowed_values": [
-            "POST",
-            "GET"
-          ],
-          "description": "The HTTP method of the reply webhook; POST when left out, as on Twilio.",
-          "example": "POST"
-        },
-        {
-          "flag": "--account-sid",
-          "input": {
-            "name": "account_sid",
-            "location": "body"
-          },
-          "type": "string",
-          "value_label": "<account-sid>",
-          "is_required": false,
-          "is_repeatable": false,
-          "takes_json": false,
-          "allowed_values": null,
-          "description": "The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.",
-          "example": null
-        },
-        {
           "flag": "--number",
           "input": {
             "name": "number",
@@ -7441,9 +7393,57 @@
           "allowed_values": null,
           "description": "The Messaging Service this number belongs to, `MG...`; null for none.",
           "example": "MG00000000000000000000000000000001"
+        },
+        {
+          "flag": "--inbound-method",
+          "input": {
+            "name": "inbound_method",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<inbound-method>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "POST",
+            "GET"
+          ],
+          "description": "The HTTP method of the reply webhook; POST when left out, as on Twilio.",
+          "example": "POST"
+        },
+        {
+          "flag": "--account-sid",
+          "input": {
+            "name": "account_sid",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<account-sid>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.",
+          "example": null
+        },
+        {
+          "flag": "--opt-out-keywords",
+          "input": {
+            "name": "opt_out_keywords",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Whether a text of STOP to this number opts the contact out; on when left out.",
+          "example": true
         }
       ],
-      "example": "sendmock numbers add --number +15550001111 --label 'Support line' --channel sms --opt-out-keywords --inbound-method POST",
+      "example": "sendmock numbers add --number +15550001111 --label 'Support line' --channel sms --inbound-url http://localhost:3000/sms/inbound --inbound-fallback-url http://localhost:3000/sms/inbound-fallback",
       "output": "VirtualNumber",
       "exit_codes": [
         0,
@@ -7593,11 +7593,11 @@
             "name": "number",
             "location": "body"
           },
-          "type": "object",
+          "type": "string",
           "value_label": "<number>",
           "is_required": false,
           "is_repeatable": false,
-          "takes_json": true,
+          "takes_json": false,
           "allowed_values": null,
           "description": "E.164, without a channel prefix; `channels` says whether WhatsApp works.",
           "example": "+15550001111"
@@ -7608,27 +7608,30 @@
             "name": "label",
             "location": "body"
           },
-          "type": "object",
+          "type": "string",
           "value_label": "<label>",
           "is_required": false,
           "is_repeatable": false,
-          "takes_json": true,
+          "takes_json": false,
           "allowed_values": null,
           "description": "A name for the number, e.g. the app or feature that uses it.",
           "example": "Support line"
         },
         {
-          "flag": "--channels",
+          "flag": "--channel",
           "input": {
             "name": "channels",
             "location": "body"
           },
-          "type": "object",
-          "value_label": "<channels>",
+          "type": "string[]",
+          "value_label": "<channel>",
           "is_required": false,
-          "is_repeatable": false,
-          "takes_json": true,
-          "allowed_values": null,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": [
+            "sms",
+            "whatsapp"
+          ],
           "description": "Where the number works: `sms`, `whatsapp` or both.",
           "example": [
             "sms"
@@ -7710,34 +7713,22 @@
           "example": "MG00000000000000000000000000000001"
         },
         {
-          "flag": "--opt-out-keywords",
-          "input": {
-            "name": "opt_out_keywords",
-            "location": "body"
-          },
-          "type": "boolean",
-          "value_label": null,
-          "is_required": false,
-          "is_repeatable": false,
-          "takes_json": false,
-          "allowed_values": null,
-          "description": "",
-          "example": false
-        },
-        {
           "flag": "--inbound-method",
           "input": {
             "name": "inbound_method",
             "location": "body"
           },
-          "type": "object",
+          "type": "string",
           "value_label": "<inbound-method>",
           "is_required": false,
           "is_repeatable": false,
-          "takes_json": true,
-          "allowed_values": null,
-          "description": "",
-          "example": {}
+          "takes_json": false,
+          "allowed_values": [
+            "POST",
+            "GET"
+          ],
+          "description": "The HTTP method of the reply webhook; POST when left out, as on Twilio.",
+          "example": "POST"
         },
         {
           "flag": "--account-sid",
@@ -7751,11 +7742,26 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "",
-          "example": ""
+          "description": "The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.",
+          "example": null
+        },
+        {
+          "flag": "--opt-out-keywords",
+          "input": {
+            "name": "opt_out_keywords",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Whether a text of STOP to this number opts the contact out; on when left out.",
+          "example": true
         }
       ],
-      "example": "sendmock numbers update 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --inbound-url http://localhost:3000/sms/inbound --inbound-fallback-url http://localhost:3000/sms/inbound-fallback",
+      "example": "sendmock numbers update 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --number +15550001111 --label 'Support line'",
       "output": "VirtualNumber",
       "exit_codes": [
         0,
@@ -18034,21 +18040,6 @@
           "example": "MG00000000000000000000000000000001"
         },
         {
-          "flag": "--opt-out-keywords",
-          "input": {
-            "name": "opt_out_keywords",
-            "location": "body"
-          },
-          "type": "boolean",
-          "value_label": null,
-          "is_required": false,
-          "is_repeatable": false,
-          "takes_json": false,
-          "allowed_values": null,
-          "description": "Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.",
-          "example": true
-        },
-        {
           "flag": "--friendly-name",
           "input": {
             "name": "friendly_name",
@@ -18128,9 +18119,24 @@
           "allowed_values": null,
           "description": "Called when `inbound_url` fails.",
           "example": "http://localhost:3000/sms/inbound-fallback"
+        },
+        {
+          "flag": "--opt-out-keywords",
+          "input": {
+            "name": "opt_out_keywords",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.",
+          "example": true
         }
       ],
-      "example": "sendmock sms services create --friendly-name Notifications --number-id 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --inbound-mode webhook --sid MG00000000000000000000000000000001 --opt-out-keywords",
+      "example": "sendmock sms services create --friendly-name Notifications --number-id 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --inbound-mode webhook --sid MG00000000000000000000000000000001 --inbound-url http://localhost:3000/sms/inbound",
       "output": "MessagingService",
       "exit_codes": [
         0,
@@ -18277,26 +18283,26 @@
             "name": "friendly_name",
             "location": "body"
           },
-          "type": "object",
+          "type": "string",
           "value_label": "<friendly-name>",
           "is_required": false,
           "is_repeatable": false,
-          "takes_json": true,
+          "takes_json": false,
           "allowed_values": null,
           "description": "A name for the service.",
           "example": "Notifications"
         },
         {
-          "flag": "--number-ids",
+          "flag": "--number-id",
           "input": {
             "name": "number_ids",
             "location": "body"
           },
-          "type": "object",
-          "value_label": "<number-ids>",
+          "type": "string[]",
+          "value_label": "<number-id>",
           "is_required": false,
-          "is_repeatable": false,
-          "takes_json": true,
+          "is_repeatable": true,
+          "takes_json": false,
           "allowed_values": null,
           "description": "The virtual numbers in the sender pool, by ID.",
           "example": [
@@ -18309,12 +18315,16 @@
             "name": "inbound_mode",
             "location": "body"
           },
-          "type": "object",
+          "type": "string",
           "value_label": "<inbound-mode>",
           "is_required": false,
           "is_repeatable": false,
-          "takes_json": true,
-          "allowed_values": null,
+          "takes_json": false,
+          "allowed_values": [
+            "webhook",
+            "defer_to_sender",
+            "drop"
+          ],
           "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.",
           "example": "webhook"
         },
@@ -18360,11 +18370,11 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "",
-          "example": false
+          "description": "Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.",
+          "example": true
         }
       ],
-      "example": "sendmock sms services update MG00000000000000000000000000000001 --inbound-url http://localhost:3000/sms/inbound --inbound-fallback-url http://localhost:3000/sms/inbound-fallback",
+      "example": "sendmock sms services update MG00000000000000000000000000000001 --friendly-name Notifications --number-id 01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
       "output": "MessagingService",
       "exit_codes": [
         0,

@@ -67,11 +67,11 @@ Start SendMock first; the provider port is on by default at `http://127.0.0.1:80
    class SendMockHttpClient(TwilioHttpClient):
        def request(self, method, url, *args, **kwargs):
            twilio_url = urllib.parse.urlsplit(url)
-           sendmock_url = urllib.parse.urljoin(
+           local_url = urllib.parse.urljoin(
                "http://127.0.0.1:8026",
                urllib.parse.urlunsplit(("", "", twilio_url.path, twilio_url.query, "")),
            )
-           return super().request(method, sendmock_url, *args, **kwargs)
+           return super().request(method, local_url, *args, **kwargs)
 
    client = Client(account_sid, auth_token, http_client=SendMockHttpClient())
    ```
@@ -86,7 +86,7 @@ Start SendMock first; the provider port is on by default at `http://127.0.0.1:80
    $mailgun = Mailgun::create('key-sendmock-example', 'http://127.0.0.1:8026');
    ```
 
-Laravel's `mailgun` mailer only speaks HTTPS: use the HTTPS provider port and `sendmock trust`, as [HTTPS for provider SDKs](../connect/https.md) shows.
+Laravel's `mailgun` mailer only speaks HTTPS: use the HTTPS provider port and `sendmock trust`, as [HTTPS for provider SDKs](./https.md) shows.
 
 ## Mailgun Node
 
@@ -112,6 +112,4 @@ Laravel's `mailgun` mailer only speaks HTTPS: use the HTTPS provider port and `s
    sendmock email list
    ```
 
-## Try it in the demo
-
-The [live demo](/demo/) has no provider port, but SMS > Providers > Twilio and Mail > Providers > Mailgun show each provider's base URLs under **Try it**, with a `curl` command that sends the same request these clients send.
+The demo has no provider port, but SMS > Providers > Twilio and Mail > Providers > Mailgun show each provider's base URLs under **Try it**, with a `curl` command that sends the same request these clients send.

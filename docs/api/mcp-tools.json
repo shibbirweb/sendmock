@@ -11523,18 +11523,6 @@
           "example": "MG00000000000000000000000000000001"
         },
         {
-          "name": "opt_out_keywords",
-          "input": {
-            "name": "opt_out_keywords",
-            "location": "body"
-          },
-          "type": "boolean",
-          "is_required": false,
-          "allowed_values": null,
-          "description": "Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.",
-          "example": true
-        },
-        {
           "name": "friendly_name",
           "input": {
             "name": "friendly_name",
@@ -11599,6 +11587,18 @@
           "allowed_values": null,
           "description": "Called when `inbound_url` fails.",
           "example": "http://localhost:3000/sms/inbound-fallback"
+        },
+        {
+          "name": "opt_out_keywords",
+          "input": {
+            "name": "opt_out_keywords",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.",
+          "example": true
         }
       ],
       "input_schema": {
@@ -11612,13 +11612,6 @@
             "description": "The SID to give the service, `MG` and 32 hex digits, so an app's configured SID works unchanged; left out, a new one is generated.",
             "examples": [
               "MG00000000000000000000000000000001"
-            ]
-          },
-          "opt_out_keywords": {
-            "type": "boolean",
-            "description": "Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.",
-            "examples": [
-              true
             ]
           },
           "friendly_name": {
@@ -11666,6 +11659,13 @@
             "examples": [
               "http://localhost:3000/sms/inbound-fallback"
             ]
+          },
+          "opt_out_keywords": {
+            "type": "boolean",
+            "description": "Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.",
+            "examples": [
+              true
+            ]
           }
         },
         "required": [
@@ -11696,7 +11696,7 @@
         ],
         "inbound_mode": "webhook",
         "sid": "MG00000000000000000000000000000001",
-        "opt_out_keywords": true
+        "inbound_url": "http://localhost:3000/sms/inbound"
       },
       "output": "MessagingService",
       "cli": [
@@ -11845,7 +11845,7 @@
             "name": "friendly_name",
             "location": "body"
           },
-          "type": "object",
+          "type": "string",
           "is_required": false,
           "allowed_values": null,
           "description": "A name for the service.",
@@ -11857,7 +11857,7 @@
             "name": "number_ids",
             "location": "body"
           },
-          "type": "object",
+          "type": "string[]",
           "is_required": false,
           "allowed_values": null,
           "description": "The virtual numbers in the sender pool, by ID.",
@@ -11871,9 +11871,13 @@
             "name": "inbound_mode",
             "location": "body"
           },
-          "type": "object",
+          "type": "string",
           "is_required": false,
-          "allowed_values": null,
+          "allowed_values": [
+            "webhook",
+            "defer_to_sender",
+            "drop"
+          ],
           "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.",
           "example": "webhook"
         },
@@ -11910,8 +11914,8 @@
           "type": "boolean",
           "is_required": false,
           "allowed_values": null,
-          "description": "",
-          "example": false
+          "description": "Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.",
+          "example": true
         }
       ],
       "input_schema": {
@@ -11925,16 +11929,17 @@
             ]
           },
           "friendly_name": {
-            "type": "object",
-            "properties": {},
+            "type": "string",
             "description": "A name for the service.",
             "examples": [
               "Notifications"
             ]
           },
           "number_ids": {
-            "type": "object",
-            "properties": {},
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Ulid"
+            },
             "description": "The virtual numbers in the sender pool, by ID.",
             "examples": [
               [
@@ -11943,20 +11948,7 @@
             ]
           },
           "inbound_mode": {
-            "anyOf": [
-              {
-                "type": "object",
-                "properties": {}
-              },
-              {
-                "type": "object",
-                "properties": {}
-              },
-              {
-                "type": "object",
-                "properties": {}
-              }
-            ],
+            "$ref": "#/$defs/MessagingServiceInboundMode",
             "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.",
             "examples": [
               "webhook"
@@ -11984,20 +11976,37 @@
           },
           "opt_out_keywords": {
             "type": "boolean",
-            "description": "",
+            "description": "Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.",
             "examples": [
-              false
+              true
             ]
           }
         },
         "required": [
           "service_sid"
-        ]
+        ],
+        "$defs": {
+          "MessagingServiceInboundMode": {
+            "type": "string",
+            "enum": [
+              "webhook",
+              "defer_to_sender",
+              "drop"
+            ],
+            "description": "What a Messaging Service does with inbound messages to its numbers."
+          },
+          "Ulid": {
+            "type": "string",
+            "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
+          }
+        }
       },
       "example_arguments": {
         "service_sid": "MG00000000000000000000000000000001",
-        "inbound_url": "http://localhost:3000/sms/inbound",
-        "inbound_fallback_url": "http://localhost:3000/sms/inbound-fallback"
+        "friendly_name": "Notifications",
+        "number_ids": [
+          "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        ]
       },
       "output": "MessagingService",
       "cli": [
@@ -12143,45 +12152,6 @@
       },
       "properties": [
         {
-          "name": "opt_out_keywords",
-          "input": {
-            "name": "opt_out_keywords",
-            "location": "body"
-          },
-          "type": "boolean",
-          "is_required": false,
-          "allowed_values": null,
-          "description": "Whether a text of STOP to this number opts the contact out; on when left out.",
-          "example": true
-        },
-        {
-          "name": "inbound_method",
-          "input": {
-            "name": "inbound_method",
-            "location": "body"
-          },
-          "type": "string",
-          "is_required": false,
-          "allowed_values": [
-            "POST",
-            "GET"
-          ],
-          "description": "The HTTP method of the reply webhook; POST when left out, as on Twilio.",
-          "example": "POST"
-        },
-        {
-          "name": "account_sid",
-          "input": {
-            "name": "account_sid",
-            "location": "body"
-          },
-          "type": "string",
-          "is_required": false,
-          "allowed_values": null,
-          "description": "The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.",
-          "example": null
-        },
-        {
           "name": "number",
           "input": {
             "name": "number",
@@ -12283,6 +12253,45 @@
           "example": "MG00000000000000000000000000000001"
         },
         {
+          "name": "inbound_method",
+          "input": {
+            "name": "inbound_method",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "POST",
+            "GET"
+          ],
+          "description": "The HTTP method of the reply webhook; POST when left out, as on Twilio.",
+          "example": "POST"
+        },
+        {
+          "name": "account_sid",
+          "input": {
+            "name": "account_sid",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.",
+          "example": null
+        },
+        {
+          "name": "opt_out_keywords",
+          "input": {
+            "name": "opt_out_keywords",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Whether a text of STOP to this number opts the contact out; on when left out.",
+          "example": true
+        },
+        {
           "name": "number_id",
           "input": {
             "name": "numberId",
@@ -12298,30 +12307,6 @@
       "input_schema": {
         "type": "object",
         "properties": {
-          "opt_out_keywords": {
-            "type": "boolean",
-            "description": "Whether a text of STOP to this number opts the contact out; on when left out.",
-            "examples": [
-              true
-            ]
-          },
-          "inbound_method": {
-            "$ref": "#/$defs/InboundWebhookMethod",
-            "description": "The HTTP method of the reply webhook; POST when left out, as on Twilio.",
-            "examples": [
-              "POST"
-            ]
-          },
-          "account_sid": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.",
-            "examples": [
-              null
-            ]
-          },
           "number": {
             "type": "string",
             "description": "E.164, without a channel prefix; `channels` says whether WhatsApp works.",
@@ -12398,6 +12383,30 @@
               "MG00000000000000000000000000000001"
             ]
           },
+          "inbound_method": {
+            "$ref": "#/$defs/InboundWebhookMethod",
+            "description": "The HTTP method of the reply webhook; POST when left out, as on Twilio.",
+            "examples": [
+              "POST"
+            ]
+          },
+          "account_sid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.",
+            "examples": [
+              null
+            ]
+          },
+          "opt_out_keywords": {
+            "type": "boolean",
+            "description": "Whether a text of STOP to this number opts the contact out; on when left out.",
+            "examples": [
+              true
+            ]
+          },
           "number_id": {
             "type": "string",
             "description": "The virtual number's ID, from `GET /api/v1/numbers`.",
@@ -12429,8 +12438,8 @@
         "channels": [
           "sms"
         ],
-        "opt_out_keywords": true,
-        "inbound_method": "POST"
+        "inbound_url": "http://localhost:3000/sms/inbound",
+        "inbound_fallback_url": "http://localhost:3000/sms/inbound-fallback"
       },
       "output": "VirtualNumber",
       "cli": [

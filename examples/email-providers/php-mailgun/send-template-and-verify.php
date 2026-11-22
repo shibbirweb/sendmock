@@ -1,7 +1,7 @@
 <?php
 
 // The official Mailgun PHP SDK sends with a stored template and with `v:` variables, as a
-// Laravel app tags its mail with its own ids; a simulated open's `mailgun.events` webhook must
+// Laravel app tags its mail with its own ids; a simulated delivery's `mailgun.events` webhook must
 // then carry those variables and the message id the SDK got back.
 // AC: EM-24.5
 
@@ -112,7 +112,7 @@ $sent = $mailgun->messages()->send(SENDING_DOMAIN, [
 $emailPage = callSendMock($sendmockUrl, 'GET', '/emails?limit=1');
 $emailId = $emailPage['items'][0]['id'];
 callSendMock($sendmockUrl, 'POST', "/emails/{$emailId}/simulate", [
-    'event' => 'opened',
+    'event' => 'delivered',
     'webhook_endpoint_ids' => [$endpoint['id']],
 ]);
 $webhook = receiveWebhook($webhookServer);

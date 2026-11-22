@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 
-const recipe = readFileSync(
+const guidePage = readFileSync(
   "docs/wiki/recipes/sdks-without-a-base-url.md",
   "utf8",
 );
-const recipeIndex = readFileSync("docs/wiki/recipes/index.md", "utf8");
-const recipeMenu = readFileSync("docs/wiki/recipes/meta.json", "utf8");
+const connectIndex = readFileSync("docs/wiki/connect/index.md", "utf8");
+const connectMenu = readFileSync("docs/wiki/connect/meta.json", "utf8");
 
 /** Each recipe section, with the client class or option the CI example uses. */
 const sdkSections = [
@@ -38,18 +38,18 @@ const sdkSections = [
 ] as const;
 
 describe("SDKs without a base URL setting (AI-08.3)", () => {
-  test("AI-08.3 the recipe covers the Twilio PHP, Node and Python and Mailgun PHP and Node SDKs as CI runs them", () => {
+  test("AI-08.3 the guide page covers the Twilio PHP, Node and Python and Mailgun PHP and Node SDKs as CI runs them", () => {
     for (const [heading, examplePath, clientMarker] of sdkSections) {
-      const sectionStart = recipe.indexOf(heading);
+      const sectionStart = guidePage.indexOf(heading);
       expect(sectionStart).toBeGreaterThan(-1);
-      const sectionText = recipe.slice(
+      const sectionText = guidePage.slice(
         sectionStart,
-        recipe.indexOf("\n## ", sectionStart + 1),
+        guidePage.indexOf("\n## ", sectionStart + 1),
       );
       expect(sectionText).toContain(clientMarker);
       expect(readFileSync(examplePath, "utf8")).toContain(clientMarker);
     }
-    expect(recipeIndex).toContain("./sdks-without-a-base-url.md");
-    expect(recipeMenu).toContain('"sdks-without-a-base-url"');
+    expect(connectIndex).toContain("./sdks-without-a-base-url.md");
+    expect(connectMenu).toContain('"sdks-without-a-base-url"');
   });
 });
