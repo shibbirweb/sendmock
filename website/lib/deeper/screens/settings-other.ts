@@ -14,6 +14,8 @@ const snippetSections = [
   "Email API",
   "SMS API",
   "HTTP Catcher (point Slack, push or other webhooks here)",
+  "Mailgun SDK",
+  "Twilio SDK",
 ];
 
 /** Settings > Notifications, Opened events, Chaos and OTP patterns. */

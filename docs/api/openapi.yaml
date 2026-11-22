@@ -1171,7 +1171,7 @@ paths:
         - name: channel
           in: query
           required: false
-          description: email, sms or http (default email).
+          description: email, sms, http, mailgun or twilio (default email).
           schema:
             type: string
           example: email
@@ -12254,6 +12254,8 @@ components:
         - email
         - sms
         - http
+        - mailgun
+        - twilio
     IntegrationSnippet:
       type: object
       properties:

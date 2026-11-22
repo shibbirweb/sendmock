@@ -30,7 +30,13 @@ const hostLocations: Record<string, AppLocation> = {
   compose: "compose",
 };
 
-const channelAreas = { email: "smtp", sms: "sms", http: "catcher" } as const;
+const channelAreas = {
+  email: "smtp",
+  sms: "sms",
+  http: "catcher",
+  mailgun: "mailgun",
+  twilio: "twilio",
+} as const;
 
 /** `GET /integrations/{stack}`: the Settings > Connection snippet for one stack and channel. */
 export function buildIntegrationSnippet(
@@ -43,7 +49,9 @@ export function buildIntegrationSnippet(
     return null;
   }
   const channel =
-    channelText === "sms" || channelText === "http" ? channelText : "email";
+    channelText !== null && Object.hasOwn(channelAreas, channelText)
+      ? (channelText as keyof typeof channelAreas)
+      : "email";
   const host =
     appLocationHosts[hostLocations[hostText ?? "local"] ?? "this-machine"];
   const connectionSnippet = buildConnectionSnippets(language, {

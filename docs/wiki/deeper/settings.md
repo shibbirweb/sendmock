@@ -1696,43 +1696,67 @@ Button.
 
 - **What it does:** Copies the snippet.
 
-### 267. Provider APIs
+### 267. Mailgun SDK
+
+Heading.
+
+- **What it does:** The Mailgun SDK snippet for the chosen language.
+
+### 268. Copy Mailgun SDK snippet
+
+Button.
+
+- **What it does:** Copies the snippet.
+
+### 269. Twilio SDK
+
+Heading.
+
+- **What it does:** The Twilio SDK snippet for the chosen language.
+
+### 270. Copy Twilio SDK snippet
+
+Button.
+
+- **What it does:** Copies the snippet.
+
+### 271. Provider APIs
 
 Heading.
 
 - **What it does:** Base URLs to give the providers' SDKs.
 
-### 268. Point a provider's SDK at SendMock: use this base URL, or the real path on the provider port (#.#.#.#:#). Change, remove or add providers in Mail > Providers and SMS > Providers.
+### 272. Point a provider's SDK at SendMock: use this base URL, or the real path on the provider port (#.#.#.#:#). Change, remove or add providers in Mail > Providers and SMS > Providers.
 
 Text.
 
 - **What it does:** Explains the base URLs and the provider port.
 
-### 269. Email
+### 273. Email
 
 Heading.
 
 - **What it does:** The email providers' base URLs.
 
-### 270. …
+### 274. …
 
 Link, in each row.
 
 - **What it does:** A provider's name; opens it in Mail > Providers or SMS > Providers.
 
-### 271. Copy the … base URL
+### 275. Copy the … base URL
 
 Button, in each row.
 
 - **What it does:** Copies the provider's base URL.
 
-### 272. SMS
+### 276. SMS
 
 Heading.
 
 - **What it does:** The SMS providers' base URLs.
 
-### 273. Provider APIs over HTTPS
+### 277. Provider APIs over HTTPS
 
 Heading.
 
@@ -1740,81 +1764,81 @@ Heading.
 - **Links to:** [HTTPS for provider SDKs](../connect/https.md).
 - **Same action elsewhere:** REST [`GET /api/v1/tls/ca`](/api/system/#getTlsCa), CLI [`sendmock tls ca`](/cli/system/#tls-ca), MCP [`sendmock_tls_ca`](/mcp/system/#sendmock_tls_ca)
 
-### 274. For SDKs that only speak HTTPS, such as Laravel's mailgun mailer. Trust SendMock's local CA once, then point the SDK at this address.
+### 278. For SDKs that only speak HTTPS, such as Laravel's mailgun mailer. Trust SendMock's local CA once, then point the SDK at this address.
 
 Text.
 
 - **What it does:** Explains when to use the HTTPS address.
 
-### 275. Off. Start SendMock with --provider-tls-addr #.#.#.#:# to serve the provider APIs over HTTPS.
+### 279. Off. Start SendMock with --provider-tls-addr #.#.#.#:# to serve the provider APIs over HTTPS.
 
 Text.
 
 - **What it does:** Shown while HTTPS is off; names the flag that turns it on.
 
-### 276. AI agents
+### 280. AI agents
 
 Heading.
 
 - **What it does:** Setting up an AI coding agent.
 - **Links to:** [AI](../ai/index.md).
 
-### 277. Let Claude Code, Codex, Cursor, Gemini CLI or VS Code drive SendMock through MCP and the agent skill.
+### 281. Let Claude Code, Codex, Cursor, Gemini CLI or VS Code drive SendMock through MCP and the agent skill.
 
 Text.
 
 - **What it does:** Explains the section.
 
-### 278. AI agent
+### 282. AI agent
 
 Drop-down.
 
 - **What it does:** The agent to set up.
 - **Same action elsewhere:** REST [`GET /api/v1/ai/agents`](/api/automation/#getAiAgents), CLI [`sendmock ai install`](/cli/automation/#ai-install), MCP [`sendmock_ai_agents`](/mcp/automation/#sendmock_ai_agents)
 
-### 279. Installed
+### 283. Installed
 
 Choice.
 
 - **What it does:** Shows the commands for an installed SendMock: the agent starts `sendmock mcp`.
 
-### 280. npx (no install)
+### 284. npx (no install)
 
 Choice.
 
 - **What it does:** Shows the commands for SendMock run through npx with nothing installed: the agent starts `npx -y sendmock mcp`, and the install command is `npx sendmock ai install`, which writes that form by itself.
 
-### 281. Install command
+### 285. Install command
 
 Heading.
 
 - **What it does:** The command that sets the agent up.
 
-### 282. Copy install command
+### 286. Copy install command
 
 Button.
 
 - **What it does:** Copies `sendmock ai install` for the chosen agent.
 
-### 283. MCP configuration
+### 287. MCP configuration
 
 Heading.
 
 - **What it does:** The MCP configuration, to add by hand instead.
 
-### 284. Copy mcp configuration
+### 288. Copy mcp configuration
 
 Button.
 
 - **What it does:** Copies the MCP configuration.
 
-### 285. The install command writes the configuration to claude mcp add sendmock -- sendmock mcp and the skill to .claude/skills/sendmock/ , after showing what it will change.
+### 289. The install command writes the configuration to claude mcp add sendmock -- sendmock mcp and the skill to .claude/skills/sendmock/ , after showing what it will change.
 
 Text.
 
 - **What it does:** Says what the install command writes for the chosen agent (here Claude Code).
 
-### 286. Download the skill
+### 290. Download the skill
 
 Link.
 
@@ -1823,98 +1847,98 @@ Link.
 
 ## About section
 
-### 287. About SendMock
+### 291. About SendMock
 
 Heading.
 
 - **What it does:** The version and channel of the running SendMock.
 - **Same action elsewhere:** REST [`GET /api/v1/info`](/api/system/#getInfo), CLI [`sendmock status`](/cli/system/#status), MCP [`sendmock_status`](/mcp/system/#sendmock_status)
 
-### 288. Help and feedback
+### 292. Help and feedback
 
 Heading.
 
 - **What it does:** The help links, as in the Help menu.
 
-### 289. Issue forms open on GitHub with your version, channel, OS and browser filled in; nothing you captured is sent.
+### 293. Issue forms open on GitHub with your version, channel, OS and browser filled in; nothing you captured is sent.
 
 Text.
 
 - **What it does:** Explains what the issue forms carry.
 
-### 290. Documentation
+### 294. Documentation
 
 Link.
 
 - **What it does:** Opens the docs in a new tab.
 
-### 291. Keyboard shortcuts
+### 295. Keyboard shortcuts
 
 Button.
 
 - **What it does:** Opens the list of keyboard shortcuts.
 
-### 292. What's new
+### 296. What's new
 
 Link.
 
 - **What it does:** Opens the changelog.
 
-### 293. Report an issue
+### 297. Report an issue
 
 Link.
 
 - **What it does:** Opens GitHub's bug report form, filled in.
 
-### 294. Request a feature
+### 298. Request a feature
 
 Link.
 
 - **What it does:** Opens GitHub's feature request form, filled in.
 
-### 295. Report a security issue
+### 299. Report a security issue
 
 Link.
 
 - **What it does:** Opens GitHub's private security report form.
 
-### 296. Star on GitHub
+### 300. Star on GitHub
 
 Link.
 
 - **What it does:** Opens the repository.
 
-### 297. Updates
+### 301. Updates
 
 Heading.
 
 - **What it does:** Whether SendMock looks for new releases.
 
-### 298. Off by default: SendMock never calls out unless you choose Manual or Daily. Stable installs are offered stable releases; beta installs betas and stables.
+### 302. Off by default: SendMock never calls out unless you choose Manual or Daily. Stable installs are offered stable releases; beta installs betas and stables.
 
 Text.
 
 - **What it does:** Explains the update check.
 
-### 299. Off SendMock never calls out.
+### 303. Off SendMock never calls out.
 
 Choice.
 
 - **What it does:** Never checks.
 
-### 300. Manual Only when you press Check for updates.
+### 304. Manual Only when you press Check for updates.
 
 Choice.
 
 - **What it does:** Checks only when you ask.
 
-### 301. Daily On start and once a day; a new version shows in the notifications.
+### 305. Daily On start and once a day; a new version shows in the notifications.
 
 Choice.
 
 - **What it does:** Checks on start and once a day.
 
-### 302. Check for updates
+### 306. Check for updates
 
 Button.
 
@@ -1923,14 +1947,14 @@ Button.
 
 ## AI agents through npx
 
-### 303. Nothing to install: the agent starts SendMock with npx -y sendmock mcp , which needs Node.js. On Windows, if the agent cannot start npx, use cmd /c npx -y sendmock mcp .
+### 307. Nothing to install: the agent starts SendMock with npx -y sendmock mcp , which needs Node.js. On Windows, if the agent cannot start npx, use cmd /c npx -y sendmock mcp .
 
 Text.
 
 - **What it does:** Explains the npx form and the Windows workaround.
 - **Links to:** [Install: npx (no install)](../install.md#npx-no-install).
 
-### 304. The install command writes the configuration to claude mcp add sendmock -- npx -y sendmock mcp and the skill to .claude/skills/sendmock/ , after showing what it will change.
+### 308. The install command writes the configuration to claude mcp add sendmock -- npx -y sendmock mcp and the skill to .claude/skills/sendmock/ , after showing what it will change.
 
 Text.
 
@@ -1938,40 +1962,13 @@ Text.
 
 ## Delete all emails dialog
 
-### 305. Delete all emails?
+### 309. Delete all emails?
 
 Heading.
 
 - **What it does:** The confirmation before deleting every email.
 
-### 306. Every captured email, its attachments and its SMTP session link are removed. Configuration stays.
-
-Text.
-
-- **What it does:** Says what is deleted.
-
-### 307. Cancel
-
-Button.
-
-- **What it does:** Closes the confirmation without doing anything.
-
-### 308. Delete all emails
-
-Button.
-
-- **What it does:** Deletes every email.
-- **Same action elsewhere:** REST [`DELETE /api/v1/emails`](/api/email/#deleteEmails), CLI [`sendmock email delete-all`](/cli/email/#email-delete-all), MCP [`sendmock_email_delete_all`](/mcp/email/#sendmock_email_delete_all)
-
-## Delete all SMS dialog
-
-### 309. Delete all SMS?
-
-Heading.
-
-- **What it does:** The confirmation before deleting every SMS.
-
-### 310. Every captured SMS and WhatsApp message is removed. Numbers and services stay.
+### 310. Every captured email, its attachments and its SMTP session link are removed. Configuration stays.
 
 Text.
 
@@ -1983,7 +1980,34 @@ Button.
 
 - **What it does:** Closes the confirmation without doing anything.
 
-### 312. Delete all SMS
+### 312. Delete all emails
+
+Button.
+
+- **What it does:** Deletes every email.
+- **Same action elsewhere:** REST [`DELETE /api/v1/emails`](/api/email/#deleteEmails), CLI [`sendmock email delete-all`](/cli/email/#email-delete-all), MCP [`sendmock_email_delete_all`](/mcp/email/#sendmock_email_delete_all)
+
+## Delete all SMS dialog
+
+### 313. Delete all SMS?
+
+Heading.
+
+- **What it does:** The confirmation before deleting every SMS.
+
+### 314. Every captured SMS and WhatsApp message is removed. Numbers and services stay.
+
+Text.
+
+- **What it does:** Says what is deleted.
+
+### 315. Cancel
+
+Button.
+
+- **What it does:** Closes the confirmation without doing anything.
+
+### 316. Delete all SMS
 
 Button.
 
@@ -1992,25 +2016,25 @@ Button.
 
 ## Reset to seed dialog
 
-### 313. Reset to seed?
+### 317. Reset to seed?
 
 Heading.
 
 - **What it does:** The confirmation before a reset.
 
-### 314. All traffic is wiped and the configuration goes back to the seed file. Changes not exported to the seed are lost.
+### 318. All traffic is wiped and the configuration goes back to the seed file. Changes not exported to the seed are lost.
 
 Text.
 
 - **What it does:** Says what a reset does.
 
-### 315. Cancel
+### 319. Cancel
 
 Button.
 
 - **What it does:** Closes the confirmation without doing anything.
 
-### 316. Reset
+### 320. Reset
 
 Button.
 
@@ -2019,20 +2043,20 @@ Button.
 
 ## When the data cannot load
 
-### 317. Could not load the settings. Try again
+### 321. Could not load the settings. Try again
 
 Message.
 
 - **What it does:** Shown when the settings could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 318. Could not load the settings.
+### 322. Could not load the settings.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 319. Try again
+### 323. Try again
 
 Button.
 

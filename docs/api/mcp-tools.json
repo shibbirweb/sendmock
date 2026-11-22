@@ -10621,7 +10621,7 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "email, sms or http (default email).",
+          "description": "email, sms, http, mailgun or twilio (default email).",
           "example": "email"
         },
         {
@@ -10649,7 +10649,7 @@
           },
           "channel": {
             "type": "string",
-            "description": "email, sms or http (default email).",
+            "description": "email, sms, http, mailgun or twilio (default email).",
             "examples": [
               "email"
             ]
