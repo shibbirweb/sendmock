@@ -30,6 +30,7 @@ mod endpoint_template_overrides;
 mod endpoint_test_operation;
 mod endpoint_validation;
 mod endpoint_view;
+mod event_template_data;
 mod file_template_library;
 mod follow_up_delivery;
 mod manual_send_operation;
@@ -115,6 +116,7 @@ pub use endpoint_test_operation::TestWebhookEndpointOperation;
 pub(crate) use endpoint_validation::validate_endpoint_input;
 pub use endpoint_view::WebhookEndpoint;
 pub(crate) use endpoint_view::{read_request_settings, write_request_settings};
+pub use event_template_data::{EventTemplateData, read_event_template_data};
 pub use file_template_library::{
     FileTemplateLibrary, LoadedTemplateDirectory, load_template_directory,
 };

@@ -185,7 +185,7 @@ pub use updates::{
 };
 pub use verify::{Verification, VerificationDetail, VerifyService, find_newest_verification};
 pub use webhooks::{
-    DeliveryOrder, DeliveryTrigger, EndpointPreviewResult, FileTemplateLibrary,
+    DeliveryOrder, DeliveryTrigger, EndpointPreviewResult, EventTemplateData, FileTemplateLibrary,
     LoadedTemplateDirectory, ResolvedVariables, RevealedEndpointSecret, SavedDelivery,
     TemplateRenderResult, TemplateRevision, VariablePreviewResult, WebhookChoiceInput,
     WebhookDelivery, WebhookDeliveryDetail, WebhookEndpoint, WebhookRequestEdit, WebhookRule,
@@ -193,8 +193,8 @@ pub use webhooks::{
     WebhookSender, WebhookTemplateDetail, WebhookTemplateSummary, WebhookVariable,
     build_event_template_context, build_sample_template_context, deliver_recorded_event,
     enqueue_webhook_delivery, fire_matching_rules, load_template_directory,
-    read_environment_variables, resolve_template_variables, run_due_deliveries,
-    run_webhook_dispatcher, run_webhook_rule_subscriber,
+    read_environment_variables, read_event_template_data, resolve_template_variables,
+    run_due_deliveries, run_webhook_dispatcher, run_webhook_rule_subscriber,
 };
 
 /// Every operation this build of SendMock serves.
