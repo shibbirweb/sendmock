@@ -89,7 +89,33 @@ fn java_cacerts_is_checked_added_and_removed_under_one_alias() {
         "{calls:?}"
     );
     assert!(
-        calls[2].contains("-delete -alias sendmock-local-ca"),
+        calls[2].contains("-list -alias sendmock-local-ca"),
+        "{calls:?}"
+    );
+    assert!(
+        calls[3].contains("-delete -alias sendmock-local-ca"),
+        "{calls:?}"
+    );
+}
+
+// AC: PL-25.3
+#[test]
+fn an_alias_the_system_bundle_rebuild_already_removed_counts_as_removed() {
+    let runner = Arc::new(FakeCommandRunner::succeeding(&[]));
+    let folder = tempfile::tempdir().unwrap_or_else(|error| panic!("{error}"));
+    let local_ca = build_local_ca(folder.path());
+    let java = JavaTarget {
+        runner: runner.clone(),
+        keytool: PathBuf::from("/jdk/bin/keytool"),
+    };
+
+    let removed = java.remove(&local_ca);
+
+    assert!(removed.is_ok(), "{removed:?}");
+    let calls = runner.recorded_calls();
+    assert_eq!(calls.len(), 1, "{calls:?}");
+    assert!(
+        calls[0].contains("-list -alias sendmock-local-ca"),
         "{calls:?}"
     );
 }
