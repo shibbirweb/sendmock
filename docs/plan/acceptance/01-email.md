@@ -229,9 +229,9 @@ Phase 5 (W20), for the next beta (0.1.0-beta.4), added 2026-11-13 (owner request
 
 1.4.0 (A23), planned 2026-11-20 from a user's request (owner request to plan it for 1.4.0). Plan: [32-after-1-0.md](../32-after-1-0.md#a23-fuller-twilio-and-mailgun-emulation-sm-19-sm-20-sm-21-em-23-pl-20-pl-21) (A23).
 
-- [ ] EM-23.1 `GET /v3/{domain}/events` answers Mailgun's `items` and `paging` for the emails sent through the Mailgun provider for that domain and their simulated outcomes (`accepted`, `delivered`, `failed` with `severity` and `delivery-status`, `opened`, `clicked`, `complained`), each item with the same event data the `mailgun.events` template sends.
-- [ ] EM-23.2 The events filters `event`, `recipient`, `message-id`, `from`, `to`, `subject`, `tags`, `severity`, `begin`, `end`, `ascending` and `limit` (up to 300) work as Mailgun documents, and the `paging` URLs answer the next and previous pages.
-- [ ] EM-23.3 `/v3/{domain}/complaints` lists, fetches, adds and deletes complaints (one address or all) in Mailgun's shapes, and an address without a complaint answers Mailgun's `404`.
-- [ ] EM-23.4 A complaint simulated in SendMock (Simulate, the `complaint@` alias or an outcome rule) adds the address for that domain, and a later send to it through Mailgun is accepted but not delivered, recorded as a `failed` event with reason `suppress-complaint`.
-- [ ] EM-23.5 The Mailgun provider's sheet lists each domain's complaints and clears them, and REST, CLI and MCP list and clear them too.
-- [ ] EM-23.6 In CI, the Mailgun PHP SDK reads the events of a sent email and adds, reads and deletes a complaint, and the provider docs list the new paths.
+- [x] EM-23.1 `GET /v3/{domain}/events` answers Mailgun's `items` and `paging` for the emails sent through the Mailgun provider for that domain and their simulated outcomes (`accepted`, `delivered`, `failed` with `severity` and `delivery-status`, `opened`, `clicked`, `complained`), each item with the same event data the `mailgun.events` template sends.
+- [x] EM-23.2 The events filters `event`, `recipient`, `message-id`, `from`, `to`, `subject`, `tags`, `severity`, `begin`, `end`, `ascending` and `limit` (up to 300) work as Mailgun documents, and the `paging` URLs answer the next and previous pages.
+- [x] EM-23.3 `/v3/{domain}/complaints` lists, fetches, adds and deletes complaints (one address or all) in Mailgun's shapes, and an address without a complaint answers Mailgun's `404`.
+- [x] EM-23.4 A complaint simulated in SendMock (Simulate, the `complaint@` alias or an outcome rule) adds the address for that domain, and a later send to it through Mailgun is accepted but not delivered, recorded as a `failed` event with reason `suppress-complaint`.
+- [x] EM-23.5 The Mailgun provider's sheet lists each domain's complaints and clears them, and REST, CLI and MCP list and clear them too.
+- [x] EM-23.6 In CI, the Mailgun PHP SDK reads the events of a sent email and adds, reads and deletes a complaint, and the provider docs list the new paths.
