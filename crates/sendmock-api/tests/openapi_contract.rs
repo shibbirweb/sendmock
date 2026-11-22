@@ -8,14 +8,15 @@ use axum::http::Request;
 use sendmock_api::{UiAsset, UiAssets, build_app_router, build_openapi_document};
 use sendmock_core::FixedClock;
 use sendmock_ops::{
-    AnswerKind, AppEvent, AppSettingsUpdate, DeliveryOrder, DeliveryTrigger, InstanceDetails,
-    MessageProviderInput, OperationContext, OperationRegistry, ReleaseChannel, SampleEmail,
-    SampleEmailSender, SmtpMessage, SuccessStatus, UpdateCheckMode, build_operation_registry,
-    builtin_email_providers, builtin_sms_providers, enqueue_webhook_delivery, run_due_deliveries,
-    store_smtp_message,
+    AnswerKind, AppEvent, AppSettingsUpdate, DeliveryOrder, DeliveryTrigger, FixedTrustInspector,
+    InstanceDetails, MessageProviderInput, OperationContext, OperationRegistry, ReleaseChannel,
+    SampleEmail, SampleEmailSender, SmtpMessage, SuccessStatus, TlsTrustPlace, TlsTrustReport,
+    UpdateCheckMode, build_operation_registry, builtin_email_providers, builtin_sms_providers,
+    enqueue_webhook_delivery, run_due_deliveries, store_smtp_message,
 };
 use sendmock_store::{
-    ApiRequestFilter, Database, DatabaseLocation, EMBEDDED_MIGRATIONS, SmtpSessionRecord,
+    ApiRequestFilter, Database, DatabaseLocation, EMBEDDED_MIGRATIONS, SmsOptOutRecord,
+    SmtpSessionRecord,
 };
 use serde_json::{Value, json};
 use tower::ServiceExt;
@@ -153,7 +154,7 @@ async fn prepare_sample_inputs(
     samples.extend(prepare_inbound_route_samples(app_router).await);
     samples.extend(prepare_http_catcher_samples(app_router).await);
     samples.extend(prepare_number_samples(app_router).await);
-    samples.extend(prepare_twilio_subaccount_samples(app_router).await);
+    samples.extend(prepare_provider_app_samples(app_router, operation_context).await);
     samples.extend(provider_gap_samples());
     samples.extend(ci_samples());
     samples.extend(prepare_verify_samples(app_router).await);
@@ -748,6 +749,89 @@ async fn prepare_twilio_subaccount_samples(
     ]
 }
 
+/// Twilio subaccounts, local email templates, SMS opt-outs and stack presets, for apps on a
+/// provider's SDK.
+async fn prepare_provider_app_samples(
+    app_router: &axum::Router,
+    operation_context: &OperationContext,
+) -> Vec<(&'static str, Vec<Value>)> {
+    let mut samples = prepare_twilio_subaccount_samples(app_router).await;
+    samples.extend(prepare_email_template_samples(app_router).await);
+    samples.extend(prepare_sms_opt_out_samples(operation_context).await);
+    samples.extend(preset_samples());
+    samples
+}
+
+/// Two local email templates: one to edit, one to delete.
+async fn prepare_email_template_samples(
+    app_router: &axum::Router,
+) -> Vec<(&'static str, Vec<Value>)> {
+    for template_id in ["order-shipped", "old-newsletter"] {
+        post_json(
+            app_router,
+            "/api/v1/emails/templates",
+            &json!({ "id": template_id, "subject": "Shipped", "text": "On its way", "html": null }),
+        )
+        .await;
+    }
+    vec![
+        ("getEmailsTemplates", vec![json!({})]),
+        (
+            "postEmailsTemplates",
+            vec![json!({
+                "id": "welcome-email", "subject": "Welcome, {{ first_name }}",
+                "text": "Hello {{ first_name }}", "html": "<p>Hello {{ first_name }}</p>",
+            })],
+        ),
+        (
+            "patchEmailsTemplatesByTemplateId",
+            vec![json!({ "template_id": "order-shipped", "subject": "Your order shipped" })],
+        ),
+        (
+            "deleteEmailsTemplatesByTemplateId",
+            vec![json!({ "template_id": "old-newsletter" })],
+        ),
+    ]
+}
+
+/// One opt-out to lift; lifting one runs before clearing them all (registration order).
+async fn prepare_sms_opt_out_samples(
+    operation_context: &OperationContext,
+) -> Vec<(&'static str, Vec<Value>)> {
+    operation_context
+        .sms_delivery_stores
+        .opt_outs
+        .save_opt_out(SmsOptOutRecord {
+            sender: "+15550001111".to_owned(),
+            contact_number: "+14155550100".to_owned(),
+            keyword: "STOP".to_owned(),
+            created_at_unix_ms: 1_767_225_600_000,
+        })
+        .await
+        .unwrap_or_else(|error| panic!("an opt-out is stored: {error}"));
+    vec![
+        ("getSmsOptOuts", vec![json!({})]),
+        (
+            "deleteSmsOptOutsBySenderByContactNumber",
+            vec![json!({ "sender": "+15550001111", "contact_number": "+14155550100" })],
+        ),
+        ("deleteSmsOptOuts", vec![json!({})]),
+    ]
+}
+
+fn preset_samples() -> Vec<(&'static str, Vec<Value>)> {
+    vec![
+        ("getPresets", vec![json!({})]),
+        (
+            "postPresetsByPresetNameApply",
+            vec![json!({
+                "preset_name": "laravel-mailgun-twilio", "app_url": "http://localhost:8000",
+                "options": {}, "numbers_csv": null,
+            })],
+        ),
+    ]
+}
+
 /// Mailgun complaints, the local CA and provider bins, which need no setup.
 fn provider_gap_samples() -> Vec<(&'static str, Vec<Value>)> {
     vec![
@@ -756,6 +840,7 @@ fn provider_gap_samples() -> Vec<(&'static str, Vec<Value>)> {
             vec![json!({}), json!({ "domain": "mg.shop.test" })],
         ),
         ("getTlsCa", vec![json!({})]),
+        ("getTlsTrust", vec![json!({})]),
         (
             "deleteMailgunComplaintsByDomain",
             vec![json!({ "domain": "mg.shop.test" })],
@@ -2092,6 +2177,14 @@ fn build_operation_context() -> OperationContext {
     operation_context
         .clone()
         .with_sample_email_sender(Arc::new(StoringSampleSender { operation_context }))
+        .with_trust_inspector(Arc::new(FixedTrustInspector(TlsTrustReport {
+            ca_path: "/tmp/sendmock/provider-ca-certificate.pem".to_owned(),
+            places: vec![TlsTrustPlace {
+                place: "System store".to_owned(),
+                state: "trusted".to_owned(),
+                detail: String::new(),
+            }],
+        })))
 }
 
 fn build_bare_operation_context() -> OperationContext {

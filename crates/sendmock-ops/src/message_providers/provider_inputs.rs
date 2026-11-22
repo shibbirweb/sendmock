@@ -33,12 +33,10 @@ pub struct MessageProviderInput {
     /// SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END,
     /// QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null
     /// keeps the default: on for Twilio, off for others.
-    #[serde(default)]
     #[schemars(required, schema_with = "crate::nullable_schema::<bool>")]
     pub opt_out_keywords: Option<bool>,
     /// SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound
     /// messages.
-    #[serde(default)]
     pub opt_out_auto_replies: bool,
     /// The requests it answers.
     pub operations: Vec<ProviderOperation>,
