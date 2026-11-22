@@ -131,7 +131,7 @@ On top of its own criteria, a feature is done only when:
 | [WH-12](03-webhooks.md#wh-12-inbound-routes-mailgun-style) | Inbound routes (Mailgun style) | UI in U2, backend Phase 4 | 7 | Accepted |
 | [WH-13](03-webhooks.md#wh-13-webhooks-shown-and-chosen-on-every-simulation) | Webhooks shown and chosen on every simulation | Phase 5 (W22) | 5 | Accepted |
 | [WH-14](03-webhooks.md#wh-14-webhook-payload-shown-and-edited-before-a-simulation) | Webhook payload shown and edited before a simulation | Phase 5 (W23) | 4 | Accepted |
-| [WH-15](03-webhooks.md#wh-15-webhook-tests-in-cicd-pipelines) | Webhook tests in CI/CD pipelines | 1.5.0 (A19) | 9 | In progress |
+| [WH-15](03-webhooks.md#wh-15-webhook-tests-in-cicd-pipelines) | Webhook tests in CI/CD pipelines | 1.6.0 (A19) | 9 | In progress |
 | [HC-01](04-catcher-platform.md#hc-01-capture-requests) | Capture requests | UI in U2, backend Phase 4 | 7 | Accepted |
 | [HC-02](04-catcher-platform.md#hc-02-mock-responses) | Mock responses | UI in U2, backend Phase 4 | 4 | Accepted |
 | [HC-03](04-catcher-platform.md#hc-03-presets) | Presets | Phase 4 (Slack, Discord, Telegram, FCM), Phase 5 (Teams, Google Chat, Expo, OneSignal) | 2 | Accepted |
@@ -212,8 +212,8 @@ On top of its own criteria, a feature is done only when:
 | [WS-08](07-distribution-website.md#ws-08-code-examples) | Code examples | Phase U3 (WS-08.5 in Phase 2) | 5 | Accepted |
 | [WS-09](07-distribution-website.md#ws-09-install-with-ai) | Install with AI | Phase U3 | 4 | Accepted |
 | [WS-10](07-distribution-website.md#ws-10-deeper-docs-every-control) | Deeper docs: every control | Phase 5 (screen by screen in Stage B; W24 the Screenshots workflow) | 5 | Accepted |
-| [WS-11](07-distribution-website.md#ws-11-docs-traffic-analytics) | Docs traffic analytics | 1.5.0 (A15) | 6 | Not started |
-| [WS-12](07-distribution-website.md#ws-12-code-examples-on-every-page) | Code examples on every page | 1.5.0 (A16) | 4 | Not started |
+| [WS-11](07-distribution-website.md#ws-11-docs-traffic-analytics) | Docs traffic analytics | 1.6.0 (A15) | 6 | Not started |
+| [WS-12](07-distribution-website.md#ws-12-code-examples-on-every-page) | Code examples on every page | 1.6.0 (A16) | 4 | Not started |
 | [WS-13](07-distribution-website.md#ws-13-search-engines-and-link-previews) | Search engines and link previews | 1.2.0 (A20) | 9 | Accepted |
 | [WS-14](07-distribution-website.md#ws-14-whats-new-and-upgrade-guide) | What's new and Upgrade guide | 1.2.0 (A21) | 4 | Accepted |
 | [WS-15](07-distribution-website.md#ws-15-download-activity-in-the-footer-wordmark) | Download activity in the footer wordmark | 1.3.1 (A26) | 6 | Accepted |

@@ -22,11 +22,11 @@ Smallest change with the most users first; items that need an outside party (a d
 | A12 | Monitoring: Prometheus metrics, OpenTelemetry export, log files and readiness | #175, #176, #177 | PL-11, PL-12, PL-13 (new) | 1.6.0 |
 | A13 | Accounts, login and roles (Admin, Developer, Viewer) | #178, #179 | PL-14, PL-15 (new) | 2.0.0 |
 | A14 | Real forwarding: provider connections and routing rules for email and SMS | #180, #181 | PL-16, PL-17 (new) | 2.0.0 |
-| A15 | Docs traffic analytics with Google Analytics | #186 | WS-11 (new) | 1.5.0 |
-| A16 | Code examples on every docs page, for every task | #197 | WS-12 (new) | 1.5.0 |
+| A15 | Docs traffic analytics with Google Analytics | #186 | WS-11 (new) | 1.6.0 (moved from 1.5.0, owner decision 2026-11-23) |
+| A16 | Code examples on every docs page, for every task | #197 | WS-12 (new) | 1.6.0 (moved from 1.5.0, owner decision 2026-11-23) |
 | A17 | List actions on every traffic screen: select, mark read or unread, delete, delete all | #277 | UI-14 (new) | 1.1.0 |
 | A18 | Share and move a setup: versioned export and import, from a file or a URL; saved scenarios (owner decision 2026-11-20) | #287 | PL-18, AI-07 (new) | 1.3.0 |
-| A19 | SendMock in CI/CD pipelines for webhook tests, set up from a JSON or YAML file at a URL | #286 | WH-15 (new) | 1.5.0 (WH-15.1 to WH-15.7 ship in 1.4.0; the GitHub Action, WH-15.8 and WH-15.9, in 1.5.0, owner decision 2026-11-22) |
+| A19 | SendMock in CI/CD pipelines for webhook tests, set up from a JSON or YAML file at a URL | #286 | WH-15 (new) | 1.6.0 (WH-15.1 to WH-15.7 ship in 1.4.0; the GitHub Action, WH-15.8 and WH-15.9, moved from 1.5.0 to 1.6.0, owner decisions 2026-11-22 and 2026-11-23) |
 | A20 | Search engines and link previews for the website | #293 | WS-13 (new) | 1.2.0 |
 | A21 | What's new and Upgrade guide links in the docs sidebar | #295 | WS-14 (new) | 1.2.0 |
 | A22 | Security and quality clean-up: every open alert and Dependabot pull request | #308 | PL-19 (new) | 1.3.1 |
