@@ -1,8 +1,19 @@
 import type { TemplateDefinition } from "@/mocks/fixtures/template-definitions";
 
 const jsonType = "application/json";
-const formType = "application/x-www-form-urlencoded";
 const verifiedOn = "2026-09-30";
+const forwardVerifiedOn = "2026-11-22";
+const forwardBoundary = "MailgunForward";
+
+/** One multipart form field of Mailgun's forward, as lines joined with CRLF. */
+function forwardField(fieldName: string, valueTemplate: string): string[] {
+  return [
+    `--${forwardBoundary}`,
+    `Content-Disposition: form-data; name="${fieldName}"`,
+    "",
+    valueTemplate,
+  ];
+}
 
 /**
  * Mailgun's inbound route forward and event webhooks. Both the binary's template engine and
@@ -11,13 +22,69 @@ const verifiedOn = "2026-09-30";
 export const mailgunTemplateDefinitions: Record<string, TemplateDefinition> = {
   "mailgun.routes": {
     method: "POST",
-    content_type: formType,
+    content_type: `multipart/form-data; boundary=${forwardBoundary}`,
     header_templates: {},
-    body_template:
-      "{% set mailgun_timestamp = event.created_at | unix %}{% set mailgun_token = random_hex(50) %}sender={{ data.from.address | urlencode }}&recipient={{ data.to[0].address | urlencode }}&subject={{ data.subject | urlencode }}&body-plain={{ data.text_body | urlencode }}&timestamp={{ mailgun_timestamp }}&token={{ mailgun_token }}&signature={{ mailgun_signature(vars.mailgun_signing_key, mailgun_timestamp, mailgun_token) }}",
+    // Mailgun's store-and-notify forward: the parsed message, every header, the stripped
+    // reply and signature, and each file as attachment-N, fetched from its URL when sent.
+    body_template: [
+      "{% set mailgun_timestamp = event.created_at | unix %}{% set mailgun_token = random_hex(50) %}",
+      ...forwardField("recipient", "{{ data.to[0].address }}"),
+      ...forwardField("sender", "{{ data.from.address }}"),
+      ...forwardField("from", "{{ data.from.address }}"),
+      ...forwardField("To", "{{ data.to[0].address }}"),
+      ...forwardField("subject", "{{ data.subject }}"),
+      ...forwardField(
+        "Message-Id",
+        "{% if data.message_id %}{{ data.message_id }}{% endif %}",
+      ),
+      ...forwardField("In-Reply-To", '{{ data.in_reply_to | default("") }}'),
+      ...forwardField("References", '{{ data.references | default("") }}'),
+      ...forwardField(
+        "body-plain",
+        "{% if data.text_body %}{{ data.text_body }}{% endif %}",
+      ),
+      ...forwardField(
+        "stripped-text",
+        '{{ data.stripped_text | default("") }}',
+      ),
+      ...forwardField(
+        "stripped-signature",
+        '{{ data.stripped_signature | default("") }}',
+      ),
+      ...forwardField(
+        "body-html",
+        "{% if data.html_body %}{{ data.html_body }}{% endif %}",
+      ),
+      ...forwardField(
+        "stripped-html",
+        "{% if data.html_body %}{{ data.html_body }}{% endif %}",
+      ),
+      ...forwardField(
+        "message-headers",
+        "{% if data.header_pairs %}{{ data.header_pairs | tojson }}{% else %}[]{% endif %}",
+      ),
+      ...forwardField(
+        "content-id-map",
+        "{% if data.content_id_map %}{{ data.content_id_map | tojson }}{% else %}{}{% endif %}",
+      ),
+      ...forwardField("message-url", '{{ data.message_url | default("") }}'),
+      ...forwardField("attachment-count", "{{ data.attachments | length }}"),
+      ...forwardField("timestamp", "{{ mailgun_timestamp }}"),
+      ...forwardField("token", "{{ mailgun_token }}"),
+      ...forwardField(
+        "signature",
+        "{{ mailgun_signature(vars.mailgun_signing_key, mailgun_timestamp, mailgun_token) }}",
+      ),
+      `{% for attachment in data.attachments %}--${forwardBoundary}`,
+      'Content-Disposition: form-data; name="attachment-{{ loop.index }}"; filename="{{ attachment.filename }}"',
+      "X-Sendmock-File-Url: {{ attachment.url }}",
+      "",
+      `{% endfor %}--${forwardBoundary}--`,
+      "",
+    ].join("\r\n"),
     doc_url:
       "https://documentation.mailgun.com/docs/mailgun/user-manual/receive-forward-store/",
-    verified_on: verifiedOn,
+    verified_on: forwardVerifiedOn,
   },
   "mailgun.events": {
     method: "POST",

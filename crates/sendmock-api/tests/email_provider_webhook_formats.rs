@@ -134,7 +134,32 @@ async fn resend_events_match_the_docs_and_carry_a_real_svix_signature() {
     );
 }
 
-// AC: WH-06.1 WH-06.2
+/// The text fields of a multipart form body, by name; file parts are left out.
+fn read_multipart_fields(form_body: &str, boundary: &str) -> BTreeMap<String, String> {
+    form_body
+        .split(&format!("--{boundary}"))
+        .filter_map(|form_part| {
+            let (part_headers, part_value) = form_part.split_once("\r\n\r\n")?;
+            let field_name = part_headers
+                .split("name=\"")
+                .nth(1)?
+                .split('"')
+                .next()?
+                .to_owned();
+            (!part_headers.contains("filename=")).then(|| {
+                (
+                    field_name,
+                    part_value
+                        .strip_suffix("\r\n")
+                        .unwrap_or(part_value)
+                        .to_owned(),
+                )
+            })
+        })
+        .collect()
+}
+
+// AC: WH-06.1 WH-06.2 EM-25.3
 #[tokio::test]
 async fn mailgun_forwards_match_the_docs_with_a_real_signature() {
     let (app_router, _) = build_test_app();
@@ -142,8 +167,7 @@ async fn mailgun_forwards_match_the_docs_with_a_real_signature() {
 
     let (_, body) = render(&app_router, "mailgun.routes").await;
 
-    let form_fields: BTreeMap<String, String> =
-        serde_urlencoded::from_str(&body).unwrap_or_default();
+    let form_fields = read_multipart_fields(&body, "MailgunForward");
     check_against_fixture(MAILGUN_ROUTE_FORWARD, &json!(form_fields));
     assert_eq!(
         form_fields.get("signature"),

@@ -124,12 +124,7 @@
     "service": "Mailgun",
     "category": "email-provider",
     "events": [
-      "email.received",
-      "email.opened",
-      "email.clicked",
-      "email.delivered",
-      "email.bounced",
-      "email.complained"
+      "email.inbound"
     ],
     "description": "Mailgun: routes (inbound) payload, matching the provider's documented format.",
     "required_variables": [
@@ -142,7 +137,6 @@
     "service": "Mailgun",
     "category": "email-provider",
     "events": [
-      "email.received",
       "email.opened",
       "email.clicked",
       "email.delivered",
@@ -160,7 +154,6 @@
     "service": "Postmark",
     "category": "email-provider",
     "events": [
-      "email.received",
       "email.opened",
       "email.clicked",
       "email.delivered",
@@ -192,7 +185,7 @@
     "service": "SendGrid",
     "category": "email-provider",
     "events": [
-      "email.received"
+      "email.inbound"
     ],
     "description": "SendGrid: Inbound Parse payload, matching the provider's documented format.",
     "required_variables": []
@@ -219,12 +212,7 @@
     "service": "Postmark",
     "category": "email-provider",
     "events": [
-      "email.received",
-      "email.opened",
-      "email.clicked",
-      "email.delivered",
-      "email.bounced",
-      "email.complained"
+      "email.inbound"
     ],
     "description": "Postmark: inbound payload, matching the provider's documented format.",
     "required_variables": []

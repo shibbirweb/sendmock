@@ -13,7 +13,7 @@ use serde_json::{Value, json};
 use support::email_provider_requests::send_provider_request;
 use support::scripted_webhook_sender::ScriptedAnswer;
 use support::test_app::call_api;
-use support::webhook_samples::wait_for_deliveries_at;
+use support::webhook_samples::{create_rule, send_email, wait_for_deliveries_at};
 use support::webhook_send_fixture::{WebhookSendFixture, build_send_fixture, global_variable};
 
 const MAILGUN_FAILED_EVENT_WEBHOOK: &str =
@@ -166,4 +166,58 @@ async fn a_render_of_a_bounced_email_shows_its_bounce() {
     );
     assert_eq!(rendered_body["data"]["bounce"]["code"], 452);
     assert_eq!(rendered_body["data"]["bounce_type"], "soft");
+}
+
+/// The deliveries queued for an email, waiting until there is one.
+async fn wait_for_email_delivery(fixture: &WebhookSendFixture, email_id: &str) -> Vec<Value> {
+    wait_for_deliveries_at(
+        &fixture.app_router,
+        &format!("/api/v1/webhooks/deliveries?subject_id={email_id}"),
+        1,
+    )
+    .await
+}
+
+// AC: EM-25.4
+#[tokio::test]
+async fn an_inbound_rule_on_mailgun_routes_fires_for_inbound_mail_and_replies() {
+    let fixture = build_send_fixture(&[ScriptedAnswer::Status(200), ScriptedAnswer::Status(200)]);
+    tokio::spawn(run_webhook_rule_subscriber(
+        fixture.operation_context.clone(),
+    ));
+    let endpoint_id = fixture
+        .create_endpoint(json!({ "template_id": "mailgun.routes" }))
+        .await;
+    create_rule(
+        &fixture.app_router,
+        &json!({
+            "name": "Inbound mail", "endpoint_id": endpoint_id, "events": ["email.inbound"],
+            "is_enabled": true,
+        }),
+    )
+    .await;
+    let (_, inbound_email) = fixture
+        .post(
+            "/api/v1/emails/inbound",
+            &json!({
+                "from": "sam@example.test", "to": ["support@inbound.shop.test"],
+                "subject": "Help", "text": "My order is late",
+            }),
+        )
+        .await;
+    let sent_email_id = send_email(&fixture.app_router, "ana@example.test", "Your order").await;
+    let (_, reply) = fixture
+        .post(
+            &format!("/api/v1/emails/{sent_email_id}/reply"),
+            &json!({ "body": "Thanks!" }),
+        )
+        .await;
+
+    let inbound_deliveries =
+        wait_for_email_delivery(&fixture, inbound_email["id"].as_str().unwrap_or_default()).await;
+    let reply_deliveries =
+        wait_for_email_delivery(&fixture, reply["id"].as_str().unwrap_or_default()).await;
+
+    assert_eq!(inbound_deliveries.len(), 1, "{inbound_email}");
+    assert_eq!(reply_deliveries.len(), 1, "{reply}");
 }

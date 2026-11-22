@@ -28,16 +28,7 @@ async fn read_signing_key(operation_context: &OperationContext) -> Result<String
 
 /// Where `GET` reads a stored message back, on the provider port when there is one.
 fn build_message_url(operation_context: &OperationContext, email_id: &str) -> String {
-    let instance_details = &operation_context.instance_details;
-    match &instance_details.provider_address {
-        Some(provider_address) => {
-            format!("http://{provider_address}/v3/domains/inbound/messages/{email_id}")
-        }
-        None => format!(
-            "http://{}/providers/mailgun/v3/domains/inbound/messages/{email_id}",
-            instance_details.http_address
-        ),
-    }
+    crate::webhooks::build_message_url(&operation_context.instance_details, "inbound", email_id)
 }
 
 pub async fn queue_route_delivery(

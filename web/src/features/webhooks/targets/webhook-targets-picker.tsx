@@ -29,8 +29,16 @@ import {
   replaceRequestEdit,
 } from "@/features/webhooks/targets/webhook-request-edits";
 import { TargetPayloadButton } from "@/features/webhooks/targets/webhook-target-links";
-import { useWebhookEndpoints } from "@/lib/api/hooks/use-webhook-queries";
-import type { WebhookEndpoint, WebhookRequestEdit } from "@/lib/api/types";
+import { findTemplateEventWarning } from "@/features/webhooks/targets/template-event-warning";
+import {
+  useWebhookEndpoints,
+  useWebhookTemplates,
+} from "@/lib/api/hooks/use-webhook-queries";
+import type {
+  AppEventType,
+  WebhookEndpoint,
+  WebhookRequestEdit,
+} from "@/lib/api/types";
 
 export type WebhookTargetsPickerRequest = {
   /** What the action does, e.g. "Hard bounce". */
@@ -52,6 +60,7 @@ function PickerEndpointList({
   searchText,
   checkedEndpointIds,
   requestEdits,
+  eventType,
   onToggle,
   onOpenPayload,
 }: {
@@ -59,9 +68,11 @@ function PickerEndpointList({
   searchText: string;
   checkedEndpointIds: string[];
   requestEdits: WebhookRequestEdit[];
+  eventType: AppEventType | undefined;
   onToggle: (endpointId: string, isChecked: boolean) => void;
   onOpenPayload: (webhookEndpoint: WebhookEndpoint) => void;
 }) {
+  const templatesQuery = useWebhookTemplates();
   const visibleEndpoints = enabledEndpoints.filter((webhookEndpoint) =>
     matchesSearch(webhookEndpoint, searchText),
   );
@@ -76,6 +87,15 @@ function PickerEndpointList({
           key={webhookEndpoint.id}
           webhookEndpoint={webhookEndpoint}
           isChecked={checkedEndpointIds.includes(webhookEndpoint.id)}
+          templateWarning={
+            eventType === undefined
+              ? null
+              : findTemplateEventWarning(
+                  webhookEndpoint,
+                  templatesQuery.data ?? [],
+                  eventType,
+                )
+          }
           onCheckedChange={(isChecked) => {
             onToggle(webhookEndpoint.id, isChecked);
           }}
@@ -180,6 +200,7 @@ export function WebhookTargetsPicker({
           searchText={searchText}
           checkedEndpointIds={checkedEndpointIds}
           requestEdits={requestEdits}
+          eventType={eventType}
           onToggle={(endpointId, isChecked) => {
             setCheckedEndpointIds((previousIds) =>
               isChecked

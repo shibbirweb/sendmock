@@ -12,6 +12,7 @@ import {
   samplePaymentEventData,
   toPaymentEventData,
 } from "@/mocks/payments/payment-event-data";
+import { buildEmailForwardFields } from "@/mocks/webhooks/email-forward-fields";
 import type { TemplateContext } from "@/mocks/webhooks/render-template-text";
 
 type ContextSubject = {
@@ -22,6 +23,7 @@ type ContextSubject = {
 
 function toEmailData(email: EmailDetail): Record<string, unknown> {
   return {
+    ...buildEmailForwardFields(email),
     id: email.id,
     message_id: email.message_id,
     from: email.from,

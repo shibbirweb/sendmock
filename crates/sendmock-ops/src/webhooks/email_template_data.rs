@@ -8,6 +8,9 @@ use sendmock_mail::{EmailDeliveryEvent, decompress_raw_message, parse_email};
 use sendmock_store::EmailRecord;
 use serde_json::{Map, Value, json};
 
+use super::email_forward_fields::{
+    build_message_url, list_header_pairs, map_content_ids, read_first_header, split_reply_text,
+};
 use crate::email::{EmailAddress, EmailSummary, build_bounce_data, read_stored_user_variables};
 use crate::{OperationContext, OperationError};
 
@@ -46,6 +49,60 @@ async fn build_attachment_data(
             })
         })
         .collect())
+}
+
+/// What the email's provider send kept: the provider's message id, the user variables and
+/// the template id; null and empty for mail that did not come through a provider's API.
+fn build_provider_send_fields(
+    provider_send: Option<&sendmock_store::EmailProviderSendRecord>,
+) -> Vec<(String, Value)> {
+    vec![
+        (
+            "provider_message_id".to_owned(),
+            json!(provider_send.map(|send| &send.provider_message_id)),
+        ),
+        (
+            "user_variables".to_owned(),
+            Value::Object(
+                provider_send
+                    .map(read_stored_user_variables)
+                    .unwrap_or_default(),
+            ),
+        ),
+        (
+            "template_id".to_owned(),
+            json!(provider_send.and_then(|send| send.template_id.as_ref())),
+        ),
+    ]
+}
+
+/// The reply headers, header pairs, stripped text and inline parts inbound formats read.
+fn build_forward_fields(
+    stored_email: &EmailRecord,
+    attachment_data: &[Value],
+) -> Vec<(String, Value)> {
+    let (stripped_text, stripped_signature) =
+        split_reply_text(stored_email.text_body.as_deref().unwrap_or_default());
+    vec![
+        (
+            "in_reply_to".to_owned(),
+            json!(read_first_header(&stored_email.headers, "In-Reply-To")),
+        ),
+        (
+            "references".to_owned(),
+            json!(read_first_header(&stored_email.headers, "References")),
+        ),
+        (
+            "header_pairs".to_owned(),
+            json!(list_header_pairs(&stored_email.headers)),
+        ),
+        ("stripped_text".to_owned(), json!(stripped_text)),
+        ("stripped_signature".to_owned(), json!(stripped_signature)),
+        (
+            "content_id_map".to_owned(),
+            Value::Object(map_content_ids(attachment_data)),
+        ),
+    ]
 }
 
 /// A bounced email's last bounce from its timeline, under `bounce` and the flat names events
@@ -103,30 +160,14 @@ pub async fn build_email_template_data(
         .sends
         .find_send(&stored_email.email_id)
         .await?;
-    email_data.extend([
-        (
-            "provider_message_id".to_owned(),
-            json!(provider_send.as_ref().map(|send| &send.provider_message_id)),
-        ),
-        (
-            "user_variables".to_owned(),
-            Value::Object(
-                provider_send
-                    .as_ref()
-                    .map(read_stored_user_variables)
-                    .unwrap_or_default(),
-            ),
-        ),
-        (
-            "template_id".to_owned(),
-            json!(
-                provider_send
-                    .as_ref()
-                    .and_then(|send| send.template_id.as_ref())
-            ),
-        ),
-    ]);
+    email_data.extend(build_provider_send_fields(provider_send.as_ref()));
     email_data.extend(read_stored_bounce_fields(operation_context, stored_email).await?);
+    let attachment_data = build_attachment_data(operation_context, stored_email).await?;
+    let sending_domain = provider_send
+        .as_ref()
+        .and_then(|send| send.sending_domain.clone())
+        .unwrap_or_else(|| "inbound".to_owned());
+    email_data.extend(build_forward_fields(stored_email, &attachment_data));
     email_data.extend([
         ("message_id".to_owned(), json!(stored_email.message_id)),
         ("cc".to_owned(), json!(cc)),
@@ -134,9 +175,14 @@ pub async fn build_email_template_data(
         ("html_body".to_owned(), json!(stored_email.html_body)),
         ("headers".to_owned(), json!(stored_email.headers)),
         (
-            "attachments".to_owned(),
-            Value::Array(build_attachment_data(operation_context, stored_email).await?),
+            "message_url".to_owned(),
+            json!(build_message_url(
+                &operation_context.instance_details,
+                &sending_domain,
+                &stored_email.email_id
+            )),
         ),
+        ("attachments".to_owned(), Value::Array(attachment_data)),
     ]);
     Ok(Value::Object(email_data))
 }

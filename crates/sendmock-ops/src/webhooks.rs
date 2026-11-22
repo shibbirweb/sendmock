@@ -13,6 +13,7 @@ mod delivery_signing;
 mod delivery_template_context;
 mod delivery_view;
 mod delivery_wait_operation;
+mod email_forward_fields;
 mod email_template_data;
 mod endpoint_body_rendering;
 mod endpoint_delivery_health;
@@ -96,6 +97,7 @@ pub use delivery_replay_operation::ReplayWebhookDeliveryOperation;
 pub(crate) use delivery_request_rendering::RenderedDeliveryRequest;
 pub use delivery_view::WebhookDelivery;
 pub use delivery_wait_operation::WaitForWebhookOperation;
+pub(crate) use email_forward_fields::build_message_url;
 pub(crate) use endpoint_inputs::{WebhookEndpointInput, WebhookEndpointReference};
 pub use endpoint_operations::{
     CreateWebhookEndpointOperation, DeleteWebhookEndpointOperation, GetWebhookEndpointOperation,
