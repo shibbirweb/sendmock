@@ -12,7 +12,8 @@ use super::email_template_data::read_email_event_data;
 use super::request_part_renderer::RenderProblem;
 use super::template_context::build_event_template_context;
 use super::variable_resolution::{read_environment_variables, resolve_template_variables};
-use crate::twilio_accounts::default_twilio_auth_token_variable;
+use crate::sms::add_number_countries;
+use crate::twilio_accounts::default_twilio_account_variables;
 use crate::{AppEvent, OperationContext, OperationError};
 
 /// Who a delivery goes to and why, for the context.
@@ -76,6 +77,11 @@ async fn build_base_context(
         template_context.insert("data".to_owned(), email_data.clone());
         template_context.insert("email".to_owned(), email_data);
     }
+    if details.app_event.event_type.starts_with("sms.")
+        && let Some(message_data) = template_context.get_mut("data")
+    {
+        add_number_countries(message_data);
+    }
     let rule_name = read_rule_name(operation_context, details.rule_id).await?;
     template_context.insert(
         "endpoint".to_owned(),
@@ -135,7 +141,7 @@ pub async fn build_delivery_template_context(
         render_mode,
     );
     let mut resolved_values = resolved_variables.values;
-    default_twilio_auth_token_variable(
+    default_twilio_account_variables(
         operation_context,
         &Value::Object(template_context.clone()),
         &mut resolved_values,

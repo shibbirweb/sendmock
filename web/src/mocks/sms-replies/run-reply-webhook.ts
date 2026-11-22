@@ -2,6 +2,7 @@ import type { SmsMessageDetail, TwimlVerb } from "@/lib/api/types";
 import type { MockDatabase } from "@/mocks/db/mock-database";
 import { buildNewSmsMessage } from "@/mocks/fixtures/sms-message-builder";
 import { type FetchOutcome, fetchTwiml } from "@/mocks/sms-replies/fetch-twiml";
+import { findNumberCountry } from "@/mocks/webhooks/number-country";
 import {
   type ReplyWebhookTarget,
   resolveReplyWebhookTarget,
@@ -24,13 +25,21 @@ function buildTwilioFields(
     MessageSid: inboundMessage.provider_id,
     SmsSid: inboundMessage.provider_id,
     SmsMessageSid: inboundMessage.provider_id,
-    AccountSid: "AC00000000000000000000000000000000",
+    AccountSid: inboundMessage.account ?? "AC00000000000000000000000000000000",
     ...(messagingServiceSid === null
       ? {}
       : { MessagingServiceSid: messagingServiceSid }),
     From: inboundMessage.from_number,
     To: inboundMessage.to_number,
     Body: inboundMessage.body,
+    FromCity: "",
+    FromState: "",
+    FromZip: "",
+    FromCountry: findNumberCountry(inboundMessage.from_number),
+    ToCity: "",
+    ToState: "",
+    ToZip: "",
+    ToCountry: findNumberCountry(inboundMessage.to_number),
     NumMedia: String(inboundMessage.media.length),
     NumSegments: String(inboundMessage.segments),
     ApiVersion: "2010-04-01",

@@ -57,7 +57,7 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
       "I-Twilio-Idempotency-Token": "{{ uuid() }}",
       "User-Agent": "TwilioProxy/1.1",
     },
-    body_template: `${twilioWhatsAppProfile}SmsMessageSid={{ data.provider_id }}&NumMedia={{ data.media | length }}${twilioMediaFields}&SmsSid={{ data.provider_id }}&SmsStatus=received&Body={{ data.body | urlencode }}&To=${twilioWhatsAppPrefix}{{ data.to_number | urlencode }}${twilioMessagingService}&NumSegments={{ data.segments | default("1") }}&MessageSid={{ data.provider_id }}&AccountSid=${twilioAccountSid}&From=${twilioWhatsAppPrefix}{{ data.from_number | urlencode }}&ApiVersion=2010-04-01`,
+    body_template: `${twilioWhatsAppProfile}SmsMessageSid={{ data.provider_id }}&NumMedia={{ data.media | length }}${twilioMediaFields}&SmsSid={{ data.provider_id }}&SmsStatus=received&Body={{ data.body | urlencode }}&FromCity=&FromState=&FromZip=&FromCountry={{ data.from_country | default("") }}&ToCity=&ToState=&ToZip=&ToCountry={{ data.to_country | default("") }}&To=${twilioWhatsAppPrefix}{{ data.to_number | urlencode }}${twilioMessagingService}&NumSegments={{ data.segments | default("1") }}&MessageSid={{ data.provider_id }}&AccountSid=${twilioAccountSid}&From=${twilioWhatsAppPrefix}{{ data.from_number | urlencode }}&ApiVersion=2010-04-01`,
     doc_url: "https://www.twilio.com/docs/messaging/guides/webhook-request",
     verified_on: smsFormatsVerifiedOn,
   },

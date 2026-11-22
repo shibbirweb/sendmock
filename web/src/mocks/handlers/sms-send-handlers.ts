@@ -181,6 +181,11 @@ export const smsSendHandlers = [
       parsedMedia: inboundMediaResult.media,
     });
     storeSmsMediaBytes(inboundMessage.id, inboundMediaResult.media);
+    const receivingNumber = mockDatabase.virtualNumbers.find(
+      (virtualNumber) => virtualNumber.number === inboundMessage.to_number,
+    );
+    inboundMessage.account =
+      receivingNumber?.account_sid ?? inboundMessage.account;
 
     mockDatabase.smsMessages.unshift(inboundMessage);
     runWithWebhookChoice(inboundSmsRequest, () => {

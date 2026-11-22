@@ -12,7 +12,7 @@ pub(crate) use twilio_debugger::{
     report_failed_message, send_debugger_event,
 };
 pub(crate) use twilio_signing_vars::{
-    apply_twilio_account_vars, default_twilio_auth_token_variable, find_conversation_account,
+    apply_twilio_account_vars, default_twilio_account_variables, find_conversation_account,
 };
 pub(crate) use twilio_subaccount_builder::{
     build_subaccount, generate_account_sid, is_account_sid,

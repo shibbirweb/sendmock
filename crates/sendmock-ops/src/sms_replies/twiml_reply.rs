@@ -84,7 +84,10 @@ pub async fn send_twiml_reply(
                 .as_deref()
                 .map(|callback_url| reply_request.resolve_url(callback_url)),
             messaging_service_sid: reply_request.messaging_service_sid.map(str::to_owned),
-            account: find_twilio_account_sid(operation_context).await?,
+            account: match &reply_request.inbound_sms.account {
+                Some(inbound_account) => Some(inbound_account.clone()),
+                None => find_twilio_account_sid(operation_context).await?,
+            },
             metadata_json: None,
             request_body_json: Some(describe_twiml_message(twiml_message)),
             provider_id: Some(generate_message_sid(operation_context)),
