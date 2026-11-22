@@ -327,6 +327,8 @@ jobs:
   linux-packages:
     name: .deb and .rpm (${{ matrix.architecture }})
     needs: [changes, plan, test]
+    # When unaffected the build is skipped; this still runs, as a no-op, so its checks report.
+    if: ${{ !cancelled() && (needs.changes.outputs.is_affected != 'true' || success()) }}
     runs-on: ${{ needs.changes.outputs.is_affected == 'true' && matrix.runner || 'ubuntu-latest' }}
     strategy:
       fail-fast: false
@@ -402,6 +404,8 @@ jobs:
   linux-community-packages:
     name: AUR, COPR and Nix packages
     needs: [changes, plan, test]
+    # When unaffected the build is skipped; this still runs, as a no-op, so its checks report.
+    if: ${{ !cancelled() && (needs.changes.outputs.is_affected != 'true' || success()) }}
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ needs.plan.outputs.version }}
@@ -476,6 +480,8 @@ jobs:
   checksums:
     name: SHA256SUMS
     needs: [changes, test, linux-packages, linux-community-packages]
+    # When unaffected the build is skipped; this still runs, as a no-op, so its checks report.
+    if: ${{ !cancelled() && (needs.changes.outputs.is_affected != 'true' || success()) }}
     runs-on: ubuntu-latest
     steps:
       - if: needs.changes.outputs.is_affected == 'true'

@@ -252,3 +252,30 @@ UI in U1, backend Phase 2.
 - [x] SM-21.2 The Twilio provider and each subaccount have a Debugger webhook URL, set on the provider sheet, through REST, CLI and MCP and in the seed file.
 - [x] SM-21.3 With a Debugger URL set, a message that ends `failed` or `undelivered` with an error code (magic number, outcome rule or Simulate) sends one event with that code and the message SID, and a status callback or inbound URL that fails sends one event with error `11200` and the `webhook` request and response.
 - [x] SM-21.4 Debugger events show on the message's timeline, are retried like status callbacks, and the template can also be picked for a webhook endpoint.
+
+## SM-22 Twilio accounts in every place
+
+1.5.0 (A28), planned 2026-11-22 from a user's report on 1.4.0 (owner request). Plan: [32-after-1-0.md](../32-after-1-0.md#a28-plug-and-play-for-mailgun-and-twilio-apps-em-24-to-em-27-sm-22-to-sm-24-pl-24-to-pl-27-ai-08) (A28).
+
+- [ ] SM-22.1 An inbound SMS or MMS to a number owned by a subaccount is stored with that account, carries its `AccountSid` and is signed with its token (R-31).
+- [ ] SM-22.2 `twilio.inbound_sms` always sends `FromCity`, `FromState`, `FromZip`, `FromCountry`, `ToCity`, `ToState`, `ToZip` and `ToCountry`, empty unless known, the countries from the numbers (R-34).
+- [ ] SM-22.3 A fetch of a message, number or other account-scoped resource through an account that does not own it answers Twilio's 20404, and every answer reports the real owner in `account_sid` (R-35).
+- [ ] SM-22.4 A 401 keeps Twilio's 20003 body, and the HTTP request log says why: a wrong token, an unknown account, or an account that is not the provider's (R-21).
+- [ ] SM-22.5 Numbers take an account on add and update (REST, CLI `--account-sid`, MCP, UI), the setup file exports and imports it, `inbound_method` defaults to POST, and `sms services create` takes `--sid` (R-11, R-15).
+- [ ] SM-22.6 The Twilio PHP and Node SDKs in CI fetch a subaccount's message through the main account and get 20404, and validate an inbound webhook signed with the subaccount's token.
+
+## SM-23 Opt-out keywords
+
+1.5.0 (A28), planned 2026-11-22 from a user's report on 1.4.0 (owner request). Plan: [32-after-1-0.md](../32-after-1-0.md#a28-plug-and-play-for-mailgun-and-twilio-apps-em-24-to-em-27-sm-22-to-sm-24-pl-24-to-pl-27-ai-08) (A28).
+
+- [ ] SM-23.1 With opt-out emulation on (the default for the Twilio provider), an inbound STOP, STOPALL, UNSUBSCRIBE, CANCEL, END or QUIT blocks later sends from that number or Messaging Service to the sender with Twilio's 21610, and START, YES or UNSTOP lifts it (R-32).
+- [ ] SM-23.2 Optional auto-replies answer STOP, START and HELP as Twilio does, recorded as outbound messages.
+- [ ] SM-23.3 Opt-out emulation is switched per provider, number and Messaging Service, and opt-outs are listed and cleared on REST, CLI, MCP and the UI.
+- [ ] SM-23.4 The Twilio PHP and Node SDKs in CI see 21610 after a STOP and send again after START.
+
+## SM-24 Statuses set by hand
+
+1.5.0 (A28), planned 2026-11-22 from a user's report on 1.4.0 (owner request). Plan: [32-after-1-0.md](../32-after-1-0.md#a28-plug-and-play-for-mailgun-and-twilio-apps-em-24-to-em-27-sm-22-to-sm-24-pl-24-to-pl-27-ai-08) (A28).
+
+- [ ] SM-24.1 A final status set by hand (delivered, undelivered or failed) ends the simulated lifecycle: no later step changes it, and status callbacks are sent in status order (R-30).
+- [ ] SM-24.2 Setting a status by hand says, in the CLI, the API answer and the UI, when its status callback is sent (R-14).
