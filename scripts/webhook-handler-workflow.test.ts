@@ -10,9 +10,9 @@ type LibraryEntry = { library: string; folder: string; run: string };
 type WebhookHandlerWorkflow = {
   jobs: {
     binary: { steps: WorkflowStep[] };
-    express: { needs: string; steps: WorkflowStep[] };
+    express: { needs: string[]; steps: WorkflowStep[] };
     libraries: {
-      needs: string;
+      needs: string[];
       strategy: { matrix: { include: LibraryEntry[] } };
     };
   };
@@ -34,7 +34,10 @@ describe("Webhook handler workflow", () => {
     expect(
       binarySteps.some((step) => step.run?.includes("cargo build --release")),
     ).toBe(true);
-    expect(webhookHandlerWorkflow.jobs.express.needs).toBe("binary");
+    expect(webhookHandlerWorkflow.jobs.express.needs).toEqual([
+      "changes",
+      "binary",
+    ]);
     expect(checkStep?.run).toContain("node done-when.js");
     expect(existsSync("examples/webhooks/express-handler/done-when.js")).toBe(
       true,
@@ -53,7 +56,10 @@ describe("Webhook handler workflow", () => {
         "github.com/standard-webhooks/standard-webhooks/libraries/go",
     };
 
-    expect(webhookHandlerWorkflow.jobs.libraries.needs).toBe("binary");
+    expect(webhookHandlerWorkflow.jobs.libraries.needs).toEqual([
+      "changes",
+      "binary",
+    ]);
     expect(libraryEntries.map((libraryEntry) => libraryEntry.folder)).toEqual(
       Object.keys(libraryImports),
     );

@@ -1123,3 +1123,4 @@ See [10-open-questions.md](10-open-questions.md). Summary:
 | 2026-11-22 | #345 merged (`09b1ff00`); #286 moved to 1.5.0 with the GitHub Action (owner decision); release PR #346 for `1.4.0-beta.1` opened. |
 | 2026-11-22 | `v1.4.0-beta.1` published; the Docker image check's `docker logs | grep -q` under `pipefail` failed the arm64 debug image falsely (#348, fixed on #347). |
 | 2026-11-22 | 1.4.0 promoted to `main` (#351) with CodeQL red; 1.4.1 started: secure demo tokens (#352) and every CI check required through workflow gates and a CodeQL rule (#353). |
+| 2026-11-22 | #354 first run: 248 passed; 14 workflow-shape tests expected the old `needs` and step conditions and are updated; every gate but CI's passed, and CodeQL passed. |

@@ -107,6 +107,7 @@ describe("Release build", () => {
       "./.github/workflows/build-archives.yml",
     );
     expect(releaseWorkflow.jobs.build?.with).toEqual({
+      skip_every_job: "${{ needs.changes.outputs.is_affected != 'true' }}",
       commit_sha: "${{ inputs.commit_sha || github.sha }}",
       channel: "${{ inputs.channel || 'dev' }}",
     });
@@ -261,6 +262,7 @@ describe("Docker image", () => {
     );
     expect(releaseJobs.homebrew?.if).toBe(publishedChannelCondition);
     expect(releaseJobs.checksums?.needs).toEqual([
+      "changes",
       "test",
       "linux-packages",
       "linux-community-packages",
