@@ -461,3 +461,34 @@ jobs:
 
       - name: Typecheck and static export build
         run: bun run build
+
+  # A required check like every job above: it fails unless each job passed or was skipped.
+  passed:
+    name: CI passed
+    if: always()
+    needs:
+      - web
+      - web-e2e
+      - web-e2e-result
+      - rust
+      - rust-coverage
+      - web-dist
+      - binary-smoke
+      - web-live
+      - setup-compatibility
+      - claude-plugin
+      - mcp-registry
+      - rust-result
+      - acceptance
+      - website
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job passed or was skipped
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          failed_jobs="$(echo "$JOB_RESULTS" | jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | "\(.key): \(.value.result)"')"
+          if [ -n "$failed_jobs" ]; then
+            echo "::error::Not every job passed: $failed_jobs"
+            exit 1
+          fi

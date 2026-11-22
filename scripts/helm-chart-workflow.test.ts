@@ -49,7 +49,11 @@ describe("Helm chart", () => {
     expect(releaseJobs["helm-chart"]?.if).toBe(
       "inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')",
     );
-    expect(releaseJobs["helm-chart"]?.needs).toEqual(["plan", "docker"]);
+    expect(releaseJobs["helm-chart"]?.needs).toEqual([
+      "changes",
+      "plan",
+      "docker",
+    ]);
     expect(releaseWorkflowText).toContain("helm push \"chart-package/sendmock-$VERSION.tgz\" oci://ghcr.io/shibbirweb/charts");
     expect(releaseWorkflowText).toContain("helm registry logout ghcr.io");
     expect(releaseWorkflowText).toContain(

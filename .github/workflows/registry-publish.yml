@@ -172,6 +172,8 @@ jobs:
 
       - uses: ./.github/actions/install-mcp-publisher
 
+      - uses: oven-sh/setup-bun@v2
+
       - name: server.json names this release, and its image is published
         env:
           VERSION: ${{ needs.plan.outputs.version }}
@@ -179,10 +181,13 @@ jobs:
           grep -q "ghcr.io/shibbirweb/sendmock:$VERSION\"" server.json
           docker buildx imagetools inspect "ghcr.io/shibbirweb/sendmock:$VERSION" > /dev/null
 
-      - name: Publish to the MCP registry
-        run: |
-          mcp-publisher login github-oidc
-          mcp-publisher publish server.json
+      # npm does not serve a version the moment it is published, and the MCP registry checks it
+      # there, so the script waits for npm first and retries while the registry cannot see it (#355).
+      - name: Publish to the MCP registry once npm serves the version
+        timeout-minutes: 40
+        env:
+          VERSION: ${{ needs.plan.outputs.version }}
+        run: bun scripts/release/mcp-registry-publish.ts "$VERSION"
 
   # crates.io trusted publishing refuses a `workflow_run` OIDC token, so a stable that came in
   # through `workflow_run` starts a hand run of this same file for its crates, on the default

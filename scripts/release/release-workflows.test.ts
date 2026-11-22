@@ -261,6 +261,7 @@ describe("Docker image", () => {
     );
     expect(releaseJobs.homebrew?.if).toBe(publishedChannelCondition);
     expect(releaseJobs.checksums?.needs).toEqual([
+      "changes",
       "test",
       "linux-packages",
       "linux-community-packages",
@@ -293,7 +294,10 @@ describe("Docker image", () => {
       "./.github/actions/install-mcp-publisher",
     );
     expect(registryRunText).toContain("docker buildx imagetools inspect");
-    expect(registryRunText).toContain("mcp-publisher login github-oidc");
+    expect(registryRunText).toContain("bun scripts/release/mcp-registry-publish.ts");
+    expect(
+      readFileSync("scripts/release/mcp-registry-publish.ts", "utf8"),
+    ).toContain('["login", "github-oidc"]');
   });
 });
 

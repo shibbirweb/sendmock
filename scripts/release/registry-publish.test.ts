@@ -30,6 +30,7 @@ type RegistryWorkflow = {
         if?: string;
         with?: Record<string, string>;
         env?: Record<string, string>;
+        "timeout-minutes"?: number;
       }[];
     }
   >;
@@ -249,6 +250,19 @@ describe("the Registry publish workflow", () => {
     expect(handoffJob?.permissions).toEqual({ actions: "write" });
     expect(handoffRun).toContain('gh workflow run registry-publish.yml --repo "$GITHUB_REPOSITORY" --ref "$DEFAULT_BRANCH"');
     expect(handoffRun).toContain('-f release_run_id="$RELEASE_RUN_ID" -f registries=crates');
+  });
+
+  test("the MCP registry publishes only once npm serves the version, so its first try passes (#355)", () => {
+    const mcpSteps = registryWorkflow.jobs["mcp-registry"]?.steps ?? [];
+    const publishStep = mcpSteps.find((step) =>
+      step.run?.includes("scripts/release/mcp-registry-publish.ts"),
+    );
+
+    expect(publishStep?.run).toBe('bun scripts/release/mcp-registry-publish.ts "$VERSION"');
+    expect(publishStep?.env?.VERSION).toBe("${{ needs.plan.outputs.version }}");
+    expect(publishStep?.["timeout-minutes"]).toBeGreaterThanOrEqual(35);
+    expect(mcpSteps.some((step) => step.uses === "oven-sh/setup-bun@v2")).toBe(true);
+    expect(mcpSteps.some((step) => step.run?.includes("mcp-publisher publish"))).toBe(false);
   });
 
   test("DS-03.8 a crates-only run skips every other registry", () => {

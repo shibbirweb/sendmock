@@ -137,7 +137,8 @@ describe("the project board", () => {
 
   test("released milestones are green, planned ones blue and the waiting one yellow", () => {
     expect(targetOptionColor("1.1.0")).toBe("GREEN");
-    expect(targetOptionColor("1.4.0")).toBe("BLUE");
+    expect(targetOptionColor("1.4.0")).toBe("GREEN");
+    expect(targetOptionColor("2.0.0")).toBe("BLUE");
     expect(targetOptionColor(waitingOnOthersMilestone)).toBe("YELLOW");
   });
 });

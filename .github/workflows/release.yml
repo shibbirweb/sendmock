@@ -34,14 +34,6 @@ on:
         type: boolean
         default: false
   pull_request:
-    paths:
-      - .github/workflows/release.yml
-      - .github/workflows/build-archives.yml
-      - packaging/**
-      - scripts/release/**
-      - scripts/release-tests/**
-      - scripts/install/**
-      - scripts/binary-smoke-test.ts
 
 permissions:
   contents: write
@@ -51,20 +43,49 @@ env:
   RELEASE_CHANNEL: ${{ inputs.channel || 'dev' }}
 
 jobs:
+  changes:
+    name: Changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      is_affected: ${{ steps.changed-paths.outputs.is_affected }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            .github/actions
+            scripts/ci
+
+      - id: changed-paths
+        uses: ./.github/actions/changed-paths
+        with:
+          run-every-job: ${{ github.event_name != 'pull_request' }}
+          paths: |
+            .github/workflows/release.yml
+            .github/workflows/build-archives.yml
+            packaging/**
+            scripts/release/**
+            scripts/release-tests/**
+            scripts/install/**
+            scripts/binary-smoke-test.ts
+
   plan:
     name: Version from the code
+    needs: changes
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
       docker_tags: ${{ steps.version.outputs.docker_tags }}
     steps:
-      - uses: actions/checkout@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/checkout@v7
         with:
           ref: ${{ env.COMMIT_SHA }}
 
-      - uses: oven-sh/setup-bun@v2
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: oven-sh/setup-bun@v2
 
-      - name: The version in the code must match the release being built
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: The version in the code must match the release being built
         id: version
         env:
           REQUESTED_VERSION: ${{ inputs.version }}
@@ -81,8 +102,12 @@ jobs:
           fi
 
   # The web UI and the six archives, built as the test builds of every pull request build them.
+  # Skipped as a whole when the pull request did not touch the release build: Test builds runs
+  # the same build under the same check names on every pull request.
   build:
     name: Build
+    needs: changes
+    if: needs.changes.outputs.is_affected == 'true'
     uses: ./.github/workflows/build-archives.yml
     with:
       commit_sha: ${{ inputs.commit_sha || github.sha }}
@@ -90,8 +115,10 @@ jobs:
 
   test:
     name: Test ${{ matrix.target }}
-    needs: [plan, build]
-    runs-on: ${{ matrix.runner }}
+    needs: [changes, plan, build]
+    # When unaffected the build is skipped; this still runs, as a no-op, so its checks report.
+    if: ${{ !cancelled() && (needs.changes.outputs.is_affected != 'true' || success()) }}
+    runs-on: ${{ needs.changes.outputs.is_affected == 'true' && matrix.runner || 'ubuntu-latest' }}
     strategy:
       fail-fast: false
       matrix:
@@ -103,37 +130,43 @@ jobs:
           - { target: x86_64-pc-windows-msvc, runner: windows-latest, archive: zip, npm_platform: win32-x64 }
           - { target: aarch64-pc-windows-msvc, runner: windows-11-arm, archive: zip, npm_platform: win32-arm64 }
     steps:
-      - uses: actions/checkout@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/checkout@v7
         with:
           ref: ${{ env.COMMIT_SHA }}
 
-      - uses: actions/download-artifact@v8
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/download-artifact@v8
         with:
           name: archive-${{ matrix.target }}
           path: dist
 
-      - uses: oven-sh/setup-bun@v2
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: oven-sh/setup-bun@v2
 
       # AC: DS-01.2 DS-01.3 DS-01.4
-      - name: "Test cases 1 to 8: checksum and layout, version, listeners, health, UI, an email and an SMS, a restart, a clean stop"
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: "Test cases 1 to 8: checksum and layout, version, listeners, health, UI, an email and an SMS, a restart, a clean stop"
         shell: bash
         run: bun scripts/release/check-archive.ts dist/sendmock-${{ matrix.target }}.${{ matrix.archive }} ${{ needs.plan.outputs.version }} ${{ env.RELEASE_CHANNEL }}
 
       - name: The install script installs the stable and the beta onto a new shell's PATH (macOS, Linux)
-        if: matrix.archive == 'tar.gz'
+        if: ${{ (matrix.archive == 'tar.gz') && needs.changes.outputs.is_affected == 'true' }}
         run: sh scripts/release-tests/install-script.sh dist/sendmock-${{ matrix.target }}.tar.gz ${{ needs.plan.outputs.version }} ${{ env.RELEASE_CHANNEL }}
 
       - name: The install script installs the stable and the beta onto a new shell's Path (Windows)
-        if: matrix.archive == 'zip'
+        if: ${{ (matrix.archive == 'zip') && needs.changes.outputs.is_affected == 'true' }}
         shell: pwsh
         run: ./scripts/release-tests/install-script.ps1 dist/sendmock-${{ matrix.target }}.zip ${{ needs.plan.outputs.version }} ${{ env.RELEASE_CHANNEL }}
 
-      - uses: actions/setup-node@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/setup-node@v7
         with:
           node-version: 22
 
       # AC: DS-03.1
-      - name: npm installs the launcher and this platform's package, and npx runs sendmock
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: npm installs the launcher and this platform's package, and npx runs sendmock
         shell: bash
         env:
           VERSION: ${{ needs.plan.outputs.version }}
@@ -149,7 +182,8 @@ jobs:
           echo "$version_json" | grep -q "\"version\":\"$VERSION\"" || { echo "npx sendmock does not run $VERSION" >&2; exit 1; }
 
       # AC: DS-03.7
-      - name: npx runs sendmock from the packed packages with no install
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: npx runs sendmock from the packed packages with no install
         shell: bash
         env:
           VERSION: ${{ needs.plan.outputs.version }}
@@ -164,7 +198,7 @@ jobs:
 
       # AC: DS-03.1 DS-03.6
       - name: Homebrew installs the formula from a local tap and server, and it passes test cases 2 to 8 (macOS, Linux x64)
-        if: matrix.archive == 'tar.gz' && matrix.target != 'aarch64-unknown-linux-musl'
+        if: ${{ (matrix.archive == 'tar.gz' && matrix.target != 'aarch64-unknown-linux-musl') && needs.changes.outputs.is_affected == 'true' }}
         shell: bash
         env:
           VERSION: ${{ needs.plan.outputs.version }}
@@ -195,7 +229,7 @@ jobs:
 
       # AC: DS-03.1
       - name: Scoop installs the manifest from a local server, and its shim runs sendmock (Windows)
-        if: matrix.archive == 'zip'
+        if: ${{ (matrix.archive == 'zip') && needs.changes.outputs.is_affected == 'true' }}
         shell: pwsh
         env:
           VERSION: ${{ needs.plan.outputs.version }}
@@ -222,7 +256,7 @@ jobs:
 
       # AC: DS-03.4
       - name: WinGet and Chocolatey install their packages from a local server (Windows x64)
-        if: matrix.target == 'x86_64-pc-windows-msvc'
+        if: ${{ (matrix.target == 'x86_64-pc-windows-msvc') && needs.changes.outputs.is_affected == 'true' }}
         shell: pwsh
         env:
           VERSION: ${{ needs.plan.outputs.version }}
@@ -265,7 +299,7 @@ jobs:
 
       # The shipped static binary against the budgets, on Linux x64 (DS-07).
       - name: Performance budgets (size, cold start, idle memory, SMTP ingest)
-        if: matrix.target == 'x86_64-unknown-linux-musl'
+        if: ${{ (matrix.target == 'x86_64-unknown-linux-musl') && needs.changes.outputs.is_affected == 'true' }}
         run: |
           mkdir "$RUNNER_TEMP/budget-binary"
           tar -xzf dist/sendmock-${{ matrix.target }}.tar.gz -C "$RUNNER_TEMP/budget-binary"
@@ -273,7 +307,7 @@ jobs:
 
       # The same report on the arm64 musl binary, which has no budget of its own; never fails.
       - name: Idle memory breakdown (arm64 musl, report only)
-        if: matrix.target == 'aarch64-unknown-linux-musl'
+        if: ${{ (matrix.target == 'aarch64-unknown-linux-musl') && needs.changes.outputs.is_affected == 'true' }}
         continue-on-error: true
         run: |
           mkdir "$RUNNER_TEMP/budget-binary"
@@ -281,7 +315,7 @@ jobs:
           bun scripts/performance-budget.ts "$RUNNER_TEMP/budget-binary/sendmock" || true
 
       - name: Starts with no runtime in minimal Linux images
-        if: matrix.containers
+        if: ${{ (matrix.containers) && needs.changes.outputs.is_affected == 'true' }}
         run: |
           mkdir extracted
           tar -xzf dist/sendmock-${{ matrix.target }}.tar.gz -C extracted
@@ -292,8 +326,8 @@ jobs:
   # .deb and .rpm from the tested Linux archives, installed with apt and dnf (DS-03.3).
   linux-packages:
     name: .deb and .rpm (${{ matrix.architecture }})
-    needs: [plan, test]
-    runs-on: ${{ matrix.runner }}
+    needs: [changes, plan, test]
+    runs-on: ${{ needs.changes.outputs.is_affected == 'true' && matrix.runner || 'ubuntu-latest' }}
     strategy:
       fail-fast: false
       matrix:
@@ -303,19 +337,23 @@ jobs:
     env:
       NFPM_VERSION: "2.48.0"
     steps:
-      - uses: actions/checkout@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/checkout@v7
         with:
           ref: ${{ env.COMMIT_SHA }}
 
-      - uses: actions/download-artifact@v8
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/download-artifact@v8
         with:
           name: archive-${{ matrix.target }}
           path: archives
 
-      - name: Install nfpm
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Install nfpm
         run: curl -fsSL "https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_Linux_${{ matrix.nfpm_platform }}.tar.gz" | tar -xz -C "$RUNNER_TEMP" nfpm
 
-      - name: Build the packages and their checksums
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Build the packages and their checksums
         env:
           NFPM_ARCH: ${{ matrix.architecture }}
           SENDMOCK_VERSION: ${{ needs.plan.outputs.version }}
@@ -329,14 +367,16 @@ jobs:
           for package_file in *; do sha256sum "$package_file" > "$package_file.sha256"; done
           ls -l
 
-      - name: apt install and dnf install give a working sendmock
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: apt install and dnf install give a working sendmock
         run: |
           docker run --rm -v "$PWD/packages:/packages:ro" debian:stable-slim \
             sh -c 'apt-get install -y -qq /packages/*.deb > /dev/null && sendmock version --json'
           docker run --rm -v "$PWD/packages:/packages:ro" fedora:42 \
             sh -c 'dnf install -y -q /packages/*.rpm > /dev/null && sendmock version --json'
 
-      - name: Our signed APT and YUM repository installs and upgrades sendmock with apt and dnf
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Our signed APT and YUM repository installs and upgrades sendmock with apt and dnf
         env:
           NFPM_ARCH: ${{ matrix.architecture }}
           SENDMOCK_VERSION: "99.0.0"
@@ -350,7 +390,8 @@ jobs:
           cp packages/*.deb packages/*.rpm "$RUNNER_TEMP/packages-tested/"
           sh scripts/release-tests/package-repository-test.sh "$RUNNER_TEMP/packages-tested" "$RUNNER_TEMP/packages-newer"
 
-      - uses: actions/upload-artifact@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/upload-artifact@v7
         with:
           name: archive-packages-${{ matrix.architecture }}
           path: packages
@@ -360,24 +401,28 @@ jobs:
   # locally (DS-03.5, plan 30 W5b).
   linux-community-packages:
     name: AUR, COPR and Nix packages
-    needs: [plan, test]
+    needs: [changes, plan, test]
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ needs.plan.outputs.version }}
       DOWNLOAD_URL: http://127.0.0.1:8767
     steps:
-      - uses: actions/checkout@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/checkout@v7
         with:
           ref: ${{ env.COMMIT_SHA }}
 
-      - uses: oven-sh/setup-bun@v2
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: oven-sh/setup-bun@v2
 
-      - uses: actions/download-artifact@v8
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/download-artifact@v8
         with:
           name: archive-x86_64-unknown-linux-musl
           path: served
 
-      - name: Serve the tested archive, with stand-ins for the other targets' archives
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Serve the tested archive, with stand-ins for the other targets' archives
         run: |
           cd served
           for other_target in aarch64-unknown-linux-musl x86_64-apple-darwin aarch64-apple-darwin; do
@@ -388,7 +433,8 @@ jobs:
           python3 -m http.server 8767 --bind 127.0.0.1 > /dev/null 2>&1 &
 
       # AC: DS-03.5
-      - name: makepkg builds sendmock-bin and pacman installs it (Arch)
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: makepkg builds sendmock-bin and pacman installs it (Arch)
         run: |
           mkdir aur
           bun scripts/release/aur-package.ts "$VERSION" "$RELEASE_CHANNEL" "$RUNNER_TEMP/SHA256SUMS" aur "$DOWNLOAD_URL"
@@ -402,7 +448,8 @@ jobs:
           '
 
       # AC: DS-03.5
-      - name: rpmbuild builds the COPR spec and dnf installs it (Fedora)
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: rpmbuild builds the COPR spec and dnf installs it (Fedora)
         run: |
           bun scripts/release/copr-spec.ts "$VERSION" "$(date -u +%Y-%m-%d)" "$DOWNLOAD_URL" > sendmock.spec
           docker run --rm --network host -v "$PWD/sendmock.spec:/sendmock.spec:ro" fedora:42 sh -c '
@@ -415,7 +462,8 @@ jobs:
           '
 
       # AC: DS-03.5
-      - name: nix-build builds package.nix and its binary runs (Nix)
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: nix-build builds package.nix and its binary runs (Nix)
         run: |
           bun scripts/release/nix-package.ts "$VERSION" "$RUNNER_TEMP/SHA256SUMS" "$DOWNLOAD_URL" > package.nix
           docker run --rm --network host -v "$PWD/package.nix:/build/package.nix:ro" nixos/nix:2.35.4 sh -c '
@@ -427,23 +475,26 @@ jobs:
 
   checksums:
     name: SHA256SUMS
-    needs: [test, linux-packages, linux-community-packages]
+    needs: [changes, test, linux-packages, linux-community-packages]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v8
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/download-artifact@v8
         with:
           pattern: archive-*
           path: dist
           merge-multiple: true
 
-      - name: One checksum file for every archive
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: One checksum file for every archive
         working-directory: dist
         run: |
           cat *.sha256 > SHA256SUMS
           rm *.sha256
           cat SHA256SUMS
 
-      - uses: actions/upload-artifact@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/upload-artifact@v7
         with:
           name: release-files
           path: dist
@@ -453,66 +504,95 @@ jobs:
   # `cargo install sendmock` works once the stable is published (DS-03.1).
   crates:
     name: crates.io packages
-    needs: build
+    needs: [changes, build]
+    # When unaffected the build is skipped; this still runs, as a no-op, so its checks report.
+    if: ${{ !cancelled() && (needs.changes.outputs.is_affected != 'true' || success()) }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/checkout@v7
         with:
           ref: ${{ env.COMMIT_SHA }}
 
-      - uses: actions/download-artifact@v8
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/download-artifact@v8
         with:
           name: release-web-dist
           path: web/dist
 
-      - name: Toolchain
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Toolchain
         run: rustup toolchain install
 
-      - uses: Swatinem/rust-cache@v2
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: Swatinem/rust-cache@v2
         with:
           key: crates-package
           save-if: ${{ github.event_name != 'pull_request' }}
 
-      - name: Put the UI and the skill inside the crates that embed them
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Put the UI and the skill inside the crates that embed them
         run: sh scripts/release/stage-crate-files.sh
 
       # AC: DS-03.1
       # --allow-dirty: the staged copies are untracked on purpose; the checkout is otherwise clean.
-      - name: Every crate packages and builds from its package (cargo publish --dry-run)
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Every crate packages and builds from its package (cargo publish --dry-run)
         run: cargo publish --workspace --dry-run --locked --allow-dirty
 
   # Real mailers in eight languages against this commit's SMTP server, before publishing.
   smtp-clients:
+    needs: changes
     uses: ./.github/workflows/smtp-clients.yml
+    with:
+      skip_every_job: ${{ needs.changes.outputs.is_affected != 'true' }}
 
   # The official Twilio SDKs send and run a Verify login against this commit, before publishing.
   sms-clients:
+    needs: changes
     uses: ./.github/workflows/sms-clients.yml
+    with:
+      skip_every_job: ${{ needs.changes.outputs.is_affected != 'true' }}
 
   # An Express handler receives, fails, retries and replays webhooks against this commit.
   webhook-handler:
+    needs: changes
     uses: ./.github/workflows/webhook-handler.yml
+    with:
+      skip_every_job: ${{ needs.changes.outputs.is_affected != 'true' }}
 
   # Stripe, PayPal, SSLCommerz, Razorpay and Paddle apps pay, verify, decline and refund against this commit offline.
   payment-apps:
+    needs: changes
     uses: ./.github/workflows/payment-apps.yml
+    with:
+      skip_every_job: ${{ needs.changes.outputs.is_affected != 'true' }}
 
   # The email providers' official SDKs send to this commit offline.
   email-provider-sdks:
+    needs: changes
     uses: ./.github/workflows/email-provider-sdks.yml
+    with:
+      skip_every_job: ${{ needs.changes.outputs.is_affected != 'true' }}
 
   # The push providers' official SDKs send to this commit offline.
   push-sdks:
+    needs: changes
     uses: ./.github/workflows/push-sdks.yml
+    with:
+      skip_every_job: ${{ needs.changes.outputs.is_affected != 'true' }}
 
   # An app in each of eight languages uses the API against this commit.
   example-apps:
+    needs: changes
     uses: ./.github/workflows/example-apps.yml
+    with:
+      skip_every_job: ${{ needs.changes.outputs.is_affected != 'true' }}
 
   publish:
     name: Publish ${{ inputs.tag_name }}
     if: inputs.publish
-    needs: [plan, checksums, smtp-clients, sms-clients, webhook-handler, payment-apps, email-provider-sdks, push-sdks, example-apps, crates]
+    needs: [changes, plan, checksums, smtp-clients, sms-clients, webhook-handler, payment-apps, email-provider-sdks, push-sdks, example-apps, crates]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -576,7 +656,7 @@ jobs:
 
   # The release images on GHCR (and Docker Hub with its token), signed like edge.
   docker:
-    needs: [plan, publish]
+    needs: [changes, plan, publish]
     if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
     permissions:
       contents: read
@@ -591,7 +671,7 @@ jobs:
 
   # The Docker page's examples against the image just pushed, as users run them (DS-02.6).
   docker-examples:
-    needs: [plan, docker]
+    needs: [changes, plan, docker]
     uses: ./.github/workflows/docker-examples.yml
     with:
       image: ghcr.io/shibbirweb/sendmock:${{ needs.plan.outputs.version }}
@@ -600,7 +680,7 @@ jobs:
   # cluster that pulls the image the docker job just pushed (DS-09.5).
   helm-chart:
     name: Helm chart on GHCR
-    needs: [plan, docker]
+    needs: [changes, plan, docker]
     if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
     runs-on: ubuntu-latest
     permissions:
@@ -647,7 +727,7 @@ jobs:
   # same version, read back logged out (DS-10.5).
   docker-extension:
     name: Docker Desktop extension on GHCR
-    needs: [plan, docker]
+    needs: [changes, plan, docker]
     if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
     runs-on: ubuntu-latest
     permissions:
@@ -711,7 +791,7 @@ jobs:
   # The formula in the tap, when the owner has set HOMEBREW_TAP_TOKEN (DS-03.1).
   homebrew:
     name: Homebrew formula
-    needs: [plan, publish]
+    needs: [changes, plan, publish]
     if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
     runs-on: ubuntu-latest
     env:
@@ -754,7 +834,7 @@ jobs:
   # The manifest in the bucket, when the owner has set SCOOP_BUCKET_TOKEN (DS-03.1).
   scoop:
     name: Scoop manifest
-    needs: [plan, publish]
+    needs: [changes, plan, publish]
     if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
     runs-on: ubuntu-latest
     env:
@@ -797,7 +877,7 @@ jobs:
   # The Testcontainers modules under the release's version, each registry once the owner sets
   # it up (DS-06, plan 30 W3b).
   testcontainers:
-    needs: [plan, publish]
+    needs: [changes, plan, publish]
     if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
     permissions:
       contents: write
@@ -812,7 +892,7 @@ jobs:
   # owner's fork, when WINGET_TOKEN is set (DS-03.4).
   winget:
     name: WinGet submission
-    needs: [plan, publish]
+    needs: [changes, plan, publish]
     if: inputs.publish && inputs.channel == 'stable'
     runs-on: windows-latest
     env:
@@ -848,7 +928,7 @@ jobs:
   # Chocolatey's moderators (DS-03.4).
   chocolatey:
     name: Chocolatey package
-    needs: [plan, publish]
+    needs: [changes, plan, publish]
     if: inputs.publish && inputs.channel == 'stable'
     runs-on: windows-latest
     env:
@@ -883,7 +963,7 @@ jobs:
   # sendmock-bin or sendmock-beta-bin on the AUR, when AUR_SSH_PRIVATE_KEY is set (DS-03.5).
   aur:
     name: AUR package
-    needs: [plan, publish]
+    needs: [changes, plan, publish]
     if: inputs.publish && (inputs.channel == 'beta' || inputs.channel == 'stable')
     runs-on: ubuntu-latest
     env:
@@ -933,7 +1013,7 @@ jobs:
   # from https://copr.fedorainfracloud.org/api/ (DS-03.5).
   copr:
     name: COPR build
-    needs: [plan, publish]
+    needs: [changes, plan, publish]
     if: inputs.publish && inputs.channel == 'stable'
     runs-on: ubuntu-latest
     env:
@@ -966,7 +1046,7 @@ jobs:
   # request with it, and Nixpkgs' update bot follows later releases (DS-03.5).
   nix:
     name: Nix package file
-    needs: [plan, publish]
+    needs: [changes, plan, publish]
     if: inputs.publish && inputs.channel == 'stable'
     runs-on: ubuntu-latest
     steps:
@@ -988,3 +1068,47 @@ jobs:
           bun scripts/release/nix-package.ts "${{ needs.plan.outputs.version }}" dist/SHA256SUMS > package.nix
           gh release upload "${{ inputs.tag_name }}" package.nix --clobber
 
+  # A required check like every job above: it fails unless each job passed or was skipped.
+  passed:
+    name: Release build passed
+    if: always()
+    needs:
+      - changes
+      - plan
+      - build
+      - test
+      - linux-packages
+      - linux-community-packages
+      - checksums
+      - crates
+      - smtp-clients
+      - sms-clients
+      - webhook-handler
+      - payment-apps
+      - email-provider-sdks
+      - push-sdks
+      - example-apps
+      - publish
+      - docker
+      - docker-examples
+      - helm-chart
+      - docker-extension
+      - homebrew
+      - scoop
+      - testcontainers
+      - winget
+      - chocolatey
+      - aur
+      - copr
+      - nix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job passed or was skipped
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          failed_jobs="$(echo "$JOB_RESULTS" | jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | "\(.key): \(.value.result)"')"
+          if [ -n "$failed_jobs" ]; then
+            echo "::error::Not every job passed: $failed_jobs"
+            exit 1
+          fi

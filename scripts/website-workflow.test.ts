@@ -2,10 +2,12 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 
 type WorkflowStep = {
+  id?: string;
   name?: string;
   if?: string;
   uses?: string;
   run?: string;
+  with?: Record<string, string>;
 };
 type WorkflowJob = {
   if?: string;
@@ -17,7 +19,7 @@ type WorkflowJob = {
 type WebsiteWorkflow = {
   on: {
     push: { branches: string[]; paths: string[] };
-    pull_request: { paths: string[] };
+    pull_request: null;
     release: { types: string[] };
     workflow_run: { workflows: string[]; types: string[] };
     workflow_dispatch: unknown;
@@ -31,6 +33,15 @@ const websiteWorkflow = Bun.YAML.parse(
 ) as WebsiteWorkflow;
 const buildSteps = websiteWorkflow.jobs.build?.steps ?? [];
 
+/** Every step of a job checks the changed paths, so the job reports as a no-op when unaffected. */
+const affectedCondition = "needs.changes.outputs.is_affected == 'true'";
+const changedPathPatterns = String(
+  websiteWorkflow.jobs.changes?.steps.find((step) => step.id === "changed-paths")
+    ?.with?.paths ?? "",
+)
+  .split("\n")
+  .filter((pattern) => pattern !== "");
+
 function findBuildStep(stepName: string): WorkflowStep | undefined {
   return buildSteps.find((step) => step.name === stepName);
 }
@@ -38,8 +49,9 @@ function findBuildStep(stepName: string): WorkflowStep | undefined {
 describe("Website workflow", () => {
   test("WS-01.1 pull requests build and test the site, and only pushes to develop, releases and Run workflow deploy", () => {
     expect(websiteWorkflow.on.push.branches).toEqual(["develop"]);
-    expect(websiteWorkflow.on.pull_request.paths).toContain("website/**");
-    expect(websiteWorkflow.on.pull_request.paths).toContain("docs/wiki/**");
+    expect(websiteWorkflow.on).toHaveProperty("pull_request");
+    expect(changedPathPatterns).toContain("website/**");
+    expect(changedPathPatterns).toContain("docs/wiki/**");
     expect(websiteWorkflow.on.release.types).toEqual(["published"]);
     expect(websiteWorkflow.on).toHaveProperty("workflow_dispatch");
 
@@ -47,17 +59,17 @@ describe("Website workflow", () => {
       "Unit tests (snippets, docs versions)",
       "Landing, docs and API playground tests (WS-02, WS-03.3, WS-04)",
     ]) {
-      expect(findBuildStep(testStepName)?.if).toBeUndefined();
+      expect(findBuildStep(testStepName)?.if).toBe(affectedCondition);
     }
 
     expect(
       findBuildStep("Build every docs version, each with its demo")?.if,
-    ).toBeUndefined();
+    ).toBe(affectedCondition);
     expect(findBuildStep("Upload")?.uses).toStartWith(
       "actions/upload-pages-artifact@",
     );
     expect(findBuildStep("Upload")?.if).toBe(
-      "github.event_name != 'pull_request'",
+      `\${{ (github.event_name != 'pull_request') && ${affectedCondition} }}`,
     );
   });
 
@@ -66,11 +78,12 @@ describe("Website workflow", () => {
     expect(deployJob?.if).toBe(
       "${{ !cancelled() && github.event_name != 'pull_request' && needs.build.result == 'success' }}",
     );
-    expect(deployJob?.needs).toBe("build");
+    expect(deployJob?.needs).toEqual(["changes", "build"]);
     expect(deployJob?.permissions).toEqual({
       pages: "write",
       "id-token": "write",
     });
+    expect(deployJob?.steps.map((step) => step.if)).toEqual([affectedCondition]);
     expect(deployJob?.steps.map((step) => step.uses)).toEqual([
       "actions/deploy-pages@v5",
     ]);
@@ -100,11 +113,14 @@ describe("Website workflow", () => {
     );
 
     const packageRepository = websiteWorkflow.jobs["package-repository"];
-    expect(packageRepository?.needs).toBe("release-check");
+    expect(packageRepository?.needs).toEqual(["changes", "release-check"]);
     expect(packageRepository?.if).toBe(
       "${{ !cancelled() && (needs.release-check.result == 'skipped' || needs.release-check.outputs.should_deploy == 'true') }}",
     );
-    expect(websiteWorkflow.jobs.build?.needs).toBe("package-repository");
+    expect(websiteWorkflow.jobs.build?.needs).toEqual([
+      "changes",
+      "package-repository",
+    ]);
   });
 
   test("WS-03.1 every build, pull requests included, tests the versioned site before it is uploaded", () => {
@@ -112,7 +128,7 @@ describe("Website workflow", () => {
     const versionedTests = findBuildStep(
       "Versioned site tests (WS-03.1, WS-03.7)",
     );
-    expect(versionedTests?.if).toBeUndefined();
+    expect(versionedTests?.if).toBe(affectedCondition);
     expect(versionedTests?.run).toBe("bun run test:versioned");
     expect(
       stepNames.indexOf("Versioned site tests (WS-03.1, WS-03.7)"),
@@ -134,7 +150,7 @@ describe("Website workflow", () => {
   });
 
   test("a changelog change builds and tests the site, so a release pull request runs the changelog test", () => {
-    expect(websiteWorkflow.on.pull_request.paths).toContain("CHANGELOG.md");
+    expect(changedPathPatterns).toContain("CHANGELOG.md");
     expect(websiteWorkflow.on.push.paths).toContain("CHANGELOG.md");
   });
 });

@@ -1,0 +1,46 @@
+# Says whether a workflow's jobs should do their work: always on pushes, manual runs and calls
+# from another workflow (unless the caller has nothing to do), and on a pull request only when it
+# changed a file matching one of the patterns. Otherwise every job still runs, on Ubuntu with its
+# steps skipped, so each check name reports and every check can be required.
+name: Changed paths
+description: Whether a pull request changed any of a workflow's paths
+inputs:
+  paths:
+    description: Glob patterns, one per line, as a workflow's paths filter takes them
+    required: true
+  run-every-job:
+    description: true runs every job without reading the changes
+    required: true
+  skip-every-job:
+    description: true skips every job's steps, when a calling workflow has nothing to do
+    default: "false"
+outputs:
+  is_affected:
+    description: true when the workflow's jobs should run
+    value: ${{ steps.match.outputs.is_affected }}
+runs:
+  using: composite
+  steps:
+    - uses: oven-sh/setup-bun@v2
+      if: inputs.run-every-job != 'true' && inputs.skip-every-job != 'true'
+
+    - id: match
+      shell: bash
+      env:
+        RUN_EVERY_JOB: ${{ inputs.run-every-job }}
+        SKIP_EVERY_JOB: ${{ inputs.skip-every-job }}
+        PATH_PATTERNS: ${{ inputs.paths }}
+        PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        if [ "$SKIP_EVERY_JOB" = "true" ]; then
+          echo "is_affected=false" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+        if [ "$RUN_EVERY_JOB" = "true" ]; then
+          echo "is_affected=true" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+        gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PULL_REQUEST_NUMBER/files" \
+          --jq '.[].filename' > "$RUNNER_TEMP/changed-files.txt"
+        bun scripts/ci/changed-paths.ts "$RUNNER_TEMP/changed-files.txt" >> "$GITHUB_OUTPUT"
