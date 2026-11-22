@@ -138,6 +138,10 @@ export const pathParameterDocs: Record<string, PathParameterDoc> = {
     description: "A Mailgun sending domain, as in `/v3/{domain}/messages`.",
     example: "mg.shop.test",
   },
+  presetName: {
+    description: "The preset's name, from `GET /api/v1/presets`.",
+    example: "laravel-mailgun-twilio",
+  },
   sender: {
     description:
       "Your number (E.164) or the Messaging Service SID an opt-out is kept under, from `GET /api/v1/sms/opt-outs`.",

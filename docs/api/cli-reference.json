@@ -12755,6 +12755,136 @@
       ]
     },
     {
+      "command": "sendmock preset",
+      "slug": "preset",
+      "usage": "sendmock preset <presetName> [flags]",
+      "summary": "Set SendMock up for a stack in one step; a second run changes nothing.",
+      "area": "Setup",
+      "area_slug": "setup",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/presets/{presetName}/apply",
+          "operation_id": "postPresetsByPresetNameApply",
+          "summary": "Set SendMock up for a stack in one step; a second run changes nothing.",
+          "area_slug": "setup",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "presetName",
+          "input": {
+            "name": "presetName",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The preset's name, from `GET /api/v1/presets`.",
+          "example": "laravel-mailgun-twilio",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--app-url",
+          "input": {
+            "name": "app_url",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<app-url>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Where SendMock reaches your app.",
+          "example": "http://localhost:8000"
+        },
+        {
+          "flag": "--options",
+          "input": {
+            "name": "options",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<options>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "The preset's options by name (its webhook paths); left out, their defaults.",
+          "example": {
+            "mailgun_events_path": "/webhooks/mailgun/events"
+          }
+        },
+        {
+          "flag": "--numbers-csv",
+          "input": {
+            "name": "numbers_csv",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<numbers-csv>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Numbers to add, one per line: `number,label,subaccount_sid,messaging_service_sid` (a first line starting with `number` is a header).",
+          "example": "+15550001111,Clinic line,AC22222222222222222222222222222222,"
+        }
+      ],
+      "example": "sendmock preset laravel-mailgun-twilio --app-url http://localhost:8000 --numbers-csv '+15550001111,Clinic line,AC22222222222222222222222222222222,'",
+      "output": "PresetApplyResult",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_preset_apply"
+      ],
+      "ui": [
+        "Settings > Setup > Presets > Apply"
+      ]
+    },
+    {
+      "command": "sendmock presets",
+      "slug": "presets",
+      "usage": "sendmock presets",
+      "summary": "The stack presets: what each sets up and its options.",
+      "area": "Setup",
+      "area_slug": "setup",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/presets",
+          "operation_id": "getPresets",
+          "summary": "The stack presets: what each sets up and its options.",
+          "area_slug": "setup",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [],
+      "example": "sendmock presets",
+      "output": "StackPreset[]",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_preset_list"
+      ],
+      "ui": [
+        "Settings > Setup > Presets"
+      ]
+    },
+    {
       "command": "sendmock projects create",
       "slug": "projects-create",
       "usage": "sendmock projects create [flags]",

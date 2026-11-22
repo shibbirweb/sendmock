@@ -119,6 +119,18 @@ export const systemSurfaces: SurfaceCatalogue = {
     ui: "Settings > Setup > Import a setup > Preview",
     cliArguments: { file: "setup_text" },
   },
+  "GET /api/v1/presets": {
+    phase: "A28",
+    cli: "sendmock presets",
+    mcp: "sendmock_preset_list",
+    ui: "Settings > Setup > Presets",
+  },
+  "POST /api/v1/presets/{presetName}/apply": {
+    phase: "A28",
+    cli: "sendmock preset <presetName>",
+    mcp: "sendmock_preset_apply",
+    ui: "Settings > Setup > Presets > Apply",
+  },
   "POST /api/v1/setup/import": {
     phase: "A18",
     cli: "sendmock setup import <file>",

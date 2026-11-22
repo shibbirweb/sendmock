@@ -34,6 +34,7 @@ mod payments;
 mod paypal;
 mod pop3_mailbox;
 mod present_value;
+mod presets;
 mod projects;
 mod provider_bins;
 mod providers;
@@ -209,6 +210,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     operation_registry.register(ValidateSeedOperation);
     operation_registry.register(ApplySeedOperation);
     setup::register_setup_operations(&mut operation_registry);
+    presets::register_preset_operations(&mut operation_registry);
     operation_registry.register(GetStatsOperation);
     email::register_email_operations(&mut operation_registry);
     events::register_event_operations(&mut operation_registry);

@@ -1,0 +1,32 @@
+# The laravel-mailgun-twilio preset (PL-27): a Laravel app on Mailgun and Twilio. The values in
+# braces are filled from the preset's options before the file is applied.
+[sendmock]
+format = "sendmock.setup"
+format_version = 2
+
+[[webhook.endpoints]]
+name = "Laravel app: Mailgun events"
+url = "{app_url}{mailgun_events_path}"
+template = "mailgun.events"
+
+[[webhook.endpoints]]
+name = "Laravel app: Mailgun inbound"
+url = "{app_url}{mailgun_inbound_path}"
+template = "mailgun.routes"
+
+[[webhook.rules]]
+name = "Laravel app: email opened, bounced and complained"
+endpoint = "Laravel app: Mailgun events"
+events = ["email.opened", "email.bounced", "email.complained"]
+
+[[webhook.rules]]
+name = "Laravel app: inbound email"
+endpoint = "Laravel app: Mailgun inbound"
+events = ["email.inbound"]
+
+[[numbers]]
+number = "+15005550006"
+label = "Twilio test sender"
+inbound_url = "{app_url}{twilio_inbound_path}"
+inbound_template = "twilio.inbound_sms"
+status_callback = "{app_url}{twilio_status_path}"

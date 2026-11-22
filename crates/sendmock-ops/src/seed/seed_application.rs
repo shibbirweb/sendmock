@@ -176,7 +176,7 @@ fn describe_invalid_setup(setup_check: &SetupCheck) -> OperationError {
 
 /// Applies every section in order. Replace first puts the settings back to their defaults and
 /// afterwards removes the items the file does not hold, as reset does.
-async fn apply_seed_document(
+pub(crate) async fn apply_seed_document(
     operation_context: &OperationContext,
     seed_toml: &str,
     passphrase: Option<&str>,

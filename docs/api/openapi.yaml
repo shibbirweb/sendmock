@@ -425,6 +425,62 @@ paths:
       x-sendmock-cli: sendmock setup validate <file>
       x-sendmock-mcp: sendmock_setup_validate
       x-sendmock-ui: Settings > Setup > Import a setup > Preview
+  /api/v1/presets:
+    get:
+      operationId: getPresets
+      summary: "The stack presets: what each sets up and its options."
+      tags:
+        - Setup
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StackPreset"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock presets
+      x-sendmock-mcp: sendmock_preset_list
+      x-sendmock-ui: Settings > Setup > Presets
+  /api/v1/presets/{presetName}/apply:
+    post:
+      operationId: postPresetsByPresetNameApply
+      summary: Set SendMock up for a stack in one step; a second run changes nothing.
+      tags:
+        - Setup
+      parameters:
+        - name: presetName
+          in: path
+          required: true
+          description: The preset's name, from `GET /api/v1/presets`.
+          schema:
+            type: string
+          example: laravel-mailgun-twilio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PresetApplyInput"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PresetApplyResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock preset <presetName>
+      x-sendmock-mcp: sendmock_preset_apply
+      x-sendmock-ui: Settings > Setup > Presets > Apply
   /api/v1/setup/import:
     post:
       operationId: postSetupImport
@@ -15374,6 +15430,114 @@ components:
         - redirected
         - delayed
         - notification_sent
+    PresetApplyInput:
+      type: object
+      properties:
+        app_url:
+          type: string
+          description: Where SendMock reaches your app.
+          examples:
+            - http://localhost:8000
+        options:
+          type: object
+          additionalProperties:
+            type: string
+          description: The preset's options by name (its webhook paths); left out, their defaults.
+          examples:
+            - mailgun_events_path: /webhooks/mailgun/events
+        numbers_csv:
+          type:
+            - string
+            - "null"
+          description: "Numbers to add, one per line: `number,label,subaccount_sid,messaging_service_sid` (a first line starting with `number` is a header)."
+          examples:
+            - +15550001111,Clinic line,AC22222222222222222222222222222222,
+      required:
+        - app_url
+      description: Body of `POST /presets/{presetName}/apply`.
+    PresetApplyResult:
+      type: object
+      properties:
+        preset_name:
+          type: string
+          description: The preset applied.
+          examples:
+            - laravel-mailgun-twilio
+        applied:
+          type: array
+          items:
+            $ref: "#/components/schemas/SeedItemCount"
+          description: The items its setup file created or updated, by kind.
+        steps:
+          type: array
+          items:
+            type: string
+          description: "What else it did: the signing key, the Debugger URL, the numbers."
+          examples:
+            - - Made the Mailgun signing key.
+        smtp_address:
+          type: string
+          description: The SMTP address of this SendMock.
+          examples:
+            - 127.0.0.1:1025
+        provider_address:
+          type:
+            - string
+            - "null"
+          description: The provider port; null when it is off.
+          examples:
+            - 127.0.0.1:8026
+        provider_tls_address:
+          type:
+            - string
+            - "null"
+          description: The HTTPS provider port; null when it is off.
+          examples:
+            - null
+        warnings:
+          type: array
+          items:
+            type: string
+          description: What to fix, such as an HTTPS provider port that is off.
+          examples:
+            - []
+        env_block:
+          type: string
+          description: The lines for your app's `.env`; secrets are hidden from AI agents.
+          examples:
+            - |-
+              MAIL_MAILER=mailgun
+              MAILGUN_DOMAIN=mg.example.test
+      required:
+        - preset_name
+        - applied
+        - steps
+        - smtp_address
+        - provider_address
+        - provider_tls_address
+        - warnings
+        - env_block
+      description: What applying a preset did, and what your app needs.
+    PresetOptionView:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The option's name, as the apply body's `options` takes it.
+          examples:
+            - mailgun_events_path
+        default_value:
+          type: string
+          description: The value used when the option is left out.
+          examples:
+            - /webhooks/mailgun/events
+        description:
+          type: string
+      required:
+        - name
+        - default_value
+        - description
+      description: One option of a stack preset, with the value used when it is left out.
     Project:
       type: object
       properties:
@@ -17934,6 +18098,25 @@ components:
         - name
         - score
         - description
+    StackPreset:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The preset's name.
+          examples:
+            - laravel-mailgun-twilio
+        description:
+          type: string
+        options:
+          type: array
+          items:
+            $ref: "#/components/schemas/PresetOptionView"
+      required:
+        - name
+        - description
+        - options
+      description: A stack preset, as `GET /presets` lists it.
     SubscriptionInterval:
       type: string
       enum:

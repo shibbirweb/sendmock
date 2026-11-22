@@ -127,6 +127,11 @@ export const settingsSetupEntries: DeeperEntry[] = [
     changes: "Adds, updates and (with Replace) removes configuration; traffic is never touched.",
     operationIds: ["postSetupImport"],
   },
+  { control: "heading: Presets", does: "Sets SendMock up for a stack in one step, as `sendmock preset` does.", links: "[HTTPS for provider SDKs](../../connect/https.md)" },
+  { control: "paragraph: Laravel with Mailgun and Twilio: the Mailgun event and inbound webhooks, Twilio's test sender with your app's URLs, the Debugger URL and a signing key. Running it again changes nothing.", does: "Explains what the Laravel, Mailgun and Twilio preset sets up." },
+  { control: "textbox: App URL", does: "Where SendMock reaches your app; every webhook URL the preset makes starts with it." },
+  { control: "paragraph: Where SendMock reaches your app; the webhook paths are the preset's defaults (sendmock preset changes them).", does: "Explains the app URL and where the paths come from." },
+  { control: "button: Apply the preset", does: "Applies the preset and shows what it did, any warnings and the lines for your app's `.env`.", operationIds: ["postPresetsByPresetNameApply", "getPresets"] },
   { control: "heading: Use in CI", does: "Writes the files a pipeline needs to run your webhook tests with `sendmock ci run`.", links: "[CI pipelines](../../advanced/ci-pipelines.md)" },
   {
     control:

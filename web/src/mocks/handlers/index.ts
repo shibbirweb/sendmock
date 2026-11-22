@@ -31,6 +31,7 @@ import { paymentMethodHandlers } from "@/mocks/handlers/payment-method-handlers"
 import { samplesHandlers } from "@/mocks/handlers/samples-handlers";
 import { savedScenarioHandlers } from "@/mocks/handlers/saved-scenario-handlers";
 import { settingsHandlers } from "@/mocks/handlers/settings-handlers";
+import { presetHandlers } from "@/mocks/handlers/preset-handlers";
 import { setupHandlers } from "@/mocks/handlers/setup-handlers";
 import { simulatedErrorHandler } from "@/mocks/handlers/simulated-error-handler";
 import { smsHandlers } from "@/mocks/handlers/sms-handlers";
@@ -60,6 +61,7 @@ export const mockHandlers = [
   ...systemHandlers,
   ...settingsHandlers,
   ...setupHandlers,
+  ...presetHandlers,
   ...waitHandlers,
   ...automationHandlers,
   ...savedScenarioHandlers,

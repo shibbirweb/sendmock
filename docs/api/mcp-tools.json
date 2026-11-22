@@ -18728,6 +18728,174 @@
       ]
     },
     {
+      "name": "sendmock_preset_apply",
+      "toolset": "core",
+      "summary": "Set SendMock up for a stack in one step; a second run changes nothing.",
+      "area": "Setup",
+      "area_slug": "setup",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/presets/{presetName}/apply",
+          "operation_id": "postPresetsByPresetNameApply",
+          "summary": "Set SendMock up for a stack in one step; a second run changes nothing.",
+          "area_slug": "setup",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "preset_name",
+          "input": {
+            "name": "presetName",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The preset's name, from `GET /api/v1/presets`.",
+          "example": "laravel-mailgun-twilio"
+        },
+        {
+          "name": "app_url",
+          "input": {
+            "name": "app_url",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "Where SendMock reaches your app.",
+          "example": "http://localhost:8000"
+        },
+        {
+          "name": "options",
+          "input": {
+            "name": "options",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The preset's options by name (its webhook paths); left out, their defaults.",
+          "example": {
+            "mailgun_events_path": "/webhooks/mailgun/events"
+          }
+        },
+        {
+          "name": "numbers_csv",
+          "input": {
+            "name": "numbers_csv",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Numbers to add, one per line: `number,label,subaccount_sid,messaging_service_sid` (a first line starting with `number` is a header).",
+          "example": "+15550001111,Clinic line,AC22222222222222222222222222222222,"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "preset_name": {
+            "type": "string",
+            "description": "The preset's name, from `GET /api/v1/presets`.",
+            "examples": [
+              "laravel-mailgun-twilio"
+            ]
+          },
+          "app_url": {
+            "type": "string",
+            "description": "Where SendMock reaches your app.",
+            "examples": [
+              "http://localhost:8000"
+            ]
+          },
+          "options": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "The preset's options by name (its webhook paths); left out, their defaults.",
+            "examples": [
+              {
+                "mailgun_events_path": "/webhooks/mailgun/events"
+              }
+            ]
+          },
+          "numbers_csv": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Numbers to add, one per line: `number,label,subaccount_sid,messaging_service_sid` (a first line starting with `number` is a header).",
+            "examples": [
+              "+15550001111,Clinic line,AC22222222222222222222222222222222,"
+            ]
+          }
+        },
+        "required": [
+          "preset_name",
+          "app_url"
+        ]
+      },
+      "example_arguments": {
+        "preset_name": "laravel-mailgun-twilio",
+        "app_url": "http://localhost:8000",
+        "numbers_csv": "+15550001111,Clinic line,AC22222222222222222222222222222222,"
+      },
+      "output": "PresetApplyResult",
+      "cli": [
+        "sendmock preset <presetName>"
+      ],
+      "ui": [
+        "Settings > Setup > Presets > Apply"
+      ]
+    },
+    {
+      "name": "sendmock_preset_list",
+      "toolset": "core",
+      "summary": "The stack presets: what each sets up and its options.",
+      "area": "Setup",
+      "area_slug": "setup",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/presets",
+          "operation_id": "getPresets",
+          "summary": "The stack presets: what each sets up and its options.",
+          "area_slug": "setup",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [],
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "example_arguments": {},
+      "output": "StackPreset[]",
+      "cli": [
+        "sendmock presets"
+      ],
+      "ui": [
+        "Settings > Setup > Presets"
+      ]
+    },
+    {
       "name": "sendmock_project_create",
       "toolset": "core",
       "summary": "Add a project that apps can send traffic to by its key.",

@@ -273,6 +273,50 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock presets",
+    "usage": "sendmock presets",
+    "aliases": [],
+    "summary": "The stack presets: what each sets up and its options.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/presets",
+        "operation_id": "getPresets",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_preset_list"
+    ]
+  },
+  {
+    "command": "sendmock preset",
+    "usage": "sendmock preset <presetName>",
+    "aliases": [],
+    "summary": "Set SendMock up for a stack in one step; a second run changes nothing.",
+    "arguments": [
+      "presetName"
+    ],
+    "flags": [
+      "--app-url",
+      "--numbers-csv",
+      "--options"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/presets/{presetName}/apply",
+        "operation_id": "postPresetsByPresetNameApply",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_preset_apply"
+    ]
+  },
+  {
     "command": "sendmock stats",
     "usage": "sendmock stats",
     "aliases": [],

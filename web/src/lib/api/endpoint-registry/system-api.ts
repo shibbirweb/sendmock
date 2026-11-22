@@ -4,6 +4,7 @@ import {
   pageOf,
   pageQueryParameters,
   tagEndpoints,
+  listOf,
   typeRef,
 } from "./endpoint-definition";
 
@@ -141,6 +142,21 @@ const setupEndpoints = tagEndpoints("Setup", [
     requestBody: typeRef("SetupImportRequest"),
     response: typeRef("SetupValidation"),
     errorStatuses: [400, 422],
+  },
+  {
+    method: "GET",
+    path: "/api/v1/presets",
+    summary: "The stack presets: what each sets up and its options.",
+    response: listOf("StackPreset"),
+  },
+  {
+    method: "POST",
+    path: "/api/v1/presets/{presetName}/apply",
+    summary:
+      "Set SendMock up for a stack in one step; a second run changes nothing.",
+    requestBody: typeRef("PresetApplyInput"),
+    response: typeRef("PresetApplyResult"),
+    errorStatuses: [400, 404],
   },
   {
     method: "POST",

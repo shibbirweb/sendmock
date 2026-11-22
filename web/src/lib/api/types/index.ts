@@ -8,6 +8,7 @@ export type * from "@/lib/api/types/webhooks";
 export type * from "@/lib/api/types/events";
 export type * from "@/lib/api/types/email-templates";
 export type * from "@/lib/api/types/reset";
+export type * from "@/lib/api/types/presets";
 export type * from "@/lib/api/types/system";
 export type * from "@/lib/api/types/tls";
 export type * from "@/lib/api/types/ci";

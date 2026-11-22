@@ -134,6 +134,25 @@ fn read_flag(matched_operation: &MatchedOperation, name: &str) -> bool {
 }
 
 pub fn run_trust_command(matched_operation: &MatchedOperation) -> ExitCode {
+    run_trust(
+        TrustAction {
+            is_check: read_flag(matched_operation, "check"),
+            is_undo: read_flag(matched_operation, "undo"),
+            is_confirmed: read_flag(matched_operation, "yes"),
+        },
+        read_flag(matched_operation, "json"),
+    )
+}
+
+/// What `sendmock trust` was asked to do.
+pub struct TrustAction {
+    pub is_check: bool,
+    pub is_undo: bool,
+    pub is_confirmed: bool,
+}
+
+/// Checks, adds or removes the local CA, as `sendmock trust` and `sendmock preset` run it.
+pub fn run_trust(trust_action: TrustAction, as_json: bool) -> ExitCode {
     let local_ca = match load_local_ca() {
         Ok(local_ca) => local_ca,
         Err(reason) => {
@@ -146,11 +165,11 @@ pub fn run_trust_command(matched_operation: &MatchedOperation) -> ExitCode {
         .iter()
         .map(|target| target.check(&local_ca))
         .collect();
-    if read_flag(matched_operation, "check") {
-        print_checks(&local_ca, &checks, read_flag(matched_operation, "json"));
+    if trust_action.is_check {
+        print_checks(&local_ca, &checks, as_json);
         return CliExitCode::Success.into();
     }
-    let is_undo = read_flag(matched_operation, "undo");
+    let is_undo = trust_action.is_undo;
     let wanted_state = if is_undo {
         TrustState::Trusted
     } else {
@@ -163,7 +182,7 @@ pub fn run_trust_command(matched_operation: &MatchedOperation) -> ExitCode {
     if planned.is_empty() {
         return CliExitCode::Success.into();
     }
-    if !(read_flag(matched_operation, "yes") || confirm_changes(planned.len(), is_undo)) {
+    if !(trust_action.is_confirmed || confirm_changes(planned.len(), is_undo)) {
         eprintln!("Nothing changed. Run it again with --yes to change without asking.");
         return CliExitCode::Error.into();
     }
