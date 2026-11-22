@@ -10,7 +10,7 @@ use sendmock_store::{
     MessagingServiceRepository, PaymentDefinitionRepository, PaymentProviderObjectRepository,
     PaymentRepository, PaymentSubscriptionRepository, ProjectRepository, ProviderBinRepository,
     PushNotificationRepository, SavedScenarioRepository, SavedWebhookDeliveryRepository,
-    SeedStateRepository, SettingsRepository, SmsCallbackAttemptRepository,
+    SeedStateRepository, SettingsRepository, SmsCallbackAttemptRepository, SmsOptOutRepository,
     SmsOutcomeRuleRepository, SmsReplyWebhookRepository, SmsRepository, SmtpSessionRepository,
     TrafficPruner, TwilioSubaccountRepository, VerificationRepository, VerifyServiceRepository,
     VirtualNumberRepository, WebhookDeliveryRepository, WebhookEndpointRepository,
@@ -108,6 +108,8 @@ pub struct SmsDeliveryStores {
     pub callback_attempts: SmsCallbackAttemptRepository,
     /// Reply webhook calls of inbound messages and their latest outcome.
     pub reply_webhooks: SmsReplyWebhookRepository,
+    /// Contacts who texted STOP, per sender.
+    pub opt_outs: SmsOptOutRepository,
 }
 
 impl SmsDeliveryStores {
@@ -115,6 +117,7 @@ impl SmsDeliveryStores {
         Self {
             callback_attempts: SmsCallbackAttemptRepository::new(Arc::clone(database)),
             reply_webhooks: SmsReplyWebhookRepository::new(Arc::clone(database)),
+            opt_outs: SmsOptOutRepository::new(Arc::clone(database)),
         }
     }
 }

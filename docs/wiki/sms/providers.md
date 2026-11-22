@@ -53,6 +53,17 @@ Built-ins you removed are listed here. Requests to their paths get a 404 until y
 
 
 Every control and text, one by one: [SMS providers in depth](../deeper/sms/providers.md).
+## Opt-out keywords
+
+SendMock emulates Twilio's Advanced Opt-Out, on by default for the Twilio provider as on Twilio:
+
+- A contact who texts STOP, STOPALL, UNSUBSCRIBE, CANCEL, END or QUIT (the whole text, in any case) to one of your numbers is opted out of that number, or of the Messaging Service the number is in.
+- A later send through the Twilio API from that number or Messaging Service to the contact answers Twilio's error `21610`, and nothing is stored.
+- START, YES or UNSTOP lifts it; HELP and INFO are left as they are.
+- The inbound message still reaches your app's webhook, as on Twilio.
+
+**Opt-out keywords** in the provider's General tab turns it off (`opt_out_keywords`). **Opt-out auto-replies** (`opt_out_auto_replies`, off by default) answers STOP, START and HELP with Twilio's default replies, stored as outbound messages. The list of opt-outs is on the Numbers screen's **Opt-outs** tab; see [Numbers](../numbers.md#opt-outs).
+
 ## Twilio subaccounts
 
 Apps that give each customer a Twilio subaccount send under `/2010-04-01/Accounts/{AccountSid}/Messages.json` with that subaccount's SID and token, and check every webhook with the subaccount's own token. SendMock does the same:

@@ -1481,6 +1481,66 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock sms opt-outs list",
+    "usage": "sendmock sms opt-outs list",
+    "aliases": [],
+    "summary": "Contacts who texted STOP, newest first.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/sms/opt-outs",
+        "operation_id": "getSmsOptOuts",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_opt_out_list"
+    ]
+  },
+  {
+    "command": "sendmock sms opt-outs delete",
+    "usage": "sendmock sms opt-outs delete <sender> <contactNumber>",
+    "aliases": [],
+    "summary": "Lift one opt-out, as if the contact texted START.",
+    "arguments": [
+      "sender",
+      "contactNumber"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/sms/opt-outs/{sender}/{contactNumber}",
+        "operation_id": "deleteSmsOptOutsBySenderByContactNumber",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_opt_out_delete"
+    ]
+  },
+  {
+    "command": "sendmock sms opt-outs clear",
+    "usage": "sendmock sms opt-outs clear --yes",
+    "aliases": [],
+    "summary": "Lift every opt-out.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/sms/opt-outs",
+        "operation_id": "deleteSmsOptOuts",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_opt_out_clear"
+    ]
+  },
+  {
     "command": "sendmock payments flows step-types",
     "usage": "sendmock payments flows step-types",
     "aliases": [],
@@ -4716,6 +4776,8 @@ expression: command_descriptions
       "--message-id-template",
       "--name",
       "--operations",
+      "--opt-out-auto-replies",
+      "--opt-out-keywords",
       "--outcome-error-codes",
       "--status-names",
       "--success-response",
@@ -4947,6 +5009,8 @@ expression: command_descriptions
       "--message-id-template",
       "--name",
       "--operations",
+      "--opt-out-auto-replies",
+      "--opt-out-keywords",
       "--outcome-error-codes",
       "--status-names",
       "--success-response",

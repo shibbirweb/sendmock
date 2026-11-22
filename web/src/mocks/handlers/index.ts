@@ -40,6 +40,7 @@ import { systemHandlers } from "@/mocks/handlers/system-handlers";
 import { tlsHandlers } from "@/mocks/handlers/tls-handlers";
 import { ciHandlers } from "@/mocks/handlers/ci-handlers";
 import { providerBinHandlers } from "@/mocks/handlers/provider-bin-handlers";
+import { smsOptOutHandlers } from "@/mocks/handlers/sms-opt-out-handlers";
 import { twilioSubaccountHandlers } from "@/mocks/handlers/twilio-subaccount-handlers";
 import { mailgunComplaintHandlers } from "@/mocks/handlers/mailgun-complaint-handlers";
 import { verifyHandlers } from "@/mocks/handlers/verify-handlers";
@@ -78,6 +79,7 @@ export const mockHandlers = [
   ...emailHandlers,
   ...emailClickHandlers,
   ...emailResponseHandlers,
+  ...smsOptOutHandlers,
   ...smsSendHandlers,
   // Before the SMS handlers, so `/sms/threads` is not read as an SMS id.
   ...smsThreadHandlers,

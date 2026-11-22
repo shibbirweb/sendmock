@@ -37,6 +37,7 @@ function buildTwilioProvider(): MessageProviderRecord {
     key: "twilio",
     name: "Twilio",
     area: "sms",
+    opt_out_keywords: true,
     accent: "#f22f46",
     host: "api.twilio.com",
     credentials: [

@@ -4417,6 +4417,70 @@ paths:
       x-sendmock-cli: sendmock email mailgun complaints clear <domain>
       x-sendmock-mcp: sendmock_email_mailgun_complaint_clear
       x-sendmock-ui: Mail > Providers > Mailgun > Complaints > Clear
+  /api/v1/sms/opt-outs:
+    get:
+      operationId: getSmsOptOuts
+      summary: Contacts who texted STOP, newest first.
+      tags:
+        - SMS
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SmsOptOut"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms opt-outs list
+      x-sendmock-mcp: sendmock_sms_opt_out_list
+      x-sendmock-ui: Numbers > Opt-outs
+    delete:
+      operationId: deleteSmsOptOuts
+      summary: Lift every opt-out.
+      tags:
+        - SMS
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms opt-outs clear --yes
+      x-sendmock-mcp: sendmock_sms_opt_out_clear
+      x-sendmock-ui: Numbers > Opt-outs > Lift all
+  /api/v1/sms/opt-outs/{sender}/{contactNumber}:
+    delete:
+      operationId: deleteSmsOptOutsBySenderByContactNumber
+      summary: Lift one opt-out, as if the contact texted START.
+      tags:
+        - SMS
+      parameters:
+        - name: sender
+          in: path
+          required: true
+          description: Your number (E.164) or the Messaging Service SID an opt-out is kept under, from `GET /api/v1/sms/opt-outs`.
+          schema:
+            type: string
+          example: "+15550001111"
+        - name: contactNumber
+          in: path
+          required: true
+          description: The contact's number, E.164.
+          schema:
+            type: string
+          example: "+15550002222"
+      responses:
+        "204":
+          description: No content.
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms opt-outs delete <sender> <contactNumber>
+      x-sendmock-mcp: sendmock_sms_opt_out_delete
+      x-sendmock-ui: Numbers > Opt-outs > Lift
   /api/v1/emails/providers:
     get:
       operationId: getEmailsProviders
@@ -12521,6 +12585,18 @@ components:
           description: "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer."
           examples:
             - false
+        opt_out_keywords:
+          type:
+            - boolean
+            - "null"
+          description: "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others."
+          examples:
+            - true
+        opt_out_auto_replies:
+          type: boolean
+          description: "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages."
+          examples:
+            - false
         operations:
           type: array
           items:
@@ -12594,6 +12670,8 @@ components:
         - host
         - credentials
         - check_credentials
+        - opt_out_keywords
+        - opt_out_auto_replies
         - operations
         - field_mapping
         - validation_rules
@@ -12646,6 +12724,18 @@ components:
         check_credentials:
           type: boolean
           description: "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer."
+          examples:
+            - false
+        opt_out_keywords:
+          type:
+            - boolean
+            - "null"
+          description: "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others."
+          examples:
+            - true
+        opt_out_auto_replies:
+          type: boolean
+          description: "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages."
           examples:
             - false
         operations:
@@ -12708,6 +12798,8 @@ components:
         - host
         - credentials
         - check_credentials
+        - opt_out_keywords
+        - opt_out_auto_replies
         - operations
         - field_mapping
         - validation_rules
@@ -12756,6 +12848,18 @@ components:
         check_credentials:
           type: boolean
           description: "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer."
+          examples:
+            - false
+        opt_out_keywords:
+          type:
+            - boolean
+            - "null"
+          description: "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others."
+          examples:
+            - true
+        opt_out_auto_replies:
+          type: boolean
+          description: "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages."
           examples:
             - false
         operations:
@@ -17155,6 +17259,32 @@ components:
         - status_history
         - to_number
         - updated_at
+    SmsOptOut:
+      type: object
+      properties:
+        sender:
+          type: string
+          description: Your app's number, or the SID of the Messaging Service it was in, `MG...`.
+          examples:
+            - "+15550001111"
+        contact_number:
+          type: string
+          description: The contact's number, E.164.
+          examples:
+            - "+15550002222"
+        keyword:
+          type: string
+          description: The keyword the contact texted, as they wrote it.
+          examples:
+            - STOP
+        created_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+      required:
+        - sender
+        - contact_number
+        - keyword
+        - created_at
+      description: A contact who texted STOP to one of your numbers or Messaging Services.
     SmsOutcomeKind:
       type: string
       enum:

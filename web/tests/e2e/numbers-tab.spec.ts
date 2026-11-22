@@ -136,3 +136,20 @@ test("SM-22.5 a number is given to a Twilio subaccount and keeps it when edited"
     "Acme Clinic",
   );
 });
+
+test("SM-23.3 the Opt-outs tab lists contacts who texted STOP and lifts them", async ({
+  page,
+}) => {
+  await page.goto("/numbers?tab=opt-outs");
+  const optOutRow = page.getByRole("row").filter({ hasText: "+15550009999" });
+  await expect(optOutRow).toContainText("STOP");
+
+  await page
+    .getByRole("button", { name: "Lift the opt-out of +15550009999" })
+    .click();
+
+  await expect(optOutRow).toHaveCount(0);
+  await expect(
+    page.getByText("No opt-outs. A contact who texts STOP"),
+  ).toBeVisible();
+});

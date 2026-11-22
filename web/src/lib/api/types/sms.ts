@@ -288,3 +288,23 @@ export type SmsStatusUpdate = WebhookChoice & {
    */
   error_code?: string | null;
 };
+
+/** A contact who texted STOP to one of your numbers or Messaging Services (SM-23). */
+export type SmsOptOut = {
+  /**
+   * Your app's number, or the SID of the Messaging Service it was in, `MG...`.
+   * @example "+15550001111"
+   */
+  sender: string;
+  /**
+   * The contact's number, E.164.
+   * @example "+15550002222"
+   */
+  contact_number: string;
+  /**
+   * The keyword the contact texted, as they wrote it.
+   * @example "STOP"
+   */
+  keyword: string;
+  created_at: IsoTimestamp;
+};

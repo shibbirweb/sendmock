@@ -47,6 +47,7 @@ mod seed;
 mod settings;
 mod setup;
 mod sms;
+mod sms_opt_outs;
 mod sms_replies;
 mod smtp_chaos;
 mod smtp_delivery;
@@ -211,6 +212,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     events::register_event_operations(&mut operation_registry);
     sms::register_sms_operations(&mut operation_registry);
     sms_replies::register_sms_reply_operations(&mut operation_registry);
+    sms_opt_outs::register_sms_opt_out_operations(&mut operation_registry);
     payments::register_payment_operations(&mut operation_registry);
     outcome_rules::register_outcome_rule_operations(&mut operation_registry);
     message_rules::register_message_rule_operations(&mut operation_registry);

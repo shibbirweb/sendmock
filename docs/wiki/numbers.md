@@ -64,6 +64,10 @@ To keep the SID your app is configured with, give it when you add the service: `
 Delete asks first and leaves the numbers unassigned.
 
 
+### Opt-outs
+
+Contacts who texted STOP to one of your numbers, as Twilio's Advanced Opt-Out keeps them: the contact, the sender (your number, or the Messaging Service it is in), the keyword and when. A Twilio send from that sender to the contact answers error `21610` until the contact texts START, YES or UNSTOP. **Lift** lets your app send to one contact again; **Lift all** clears the list after you confirm. Turn the emulation off, or turn on Twilio's auto-replies, in SMS > Providers > Twilio; see [SMS providers](./sms/providers.md#opt-out-keywords).
+
 Every control and text, one by one: [Numbers in depth](./deeper/numbers.md).
 ## Customize
 
@@ -256,6 +260,9 @@ public class NumbersTests
 | remove a number | [`sendmock numbers remove <numberId>`](/cli/numbers/#numbers-remove) | [`DELETE /api/v1/numbers/{numberId}`](/api/numbers/#deleteNumbersByNumberId) | [`sendmock_number_delete`](/mcp/numbers/#sendmock_number_delete) |
 | list Messaging Services | [`sendmock sms services list`](/cli/numbers/#sms-services-list) | [`GET /api/v1/messaging-services`](/api/numbers/#getMessagingServices) | [`sendmock_messaging_service_list`](/mcp/numbers/#sendmock_messaging_service_list) |
 | add a service | [`sendmock sms services create`](/cli/numbers/#sms-services-create) | [`POST /api/v1/messaging-services`](/api/numbers/#postMessagingServices) | [`sendmock_messaging_service_create`](/mcp/numbers/#sendmock_messaging_service_create) |
+| list opt-outs | [`sendmock sms opt-outs list`](/cli/sms/#sms-opt-outs-list) | [`GET /api/v1/sms/opt-outs`](/api/sms/#getSmsOptOuts) | [`sendmock_sms_opt_out_list`](/mcp/sms/#sendmock_sms_opt_out_list) |
+| lift one | [`sendmock sms opt-outs delete <sender> <contactNumber>`](/cli/sms/#sms-opt-outs-delete) | [`DELETE /api/v1/sms/opt-outs/{sender}/{contactNumber}`](/api/sms/#deleteSmsOptOutsBySenderByContactNumber) | [`sendmock_sms_opt_out_delete`](/mcp/sms/#sendmock_sms_opt_out_delete) |
+| lift all | [`sendmock sms opt-outs clear --yes`](/cli/sms/#sms-opt-outs-clear) | [`DELETE /api/v1/sms/opt-outs`](/api/sms/#deleteSmsOptOuts) | [`sendmock_sms_opt_out_clear`](/mcp/sms/#sendmock_sms_opt_out_clear) |
 | change a service | [`sendmock sms services update <serviceSid>`](/cli/numbers/#sms-services-update) | [`PATCH /api/v1/messaging-services/{serviceSid}`](/api/numbers/#patchMessagingServicesByServiceSid) | [`sendmock_messaging_service_update`](/mcp/numbers/#sendmock_messaging_service_update) |
 
 ## Related

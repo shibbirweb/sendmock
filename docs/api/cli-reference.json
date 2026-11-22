@@ -2797,6 +2797,8 @@
               }
             ],
             "check_credentials": false,
+            "opt_out_keywords": true,
+            "opt_out_auto_replies": false,
             "operations": [
               {
                 "kind": "send",
@@ -2879,7 +2881,7 @@
           }
         }
       ],
-      "example": "sendmock email providers preview twilio --provider '{\"key\":\"sendgrid\",\"name\":\"SendGrid\",\"accent\":\"#1a82e2\",\"is_enabled\":true,\"host\":\"api.sendgrid.com\",\"credentials\":[{\"name\":\"api_key\",\"value\":\"SG.test_key_123\",\"is_secret\":true}],\"check_credentials\":false,\"operations\":[{\"kind\":\"send\",\"method\":\"POST\",\"path\":\"/v3/{domain}/messages\",\"request_format\":\"multipart\"}],\"field_mapping\":[{\"part\":\"to\",\"source\":\"personalizations[0].to[*].email\"}],\"validation_rules\":[{\"part\":\"to\",\"check\":\"required\",\"max_length\":null,\"error_kind\":\"missing_field\"}],\"success_response\":{\"status\":202,\"headers\":[{\"name\":\"X-Message-Id\",\"template\":\"{{ message.provider_id }}\"}],\"body\":\"{\\\"id\\\": \\\"{{ message.provider_id }}\\\"}\"},\"error_responses\":[{\"kind\":\"missing_field\",\"status\":202,\"headers\":[{\"name\":\"X-Message-Id\",\"template\":\"{{ message.provider_id }}\"}],\"body\":\"{\\\"id\\\": \\\"{{ message.provider_id }}\\\"}\"}],\"message_id_template\":\"<{{ uuid() }}@sendmock.local>\",\"callback_template_key\":\"sendgrid-event\",\"status_names\":{\"delivered\":\"delivered\",\"bounced\":\"bounce\",\"complained\":\"spamreport\"},\"outcome_error_codes\":{\"invalid_number\":\"21211\",\"unreachable\":\"30003\"}}'",
+      "example": "sendmock email providers preview twilio --provider '{\"key\":\"sendgrid\",\"name\":\"SendGrid\",\"accent\":\"#1a82e2\",\"is_enabled\":true,\"host\":\"api.sendgrid.com\",\"credentials\":[{\"name\":\"api_key\",\"value\":\"SG.test_key_123\",\"is_secret\":true}],\"check_credentials\":false,\"opt_out_keywords\":true,\"opt_out_auto_replies\":false,\"operations\":[{\"kind\":\"send\",\"method\":\"POST\",\"path\":\"/v3/{domain}/messages\",\"request_format\":\"multipart\"}],\"field_mapping\":[{\"part\":\"to\",\"source\":\"personalizations[0].to[*].email\"}],\"validation_rules\":[{\"part\":\"to\",\"check\":\"required\",\"max_length\":null,\"error_kind\":\"missing_field\"}],\"success_response\":{\"status\":202,\"headers\":[{\"name\":\"X-Message-Id\",\"template\":\"{{ message.provider_id }}\"}],\"body\":\"{\\\"id\\\": \\\"{{ message.provider_id }}\\\"}\"},\"error_responses\":[{\"kind\":\"missing_field\",\"status\":202,\"headers\":[{\"name\":\"X-Message-Id\",\"template\":\"{{ message.provider_id }}\"}],\"body\":\"{\\\"id\\\": \\\"{{ message.provider_id }}\\\"}\"}],\"message_id_template\":\"<{{ uuid() }}@sendmock.local>\",\"callback_template_key\":\"sendgrid-event\",\"status_names\":{\"delivered\":\"delivered\",\"bounced\":\"bounce\",\"complained\":\"spamreport\"},\"outcome_error_codes\":{\"invalid_number\":\"21211\",\"unreachable\":\"30003\"}}'",
       "output": "MessageProviderPreview",
       "exit_codes": [
         0,
@@ -3180,6 +3182,36 @@
           "takes_json": false,
           "allowed_values": null,
           "description": "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer.",
+          "example": false
+        },
+        {
+          "flag": "--opt-out-keywords",
+          "input": {
+            "name": "opt_out_keywords",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others.",
+          "example": true
+        },
+        {
+          "flag": "--opt-out-auto-replies",
+          "input": {
+            "name": "opt_out_auto_replies",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages.",
           "example": false
         },
         {
@@ -16664,6 +16696,160 @@
       ]
     },
     {
+      "command": "sendmock sms opt-outs clear",
+      "slug": "sms-opt-outs-clear",
+      "usage": "sendmock sms opt-outs clear --yes",
+      "summary": "Lift every opt-out.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/sms/opt-outs",
+          "operation_id": "deleteSmsOptOuts",
+          "summary": "Lift every opt-out.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--yes",
+          "input": null,
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Confirms a destructive command; without it the command stops.",
+          "example": true
+        }
+      ],
+      "example": "sendmock sms opt-outs clear --yes",
+      "output": null,
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_sms_opt_out_clear"
+      ],
+      "ui": [
+        "Numbers > Opt-outs > Lift all"
+      ]
+    },
+    {
+      "command": "sendmock sms opt-outs delete",
+      "slug": "sms-opt-outs-delete",
+      "usage": "sendmock sms opt-outs delete <sender> <contactNumber> [flags]",
+      "summary": "Lift one opt-out, as if the contact texted START.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/sms/opt-outs/{sender}/{contactNumber}",
+          "operation_id": "deleteSmsOptOutsBySenderByContactNumber",
+          "summary": "Lift one opt-out, as if the contact texted START.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "sender",
+          "input": {
+            "name": "sender",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "Your number (E.164) or the Messaging Service SID an opt-out is kept under, from `GET /api/v1/sms/opt-outs`.",
+          "example": "+15550001111",
+          "reads_file": false
+        },
+        {
+          "name": "contactNumber",
+          "input": {
+            "name": "contactNumber",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The contact's number, E.164.",
+          "example": "+15550002222",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--yes",
+          "input": null,
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Confirms a destructive command; without it the command stops.",
+          "example": true
+        }
+      ],
+      "example": "sendmock sms opt-outs delete +15550001111 +15550002222 --yes",
+      "output": null,
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_sms_opt_out_delete"
+      ],
+      "ui": [
+        "Numbers > Opt-outs > Lift"
+      ]
+    },
+    {
+      "command": "sendmock sms opt-outs list",
+      "slug": "sms-opt-outs-list",
+      "usage": "sendmock sms opt-outs list",
+      "summary": "Contacts who texted STOP, newest first.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/sms/opt-outs",
+          "operation_id": "getSmsOptOuts",
+          "summary": "Contacts who texted STOP, newest first.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [],
+      "example": "sendmock sms opt-outs list",
+      "output": "SmsOptOut[]",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_sms_opt_out_list"
+      ],
+      "ui": [
+        "Numbers > Opt-outs"
+      ]
+    },
+    {
       "command": "sendmock sms providers create",
       "slug": "sms-providers-create",
       "usage": "sendmock sms providers create [flags]",
@@ -16969,6 +17155,8 @@
               }
             ],
             "check_credentials": false,
+            "opt_out_keywords": true,
+            "opt_out_auto_replies": false,
             "operations": [
               {
                 "kind": "send",
@@ -17051,7 +17239,7 @@
           }
         }
       ],
-      "example": "sendmock sms providers preview twilio --provider '{\"key\":\"sendgrid\",\"name\":\"SendGrid\",\"accent\":\"#1a82e2\",\"is_enabled\":true,\"host\":\"api.sendgrid.com\",\"credentials\":[{\"name\":\"api_key\",\"value\":\"SG.test_key_123\",\"is_secret\":true}],\"check_credentials\":false,\"operations\":[{\"kind\":\"send\",\"method\":\"POST\",\"path\":\"/v3/{domain}/messages\",\"request_format\":\"multipart\"}],\"field_mapping\":[{\"part\":\"to\",\"source\":\"personalizations[0].to[*].email\"}],\"validation_rules\":[{\"part\":\"to\",\"check\":\"required\",\"max_length\":null,\"error_kind\":\"missing_field\"}],\"success_response\":{\"status\":202,\"headers\":[{\"name\":\"X-Message-Id\",\"template\":\"{{ message.provider_id }}\"}],\"body\":\"{\\\"id\\\": \\\"{{ message.provider_id }}\\\"}\"},\"error_responses\":[{\"kind\":\"missing_field\",\"status\":202,\"headers\":[{\"name\":\"X-Message-Id\",\"template\":\"{{ message.provider_id }}\"}],\"body\":\"{\\\"id\\\": \\\"{{ message.provider_id }}\\\"}\"}],\"message_id_template\":\"<{{ uuid() }}@sendmock.local>\",\"callback_template_key\":\"sendgrid-event\",\"status_names\":{\"delivered\":\"delivered\",\"bounced\":\"bounce\",\"complained\":\"spamreport\"},\"outcome_error_codes\":{\"invalid_number\":\"21211\",\"unreachable\":\"30003\"}}'",
+      "example": "sendmock sms providers preview twilio --provider '{\"key\":\"sendgrid\",\"name\":\"SendGrid\",\"accent\":\"#1a82e2\",\"is_enabled\":true,\"host\":\"api.sendgrid.com\",\"credentials\":[{\"name\":\"api_key\",\"value\":\"SG.test_key_123\",\"is_secret\":true}],\"check_credentials\":false,\"opt_out_keywords\":true,\"opt_out_auto_replies\":false,\"operations\":[{\"kind\":\"send\",\"method\":\"POST\",\"path\":\"/v3/{domain}/messages\",\"request_format\":\"multipart\"}],\"field_mapping\":[{\"part\":\"to\",\"source\":\"personalizations[0].to[*].email\"}],\"validation_rules\":[{\"part\":\"to\",\"check\":\"required\",\"max_length\":null,\"error_kind\":\"missing_field\"}],\"success_response\":{\"status\":202,\"headers\":[{\"name\":\"X-Message-Id\",\"template\":\"{{ message.provider_id }}\"}],\"body\":\"{\\\"id\\\": \\\"{{ message.provider_id }}\\\"}\"},\"error_responses\":[{\"kind\":\"missing_field\",\"status\":202,\"headers\":[{\"name\":\"X-Message-Id\",\"template\":\"{{ message.provider_id }}\"}],\"body\":\"{\\\"id\\\": \\\"{{ message.provider_id }}\\\"}\"}],\"message_id_template\":\"<{{ uuid() }}@sendmock.local>\",\"callback_template_key\":\"sendgrid-event\",\"status_names\":{\"delivered\":\"delivered\",\"bounced\":\"bounce\",\"complained\":\"spamreport\"},\"outcome_error_codes\":{\"invalid_number\":\"21211\",\"unreachable\":\"30003\"}}'",
       "output": "MessageProviderPreview",
       "exit_codes": [
         0,
@@ -17352,6 +17540,36 @@
           "takes_json": false,
           "allowed_values": null,
           "description": "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer.",
+          "example": false
+        },
+        {
+          "flag": "--opt-out-keywords",
+          "input": {
+            "name": "opt_out_keywords",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others.",
+          "example": true
+        },
+        {
+          "flag": "--opt-out-auto-replies",
+          "input": {
+            "name": "opt_out_auto_replies",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages.",
           "example": false
         },
         {

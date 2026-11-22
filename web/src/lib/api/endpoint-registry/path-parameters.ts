@@ -138,6 +138,15 @@ export const pathParameterDocs: Record<string, PathParameterDoc> = {
     description: "A Mailgun sending domain, as in `/v3/{domain}/messages`.",
     example: "mg.shop.test",
   },
+  sender: {
+    description:
+      "Your number (E.164) or the Messaging Service SID an opt-out is kept under, from `GET /api/v1/sms/opt-outs`.",
+    example: "+15550001111",
+  },
+  contactNumber: {
+    description: "The contact's number, E.164.",
+    example: "+15550002222",
+  },
   accountSid: {
     description: "A Twilio subaccount SID: `AC` and 32 hex digits.",
     example: "AC33333333333333333333333333333333",

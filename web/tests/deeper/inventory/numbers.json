@@ -8,6 +8,7 @@
       "paragraph: Fake numbers with inbound webhooks and status callbacks, and the Messaging Services that pool them.",
       "tab: Numbers",
       "tab: Messaging Services",
+      "tab: Opt-outs",
       "paragraph: Fake numbers your app sends from, with their inbound webhooks.",
       "button: Add number",
       "columnheader: Number",

@@ -125,6 +125,7 @@ export function MessageProviderSheet({
                 <ProviderGeneralTab
                   providerForm={providerForm}
                   savedCredentials={messageProvider.credentials}
+                  providerArea={messageProvider.area}
                 />
                 <UnmatchedRequestsSection
                   providerReference={{

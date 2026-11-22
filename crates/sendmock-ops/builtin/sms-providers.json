@@ -2,6 +2,8 @@
   {
     "is_enabled": true,
     "check_credentials": false,
+    "opt_out_keywords": true,
+    "opt_out_auto_replies": false,
     "credentials": [
       {
         "name": "account_sid",
@@ -179,6 +181,8 @@
   {
     "is_enabled": true,
     "check_credentials": false,
+    "opt_out_keywords": false,
+    "opt_out_auto_replies": false,
     "credentials": [
       {
         "name": "account_sid",
@@ -294,6 +298,8 @@
   {
     "is_enabled": true,
     "check_credentials": false,
+    "opt_out_keywords": false,
+    "opt_out_auto_replies": false,
     "credentials": [
       {
         "name": "api_key",
@@ -416,6 +422,8 @@
   {
     "is_enabled": true,
     "check_credentials": false,
+    "opt_out_keywords": false,
+    "opt_out_auto_replies": false,
     "credentials": [
       {
         "name": "auth_id",
@@ -529,6 +537,8 @@
   {
     "is_enabled": true,
     "check_credentials": false,
+    "opt_out_keywords": false,
+    "opt_out_auto_replies": false,
     "credentials": [
       {
         "name": "access_key",
@@ -636,6 +646,8 @@
   {
     "is_enabled": true,
     "check_credentials": false,
+    "opt_out_keywords": false,
+    "opt_out_auto_replies": false,
     "credentials": [
       {
         "name": "api_key",
@@ -742,6 +754,8 @@
   {
     "is_enabled": true,
     "check_credentials": false,
+    "opt_out_keywords": false,
+    "opt_out_auto_replies": false,
     "credentials": [
       {
         "name": "api_key",
@@ -853,6 +867,8 @@
   {
     "is_enabled": true,
     "check_credentials": false,
+    "opt_out_keywords": false,
+    "opt_out_auto_replies": false,
     "credentials": [
       {
         "name": "api_token",
@@ -960,6 +976,8 @@
   {
     "is_enabled": true,
     "check_credentials": false,
+    "opt_out_keywords": false,
+    "opt_out_auto_replies": false,
     "credentials": [
       {
         "name": "api_key",
@@ -1068,6 +1086,8 @@
   {
     "is_enabled": true,
     "check_credentials": false,
+    "opt_out_keywords": false,
+    "opt_out_auto_replies": false,
     "credentials": [
       {
         "name": "access_key_id",
@@ -1161,6 +1181,8 @@
   {
     "is_enabled": true,
     "check_credentials": false,
+    "opt_out_keywords": false,
+    "opt_out_auto_replies": false,
     "credentials": [
       {
         "name": "api_key",
@@ -1258,6 +1280,8 @@
   {
     "is_enabled": true,
     "check_credentials": false,
+    "opt_out_keywords": false,
+    "opt_out_auto_replies": false,
     "credentials": [
       {
         "name": "access_token",

@@ -29,6 +29,7 @@ mod seed_state;
 mod settings;
 mod sms;
 mod sms_callback_attempt;
+mod sms_opt_out;
 mod sms_reply_webhook;
 mod smtp_session;
 mod store_error;
@@ -100,6 +101,7 @@ pub use sms::{
 pub use sms_callback_attempt::{
     CallbackAttemptResult, SmsCallbackAttemptRecord, SmsCallbackAttemptRepository,
 };
+pub use sms_opt_out::{SmsOptOutRecord, SmsOptOutRepository};
 pub use sms_reply_webhook::{SmsReplyWebhookAttemptRecord, SmsReplyWebhookRepository};
 pub use smtp_session::{
     SmtpSessionFilter, SmtpSessionPage, SmtpSessionRecord, SmtpSessionRepository,

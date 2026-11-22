@@ -13,6 +13,7 @@ const numberListEntries: DeeperEntry[] = [
   },
   { control: "tab: Numbers", does: "Your app's fake phone numbers.", operationIds: ["getNumbers"] },
   { control: "tab: Messaging Services", does: "Sender pools, as Twilio's Messaging Services.", operationIds: ["getMessagingServices"] },
+  { control: "tab: Opt-outs", does: "Contacts who texted STOP, with Lift to let your app send to one again and Lift all.", operationIds: ["getSmsOptOuts", "deleteSmsOptOutsBySenderByContactNumber", "deleteSmsOptOuts"] },
   { control: "paragraph: Fake numbers your app sends from, with their inbound webhooks.", does: "Explains numbers." },
   { control: "button: Add number", does: "Opens the number editor; in it, adds the number.", operationIds: ["postNumbers"] },
   { control: "columnheader: Number", does: "The number and its label." },

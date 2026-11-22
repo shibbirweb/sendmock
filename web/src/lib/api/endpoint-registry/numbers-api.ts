@@ -234,9 +234,35 @@ const mailgunComplaintEndpoints = tagEndpoints("Email", [
   },
 ]);
 
+/** Contacts who texted STOP, as Twilio's Advanced Opt-Out keeps them (SM-23, A28). */
+const optOutEndpoints = tagEndpoints("SMS", [
+  {
+    method: "GET",
+    path: "/api/v1/sms/opt-outs",
+    summary: "Contacts who texted STOP, newest first.",
+    response: listOf("SmsOptOut"),
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/sms/opt-outs/{sender}/{contactNumber}",
+    summary: "Lift one opt-out, as if the contact texted START.",
+    response: null,
+    successStatus: 204,
+    errorStatuses: [404],
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/sms/opt-outs",
+    summary: "Lift every opt-out.",
+    response: null,
+    successStatus: 204,
+  },
+]);
+
 export const numbersApi: ApiEndpoint[] = [
   ...verifyEndpoints,
   ...numberEndpoints,
   ...twilioAccountEndpoints,
   ...mailgunComplaintEndpoints,
+  ...optOutEndpoints,
 ];

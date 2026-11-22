@@ -71,6 +71,7 @@ export const queryKeys = {
     all: ["numbers"] as const,
     virtualNumbers: ["numbers", "virtual-numbers"] as const,
     messagingServices: ["numbers", "messaging-services"] as const,
+    optOuts: ["numbers", "opt-outs"] as const,
   },
   twilio: {
     subaccounts: ["twilio", "subaccounts"] as const,

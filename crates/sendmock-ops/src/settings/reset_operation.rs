@@ -131,6 +131,11 @@ async fn delete_all_traffic(
         .push_notifications
         .delete_notifications(None)
         .await?;
+    let opt_out_count = operation_context
+        .sms_delivery_stores
+        .opt_outs
+        .delete_all_opt_outs()
+        .await?;
     operation_context
         .sms_repository
         .whatsapp_media()
@@ -144,6 +149,7 @@ async fn delete_all_traffic(
         ("SMS messages", sms_count),
         ("verifications", verification_count),
         ("push notifications", push_count),
+        ("SMS opt-outs", opt_out_count),
     ]);
     cleared.extend(delete_logs_deliveries_and_payments(operation_context).await?);
     Ok(cleared)

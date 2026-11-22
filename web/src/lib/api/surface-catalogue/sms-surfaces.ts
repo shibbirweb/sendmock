@@ -197,6 +197,24 @@ export const smsSurfaces: SurfaceCatalogue = {
     mcp: "sendmock_messaging_service_delete",
     ui: "Numbers > Messaging Services > Delete",
   },
+  "GET /api/v1/sms/opt-outs": {
+    phase: "A28",
+    cli: "sendmock sms opt-outs list",
+    mcp: "sendmock_sms_opt_out_list",
+    ui: "Numbers > Opt-outs",
+  },
+  "DELETE /api/v1/sms/opt-outs/{sender}/{contactNumber}": {
+    phase: "A28",
+    cli: "sendmock sms opt-outs delete <sender> <contactNumber>",
+    mcp: "sendmock_sms_opt_out_delete",
+    ui: "Numbers > Opt-outs > Lift",
+  },
+  "DELETE /api/v1/sms/opt-outs": {
+    phase: "A28",
+    cli: "sendmock sms opt-outs clear --yes",
+    mcp: "sendmock_sms_opt_out_clear",
+    ui: "Numbers > Opt-outs > Lift all",
+  },
   "GET /api/v1/twilio/subaccounts": {
     phase: "A23",
     cli: "sendmock sms twilio subaccounts list",

@@ -38,6 +38,24 @@ const twilioEntries: DeeperEntry[] = [
     operationIds: ["getSmsProvidersByProviderKeyCredentialsByCredentialName"],
   },
   {
+    control: "switch: Opt-out keywords",
+    does: "Twilio's Advanced Opt-Out: a contact who texts STOP (STOPALL, UNSUBSCRIBE, CANCEL, END or QUIT) gets no more sends from that number or Messaging Service; a send answers error 21610 until they text START, YES or UNSTOP. On by default for Twilio.",
+    operationIds: ["getSmsOptOuts"],
+  },
+  {
+    control:
+      "paragraph: A text of STOP blocks later sends to that contact with error # until they text START, as Twilio's Advanced Opt-Out does.",
+    does: "Explains Opt-out keywords.",
+  },
+  {
+    control: "switch: Opt-out auto-replies",
+    does: "Answers STOP, START and HELP with Twilio's default replies, stored as outbound messages. Needs Opt-out keywords on.",
+  },
+  {
+    control: "paragraph: Answers STOP, START and HELP with Twilio's default replies.",
+    does: "Explains Opt-out auto-replies.",
+  },
+  {
     control: "tab: Accounts",
     does: "Twilio subaccounts: add, suspend, close or delete one, and reveal its Auth Token.",
     operationIds: ["getTwilioSubaccounts"],

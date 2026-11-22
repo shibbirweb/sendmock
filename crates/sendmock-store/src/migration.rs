@@ -194,4 +194,8 @@ pub const EMBEDDED_MIGRATIONS: &[Migration] = &[
         schema_version: 46,
         sql: include_str!("../migrations/0046_api_request_note.sql"),
     },
+    Migration {
+        schema_version: 47,
+        sql: include_str!("../migrations/0047_sms_opt_outs.sql"),
+    },
 ];

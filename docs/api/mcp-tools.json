@@ -3330,6 +3330,8 @@
               }
             ],
             "check_credentials": false,
+            "opt_out_keywords": true,
+            "opt_out_auto_replies": false,
             "operations": [
               {
                 "kind": "send",
@@ -3437,6 +3439,8 @@
                   }
                 ],
                 "check_credentials": false,
+                "opt_out_keywords": true,
+                "opt_out_auto_replies": false,
                 "operations": [
                   {
                     "kind": "send",
@@ -3582,6 +3586,23 @@
                   false
                 ]
               },
+              "opt_out_keywords": {
+                "type": [
+                  "boolean",
+                  "null"
+                ],
+                "description": "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others.",
+                "examples": [
+                  true
+                ]
+              },
+              "opt_out_auto_replies": {
+                "type": "boolean",
+                "description": "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages.",
+                "examples": [
+                  false
+                ]
+              },
               "operations": {
                 "type": "array",
                 "items": {
@@ -3667,6 +3688,8 @@
               "host",
               "credentials",
               "check_credentials",
+              "opt_out_keywords",
+              "opt_out_auto_replies",
               "operations",
               "field_mapping",
               "validation_rules",
@@ -4062,6 +4085,8 @@
             }
           ],
           "check_credentials": false,
+          "opt_out_keywords": true,
+          "opt_out_auto_replies": false,
           "operations": [
             {
               "kind": "send",
@@ -4378,6 +4403,30 @@
           "example": false
         },
         {
+          "name": "opt_out_keywords",
+          "input": {
+            "name": "opt_out_keywords",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others.",
+          "example": true
+        },
+        {
+          "name": "opt_out_auto_replies",
+          "input": {
+            "name": "opt_out_auto_replies",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages.",
+          "example": false
+        },
+        {
           "name": "operations",
           "input": {
             "name": "operations",
@@ -4600,6 +4649,23 @@
           "check_credentials": {
             "type": "boolean",
             "description": "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer.",
+            "examples": [
+              false
+            ]
+          },
+          "opt_out_keywords": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others.",
+            "examples": [
+              true
+            ]
+          },
+          "opt_out_auto_replies": {
+            "type": "boolean",
+            "description": "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages.",
             "examples": [
               false
             ]
@@ -22950,6 +23016,161 @@
       ]
     },
     {
+      "name": "sendmock_sms_opt_out_clear",
+      "toolset": "sms",
+      "summary": "Lift every opt-out.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/sms/opt-outs",
+          "operation_id": "deleteSmsOptOuts",
+          "summary": "Lift every opt-out.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [],
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "example_arguments": {},
+      "output": null,
+      "cli": [
+        "sendmock sms opt-outs clear --yes"
+      ],
+      "ui": [
+        "Numbers > Opt-outs > Lift all"
+      ]
+    },
+    {
+      "name": "sendmock_sms_opt_out_delete",
+      "toolset": "sms",
+      "summary": "Lift one opt-out, as if the contact texted START.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/sms/opt-outs/{sender}/{contactNumber}",
+          "operation_id": "deleteSmsOptOutsBySenderByContactNumber",
+          "summary": "Lift one opt-out, as if the contact texted START.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "sender",
+          "input": {
+            "name": "sender",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "Your number (E.164) or the Messaging Service SID an opt-out is kept under, from `GET /api/v1/sms/opt-outs`.",
+          "example": "+15550001111"
+        },
+        {
+          "name": "contact_number",
+          "input": {
+            "name": "contactNumber",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The contact's number, E.164.",
+          "example": "+15550002222"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "sender": {
+            "type": "string",
+            "description": "Your number (E.164) or the Messaging Service SID an opt-out is kept under, from `GET /api/v1/sms/opt-outs`.",
+            "examples": [
+              "+15550001111"
+            ]
+          },
+          "contact_number": {
+            "type": "string",
+            "description": "The contact's number, E.164.",
+            "examples": [
+              "+15550002222"
+            ]
+          }
+        },
+        "required": [
+          "sender",
+          "contact_number"
+        ]
+      },
+      "example_arguments": {
+        "sender": "+15550001111",
+        "contact_number": "+15550002222"
+      },
+      "output": null,
+      "cli": [
+        "sendmock sms opt-outs delete <sender> <contactNumber>"
+      ],
+      "ui": [
+        "Numbers > Opt-outs > Lift"
+      ]
+    },
+    {
+      "name": "sendmock_sms_opt_out_list",
+      "toolset": "sms",
+      "summary": "Contacts who texted STOP, newest first.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/sms/opt-outs",
+          "operation_id": "getSmsOptOuts",
+          "summary": "Contacts who texted STOP, newest first.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [],
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "example_arguments": {},
+      "output": "SmsOptOut[]",
+      "cli": [
+        "sendmock sms opt-outs list"
+      ],
+      "ui": [
+        "Numbers > Opt-outs"
+      ]
+    },
+    {
       "name": "sendmock_sms_provider_create",
       "toolset": "sms",
       "summary": "Add an SMS provider, blank or copied from another.",
@@ -23274,6 +23495,8 @@
               }
             ],
             "check_credentials": false,
+            "opt_out_keywords": true,
+            "opt_out_auto_replies": false,
             "operations": [
               {
                 "kind": "send",
@@ -23381,6 +23604,8 @@
                   }
                 ],
                 "check_credentials": false,
+                "opt_out_keywords": true,
+                "opt_out_auto_replies": false,
                 "operations": [
                   {
                     "kind": "send",
@@ -23526,6 +23751,23 @@
                   false
                 ]
               },
+              "opt_out_keywords": {
+                "type": [
+                  "boolean",
+                  "null"
+                ],
+                "description": "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others.",
+                "examples": [
+                  true
+                ]
+              },
+              "opt_out_auto_replies": {
+                "type": "boolean",
+                "description": "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages.",
+                "examples": [
+                  false
+                ]
+              },
               "operations": {
                 "type": "array",
                 "items": {
@@ -23611,6 +23853,8 @@
               "host",
               "credentials",
               "check_credentials",
+              "opt_out_keywords",
+              "opt_out_auto_replies",
               "operations",
               "field_mapping",
               "validation_rules",
@@ -24006,6 +24250,8 @@
             }
           ],
           "check_credentials": false,
+          "opt_out_keywords": true,
+          "opt_out_auto_replies": false,
           "operations": [
             {
               "kind": "send",
@@ -24322,6 +24568,30 @@
           "example": false
         },
         {
+          "name": "opt_out_keywords",
+          "input": {
+            "name": "opt_out_keywords",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others.",
+          "example": true
+        },
+        {
+          "name": "opt_out_auto_replies",
+          "input": {
+            "name": "opt_out_auto_replies",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages.",
+          "example": false
+        },
+        {
           "name": "operations",
           "input": {
             "name": "operations",
@@ -24544,6 +24814,23 @@
           "check_credentials": {
             "type": "boolean",
             "description": "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer.",
+            "examples": [
+              false
+            ]
+          },
+          "opt_out_keywords": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others.",
+            "examples": [
+              true
+            ]
+          },
+          "opt_out_auto_replies": {
+            "type": "boolean",
+            "description": "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages.",
             "examples": [
               false
             ]

@@ -76,6 +76,10 @@ The same for an SMS vendor: `sendmock_sms_provider_create`, `sendmock_sms_provid
 
 For an app with one Twilio subaccount per customer: `sendmock_twilio_subaccount_create` with the subaccount's SID (or none for a new one), a name and an `${ENV_VAR}` token the user keeps, `sendmock_twilio_subaccount_list` to check it (tokens stay masked; the user reveals one with `sendmock sms twilio subaccounts token <accountSid> --reveal`). The app can also create and fetch subaccounts through Twilio's Accounts API on the provider port. Callbacks for a message sent under a subaccount are signed with its token; a suspended or closed subaccount refuses sends.
 
+### SMS opt-outs (STOP)
+
+The Twilio provider emulates Twilio's Advanced Opt-Out by default: an inbound STOP, STOPALL, UNSUBSCRIBE, CANCEL, END or QUIT to one of the app's numbers blocks later Twilio sends from that number (or its Messaging Service) to that contact with error 21610, until the contact texts START, YES or UNSTOP. Test the app's handling with `sendmock_sms_simulate_inbound` (body `STOP`), then a send. `sendmock_sms_opt_out_list` shows who opted out; `sendmock_sms_opt_out_delete` lifts one and `sendmock_sms_opt_out_clear` lifts all (ask the user first). The provider's `opt_out_keywords` turns it off and `opt_out_auto_replies` sends Twilio's default replies.
+
 ### Mailgun events and complaints
 
 An app on Mailgun can read `GET /v3/{domain}/events` and manage `/v3/{domain}/complaints` on the provider port. `sendmock_email_simulate` with `complained` puts the address on the domain's complaints table, so the app's suppression handling can be tested; `sendmock_email_mailgun_complaint_list` shows the tables and `sendmock_email_mailgun_complaint_clear` empties one (ask the user first).

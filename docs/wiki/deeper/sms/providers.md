@@ -332,20 +332,45 @@ Text.
 
 - **What it does:** Explains Check credentials.
 
-### 51. Unmatched requests
+### 51. Opt-out keywords
+
+Switch.
+
+- **What it does:** Twilio's Advanced Opt-Out: a contact who texts STOP (STOPALL, UNSUBSCRIBE, CANCEL, END or QUIT) gets no more sends from that number or Messaging Service; a send answers error 21610 until they text START, YES or UNSTOP. On by default for Twilio.
+- **Same action elsewhere:** REST getSmsOptOuts
+
+### 52. A text of STOP blocks later sends to that contact with error # until they text START, as Twilio's Advanced Opt-Out does.
+
+Text.
+
+- **What it does:** Explains Opt-out keywords.
+
+### 53. Opt-out auto-replies
+
+Switch.
+
+- **What it does:** Answers STOP, START and HELP with Twilio's default replies, stored as outbound messages. Needs Opt-out keywords on.
+
+### 54. Answers STOP, START and HELP with Twilio's default replies.
+
+Text.
+
+- **What it does:** Explains Opt-out auto-replies.
+
+### 55. Unmatched requests
 
 Heading.
 
 - **What it does:** Sends the requests SendMock does not answer on Twilio's base URL to an HTTP Catcher bin, which answers them with its rules.
 - **Links to:** [Provider gaps](../../http/provider-gaps.md)
 
-### 52. Requests on Twilio's base URL that SendMock does not answer. Send them to a bin to answer them with its rules and follow-up webhooks.
+### 56. Requests on Twilio's base URL that SendMock does not answer. Send them to a bin to answer them with its rules and follow-up webhooks.
 
 Text.
 
 - **What it does:** Explains Unmatched requests: built-in operations still answer first.
 
-### 53. Where Twilio's unmatched requests go
+### 57. Where Twilio's unmatched requests go
 
 Drop-down.
 
@@ -354,7 +379,7 @@ Drop-down.
 - **Same action elsewhere:** REST [`PUT /api/v1/provider-bins/{area}/{providerKey}`](/api/http-catcher/#putProviderBinsByAreaByProviderKey), CLI [`sendmock http provider-bin attach`](/cli/http-catcher/#http-provider-bin-attach), MCP [`sendmock_http_provider_bin_attach`](/mcp/http-catcher/#sendmock_http_provider_bin_attach)
 - **Same action elsewhere:** REST [`DELETE /api/v1/provider-bins/{area}/{providerKey}`](/api/http-catcher/#deleteProviderBinsByAreaByProviderKey), CLI [`sendmock http provider-bin detach`](/cli/http-catcher/#http-provider-bin-detach), MCP [`sendmock_http_provider_bin_detach`](/mcp/http-catcher/#sendmock_http_provider_bin_detach)
 
-### 54. Create a bin for this provider
+### 58. Create a bin for this provider
 
 Button.
 
@@ -362,13 +387,13 @@ Button.
 - **What it changes:** Adds an HTTP Catcher bin.
 - **Same action elsewhere:** REST [`PUT /api/v1/provider-bins/{area}/{providerKey}`](/api/http-catcher/#putProviderBinsByAreaByProviderKey), CLI [`sendmock http provider-bin attach`](/cli/http-catcher/#http-provider-bin-attach), MCP [`sendmock_http_provider_bin_attach`](/mcp/http-catcher/#sendmock_http_provider_bin_attach)
 
-### 55. Cancel
+### 59. Cancel
 
 Button.
 
 - **What it does:** Closes the dialog or editor without saving.
 
-### 56. Save provider
+### 60. Save provider
 
 Button.
 
@@ -376,7 +401,7 @@ Button.
 - **Errors:** A template that does not render, or a path another provider already answers, is refused with the reason.
 - **Same action elsewhere:** REST [`PATCH /api/v1/sms/providers/{providerKey}`](/api/sms-providers/#patchSmsProvidersByProviderKey), CLI [`sendmock sms providers update`](/cli/sms-providers/#sms-providers-update), MCP [`sendmock_sms_provider_update`](/mcp/sms-providers/#sendmock_sms_provider_update)
 
-### 57. Close
+### 61. Close
 
 Button.
 
@@ -384,109 +409,109 @@ Button.
 
 ## Provider editor, Requests tab
 
-### 58. The paths as the provider's API has them; use \{name\} for a part that changes, like /v#/\{domain\}/messages .
+### 62. The paths as the provider's API has them; use \{name\} for a part that changes, like /v#/\{domain\}/messages .
 
 Text.
 
 - **What it does:** Explains request paths and their `{name}` parts.
 
-### 59. Request # kind
+### 63. Request # kind
 
 Drop-down.
 
 - **What it does:** What the request does: send one SMS, send a batch, or another operation the provider has.
 
-### 60. Request # method
+### 64. Request # method
 
 Drop-down.
 
 - **What it does:** The HTTP method it answers.
 
-### 61. Request # path
+### 65. Request # path
 
 Field.
 
 - **What it does:** The path it answers.
 
-### 62. Request # format
+### 66. Request # format
 
 Drop-down.
 
 - **What it does:** The body format the provider's SDK sends: JSON, a form or multipart.
 
-### 63. Remove request #
+### 67. Remove request #
 
 Button.
 
 - **What it does:** Removes the request.
 
-### 64. Add request
+### 68. Add request
 
 Button.
 
 - **What it does:** Adds a request the provider answers.
 
-### 65. A JSON path ( personalizations[*].to[*].email ), a form field ( To ) or h:* for every field with a prefix. Anything unmapped is kept as metadata.
+### 69. A JSON path ( personalizations[*].to[*].email ), a form field ( To ) or h:* for every field with a prefix. Anything unmapped is kept as metadata.
 
 Text.
 
 - **What it does:** Explains the field mapping sources.
 
-### 66. Mapping # part
+### 70. Mapping # part
 
 Drop-down.
 
 - **What it does:** Which part of the stored SMS the field fills, such as the recipients or the subject.
 
-### 67. Mapping # source
+### 71. Mapping # source
 
 Field.
 
 - **What it does:** Where in the request that part is read from.
 
-### 68. Remove mapping #
+### 72. Remove mapping #
 
 Button.
 
 - **What it does:** Removes the mapping.
 
-### 69. Map a part
+### 73. Map a part
 
 Button.
 
 - **What it does:** Adds a mapping.
 
-### 70. Check # part
+### 74. Check # part
 
 Drop-down.
 
 - **What it does:** The part a request check looks at.
 
-### 71. Check # kind
+### 75. Check # kind
 
 Drop-down.
 
 - **What it does:** What the check requires, such as present or at most a length.
 
-### 72. Check # max length
+### 76. Check # max length
 
 Number field.
 
 - **What it does:** The longest value the check allows.
 
-### 73. Check # error
+### 77. Check # error
 
 Drop-down.
 
 - **What it does:** Which error response a request failing the check gets.
 
-### 74. Remove check #
+### 78. Remove check #
 
 Button.
 
 - **What it does:** Removes the check.
 
-### 75. Add check
+### 79. Add check
 
 Button.
 
@@ -494,109 +519,109 @@ Button.
 
 ## Provider editor, Responses tab
 
-### 76. Templates read request , message , error and credentials ; the Preview tab lists every value with an example.
+### 80. Templates read request , message , error and credentials ; the Preview tab lists every value with an example.
 
 Text.
 
 - **What it does:** Explains what response templates can read.
 
-### 77. Message id
+### 81. Message id
 
 Field.
 
 - **What it does:** The template for the provider's id of each message.
 
-### 78. The provider's id for each message, e.g. SM\{\{ random_hex(#) \}\}.
+### 82. The provider's id for each message, e.g. SM\{\{ random_hex(#) \}\}.
 
 Text.
 
 - **What it does:** Gives an example message id template.
 
-### 79. Success response
+### 83. Success response
 
 Heading.
 
 - **What it does:** The answer to an accepted request.
 
-### 80. Success response status
+### 84. Success response status
 
 Number field.
 
 - **What it does:** Its HTTP status.
 
-### 81. Success response header # name
+### 85. Success response header # name
 
 Field.
 
 - **What it does:** A response header's name.
 
-### 82. Success response header # value
+### 86. Success response header # value
 
 Field.
 
 - **What it does:** That header's value template.
 
-### 83. Remove Success response header #
+### 87. Remove Success response header #
 
 Button.
 
 - **What it does:** Removes the header.
 
-### 84. Add header
+### 88. Add header
 
 Button.
 
 - **What it does:** Adds a response header.
 
-### 85. Success response body
+### 89. Success response body
 
 Field.
 
 - **What it does:** The body template.
 
-### 86. Error response # kind
+### 90. Error response # kind
 
 Drop-down.
 
 - **What it does:** The error it answers: invalid input, unauthorized, a failed check, and so on.
 
-### 87. Remove error response #
+### 91. Remove error response #
 
 Button.
 
 - **What it does:** Removes the error response.
 
-### 88. Error response # status
+### 92. Error response # status
 
 Number field.
 
 - **What it does:** Its HTTP status.
 
-### 89. Error response # header # name
+### 93. Error response # header # name
 
 Field.
 
 - **What it does:** A header's name.
 
-### 90. Error response # header # value
+### 94. Error response # header # value
 
 Field.
 
 - **What it does:** That header's value template.
 
-### 91. Remove Error response # header #
+### 95. Remove Error response # header #
 
 Button.
 
 - **What it does:** Removes the header.
 
-### 92. Error response # body
+### 96. Error response # body
 
 Field.
 
 - **What it does:** The error body template, in the provider's real error shape.
 
-### 93. Add an error response
+### 97. Add an error response
 
 Button.
 
@@ -604,135 +629,135 @@ Button.
 
 ## Provider editor, Callbacks tab
 
-### 94. Callback template
+### 98. Callback template
 
 Drop-down.
 
 - **What it does:** The webhook template status callbacks are sent with.
 - **Links to:** [Webhooks > Templates](../../webhooks/templates.md).
 
-### 95. The webhook template its status callbacks and inbound messages are sent with; edit it in Webhooks > Templates.
+### 99. The webhook template its status callbacks and inbound messages are sent with; edit it in Webhooks > Templates.
 
 Text.
 
 - **What it does:** Explains the callback template.
 
-### 96. The provider's name for each SendMock status, as its callbacks and fetch answers show it.
+### 100. The provider's name for each SendMock status, as its callbacks and fetch answers show it.
 
 Text.
 
 - **What it does:** Explains the status names below.
 
-### 97. queued
+### 101. queued
 
 Field.
 
 - **What it does:** The provider's name for a message waiting to be sent, as its status callbacks show it.
 
-### 98. sent
+### 102. sent
 
 Field.
 
 - **What it does:** The provider's name for a message handed to the carrier, as its status callbacks show it.
 
-### 99. delivered
+### 103. delivered
 
 Field.
 
 - **What it does:** The provider's name for a message delivered, as its status callbacks show it.
 
-### 100. undelivered
+### 104. undelivered
 
 Field.
 
 - **What it does:** The provider's name for a message not delivered, as its status callbacks show it.
 
-### 101. failed
+### 105. failed
 
 Field.
 
 - **What it does:** The provider's name for a message failed to send, as its status callbacks show it.
 
-### 102. read
+### 106. read
 
 Field.
 
 - **What it does:** The provider's name for a message read, as its status callbacks show it.
 
-### 103. The provider's error code for each outcome, so the magic test numbers fail with its own codes. Leave one empty to use none.
+### 107. The provider's error code for each outcome, so the magic test numbers fail with its own codes. Leave one empty to use none.
 
 Text.
 
 - **What it does:** Explains the error codes below.
 - **Links to:** [Magic numbers and addresses](../../reference/magic-numbers.md).
 
-### 104. invalid_number
+### 108. invalid_number
 
 Field.
 
 - **What it does:** The provider's error code for an invalid number (Twilio's own is `21211`).
 
-### 105. cannot_route
+### 109. cannot_route
 
 Field.
 
 - **What it does:** The provider's error code for a number it cannot route to (Twilio's own is `21612`).
 
-### 106. no_international_permission
+### 110. no_international_permission
 
 Field.
 
 - **What it does:** The provider's error code for no international permission (Twilio's own is `21408`).
 
-### 107. blocked
+### 111. blocked
 
 Field.
 
 - **What it does:** The provider's error code for a blocked (opted out) number (Twilio's own is `21610`).
 
-### 108. cannot_receive_sms
+### 112. cannot_receive_sms
 
 Field.
 
 - **What it does:** The provider's error code for a number that cannot receive SMS (Twilio's own is `21614`).
 
-### 109. invalid_from
+### 113. invalid_from
 
 Field.
 
 - **What it does:** The provider's error code for an invalid sender (Twilio's own is `21212`).
 
-### 110. not_sms_capable
+### 114. not_sms_capable
 
 Field.
 
 - **What it does:** The provider's error code for a sender that is not SMS capable (Twilio's own is `21606`).
 
-### 111. queue_full
+### 115. queue_full
 
 Field.
 
 - **What it does:** The provider's error code for a full message queue (Twilio's own is `21611`).
 
-### 112. unreachable_handset
+### 116. unreachable_handset
 
 Field.
 
 - **What it does:** The provider's error code for an unreachable handset (Twilio's own is `30003`).
 
-### 113. landline
+### 117. landline
 
 Field.
 
 - **What it does:** The provider's error code for a landline or unreachable carrier (Twilio's own is `30006`).
 
-### 114. carrier_filtered
+### 118. carrier_filtered
 
 Field.
 
 - **What it does:** The provider's error code for a message the carrier filtered (Twilio's own is `30007`).
 
-### 115. unknown_error
+### 119. unknown_error
 
 Field.
 
@@ -740,87 +765,87 @@ Field.
 
 ## Provider editor, Preview tab
 
-### 116. Sample request
+### 120. Sample request
 
 Heading.
 
 - **What it does:** The request the preview sends.
 
-### 117. A send built from the field mapping. Edit it to try another request.
+### 121. A send built from the field mapping. Edit it to try another request.
 
 Text.
 
 - **What it does:** Explains the sample.
 
-### 118. Sample method
+### 122. Sample method
 
 Drop-down.
 
 - **What it does:** The sample's method.
 
-### 119. Sample path
+### 123. Sample path
 
 Field.
 
 - **What it does:** The sample's path.
 
-### 120. Sample body
+### 124. Sample body
 
 Field.
 
 - **What it does:** The sample's body.
 
-### 121. Stored message
+### 125. Stored message
 
 Heading.
 
 - **What it does:** The SMS SendMock would store for the sample.
 - **Same action elsewhere:** REST [`POST /api/v1/sms/providers/{providerKey}/preview`](/api/sms-providers/#postSmsProvidersByProviderKeyPreview), CLI [`sendmock sms providers preview`](/cli/sms-providers/#sms-providers-preview), MCP [`sendmock_sms_provider_preview`](/mcp/sms-providers/#sendmock_sms_provider_preview)
 
-### 122. Response
+### 126. Response
 
 Heading.
 
 - **What it does:** The response the sample would get.
 
-### 123. Search the reference
+### 127. Search the reference
 
 Field.
 
 - **What it does:** Filters the template reference: the values, functions and filters templates can use.
 
-### 124. Values
+### 128. Values
 
 Heading.
 
 - **What it does:** The values a template can read, with an example of each.
 
-### 125. Expand …
+### 129. Expand …
 
 Button, in each row.
 
 - **What it does:** Shows the fields inside a value, such as the parts of `request` or `message`.
 
-### 126. …
+### 130. …
 
 Button, in each row.
 
 - **What it does:** Inserts the value, function or filter into the template field you were editing.
 
-### 127. Functions
+### 131. Functions
 
 Heading.
 
 - **What it does:** The functions a template can call.
 
-### 128. Filters
+### 132. Filters
 
 Heading.
 
 - **What it does:** The filters a template can use.
 - **Links to:** [Template filters](../../reference/template-filters.md).
 
-### 129. … \}\}
+### 133. … \}\}
 
 Button, in each row.
 
@@ -828,25 +853,25 @@ Button, in each row.
 
 ## Provider editor, Try it tab
 
-### 130. Copy sdk base url (provider port)
+### 134. Copy sdk base url (provider port)
 
 Button.
 
 - **What it does:** Copies the base URL to give the provider's SDK when the provider port is on.
 
-### 131. Copy base url on the main port
+### 135. Copy base url on the main port
 
 Button.
 
 - **What it does:** Copies the base URL under `/providers/<key>/` on the main port.
 
-### 132. Copy a curl command
+### 136. Copy a curl command
 
 Button.
 
 - **What it does:** Copies a curl command that sends the sample request.
 
-### 133. The provider port answers once it is on ( --provider-addr ). The preview shows what this request gets back: #. Settings > Connection has the snippets for each language.
+### 137. The provider port answers once it is on ( --provider-addr ). The preview shows what this request gets back: #. Settings > Connection has the snippets for each language.
 
 Text.
 
@@ -854,20 +879,20 @@ Text.
 
 ## When the data cannot load
 
-### 134. Could not load the providers. Try again
+### 138. Could not load the providers. Try again
 
 Message.
 
 - **What it does:** Shown when the list could not be loaded.
 - **Errors:** Check SendMock is running, then press Try again.
 
-### 135. Could not load the providers.
+### 139. Could not load the providers.
 
 Text.
 
 - **What it does:** The message inside the alert.
 
-### 136. Try again
+### 140. Try again
 
 Button.
 

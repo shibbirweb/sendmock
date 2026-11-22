@@ -7,6 +7,7 @@ use super::sms_ingest::{IncomingSms, store_sms};
 use super::sms_inputs::{InboundSmsRequest, InlineSmsMedia, NativeSmsRequest};
 use super::sms_media_intake::{AcceptedMedia, MediaProblem, accept_media};
 use super::sms_send_decision::{decide_outbound_send, describe_rejection};
+use crate::sms_opt_outs::respond_to_opt_out_keyword;
 use crate::sms_replies::start_reply_webhook;
 use crate::{
     HttpMethod, Operation, OperationContext, OperationDefinition, OperationError,
@@ -205,6 +206,7 @@ impl Operation for SimulateInboundSmsOperation {
             },
         )
         .await?;
+        respond_to_opt_out_keyword(operation_context, &sms).await?;
         start_reply_webhook(operation_context, sms.clone(), input.template_id);
         load_sms_detail(operation_context, sms).await
     }
