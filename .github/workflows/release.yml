@@ -102,18 +102,22 @@ jobs:
           fi
 
   # The web UI and the six archives, built as the test builds of every pull request build them.
+  # Skipped as a whole when the pull request did not touch the release build: Test builds runs
+  # the same build under the same check names on every pull request.
   build:
     name: Build
     needs: changes
+    if: needs.changes.outputs.is_affected == 'true'
     uses: ./.github/workflows/build-archives.yml
     with:
-      skip_every_job: ${{ needs.changes.outputs.is_affected != 'true' }}
       commit_sha: ${{ inputs.commit_sha || github.sha }}
       channel: ${{ inputs.channel || 'dev' }}
 
   test:
     name: Test ${{ matrix.target }}
     needs: [changes, plan, build]
+    # When unaffected the build is skipped; this still runs, as a no-op, so its checks report.
+    if: ${{ !cancelled() && (needs.changes.outputs.is_affected != 'true' || success()) }}
     runs-on: ${{ needs.changes.outputs.is_affected == 'true' && matrix.runner || 'ubuntu-latest' }}
     strategy:
       fail-fast: false
@@ -501,6 +505,8 @@ jobs:
   crates:
     name: crates.io packages
     needs: [changes, build]
+    # When unaffected the build is skipped; this still runs, as a no-op, so its checks report.
+    if: ${{ !cancelled() && (needs.changes.outputs.is_affected != 'true' || success()) }}
     runs-on: ubuntu-latest
     steps:
       - if: needs.changes.outputs.is_affected == 'true'

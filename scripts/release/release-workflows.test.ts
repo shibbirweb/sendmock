@@ -107,7 +107,6 @@ describe("Release build", () => {
       "./.github/workflows/build-archives.yml",
     );
     expect(releaseWorkflow.jobs.build?.with).toEqual({
-      skip_every_job: "${{ needs.changes.outputs.is_affected != 'true' }}",
       commit_sha: "${{ inputs.commit_sha || github.sha }}",
       channel: "${{ inputs.channel || 'dev' }}",
     });
@@ -295,7 +294,10 @@ describe("Docker image", () => {
       "./.github/actions/install-mcp-publisher",
     );
     expect(registryRunText).toContain("docker buildx imagetools inspect");
-    expect(registryRunText).toContain("mcp-publisher login github-oidc");
+    expect(registryRunText).toContain("bun scripts/release/mcp-registry-publish.ts");
+    expect(
+      readFileSync("scripts/release/mcp-registry-publish.ts", "utf8"),
+    ).toContain('["login", "github-oidc"]');
   });
 });
 

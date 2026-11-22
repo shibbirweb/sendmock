@@ -107,7 +107,9 @@ function findNoOpProblems(workflow: PullRequestWorkflow): string[] {
     if (!readNeeds(workflowJob).includes(changesJobId)) {
       problems.push(`${jobId} does not wait for the changed paths`);
     }
-    if ((workflowJob.if ?? "").includes("is_affected")) {
+    // A called workflow can only be skipped as a whole; its checks are required where another
+    // workflow reports the same names (Test builds runs the release build's build).
+    if (workflowJob.uses === undefined && (workflowJob.if ?? "").includes("is_affected == 'true'")) {
       problems.push(`${jobId} is skipped as a whole when unaffected, so its check name would not report`);
     }
     const isReleaseOnly = (workflowJob.if ?? "").includes("inputs.");
