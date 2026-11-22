@@ -45,14 +45,16 @@ jobs:
   ci-example:
     name: sendmock ci run on the example shop
     needs: changes
-    if: needs.changes.outputs.is_affected == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/checkout@v7
 
-      - uses: oven-sh/setup-bun@v2
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: oven-sh/setup-bun@v2
 
-      - name: Live UI the binary embeds
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Live UI the binary embeds
         working-directory: web
         env:
           VITE_API_MODE: live
@@ -60,31 +62,35 @@ jobs:
           bun install --frozen-lockfile
           bun run build
 
-      - name: Toolchain from rust-toolchain.toml
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Toolchain from rust-toolchain.toml
         run: rustup toolchain install
 
-      - uses: Swatinem/rust-cache@v2
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: Swatinem/rust-cache@v2
         with:
           save-if: ${{ github.event_name != 'pull_request' }}
 
-      - name: Release build
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Release build
         run: cargo build --release --locked -p sendmock
 
-      - uses: actions/setup-node@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/setup-node@v7
         with:
           node-version: "22"
 
-      - name: Run the example both ways, and a broken app
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Run the example both ways, and a broken app
         env:
           SENDMOCK_BINARY: ${{ github.workspace }}/target/release/sendmock
         run: examples/ci/run-ci-example-test.sh
 
       - name: SendMock log
-        if: failure()
+        if: ${{ (failure()) && needs.changes.outputs.is_affected == 'true' }}
         run: cat sendmock-server.log || true
 
-  # The required check: it reports on every pull request, and fails unless each job above
-  # passed or was skipped because the pull request did not touch its paths.
+  # A required check like every job above: it fails unless each job passed or was skipped.
   passed:
     name: CI pipeline example passed
     if: always()

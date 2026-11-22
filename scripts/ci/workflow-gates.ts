@@ -1,5 +1,6 @@
-// Reads the workflows that run on pull requests and the "passed" gate each one ends with. The
-// gates are the repository's required checks: every job of a workflow reports through its gate.
+// Reads the workflows that run on pull requests and checks that every job reports on every pull
+// request, so each check can be required: a path-filtered workflow runs its jobs as no-ops when
+// the pull request did not touch its paths, and every workflow ends with a "passed" gate.
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -7,10 +8,14 @@ const workflowFolder = ".github/workflows";
 export const gateJobId = "passed";
 export const changesJobId = "changes";
 
+type WorkflowStep = { if?: string };
+
 type WorkflowJob = {
   name?: string;
   needs?: string | string[];
   if?: string;
+  uses?: string;
+  steps?: WorkflowStep[];
 };
 
 export type PullRequestWorkflow = {
@@ -81,17 +86,44 @@ export function findGateProblems(workflow: PullRequestWorkflow): string[] {
     }
   }
   if (changesJobId in workflow.jobs) {
-    for (const [jobId, workflowJob] of Object.entries(workflow.jobs)) {
-      const isRootJob = jobId !== changesJobId && jobId !== gateJobId && readNeeds(workflowJob).length === 0;
-      if (isRootJob) {
-        problems.push(`${jobId} does not wait for the changed paths`);
-      }
-    }
+    problems.push(...findNoOpProblems(workflow));
   }
   return problems;
 }
 
-/** The required checks: one gate per pull request workflow. */
-export function listRequiredChecks(): string[] {
+const affectedCondition = "needs.changes.outputs.is_affected == 'true'";
+
+/**
+ * A path-filtered workflow runs every job on every pull request, so each check name reports:
+ * each job waits for the changed paths, is never skipped because of them, and does its work only
+ * in steps that check them. Release-only jobs keep their own condition.
+ */
+function findNoOpProblems(workflow: PullRequestWorkflow): string[] {
+  const problems: string[] = [];
+  for (const [jobId, workflowJob] of Object.entries(workflow.jobs)) {
+    if (jobId === changesJobId || jobId === gateJobId) {
+      continue;
+    }
+    if (!readNeeds(workflowJob).includes(changesJobId)) {
+      problems.push(`${jobId} does not wait for the changed paths`);
+    }
+    if ((workflowJob.if ?? "").includes("is_affected")) {
+      problems.push(`${jobId} is skipped as a whole when unaffected, so its check name would not report`);
+    }
+    const isReleaseOnly = (workflowJob.if ?? "").includes("inputs.");
+    if (workflowJob.uses !== undefined || isReleaseOnly) {
+      continue;
+    }
+    (workflowJob.steps ?? []).forEach((workflowStep, stepIndex) => {
+      if (!(workflowStep.if ?? "").includes(affectedCondition)) {
+        problems.push(`${jobId} step ${stepIndex + 1} runs even when the pull request did not touch its paths`);
+      }
+    });
+  }
+  return problems;
+}
+
+/** The gates, one per pull request workflow. */
+export function listGateChecks(): string[] {
   return readPullRequestWorkflows().map((workflow) => `${workflow.name} passed`);
 }

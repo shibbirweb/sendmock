@@ -25,6 +25,10 @@ on:
         description: Run every job without reading the pull request's changes (a calling workflow decides)
         type: boolean
         default: true
+      skip_every_job:
+        description: Report every job with its steps skipped, when the calling workflow has nothing to do
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -46,6 +50,7 @@ jobs:
         uses: ./.github/actions/changed-paths
         with:
           run-every-job: ${{ github.event_name != 'pull_request' || inputs.run_every_job == true }}
+          skip-every-job: ${{ inputs.skip_every_job == true }}
           paths: |
             crates/sendmock-ops/src/providers/**
             crates/sendmock-ops/src/push/**
@@ -57,18 +62,20 @@ jobs:
   sdks:
     name: Three push provider SDKs offline
     needs: changes
-    if: needs.changes.outputs.is_affected == 'true'
     runs-on: ubuntu-latest
     env:
       SENDMOCK_URL: http://127.0.0.1:8025
       SENDMOCK_PROVIDER_URL: http://127.0.0.1:8026
       EXPO_BASE_URL: http://127.0.0.1:8026
     steps:
-      - uses: actions/checkout@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/checkout@v7
 
-      - uses: oven-sh/setup-bun@v2
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: oven-sh/setup-bun@v2
 
-      - name: Live UI the binary embeds
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Live UI the binary embeds
         working-directory: web
         env:
           VITE_API_MODE: live
@@ -76,34 +83,40 @@ jobs:
           bun install --frozen-lockfile
           bun run build
 
-      - name: Toolchain from rust-toolchain.toml
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Toolchain from rust-toolchain.toml
         run: rustup toolchain install
 
-      - uses: Swatinem/rust-cache@v2
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: Swatinem/rust-cache@v2
         with:
           save-if: ${{ github.event_name != 'pull_request' }}
 
-      - name: Release build
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Release build
         run: cargo build --release --locked -p sendmock
 
-      - uses: ./.github/actions/start-sendmock-offline
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: ./.github/actions/start-sendmock-offline
 
-      - uses: actions/setup-node@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/setup-node@v7
         with:
           node-version: "22"
 
-      - name: Send with firebase-admin, expo-server-sdk and OneSignal's SDK
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Send with firebase-admin, expo-server-sdk and OneSignal's SDK
         working-directory: examples/push/node
         run: bun install && node done-when.js
 
-      - uses: ./.github/actions/check-sendmock-offline
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: ./.github/actions/check-sendmock-offline
 
       - name: SendMock log
-        if: failure()
+        if: ${{ (failure()) && needs.changes.outputs.is_affected == 'true' }}
         run: cat sendmock.log
 
-  # The required check: it reports on every pull request, and fails unless each job above
-  # passed or was skipped because the pull request did not touch its paths.
+  # A required check like every job above: it fails unless each job passed or was skipped.
   passed:
     name: Push SDKs passed
     if: always()

@@ -6,6 +6,10 @@ name: Build archives
 on:
   workflow_call:
     inputs:
+      skip_every_job:
+        description: Report every job with its steps skipped, when the calling workflow has nothing to do
+        type: boolean
+        default: false
       commit_sha:
         type: string
         required: true
@@ -22,13 +26,16 @@ jobs:
     name: Web UI build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - if: inputs.skip_every_job != true
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.commit_sha }}
 
-      - uses: oven-sh/setup-bun@v2
+      - if: inputs.skip_every_job != true
+        uses: oven-sh/setup-bun@v2
 
-      - name: Build the UI the binaries embed (live mode, no mock layer)
+      - if: inputs.skip_every_job != true
+        name: Build the UI the binaries embed (live mode, no mock layer)
         working-directory: web
         env:
           VITE_API_MODE: live
@@ -36,7 +43,8 @@ jobs:
           bun install --frozen-lockfile
           bun run build
 
-      - uses: actions/upload-artifact@v7
+      - if: inputs.skip_every_job != true
+        uses: actions/upload-artifact@v7
         with:
           name: release-web-dist
           path: web/dist
@@ -45,7 +53,7 @@ jobs:
   build:
     name: Build ${{ matrix.target }}
     needs: web-dist
-    runs-on: ${{ matrix.runner }}
+    runs-on: ${{ inputs.skip_every_job != true && matrix.runner || 'ubuntu-latest' }}
     strategy:
       fail-fast: false
       matrix:
@@ -57,28 +65,34 @@ jobs:
           - { target: x86_64-pc-windows-msvc, runner: windows-latest, cross: cargo }
           - { target: aarch64-pc-windows-msvc, runner: windows-latest, cross: cargo }
     steps:
-      - uses: actions/checkout@v7
+      - if: inputs.skip_every_job != true
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.commit_sha }}
 
-      - uses: actions/download-artifact@v8
+      - if: inputs.skip_every_job != true
+        uses: actions/download-artifact@v8
         with:
           name: release-web-dist
           path: web/dist
 
-      - name: Toolchain and target
+      - if: inputs.skip_every_job != true
+        name: Toolchain and target
         run: |
           rustup toolchain install
           rustup target add ${{ matrix.target }}
 
-      - uses: Swatinem/rust-cache@v2
+      - if: inputs.skip_every_job != true
+        uses: Swatinem/rust-cache@v2
         with:
           key: ${{ matrix.target }}
           save-if: ${{ github.event_name != 'pull_request' }}
 
-      - uses: oven-sh/setup-bun@v2
+      - if: inputs.skip_every_job != true
+        uses: oven-sh/setup-bun@v2
 
-      - name: Build
+      - if: inputs.skip_every_job != true
+        name: Build
         shell: bash
         env:
           SENDMOCK_RELEASE_CHANNEL: ${{ inputs.channel }}
@@ -106,14 +120,16 @@ jobs:
             cargo build --release --locked -p sendmock --target "$BUILD_TARGET"
           fi
 
-      - name: Pack the archive and its checksum
+      - if: inputs.skip_every_job != true
+        name: Pack the archive and its checksum
         shell: bash
         run: |
           binary="target/${{ matrix.target }}/release/sendmock"
           if [[ "${{ matrix.target }}" == *windows* ]]; then binary="$binary.exe"; fi
           bun scripts/release/package-archive.ts ${{ matrix.target }} "$binary" dist
 
-      - uses: actions/upload-artifact@v7
+      - if: inputs.skip_every_job != true
+        uses: actions/upload-artifact@v7
         with:
           name: archive-${{ matrix.target }}
           path: dist

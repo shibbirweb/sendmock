@@ -25,6 +25,10 @@ on:
         description: Run every job without reading the pull request's changes (a calling workflow decides)
         type: boolean
         default: true
+      skip_every_job:
+        description: Report every job with its steps skipped, when the calling workflow has nothing to do
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -46,6 +50,7 @@ jobs:
         uses: ./.github/actions/changed-paths
         with:
           run-every-job: ${{ github.event_name != 'pull_request' || inputs.run_every_job == true }}
+          skip-every-job: ${{ inputs.skip_every_job == true }}
           paths: |
             crates/sendmock-sms/**
             crates/sendmock-ops/src/providers/**
@@ -58,14 +63,16 @@ jobs:
   binary:
     name: Release binary
     needs: changes
-    if: needs.changes.outputs.is_affected == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/checkout@v7
 
-      - uses: oven-sh/setup-bun@v2
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: oven-sh/setup-bun@v2
 
-      - name: Live UI the binary embeds
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Live UI the binary embeds
         working-directory: web
         env:
           VITE_API_MODE: live
@@ -73,17 +80,21 @@ jobs:
           bun install --frozen-lockfile
           bun run build
 
-      - name: Toolchain from rust-toolchain.toml
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Toolchain from rust-toolchain.toml
         run: rustup toolchain install
 
-      - uses: Swatinem/rust-cache@v2
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: Swatinem/rust-cache@v2
         with:
           save-if: ${{ github.event_name != 'pull_request' }}
 
-      - name: Release build
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Release build
         run: cargo build --release --locked -p sendmock
 
-      - uses: actions/upload-artifact@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/upload-artifact@v7
         with:
           name: sendmock-for-sms-clients
           path: target/release/sendmock
@@ -91,7 +102,7 @@ jobs:
 
   client:
     name: ${{ matrix.client }}
-    needs: binary
+    needs: [changes, binary]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -189,16 +200,20 @@ jobs:
       SENDMOCK_URL: http://127.0.0.1:8025
       SENDMOCK_PROVIDER_URL: http://127.0.0.1:8026
     steps:
-      - uses: actions/checkout@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/checkout@v7
 
-      - uses: actions/download-artifact@v8
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/download-artifact@v8
         with:
           name: sendmock-for-sms-clients
           path: sendmock-binary
 
-      - uses: oven-sh/setup-bun@v2
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: oven-sh/setup-bun@v2
 
-      - name: Start SendMock with the provider port
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Start SendMock with the provider port
         run: |
           chmod +x sendmock-binary/sendmock
           ./sendmock-binary/sendmock --db memory --provider-addr 127.0.0.1:8026 > sendmock.log 2>&1 &
@@ -210,53 +225,53 @@ jobs:
           exit 1
 
       - uses: actions/setup-node@v7
-        if: matrix.language == 'node'
+        if: ${{ (matrix.language == 'node') && needs.changes.outputs.is_affected == 'true' }}
         with:
           node-version: "22"
 
       - uses: actions/setup-python@v7
-        if: matrix.language == 'python'
+        if: ${{ (matrix.language == 'python') && needs.changes.outputs.is_affected == 'true' }}
         with:
           python-version: "3.13"
 
       - uses: shivammathur/setup-php@v2
-        if: matrix.language == 'php'
+        if: ${{ (matrix.language == 'php') && needs.changes.outputs.is_affected == 'true' }}
         with:
           php-version: "8.3"
           tools: composer
 
       - uses: actions/setup-go@v7
-        if: matrix.language == 'go'
+        if: ${{ (matrix.language == 'go') && needs.changes.outputs.is_affected == 'true' }}
         with:
           go-version: "1.23"
           cache-dependency-path: examples/sms/go-twilio/go.sum
 
       - uses: actions/setup-java@v6
-        if: matrix.language == 'java'
+        if: ${{ (matrix.language == 'java') && needs.changes.outputs.is_affected == 'true' }}
         with:
           distribution: temurin
           java-version: "21"
 
       - uses: actions/setup-dotnet@v6
-        if: matrix.language == 'dotnet'
+        if: ${{ (matrix.language == 'dotnet') && needs.changes.outputs.is_affected == 'true' }}
         with:
           dotnet-version: "8.0.x"
 
       - uses: ruby/setup-ruby@v1
-        if: matrix.language == 'ruby'
+        if: ${{ (matrix.language == 'ruby') && needs.changes.outputs.is_affected == 'true' }}
         with:
           ruby-version: "3.3"
 
-      - name: Send and verify with the ${{ matrix.client }}
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Send and verify with the ${{ matrix.client }}
         working-directory: examples/sms/${{ matrix.folder }}
         run: ${{ matrix.run }}
 
       - name: SendMock log
-        if: failure()
+        if: ${{ (failure()) && needs.changes.outputs.is_affected == 'true' }}
         run: cat sendmock.log
 
-  # The required check: it reports on every pull request, and fails unless each job above
-  # passed or was skipped because the pull request did not touch its paths.
+  # A required check like every job above: it fails unless each job passed or was skipped.
   passed:
     name: SMS clients passed
     if: always()

@@ -2,12 +2,12 @@ import { describe, expect, test } from "bun:test";
 
 import {
   findGateProblems,
-  listRequiredChecks,
+  listGateChecks,
   readPullRequestWorkflows,
 } from "./workflow-gates";
 
 describe("workflow gates", () => {
-  test("every workflow a pull request starts ends with a gate that waits for all of its jobs", () => {
+  test("every workflow a pull request starts reports every job and ends with a gate that waits for all of them", () => {
     const problems = readPullRequestWorkflows().flatMap((workflow) =>
       findGateProblems(workflow).map((problem) => `${workflow.fileName} ${problem}`),
     );
@@ -15,8 +15,8 @@ describe("workflow gates", () => {
     expect(problems).toEqual([]);
   });
 
-  test("the required checks are one gate per workflow, each name once", () => {
-    const requiredChecks = listRequiredChecks();
+  test("there is one gate per workflow, each name once", () => {
+    const requiredChecks = listGateChecks();
 
     expect(requiredChecks).toContain("CI passed");
     expect(requiredChecks).toContain("Release build passed");
@@ -39,15 +39,33 @@ describe("workflow gates", () => {
 });
 
 describe("required rules", () => {
-  test("the ruleset keeps its other rules and requires every gate and CodeQL", async () => {
+  test("every passed check is required once, and skipped or unexpanded ones are not", async () => {
+    const { selectRequiredChecks } = await import("./sync-required-checks");
+
+    const requiredChecks = selectRequiredChecks([
+      { name: "Web UI", conclusion: "success", app: { id: 15368 } },
+      { name: "Web UI", conclusion: "success", app: { id: 15368 } },
+      { name: "CodeQL", conclusion: "success", app: { id: 57789 } },
+      { name: "Publish v1.4.0", conclusion: "skipped", app: { id: 15368 } },
+      { name: "Image for ${{ matrix.platform }}", conclusion: "success", app: { id: 15368 } },
+    ]);
+
+    expect(requiredChecks).toEqual([
+      { context: "CodeQL", integration_id: 57789 },
+      { context: "Web UI", integration_id: 15368 },
+    ]);
+  });
+
+  test("the ruleset keeps its other rules and requires the checks and CodeQL", async () => {
     const { buildRequiredRules } = await import("./sync-required-checks");
+    const requiredChecks = [{ context: "Web UI", integration_id: 15368 }];
 
     const rules = buildRequiredRules(
       [
         { type: "deletion" },
         { type: "required_status_checks", parameters: { required_status_checks: [] } },
       ],
-      ["CI passed", "Website passed"],
+      requiredChecks,
     );
 
     expect(rules.map((rule) => rule.type)).toEqual([
@@ -55,9 +73,6 @@ describe("required rules", () => {
       "required_status_checks",
       "code_scanning",
     ]);
-    expect(rules[1]?.parameters?.required_status_checks).toEqual([
-      { context: "CI passed", integration_id: 15368 },
-      { context: "Website passed", integration_id: 15368 },
-    ]);
+    expect(rules[1]?.parameters?.required_status_checks).toEqual(requiredChecks);
   });
 });

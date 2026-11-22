@@ -462,8 +462,7 @@ jobs:
       - name: Typecheck and static export build
         run: bun run build
 
-  # The required check: it reports on every pull request, and fails unless each job above
-  # passed or was skipped because the pull request did not touch its paths.
+  # A required check like every job above: it fails unless each job passed or was skipped.
   passed:
     name: CI passed
     if: always()
