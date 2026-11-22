@@ -36,6 +36,36 @@ describe("workflow gates", () => {
       'has no "passed" job',
     ]);
   });
+
+  test("a job after a build that is skipped when unaffected is reported unless it runs !cancelled()", () => {
+    const affectedStep = { if: "needs.changes.outputs.is_affected == 'true'" };
+    const problems = findGateProblems({
+      fileName: "example.yml",
+      name: "Example",
+      pullRequestPaths: [],
+      jobs: {
+        changes: {},
+        build: { needs: "changes", if: "needs.changes.outputs.is_affected == 'true'", uses: "./build.yml" },
+        test: {
+          needs: ["changes", "build"],
+          if: "${{ !cancelled() && (needs.changes.outputs.is_affected != 'true' || success()) }}",
+          steps: [affectedStep],
+        },
+        packages: { needs: ["changes", "test"], steps: [affectedStep] },
+        publish: { needs: ["changes", "packages"], if: "inputs.publish", steps: [] },
+        announce: { needs: ["changes", "publish"], uses: "./announce.yml" },
+        passed: {
+          name: "Example passed",
+          if: "always()",
+          needs: ["changes", "build", "test", "packages", "publish", "announce"],
+        },
+      },
+    });
+
+    expect(problems).toEqual([
+      "packages comes after build, which is skipped when unaffected, so it needs !cancelled() to report",
+    ]);
+  });
 });
 
 describe("required rules", () => {

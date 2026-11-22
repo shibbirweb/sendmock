@@ -86,9 +86,55 @@ export function findGateProblems(workflow: PullRequestWorkflow): string[] {
     }
   }
   if (changesJobId in workflow.jobs) {
-    problems.push(...findNoOpProblems(workflow));
+    problems.push(...findNoOpProblems(workflow), ...findSkippedNeedProblems(workflow));
   }
   return problems;
+}
+
+/** Every job the given job waits for, directly or through the jobs it waits for. */
+function collectAncestorJobIds(workflow: PullRequestWorkflow, jobId: string): Set<string> {
+  const ancestorJobIds = new Set<string>();
+  const pendingJobIds = readNeeds(workflow.jobs[jobId] ?? {});
+  while (pendingJobIds.length > 0) {
+    const neededJobId = pendingJobIds.pop() ?? "";
+    if (ancestorJobIds.has(neededJobId)) {
+      continue;
+    }
+    ancestorJobIds.add(neededJobId);
+    pendingJobIds.push(...readNeeds(workflow.jobs[neededJobId] ?? {}));
+  }
+  return ancestorJobIds;
+}
+
+/**
+ * GitHub skips a job when any job before it in the chain was skipped, unless its condition says
+ * otherwise; a skipped matrix job then reports only its unexpanded name, so the required checks
+ * never arrive. A job after one that is skipped when unaffected must run !cancelled(), unless it
+ * also comes after a release-only job and so never runs on a pull request.
+ */
+function findSkippedNeedProblems(workflow: PullRequestWorkflow): string[] {
+  const skippedWhenUnaffected = Object.entries(workflow.jobs)
+    .filter(([, workflowJob]) => (workflowJob.if ?? "").includes("is_affected == 'true'"))
+    .map(([jobId]) => jobId);
+  return Object.entries(workflow.jobs).flatMap(([jobId, workflowJob]) => {
+    const jobCondition = workflowJob.if ?? "";
+    if (jobId === gateJobId || jobCondition.includes("inputs.") || jobCondition.includes("!cancelled()")) {
+      return [];
+    }
+    const ancestorJobIds = collectAncestorJobIds(workflow, jobId);
+    const comesAfterReleaseOnlyJob = [...ancestorJobIds].some((ancestorJobId) =>
+      (workflow.jobs[ancestorJobId]?.if ?? "").includes("inputs."),
+    );
+    if (comesAfterReleaseOnlyJob) {
+      return [];
+    }
+    return skippedWhenUnaffected
+      .filter((skippedJobId) => ancestorJobIds.has(skippedJobId))
+      .map(
+        (skippedJobId) =>
+          `${jobId} comes after ${skippedJobId}, which is skipped when unaffected, so it needs !cancelled() to report`,
+      );
+  });
 }
 
 const affectedCondition = "needs.changes.outputs.is_affected == 'true'";
