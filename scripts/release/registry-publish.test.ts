@@ -184,6 +184,7 @@ describe("the Registry publish workflow", () => {
     expect(Object.keys(registryWorkflow.jobs).sort()).toEqual([
       "crates",
       "crates-handoff",
+      "install-channels",
       "mcp-registry",
       "npm",
       "plan",
@@ -250,6 +251,33 @@ describe("the Registry publish workflow", () => {
     expect(handoffJob?.permissions).toEqual({ actions: "write" });
     expect(handoffRun).toContain('gh workflow run registry-publish.yml --repo "$GITHUB_REPOSITORY" --ref "$DEFAULT_BRANCH"');
     expect(handoffRun).toContain('-f release_run_id="$RELEASE_RUN_ID" -f registries=crates');
+  });
+
+  test("DS-03.6 starts Install channels after-publish by itself once the registries serve the release", () => {
+    const startJob = registryWorkflow.jobs["install-channels"];
+    const startSteps = startJob?.steps ?? [];
+    const waitStep = startSteps.find((step) => step.run?.includes("scripts/release/published-channels.ts"));
+    const dispatchRun = startSteps.map((step) => step.run ?? "").join("\n");
+
+    expect(startJob?.if).toBe(
+      "${{ !cancelled() && github.event_name == 'workflow_run' && needs.plan.outputs.should_publish == 'true' }}",
+    );
+    expect(startJob?.needs).toEqual([
+      "plan",
+      "npm",
+      "mcp-registry",
+      "testcontainers-node",
+      "testcontainers-python",
+      "testcontainers-dotnet",
+    ]);
+    expect(startJob?.permissions).toEqual({ contents: "read", actions: "write" });
+    expect(waitStep?.env?.CRATES_PUBLISHING).toBe("${{ vars.CRATES_PUBLISHING }}");
+    expect(dispatchRun.indexOf("published-channels.ts")).toBeLessThan(
+      dispatchRun.indexOf("gh workflow run install-channels.yml"),
+    );
+    expect(dispatchRun).toContain(
+      '-f version="$VERSION" -f channel="$RELEASE_CHANNEL" -f channels=after-publish',
+    );
   });
 
   test("the MCP registry publishes only once npm serves the version, so its first try passes (#355)", () => {

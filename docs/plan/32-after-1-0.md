@@ -985,4 +985,4 @@ The report's preset (section 6, `sendmock preset laravel-mailgun-twilio --app-ur
 
 **Not in this part:** answering on the providers' real hostnames through local DNS or a proxy (the report's alternative in R-23), presets for other stacks (they follow the first), and the report's untested areas (WhatsApp, outbound MMS, push).
 
-**Owner decisions to confirm:** the provider port on by default (PL-24), Advanced Opt-Out on by default for Twilio (SM-23), inbox views not counting as opens when a rule would fire (EM-27), and the preset command (PL-27).
+**Owner decisions (confirmed 2026-11-22):** the provider port is on by default (PL-24), Advanced Opt-Out is on by default for Twilio (SM-23), inbox views do not count as opens when a rule would fire (EM-27), and the preset command is built in 1.5.0 (PL-27), all as designed above.
