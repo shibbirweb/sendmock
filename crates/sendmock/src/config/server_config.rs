@@ -48,6 +48,8 @@ pub struct ServerConfig {
     pub loads_demo_data: bool,
     /// `--setup`: a setup file or URL applied at startup.
     pub startup_setup: Option<StartupSetupSource>,
+    /// The startup banner, unless `--no-banner`, `SENDMOCK_NO_BANNER` or `banner = false`.
+    pub shows_banner: bool,
 }
 
 impl ServerConfig {
@@ -126,6 +128,7 @@ impl ServerConfig {
             prints_ready_json: serve_arguments.ready_json,
             loads_demo_data: serve_arguments.demo,
             startup_setup: StartupSetupSource::from_arguments(serve_arguments),
+            shows_banner: !serve_arguments.no_banner && config_file.banner.unwrap_or(true),
         })
     }
 
@@ -212,6 +215,30 @@ mod tests {
         assert_eq!(server_config.smtp_addr.port(), 2525);
         assert_eq!(server_config.database_location, DatabaseLocation::InMemory);
         assert_eq!(server_config.log_level, LogLevel::Debug);
+    }
+
+    // AC: PL-23.5
+    #[test]
+    fn the_banner_shows_unless_the_flag_or_the_file_turns_it_off() {
+        let shown = resolve_config(&ServeArguments::default(), ConfigFile::default());
+        let off_by_flag = resolve_config(
+            &ServeArguments {
+                no_banner: true,
+                ..ServeArguments::default()
+            },
+            ConfigFile::default(),
+        );
+        let off_by_file = resolve_config(
+            &ServeArguments::default(),
+            ConfigFile {
+                banner: Some(false),
+                ..ConfigFile::default()
+            },
+        );
+
+        assert!(shown.shows_banner);
+        assert!(!off_by_flag.shows_banner);
+        assert!(!off_by_file.shows_banner);
     }
 
     #[test]

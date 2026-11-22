@@ -52,3 +52,4 @@ Each setting can come from a flag, a `SENDMOCK_*` environment variable or a key 
 | `--last` |  |  |  | Start the services the launcher saved last, without asking; flags given with it win. |
 | `--services <LIST>` | `SENDMOCK_SERVICES` |  |  | Start these services on their saved or default addresses, without asking: smtp, smtps, provider, provider-tls, catcher, pop3 (comma-separated). |
 | `--no-input` | `SENDMOCK_NO_INPUT` |  |  | Never ask questions, even at a terminal. |
+| `--no-banner` | `SENDMOCK_NO_BANNER` |  |  | Start without the SendMock wordmark a terminal shows first; `banner = false` in sendmock.toml does the same. |

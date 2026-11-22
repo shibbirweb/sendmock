@@ -46,6 +46,8 @@ pub struct ConfigFile {
     pub log_format: Option<LogFormat>,
     pub log_level: Option<LogLevel>,
     pub seed: Option<PathBuf>,
+    /// `false` starts without the startup banner, as `--no-banner` does.
+    pub banner: Option<bool>,
 }
 
 impl ConfigFile {
@@ -98,6 +100,17 @@ mod tests {
                 seed: Some(PathBuf::from("sendmock.seed.toml")),
                 ..ConfigFile::default()
             })
+        );
+    }
+
+    // AC: PL-23.5
+    #[test]
+    fn reads_banner_false() {
+        let config_file = parse_config("banner = false");
+
+        assert_eq!(
+            config_file.ok().and_then(|config| config.banner),
+            Some(false)
         );
     }
 

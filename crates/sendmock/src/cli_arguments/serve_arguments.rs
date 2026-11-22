@@ -240,4 +240,12 @@ pub struct ServeArguments {
         value_parser = clap::builder::FalseyValueParser::new()
     )]
     pub no_input: bool,
+
+    /// Start without the SendMock wordmark a terminal shows first; `banner = false` in sendmock.toml does the same
+    #[arg(
+        long,
+        env = "SENDMOCK_NO_BANNER",
+        value_parser = clap::builder::FalseyValueParser::new()
+    )]
+    pub no_banner: bool,
 }

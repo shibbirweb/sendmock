@@ -8,6 +8,10 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ## [Unreleased]
 
+### Added
+
+- **Startup banner:** starting SendMock in a terminal (`sendmock`, `sendmock serve`, `--last`, `--services`) first prints its wordmark in braille dots with the version under it, sized to the terminal's width and in colour where the terminal supports it. Pipes, files, `--ready-json`, `--log-format json` and `sendmock mcp` print exactly what they did before. Turn it off with `--no-banner`, `SENDMOCK_NO_BANNER=1` or `banner = false` in `sendmock.toml`; see the Configuration guide, The startup banner.
+
 ### Fixed
 
 - **Secure tokens for demo Twilio subaccounts:** in the website's demo and the web UI's mock mode, a new Twilio subaccount's auth token and SID now come from the browser's cryptographically secure random source instead of `Math.random()`.
