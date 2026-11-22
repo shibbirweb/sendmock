@@ -117,6 +117,7 @@ pub async fn answer_whatsapp_cloud(
             .map(|credential| credential.value.clone())
             .collect(),
         is_unknown_path: false,
+        note: None,
     }))
 }
 

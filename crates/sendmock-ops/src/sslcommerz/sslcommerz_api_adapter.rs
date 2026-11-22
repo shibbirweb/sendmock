@@ -147,5 +147,6 @@ pub async fn answer_sslcommerz_request(
         created_message: None,
         secret_values: collect_secret_values(&sslcommerz_call),
         is_unknown_path,
+        note: None,
     }))
 }

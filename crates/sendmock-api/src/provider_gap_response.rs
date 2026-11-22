@@ -49,6 +49,7 @@ pub async fn answer_with_bin(
         created_message: None,
         secret_values: Vec::new(),
         catcher_answer: Some(gap_answer.catcher_answer),
+        note: None,
     };
     if let Err(record_error) =
         record_provider_request(operation_context, log_entry, completed_request).await

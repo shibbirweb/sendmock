@@ -145,3 +145,66 @@ async fn each_account_lists_only_its_own_messages() {
     assert_eq!(shop_page["messages"][0]["sid"], message_sid, "{shop_page}");
     assert_eq!(shop_page["messages"][0]["account_sid"], SHOP_SUBACCOUNT_SID);
 }
+
+/// The note of the newest request-log entry.
+async fn read_newest_log_note(app_router: &axum::Router) -> Value {
+    let (_, request_log) = call_api(app_router, "GET", "/api/v1/logs/http", None).await;
+    request_log["items"][0]["note"].clone()
+}
+
+// AC: SM-22.4
+#[tokio::test]
+async fn a_twilio_401_keeps_twilios_body_and_the_log_says_why() {
+    let (app_router, _) = build_app_with_shop_message().await;
+    let shop_account_path = format!("/2010-04-01/Accounts/{SHOP_SUBACCOUNT_SID}.json");
+
+    let (wrong_token_status, wrong_token_body) = call_twilio_as(
+        &app_router,
+        "GET",
+        &shop_account_path,
+        "",
+        (SHOP_SUBACCOUNT_SID, "guess"),
+    )
+    .await;
+    let wrong_token_note = read_newest_log_note(&app_router).await;
+    call_twilio_as(
+        &app_router,
+        "GET",
+        &shop_account_path,
+        "",
+        ("AC99999999999999999999999999999999", "guess"),
+    )
+    .await;
+    let unknown_account_note = read_newest_log_note(&app_router).await;
+    call_twilio_as(
+        &app_router,
+        "GET",
+        &format!("/2010-04-01/Accounts/{MAIN_ACCOUNT_SID}.json"),
+        "",
+        (SHOP_SUBACCOUNT_SID, "wrong"),
+    )
+    .await;
+    let borrowed_path_note = read_newest_log_note(&app_router).await;
+
+    assert_eq!(wrong_token_status, 401);
+    assert_eq!(wrong_token_body["code"], 20003, "{wrong_token_body}");
+    assert_eq!(wrong_token_body["message"], "Authenticate");
+    assert_eq!(
+        wrong_token_note,
+        format!("Wrong auth token for {SHOP_SUBACCOUNT_SID}")
+    );
+    assert!(
+        unknown_account_note
+            .as_str()
+            .unwrap_or_default()
+            .starts_with("Unknown account AC99999999999999999999999999999999"),
+        "{unknown_account_note}"
+    );
+    assert!(
+        borrowed_path_note
+            .as_str()
+            .unwrap_or_default()
+            .starts_with(&format!("The path's account {MAIN_ACCOUNT_SID} is not")),
+        "{borrowed_path_note}"
+    );
+}

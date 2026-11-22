@@ -119,7 +119,7 @@ Native payments, hosted checkout, simulate actions (Phase 4 adds `answer_dispute
 | Method | Path | Purpose |
 |--------|------|---------|
 | GET | `/logs/smtp`, `/logs/smtp/{sessionId}` | SMTP sessions with full transcripts (incl. failed sessions) |
-| GET | `/logs/http`, `/logs/http/{requestId}` | requests to native and provider APIs, including rejected ones |
+| GET | `/logs/http`, `/logs/http/{requestId}` | requests to native and provider APIs, including rejected ones; each entry's `note` says why SendMock answered as it did when the answer alone does not (a Twilio 401: a wrong token, an unknown account, or an account that is not the provider's; SM-22.4), null otherwise |
 | DELETE | `/logs/smtp/{sessionId}`, `/logs/smtp` | delete one SMTP session, or all (the list's filters narrow it) (A17, UI-14) |
 | DELETE | `/logs/http/{requestId}`, `/logs/http` | delete one API request log entry, or all (the list's filters narrow it) (A17, UI-14) |
 

@@ -279,6 +279,7 @@ async fn record_outcome(
         created_message: provider_outcome.created_message.clone(),
         secret_values: provider_outcome.secret_values.clone(),
         catcher_answer: None,
+        note: provider_outcome.note.clone(),
     };
     if let Err(record_error) =
         record_provider_request(operation_context, log_entry, completed_request).await

@@ -8914,6 +8914,13 @@ components:
             - $ref: "#/components/schemas/ApiRequestCatcherAnswer"
             - type: "null"
           description: The attached bin and rule that answered; null when SendMock answered itself.
+        note:
+          type:
+            - string
+            - "null"
+          description: Why SendMock answered as it did when the answer alone does not say, such as the reason for a Twilio 401; null otherwise.
+          examples:
+            - Wrong auth token for AC22222222222222222222222222222222
         created_at:
           $ref: "#/components/schemas/IsoTimestamp"
       required:
@@ -8928,6 +8935,7 @@ components:
         - duration_ms
         - linked_message
         - catcher_answer
+        - note
         - created_at
     ApiStatusClass:
       type: string

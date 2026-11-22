@@ -39,6 +39,8 @@ pub struct ProviderOutcome {
     /// The answer is the provider's "no such path": no built-in operation serves the request,
     /// so an attached HTTP Catcher bin may answer it instead.
     pub is_unknown_path: bool,
+    /// Why SendMock answered as it did, for the request log.
+    pub note: Option<String>,
 }
 
 /// The SMS providers as they are now, so a saved change applies to the next request.
@@ -104,6 +106,7 @@ pub async fn answer_provider_request(
         created_message: provider_answer.created_message,
         secret_values: list_secret_values(provider),
         is_unknown_path: false,
+        note: provider_answer.note,
     })
 }
 
@@ -194,6 +197,7 @@ async fn answer_twilio_services(
         created_message: None,
         secret_values: twilio_answer.secret_values,
         is_unknown_path: false,
+        note: twilio_answer.note,
     }))
 }
 
@@ -223,6 +227,7 @@ async fn answer_twilio_verify(
         created_message: None,
         secret_values: list_secret_values(verify_provider),
         is_unknown_path: false,
+        note: None,
     }))
 }
 
@@ -239,6 +244,7 @@ fn answer_unmatched(provider_route: ProviderRoute<'_>) -> ProviderOutcome {
         created_message: None,
         secret_values: Vec::new(),
         is_unknown_path: true,
+        note: None,
     }
 }
 
@@ -261,12 +267,13 @@ async fn run_checked_operation(
             TwilioAccountCheck::Allowed => {
                 run_operation_kind(operation_context, provider_call).await?
             }
-            TwilioAccountCheck::Unauthorized => refuse(
+            TwilioAccountCheck::Unauthorized(reason) => refuse(
                 provider_call,
                 "unauthorized",
                 "credentials",
                 "The credentials do not match",
-            ),
+            )
+            .with_note(reason),
             TwilioAccountCheck::Refused(refusal) => refusal,
         },
     )

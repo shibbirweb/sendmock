@@ -17,6 +17,8 @@ pub struct ApiRequestRecord {
     /// The HTTP Catcher bin and rule that answered a provider request no built-in operation
     /// answers.
     pub catcher_answer: Option<CatcherAnswerRecord>,
+    /// Why SendMock answered as it did, when the answer alone does not say.
+    pub note: Option<String>,
     pub created_at_unix_ms: i64,
 }
 

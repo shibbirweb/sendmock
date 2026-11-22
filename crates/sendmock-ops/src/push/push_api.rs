@@ -43,6 +43,7 @@ pub async fn answer_push_api(
                 created_message: None,
                 secret_values: Vec::new(),
                 is_unknown_path: false,
+                note: None,
             }));
         }
     }

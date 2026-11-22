@@ -51,6 +51,7 @@ pub async fn answer_email_batch(
     Ok(ProviderAnswer {
         response,
         created_message: first_email_id.map(CreatedMessage::email),
+        note: None,
     })
 }
 

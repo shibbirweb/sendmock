@@ -37,6 +37,7 @@ pub async fn answer_email_send(
         Ok(sent_email) => Ok(ProviderAnswer {
             response: provider_call.render_success(&sent_email.described_email),
             created_message: Some(CreatedMessage::email(sent_email.email_id)),
+            note: None,
         }),
         Err(failure) => Ok(ProviderAnswer::without_message(
             provider_call.render_failure(&failure),

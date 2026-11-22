@@ -219,6 +219,7 @@ pub async fn answer_paypal_request(
             created_message: None,
             secret_values: Vec::new(),
             is_unknown_path: false,
+            note: None,
         }));
     }
     let credentials = read_credentials(request);
@@ -244,5 +245,6 @@ pub async fn answer_paypal_request(
         created_message: None,
         secret_values,
         is_unknown_path,
+        note: None,
     }))
 }

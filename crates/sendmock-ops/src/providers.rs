@@ -30,6 +30,7 @@ mod twilio_incoming_number_shape;
 mod twilio_incoming_numbers_api;
 mod twilio_messaging_services;
 mod twilio_service_numbers_api;
+mod twilio_unauthorized_reason;
 mod twilio_verify_api;
 mod twilio_verify_services;
 mod twilio_verify_verifications;

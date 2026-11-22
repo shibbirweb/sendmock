@@ -39,6 +39,11 @@ export type ApiRequestLogEntry = {
   linked_message: ApiRequestLinkedMessage | null;
   /** The attached bin and rule that answered; null when SendMock answered itself. */
   catcher_answer: ApiRequestCatcherAnswer | null;
+  /**
+   * Why SendMock answered as it did when the answer alone does not say, such as the reason for a Twilio 401; null otherwise.
+   * @example "Wrong auth token for AC22222222222222222222222222222222"
+   */
+  note: string | null;
   created_at: IsoTimestamp;
 };
 

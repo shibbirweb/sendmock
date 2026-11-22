@@ -121,5 +121,6 @@ pub async fn answer_paddle_request(
         created_message: None,
         secret_values: collect_secret_values(&paddle_call),
         is_unknown_path,
+        note: None,
     }))
 }

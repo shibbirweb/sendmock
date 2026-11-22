@@ -21,6 +21,8 @@ const MEDIA_UNFETCHABLE_ERROR_CODE: &str = "11200";
 pub struct ProviderAnswer {
     pub response: ProviderHttpResponse,
     pub created_message: Option<CreatedMessage>,
+    /// Why the provider answered as it did, for the request log.
+    pub note: Option<String>,
 }
 
 impl ProviderAnswer {
@@ -28,6 +30,14 @@ impl ProviderAnswer {
         Self {
             response,
             created_message: None,
+            note: None,
+        }
+    }
+
+    pub fn with_note(self, note: String) -> Self {
+        Self {
+            note: Some(note),
+            ..self
         }
     }
 }
@@ -83,6 +93,7 @@ pub async fn answer_send(
     Ok(ProviderAnswer {
         response,
         created_message,
+        note: None,
     })
 }
 

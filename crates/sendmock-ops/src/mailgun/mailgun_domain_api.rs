@@ -82,5 +82,6 @@ pub async fn answer_mailgun_domain_request(
         created_message: None,
         secret_values: Vec::new(),
         is_unknown_path: false,
+        note: None,
     }))
 }
