@@ -146,7 +146,7 @@ jobs:
           - client: Spring
             language: java
             folder: java-spring
-            run: mvn --quiet --batch-mode compile exec:java
+            run: mvn --quiet --batch-mode compile org.codehaus.mojo:exec-maven-plugin:3.5.1:java
           - client: lettre
             language: rust
             folder: rust-lettre

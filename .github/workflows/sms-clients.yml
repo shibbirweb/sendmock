@@ -152,7 +152,7 @@ jobs:
           - client: Twilio Java SDK
             language: java
             folder: java-twilio
-            run: mvn --quiet --batch-mode compile exec:java
+            run: mvn --quiet --batch-mode compile org.codehaus.mojo:exec-maven-plugin:3.5.1:java
           - client: Twilio C# SDK
             language: dotnet
             folder: dotnet-twilio
