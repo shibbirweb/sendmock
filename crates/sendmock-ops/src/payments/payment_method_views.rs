@@ -1,3 +1,4 @@
+use crate::PartialChanges;
 use schemars::JsonSchema;
 use sendmock_payments::{PaymentMethodDraft, TestNumberDraft};
 use serde::{Deserialize, Serialize};
@@ -140,7 +141,7 @@ pub struct PaymentMethodUpdate {
     /// The method's key, from `GET /api/v1/payments/methods`.
     pub method_key: String,
     #[serde(flatten)]
-    pub changes: PaymentMethodFields,
+    pub changes: PartialChanges<PaymentMethodFields>,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]

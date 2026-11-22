@@ -14,6 +14,7 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ### Changed
 
+- **Change one field at a time:** PATCH on providers, numbers, Messaging Services, Verify services, Twilio subaccounts, inbound routes, payment flows, gateways and methods, webhook variables and HTTP bins now takes only the fields you change (`sendmock numbers update <numberId> --label Marketing`, or a partial JSON body); the rest stay as they were, and a left-out or masked secret keeps its value. Previewing an unsaved webhook endpoint fills in every field you leave out.
 - **Setup validate catches what import refuses:** `sendmock setup validate` (and Preview in Settings > Setup) now reads every item the way an import does, so an unknown key or a wrong type is reported with its place before you import, instead of only when the import runs.
 - **Merge imports no longer ask to confirm:** `sendmock setup import` needs no `--yes` for a merge, which only adds and updates. A replace that would remove items names each one and asks you to run it again with `--confirm-removed-count <count>`.
 - **Reset says what it did:** `sendmock reset` and `POST /api/v1/reset` answer what they cleared (emails, SMS, deliveries and the rest) and which configuration stayed, instead of an empty answer. The new `--config` option also removes every configured item and puts the settings and providers back to what SendMock ships with, after you confirm the counts it names; see Seed file, Reset before every test run.

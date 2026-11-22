@@ -8,6 +8,7 @@ import {
   pageQueryParameters,
   tagEndpoints,
   typeRef,
+  partialOf,
 } from "./endpoint-definition";
 
 const binIdQueryParameter = {
@@ -58,7 +59,7 @@ export const httpCatcherApi: ApiEndpoint[] = tagEndpoints("HTTP Catcher", [
     method: "PATCH",
     path: "/api/v1/http/bins/{binId}",
     summary: "Change a bin's default response.",
-    requestBody: typeRef("HttpBinUpdate"),
+    requestBody: partialOf("HttpBinUpdate"),
     response: typeRef("HttpBin"),
     errorStatuses: [404],
   },

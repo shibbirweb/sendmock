@@ -109,8 +109,11 @@ impl Operation for UpdateMessagingServiceOperation {
             .ok_or_else(|| OperationError::NotFound {
                 message: format!("No Messaging Service with SID {}", input.service_sid),
             })?;
+        let merged_changes = input
+            .changes
+            .merge_onto(&MessagingService::from(existing_service.clone()))?;
         let changed_service =
-            build_messaging_service(operation_context, input.changes, Some(existing_service))
+            build_messaging_service(operation_context, merged_changes, Some(existing_service))
                 .await?;
         let stored_service = operation_context
             .messaging_service_repository

@@ -1,6 +1,8 @@
 use schemars::JsonSchema;
 use serde::Deserialize;
 
+use crate::PartialChanges;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum NumberChannel {
@@ -85,8 +87,9 @@ pub struct VirtualNumberInput {
 pub struct VirtualNumberUpdate {
     /// The number's ID, from `GET /api/v1/numbers`.
     pub number_id: String,
+    /// Only the fields to change; the rest stay.
     #[serde(flatten)]
-    pub changes: VirtualNumberInput,
+    pub changes: PartialChanges<VirtualNumberInput>,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
@@ -116,8 +119,9 @@ pub struct MessagingServiceInput {
 pub struct MessagingServiceUpdate {
     /// The service SID, `MG...`, from `GET /api/v1/messaging-services`.
     pub service_sid: String,
+    /// Only the fields to change; the rest stay.
     #[serde(flatten)]
-    pub changes: MessagingServiceInput,
+    pub changes: PartialChanges<MessagingServiceInput>,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]

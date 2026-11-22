@@ -189,7 +189,12 @@ impl Operation for UpdateWebhookVariableOperation {
         input: WebhookVariableUpdate,
     ) -> Result<WebhookVariable, OperationError> {
         let stored_variable = find_stored_variable(operation_context, &input.variable_id).await?;
-        let changes = input.changes;
+        let mut merge_base = build_variable_view(stored_variable.clone())?;
+        if merge_base.kind == VariableKind::Secret {
+            // The view masks a secret; an empty value is how an update keeps the stored one.
+            merge_base.value = String::new();
+        }
+        let changes = input.changes.merge_onto(&merge_base)?;
         let endpoint_id =
             validate_variable(operation_context, &changes, Some(&stored_variable)).await?;
         let random_mode = changes

@@ -170,10 +170,12 @@ impl Operation for UpdatePaymentMethodOperation {
         input: PaymentMethodUpdate,
     ) -> Result<PaymentMethodDefinition, OperationError> {
         let stored_method = find_payment_method(operation_context, &input.method_key).await?;
+        let merged_changes: PaymentMethodFields =
+            input.changes.merge_onto(&stored_method.fields)?;
         let changed_fields = PaymentMethodFields {
             key: stored_method.fields.key.clone(),
             flow: stored_method.fields.flow.clone(),
-            ..input.changes
+            ..merged_changes
         };
         check_method_fields(operation_context, &changed_fields, false).await?;
         let changed_method = PaymentMethodRecord {

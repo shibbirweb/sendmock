@@ -252,6 +252,8 @@ Delete all (A17, UI-14): every delete-all operation and `DELETE /traffic` publis
 
 ## Conventions
 
+**PATCH merges a partial body (1.5.0, PL-26.4):** every configuration PATCH (providers, numbers, Messaging Services, Verify services, Twilio subaccounts, inbound routes, payment flows, gateways and methods, webhook variables, HTTP bins) takes only the fields to change and merges them into the stored object, objects key by key and lists replaced; a left-out or masked secret keeps the stored value. The endpoint preview completes a partial endpoint from the saved one or a new endpoint's defaults (PL-26.5). Their request bodies are `Partial<...>` in the registry.
+
 - Errors: `{ "error": { "code": "not_found", "message": "..." } }` with proper HTTP status.
 - Times: RFC 3339 UTC strings in JSON.
 - Pagination: opaque `next_cursor` (ULID based).

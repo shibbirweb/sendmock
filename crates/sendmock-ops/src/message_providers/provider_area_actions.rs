@@ -3,7 +3,8 @@
 
 use super::credential_masking::merge_credentials;
 use super::provider_inputs::{
-    ProviderCreateRequest, ProviderCredentialReference, ProviderPreviewRequest, ProviderUpdate,
+    MessageProviderInput, ProviderCreateRequest, ProviderCredentialReference,
+    ProviderPreviewRequest, ProviderUpdate,
 };
 use super::provider_presenter::{present_provider, present_providers};
 use super::provider_preview::preview_provider;
@@ -87,7 +88,10 @@ pub async fn update_area_provider(
         .ok_or_else(|| OperationError::NotFound {
             message: format!("No {area} provider with the key {}", input.provider_key),
         })?;
-    let mut changed_provider = input.changes.apply_to(stored_provider);
+    let merged_input = input
+        .changes
+        .merge_onto(&MessageProviderInput::from(stored_provider.clone()))?;
+    let mut changed_provider = merged_input.apply_to(stored_provider);
     changed_provider.credentials =
         merge_credentials(&stored_provider.credentials, changed_provider.credentials);
     check_provider_can_be_saved(operation_context, &changed_provider, &area_providers)?;

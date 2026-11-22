@@ -3,6 +3,8 @@ use std::collections::BTreeMap;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+use crate::PartialChanges;
+
 use crate::providers::{
     MessageProviderDefinition, ProviderCredential, ProviderErrorResponse, ProviderFieldMapping,
     ProviderOperation, ProviderResponseTemplate, ProviderValidationRule,
@@ -124,8 +126,9 @@ pub struct ProviderReference {
 pub struct ProviderUpdate {
     /// The provider's key, e.g. `twilio`, from its providers list.
     pub provider_key: String,
+    /// Only the fields to change; the rest, a left-out or masked secret included, stay.
     #[serde(flatten)]
-    pub changes: MessageProviderInput,
+    pub changes: PartialChanges<MessageProviderInput>,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]

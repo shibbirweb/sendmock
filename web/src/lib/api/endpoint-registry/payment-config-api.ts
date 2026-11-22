@@ -3,6 +3,7 @@ import {
   listOf,
   tagEndpoints,
   typeRef,
+  partialOf,
 } from "./endpoint-definition";
 
 const flowEndpoints = tagEndpoints("Payment flows", [
@@ -32,7 +33,7 @@ const flowEndpoints = tagEndpoints("Payment flows", [
     method: "PATCH",
     path: "/api/v1/payments/flows/{flowKey}",
     summary: "Change a flow.",
-    requestBody: typeRef("PaymentFlowInput"),
+    requestBody: partialOf("PaymentFlowInput"),
     response: typeRef("PaymentFlowDefinition"),
     errorStatuses: [400, 404],
   },
@@ -115,7 +116,7 @@ const gatewayEndpoints = tagEndpoints("Payment gateways", [
     method: "PATCH",
     path: "/api/v1/payments/gateways/{gatewayKey}",
     summary: "Change a gateway; secret credentials stay masked.",
-    requestBody: typeRef("PaymentGatewayInput"),
+    requestBody: partialOf("PaymentGatewayInput"),
     response: typeRef("PaymentGatewayDefinition"),
     errorStatuses: [400, 404],
   },
@@ -177,7 +178,7 @@ const methodEndpoints = tagEndpoints("Payment methods", [
     method: "PATCH",
     path: "/api/v1/payments/methods/{methodKey}",
     summary: "Change a method.",
-    requestBody: typeRef("PaymentMethodInput"),
+    requestBody: partialOf("PaymentMethodInput"),
     response: typeRef("PaymentMethodDefinition"),
     errorStatuses: [400, 404],
   },

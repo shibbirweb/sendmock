@@ -1,3 +1,4 @@
+use crate::PartialChanges;
 use schemars::JsonSchema;
 use sendmock_payments::{FlowStep, PaymentFlowDraft};
 use serde::{Deserialize, Serialize};
@@ -97,7 +98,7 @@ pub struct PaymentFlowUpdate {
     /// The flow's key, from `GET /api/v1/payments/flows`.
     pub flow_key: String,
     #[serde(flatten)]
-    pub changes: PaymentFlowInput,
+    pub changes: PartialChanges<PaymentFlowInput>,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]

@@ -1,3 +1,4 @@
+use crate::PartialChanges;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -89,8 +90,9 @@ pub struct WebhookVariableInput {
 pub struct WebhookVariableUpdate {
     /// The webhook variable's ID, from `GET /api/v1/webhooks/variables`.
     pub variable_id: String,
+    /// Only the fields to change; the rest stay, a secret's value included.
     #[serde(flatten)]
-    pub changes: WebhookVariableInput,
+    pub changes: PartialChanges<WebhookVariableInput>,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]

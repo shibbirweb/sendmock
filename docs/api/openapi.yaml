@@ -2497,7 +2497,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/InboundRouteInput"
+              $ref: "#/components/schemas/InboundRouteInputPatch"
       responses:
         "200":
           description: OK.
@@ -3883,7 +3883,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/VerifyServiceInput"
+              $ref: "#/components/schemas/VerifyServiceInputPatch"
       responses:
         "200":
           description: OK.
@@ -3985,7 +3985,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/VirtualNumberInput"
+              $ref: "#/components/schemas/VirtualNumberInputPatch"
       responses:
         "200":
           description: OK.
@@ -4087,7 +4087,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/MessagingServiceInput"
+              $ref: "#/components/schemas/MessagingServiceInputPatch"
       responses:
         "200":
           description: OK.
@@ -4191,7 +4191,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TwilioSubaccountChanges"
+              $ref: "#/components/schemas/TwilioSubaccountChangesPatch"
       responses:
         "200":
           description: OK.
@@ -4401,7 +4401,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/MessageProviderInput"
+              $ref: "#/components/schemas/MessageProviderInputPatch"
       responses:
         "200":
           description: OK.
@@ -4664,7 +4664,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/MessageProviderInput"
+              $ref: "#/components/schemas/MessageProviderInputPatch"
       responses:
         "200":
           description: OK.
@@ -4926,7 +4926,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/HttpBinUpdate"
+              $ref: "#/components/schemas/HttpBinUpdatePatch"
       responses:
         "200":
           description: OK.
@@ -6144,7 +6144,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PaymentFlowInput"
+              $ref: "#/components/schemas/PaymentFlowInputPatch"
       responses:
         "200":
           description: OK.
@@ -6462,7 +6462,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PaymentGatewayInput"
+              $ref: "#/components/schemas/PaymentGatewayInputPatch"
       responses:
         "200":
           description: OK.
@@ -6693,7 +6693,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PaymentMethodInput"
+              $ref: "#/components/schemas/PaymentMethodInputPatch"
       responses:
         "200":
           description: OK.
@@ -8197,7 +8197,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/WebhookVariableInput"
+              $ref: "#/components/schemas/WebhookVariableInputPatch"
       responses:
         "200":
           description: OK.
@@ -10892,8 +10892,100 @@ components:
       type: object
       properties:
         endpoint:
-          $ref: "#/components/schemas/WebhookEndpointInput"
-          description: The endpoint settings to render, saved or not; left out, the saved endpoint `endpoint_id` names is rendered as stored.
+          type: object
+          properties:
+            name:
+              type: string
+              description: A name for the endpoint, shown in lists and deliveries.
+              examples:
+                - Orders app
+            url:
+              type: string
+              description: Where deliveries are sent; can use templates.
+              examples:
+                - http://localhost:3000/webhooks/sendmock
+            method:
+              $ref: "#/components/schemas/HttpMethod"
+              description: The HTTP method of each delivery.
+              examples:
+                - POST
+            headers:
+              type: object
+              additionalProperties:
+                type: string
+              description: Extra headers layered on top of the template's.
+              examples:
+                - Authorization: Bearer {{ vars.app_token }}
+            extra_fields:
+              type: object
+              additionalProperties:
+                type: string
+              description: Extra body fields layered on top of the template's.
+              examples:
+                - environment: local
+            template_id:
+              type: string
+              description: The payload template, e.g. `native` (Standard Webhooks JSON) or `slack.incoming_webhook`.
+              examples:
+                - native
+            template_mode:
+              $ref: "#/components/schemas/TemplateMode"
+              description: "`linked` follows template updates, `detached` keeps its own copy."
+              examples:
+                - linked
+            timeout_ms:
+              type: number
+              description: How long to wait for your app's answer, in milliseconds.
+              examples:
+                - 10000
+            retry_policy:
+              $ref: "#/components/schemas/RetryPolicy"
+              description: When and how often failed deliveries are retried.
+            is_enabled:
+              type: boolean
+              description: Off endpoints receive no deliveries.
+              examples:
+                - true
+            query_params:
+              type: array
+              items:
+                $ref: "#/components/schemas/NameValueTemplate"
+              description: Query parameters added to the URL.
+            body_mode:
+              $ref: "#/components/schemas/EndpointBodyMode"
+              description: "How the body is built: `template` (the payload template), `fields` (name and value rows), `raw` (one text template) or `none`."
+              examples:
+                - template
+            body_fields:
+              type: array
+              items:
+                $ref: "#/components/schemas/EndpointBodyField"
+              description: The rows of `fields` mode.
+            fields_encoding:
+              type: string
+              enum:
+                - json
+                - form
+                - multipart
+              description: "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent)."
+              examples:
+                - json
+            raw_content_type:
+              type: string
+              description: The content type of `raw` mode.
+              examples:
+                - application/json
+            raw_body:
+              type: string
+              description: The body template of `raw` mode.
+              examples:
+                - '{"text": "New email: {{ data.subject }}"}'
+            render_mode:
+              $ref: "#/components/schemas/RenderMode"
+              description: "`strict` stops a delivery on an undefined variable, `lenient` renders it empty with a warning."
+              examples:
+                - strict
+          description: "The endpoint settings to render, saved or not, as many fields as you like: the rest come from the saved endpoint `endpoint_id` names, or a new endpoint's defaults. Left out, the saved endpoint is rendered as stored."
         endpoint_id:
           $ref: "#/components/schemas/Ulid"
           description: A saved endpoint's own variables are used too; alone, its stored settings are rendered.
@@ -11283,15 +11375,13 @@ components:
         - onesignal
         - generic
       description: Ready-made bins whose replies mimic the real service.
-    HttpBinUpdate:
+    HttpBinUpdatePatch:
       type: object
       properties:
         default_response:
           $ref: "#/components/schemas/HttpMockResponse"
           description: The reply sent when no rule matches.
-      required:
-        - default_response
-      description: Body of `PATCH /http/bins/{binId}`.
+      additionalProperties: false
     HttpFollowUpWebhook:
       type: object
       properties:
@@ -11663,6 +11753,27 @@ components:
         - filter
         - actions
       description: Body of POST /api/v1/inbound-routes and PATCH /api/v1/inbound-routes/{routeId}.
+    InboundRouteInputPatch:
+      type: object
+      properties:
+        priority:
+          type: number
+          description: Lower runs first.
+          examples:
+            - 10
+        description:
+          type: string
+          description: A name for the route, shown in the list.
+          examples:
+            - Ticket replies to the helpdesk
+        filter:
+          $ref: "#/components/schemas/InboundRouteFilter"
+          description: Which incoming emails the route takes.
+        actions:
+          type: array
+          items:
+            $ref: "#/components/schemas/InboundRouteAction"
+          description: What the route does with a matching email, in order.
     InboundRouteMatch:
       type: object
       properties:
@@ -12394,6 +12505,98 @@ components:
         - status_names
         - outcome_error_codes
       description: Body of PATCH .../providers/{providerKey}; the key and area are fixed.
+    MessageProviderInputPatch:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The `/providers/<key>/...` path and the `provider` value stored on each message; lowercase, fixed after creation.
+          examples:
+            - sendgrid
+        name:
+          type: string
+          description: The provider's name, shown on messages and in pickers.
+          examples:
+            - SendGrid
+        accent:
+          type: string
+          description: "`#rrggbb`, used on its badge."
+          examples:
+            - "#1a82e2"
+        is_enabled:
+          type: boolean
+          description: Off providers answer nothing; their paths get SendMock's native 404.
+          examples:
+            - true
+        host:
+          type:
+            - string
+            - "null"
+          description: The provider's API host, used on the provider port to tell apart providers that share a path; null when not needed.
+          examples:
+            - api.sendgrid.com
+        credentials:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderCredential"
+          description: The credentials your app is configured with.
+        check_credentials:
+          type: boolean
+          description: "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer."
+          examples:
+            - false
+        operations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderOperation"
+          description: The requests it answers.
+        field_mapping:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderFieldMapping"
+          description: Where each part of a sent message is read from; anything else is kept as metadata.
+        validation_rules:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderValidationRule"
+          description: The checks run on each send, in order.
+        success_response:
+          $ref: "#/components/schemas/ProviderResponseTemplate"
+          description: The answer to a request that passes every check.
+        error_responses:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderErrorResponse"
+          description: The answer for each kind of error.
+        message_id_template:
+          type: string
+          description: The provider's id for each message, a template.
+          examples:
+            - <{{ uuid() }}@sendmock.local>
+        callback_template_key:
+          type:
+            - string
+            - "null"
+          description: The webhook template its status callbacks and inbound messages are sent with; null sends none.
+          examples:
+            - sendgrid-event
+        status_names:
+          type: object
+          additionalProperties:
+            type: string
+          description: The provider's name for each SendMock status.
+          examples:
+            - delivered: delivered
+              bounced: bounce
+              complained: spamreport
+        outcome_error_codes:
+          type: object
+          additionalProperties:
+            type: string
+          description: "SMS only: the provider's error code for each delivery outcome, so test numbers fail with its own codes."
+          examples:
+            - invalid_number: "21211"
+              unreachable: "30003"
     MessageProviderPreview:
       type: object
       properties:
@@ -12582,6 +12785,40 @@ components:
         - inbound_url
         - inbound_fallback_url
       description: Body of POST and PATCH /api/v1/messaging-services.
+    MessagingServiceInputPatch:
+      type: object
+      properties:
+        friendly_name:
+          type: string
+          description: A name for the service.
+          examples:
+            - Notifications
+        number_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: The virtual numbers in the sender pool, by ID.
+          examples:
+            - - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+        inbound_mode:
+          $ref: "#/components/schemas/MessagingServiceInboundMode"
+          description: "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`."
+          examples:
+            - webhook
+        inbound_url:
+          type:
+            - string
+            - "null"
+          description: Used when `inbound_mode` is `webhook`.
+          examples:
+            - http://localhost:3000/sms/inbound
+        inbound_fallback_url:
+          type:
+            - string
+            - "null"
+          description: Called when `inbound_url` fails.
+          examples:
+            - http://localhost:3000/sms/inbound-fallback
     MimePart:
       type: object
       properties:
@@ -13417,6 +13654,29 @@ components:
         - picker_tab
         - steps
       description: Body of POST and PATCH /api/v1/payments/flows; the key is fixed after creation.
+    PaymentFlowInputPatch:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The flow's key; fixed after creation.
+          examples:
+            - wallet_otp
+        name:
+          type: string
+          description: The flow's name.
+          examples:
+            - Wallet with OTP
+        picker_tab:
+          type: string
+          description: The checkout picker tab its methods show under, e.g. "Mobile banking".
+          examples:
+            - Mobile banking
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentFlowStep"
+          description: The steps in order.
     PaymentFlowStep:
       type: object
       properties:
@@ -13819,6 +14079,127 @@ components:
         - notification_body
         - notification_headers
       description: Body of PATCH /api/v1/payments/gateways/{gatewayKey}; the key is fixed.
+    PaymentGatewayInputPatch:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The `provider` value in the API and in `/providers/<key>/...` paths.
+          examples:
+            - upay
+        name:
+          type: string
+          description: The gateway's name, shown on checkout pages.
+          examples:
+            - Upay
+        accent:
+          type: string
+          description: "`#rrggbb`, used on its checkout pages."
+          examples:
+            - "#e2136e"
+        is_enabled:
+          type: boolean
+          description: Off gateways reject new checkouts.
+          examples:
+            - true
+        method_keys:
+          type: array
+          items:
+            type: string
+          description: The methods its checkout offers, in order.
+          examples:
+            - - upay_wallet
+              - card
+        credentials:
+          type: array
+          items:
+            $ref: "#/components/schemas/GatewayCredential"
+          description: The merchant credentials your app is configured with.
+        notification_endpoint_id:
+          anyOf:
+            - $ref: "#/components/schemas/Ulid"
+            - type: "null"
+          description: The webhook endpoint its IPN or webhook deliveries go to.
+          examples:
+            - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+        redirect_method:
+          type: string
+          enum:
+            - GET
+            - POST
+          description: "How the browser returns to your app: `GET` (query string) or `POST` (form)."
+          examples:
+            - POST
+        redirect_fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/GatewayRedirectField"
+          description: The parameters sent to your app on redirect.
+        notification_content_type:
+          type: string
+          enum:
+            - json
+            - form
+          description: "How the IPN or webhook body is sent: `json` or `form`."
+          examples:
+            - json
+        event_names:
+          type: object
+          properties:
+            payment.created:
+              type: string
+            payment.authorized:
+              type: string
+            payment.succeeded:
+              type: string
+            payment.failed:
+              type: string
+            payment.canceled:
+              type: string
+            payment.refunded:
+              type: string
+            payment.partially_refunded:
+              type: string
+            payment.dispute_opened:
+              type: string
+            payment.dispute_updated:
+              type: string
+            payment.dispute_closed:
+              type: string
+            checkout.completed:
+              type: string
+            checkout.expired:
+              type: string
+          required:
+            - payment.created
+            - payment.authorized
+            - payment.succeeded
+            - payment.failed
+            - payment.canceled
+            - payment.refunded
+            - payment.partially_refunded
+            - payment.dispute_opened
+            - payment.dispute_updated
+            - payment.dispute_closed
+            - checkout.completed
+            - checkout.expired
+          description: The gateway's name for each native event; blank sends nothing.
+          examples:
+            - payment.succeeded: PAYMENT_SUCCESS
+              payment.failed: PAYMENT_FAILED
+              payment.refunded: ""
+              checkout.completed: ""
+              checkout.expired: ""
+        notification_body:
+          type: string
+          description: The notification body, a template over the payment and the event.
+          examples:
+            - '{"status": "{{ event.name }}", "txn_id": "{{ payment.reference }}"}'
+        notification_headers:
+          type: array
+          items:
+            $ref: "#/components/schemas/GatewayHeaderTemplate"
+          description: Headers sent with each notification.
     PaymentGatewayPreview:
       type: object
       properties:
@@ -14128,6 +14509,67 @@ components:
         - default_outcome
         - test_account
       description: Body of POST and PATCH /api/v1/payments/methods; key and flow are fixed after creation.
+    PaymentMethodInputPatch:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The method's key; fixed after creation.
+          examples:
+            - upay_wallet
+        name:
+          type: string
+          description: The method's name on checkout pages.
+          examples:
+            - Upay wallet
+        flow:
+          type: string
+          description: The key of the flow its checkout runs.
+          examples:
+            - wallet
+        accent:
+          type: string
+          description: "`#rrggbb`, used on checkout pages."
+          examples:
+            - "#e2136e"
+        is_enabled:
+          type: boolean
+          description: Off methods are hidden on checkout pages.
+          examples:
+            - true
+        test_cards:
+          type: array
+          items:
+            $ref: "#/components/schemas/TestCardValue"
+          description: Read by a card form step.
+        test_numbers:
+          type: array
+          items:
+            $ref: "#/components/schemas/TestNumberValue"
+          description: Read by an account number or voucher code step.
+        otp:
+          type: string
+          description: Read by an OTP step.
+          examples:
+            - "123456"
+        pin:
+          type: string
+          description: Read by a PIN step.
+          examples:
+            - "12121"
+        default_outcome:
+          type: string
+          enum:
+            - succeed
+            - decline
+          description: The outcome when the flow has no deciding step.
+          examples:
+            - succeed
+        test_account:
+          type: string
+          description: Read by a signed-in account step.
+          examples:
+            - sb-buyer@personal.example.com
     PaymentMethodValueKind:
       type: string
       enum:
@@ -17540,7 +17982,7 @@ components:
         - created_at
         - updated_at
       description: A subaccount of the Twilio provider's main account; its auth token is masked.
-    TwilioSubaccountChanges:
+    TwilioSubaccountChangesPatch:
       type: object
       properties:
         friendly_name:
@@ -17567,9 +18009,6 @@ components:
           description: Where Twilio Debugger events for this subaccount are sent; null for none.
           examples:
             - null
-      required:
-        - friendly_name
-      description: Body of `PATCH /api/v1/twilio/subaccounts/{accountSid}`.
     TwilioSubaccountInput:
       type: object
       properties:
@@ -18007,6 +18446,31 @@ components:
         - fixed_code
         - ttl_seconds
       description: Body of POST and PATCH /api/v1/verify/services.
+    VerifyServiceInputPatch:
+      type: object
+      properties:
+        friendly_name:
+          type: string
+          description: The name shown in the code message, e.g. "Your Shop verification code is ...".
+          examples:
+            - Shop
+        code_length:
+          type: number
+          description: Digits in each code, 4 to 10.
+          examples:
+            - 6
+        fixed_code:
+          type:
+            - string
+            - "null"
+          description: Always send this code instead of a random one, for deterministic tests; null for random.
+          examples:
+            - "123456"
+        ttl_seconds:
+          type: number
+          description: How long a code stays valid, in seconds.
+          examples:
+            - 600
     VirtualNumber:
       type: object
       properties:
@@ -18168,6 +18632,66 @@ components:
         - status_callback_url
         - messaging_service_sid
       description: Body of POST and PATCH /api/v1/numbers.
+    VirtualNumberInputPatch:
+      type: object
+      properties:
+        number:
+          type: string
+          description: E.164, without a channel prefix; `channels` says whether WhatsApp works.
+          examples:
+            - "+15550001111"
+        label:
+          type: string
+          description: A name for the number, e.g. the app or feature that uses it.
+          examples:
+            - Support line
+        channels:
+          type: array
+          items:
+            $ref: "#/components/schemas/NumberChannel"
+          description: "Where the number works: `sms`, `whatsapp` or both."
+          examples:
+            - - sms
+        inbound_url:
+          type:
+            - string
+            - "null"
+          description: Reply webhook (Twilio "A message comes in"); null means rules only.
+          examples:
+            - http://localhost:3000/sms/inbound
+        inbound_method:
+          $ref: "#/components/schemas/InboundWebhookMethod"
+          description: The HTTP method of the reply webhook.
+          examples:
+            - POST
+        inbound_fallback_url:
+          type:
+            - string
+            - "null"
+          description: Called when the reply webhook fails, with `ErrorCode` and `ErrorUrl` added, as Twilio does.
+          examples:
+            - http://localhost:3000/sms/inbound-fallback
+        inbound_template_id:
+          type:
+            - string
+            - "null"
+          description: Payload template for the inbound webhook, e.g. `twilio.inbound_sms`.
+          examples:
+            - twilio.inbound_sms
+        status_callback_url:
+          type:
+            - string
+            - "null"
+          description: Your app's URL for status changes of messages sent from this number.
+          examples:
+            - http://localhost:3000/sms/status
+        messaging_service_sid:
+          type:
+            - string
+            - "null"
+          description: The Messaging Service this number belongs to, `MG...`; null for none.
+          examples:
+            - MG00000000000000000000000000000001
     WebhookDelivery:
       type: object
       properties:
@@ -19251,6 +19775,55 @@ components:
         - random_mode
         - description
       description: Body of POST and PATCH /api/v1/webhooks/variables.
+    WebhookVariableInputPatch:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name templates read it by, as `{{ vars.<name> }}`.
+          examples:
+            - tenant_id
+        kind:
+          $ref: "#/components/schemas/VariableKind"
+          description: "`text`, `number`, `boolean`, `json` and `secret` are fixed values; `dynamic` is read from the event, `random` is generated, `computed` combines other variables and `prompt` is asked for on manual sends."
+          examples:
+            - text
+        scope:
+          type: string
+          enum:
+            - global
+            - endpoint
+          description: "`global` for every endpoint, or `endpoint` for one; endpoint values win."
+          examples:
+            - global
+        endpoint_id:
+          anyOf:
+            - $ref: "#/components/schemas/Ulid"
+            - type: "null"
+          description: The endpoint of an `endpoint` variable; null for global ones.
+          examples:
+            - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+        value:
+          type: string
+          description: Static value, expression, generator or default; secrets are masked.
+          examples:
+            - acme
+        random_mode:
+          type:
+            - string
+            - "null"
+          enum:
+            - per_send
+            - fixed
+            - null
+          description: "For `random`: `per_send` generates a new value each time, `fixed` keeps one value until Regenerate; null for other kinds."
+          examples:
+            - per_send
+        description:
+          type: string
+          description: What the variable is for.
+          examples:
+            - Tenant every webhook is sent for
     WhatsappWebhookVerification:
       type: object
       properties:

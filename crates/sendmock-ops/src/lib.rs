@@ -29,6 +29,7 @@ mod operation_registry;
 mod outcome_rules;
 mod paddle;
 mod page_of;
+mod partial_changes;
 mod payments;
 mod paypal;
 mod pop3_mailbox;
@@ -110,6 +111,7 @@ pub use outcome_rules::{
     EmailOutcomeRule, OutcomeTestResult, SmsOutcomeRule, load_email_outcome_rules,
 };
 pub use page_of::PageOf;
+pub use partial_changes::PartialChanges;
 pub use payments::{
     PaymentDetail, PaymentFlowDefinition, PaymentFlowStep, PaymentGatewayDefinition,
     PaymentMethodDefinition, PaymentSummary,

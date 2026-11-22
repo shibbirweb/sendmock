@@ -6,6 +6,7 @@ import {
   projectQueryParameter,
   tagEndpoints,
   typeRef,
+  partialOf,
 } from "./endpoint-definition";
 
 const verificationFilterParameters = [
@@ -87,7 +88,7 @@ const verifyEndpoints = tagEndpoints("Verify", [
     method: "PATCH",
     path: "/api/v1/verify/services/{serviceSid}",
     summary: "Change a Verify service.",
-    requestBody: typeRef("VerifyServiceInput"),
+    requestBody: partialOf("VerifyServiceInput"),
     response: typeRef("VerifyService"),
     errorStatuses: [400, 404],
   },
@@ -120,7 +121,7 @@ const numberEndpoints = tagEndpoints("Numbers", [
     method: "PATCH",
     path: "/api/v1/numbers/{numberId}",
     summary: "Change a number.",
-    requestBody: typeRef("VirtualNumberInput"),
+    requestBody: partialOf("VirtualNumberInput"),
     response: typeRef("VirtualNumber"),
     errorStatuses: [400, 404],
   },
@@ -150,7 +151,7 @@ const numberEndpoints = tagEndpoints("Numbers", [
     method: "PATCH",
     path: "/api/v1/messaging-services/{serviceSid}",
     summary: "Change a Messaging Service.",
-    requestBody: typeRef("MessagingServiceInput"),
+    requestBody: partialOf("MessagingServiceInput"),
     response: typeRef("MessagingService"),
     errorStatuses: [400, 404],
   },
@@ -186,7 +187,7 @@ const twilioAccountEndpoints = tagEndpoints("SMS", [
     path: "/api/v1/twilio/subaccounts/{accountSid}",
     summary:
       "Change a Twilio subaccount's name, status, token or Debugger URL.",
-    requestBody: typeRef("TwilioSubaccountChanges"),
+    requestBody: partialOf("TwilioSubaccountChanges"),
     response: typeRef("TwilioSubaccount"),
     errorStatuses: [400, 404],
   },

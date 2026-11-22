@@ -8,6 +8,7 @@ import {
   type QueryParameter,
   tagEndpoints,
   typeRef,
+  partialOf,
 } from "./endpoint-definition";
 
 /** The filters the email list takes; a delete with the same filters removes what it lists. */
@@ -308,7 +309,7 @@ const inboundRouteEndpoints = tagEndpoints("Inbound routes", [
     method: "PATCH",
     path: "/api/v1/inbound-routes/{routeId}",
     summary: "Change a route.",
-    requestBody: typeRef("InboundRouteInput"),
+    requestBody: partialOf("InboundRouteInput"),
     response: typeRef("InboundRoute"),
     errorStatuses: [400, 404],
   },
