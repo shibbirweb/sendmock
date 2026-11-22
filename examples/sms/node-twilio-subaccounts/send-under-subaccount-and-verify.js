@@ -1,12 +1,16 @@
 // The official Twilio Node SDK against SendMock with a subaccount, as an app with one
 // subaccount per customer works: create it with the main account, read its token with the
 // account fetch, send under it, and check every status callback with that token (SM-19.8).
+// The main account cannot read the subaccount's message, and a text to the subaccount's number
+// reaches the app signed with the subaccount's token (SM-22.6).
 import { once } from "node:events";
 import { createServer } from "node:http";
 import twilio from "twilio";
 
 const providerUrl =
   process.env.SENDMOCK_PROVIDER_URL ?? "http://127.0.0.1:8026";
+const sendmockUrl = process.env.SENDMOCK_URL ?? "http://127.0.0.1:8025";
+const subaccountNumber = "+15550007777";
 // The shipped Twilio provider's main account; the Accounts API checks it.
 const mainAccountSid = "ACtest00000000000000000000000000";
 const mainAuthToken = "twilio-test-token";
@@ -49,9 +53,12 @@ async function startStatusCallbackHandler() {
   return { callbackServer, callbackUrl, receivedCallbacks };
 }
 
-async function waitForCallbacks(receivedCallbacks) {
+async function waitForCallbacks(
+  receivedCallbacks,
+  expectedCount = expectedStatuses.length,
+) {
   const deadline = Date.now() + callbackTimeoutMs;
-  while (receivedCallbacks.length < expectedStatuses.length) {
+  while (receivedCallbacks.length < expectedCount) {
     if (Date.now() > deadline) {
       throw new Error(`Callbacks so far: ${receivedCallbacks.length}`);
     }
@@ -116,3 +123,49 @@ for (const receivedCallback of receivedCallbacks) {
 console.log(
   `Status callbacks ${receivedCallbacks.map((callback) => callback.fields.MessageStatus).join(", ")} signed with the subaccount's token`,
 );
+
+try {
+  await mainClient.messages(message.sid).fetch();
+  throw new Error("The main account read the subaccount's message");
+} catch (fetchError) {
+  if (fetchError.status !== 404 || fetchError.code !== 20404) {
+    throw fetchError;
+  }
+}
+console.log("The main account gets 20404 for the subaccount's message");
+
+const inboundHandler = await startStatusCallbackHandler();
+await subaccountClient.incomingPhoneNumbers.create({
+  phoneNumber: subaccountNumber,
+  smsUrl: inboundHandler.callbackUrl,
+});
+const inboundResponse = await fetch(`${sendmockUrl}/api/v1/sms/inbound`, {
+  method: "POST",
+  headers: { "content-type": "application/json" },
+  body: JSON.stringify({
+    from: "+14155550110",
+    to: subaccountNumber,
+    body: "See you then",
+  }),
+});
+if (!inboundResponse.ok) {
+  throw new Error(`The inbound text was refused: ${inboundResponse.status}`);
+}
+await waitForCallbacks(inboundHandler.receivedCallbacks, 1);
+inboundHandler.callbackServer.close();
+const [inboundWebhook] = inboundHandler.receivedCallbacks;
+const isInboundSignedBySubaccount = twilio.validateRequest(
+  fetchedSubaccount.authToken,
+  inboundWebhook.signature,
+  inboundHandler.callbackUrl,
+  inboundWebhook.fields,
+);
+if (
+  !isInboundSignedBySubaccount ||
+  inboundWebhook.fields.AccountSid !== fetchedSubaccount.sid
+) {
+  throw new Error(
+    `The inbound webhook is not the subaccount's: ${JSON.stringify(inboundWebhook.fields)}`,
+  );
+}
+console.log("The inbound webhook carries and is signed with the subaccount");
