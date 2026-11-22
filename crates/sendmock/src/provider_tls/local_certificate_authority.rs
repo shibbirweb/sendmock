@@ -9,7 +9,8 @@ use rcgen::{
 
 const CA_CERTIFICATE_FILE: &str = "provider-ca-certificate.pem";
 const CA_KEY_FILE: &str = "provider-ca-key.pem";
-const CA_COMMON_NAME: &str = "SendMock local CA";
+/// The CA's name, which the system stores list it by.
+pub const CA_COMMON_NAME: &str = "SendMock local CA";
 /// The names every provider certificate holds, so an SDK on this machine can connect.
 const LOCAL_NAMES: [&str; 3] = ["localhost", "127.0.0.1", "::1"];
 
@@ -155,6 +156,24 @@ fn write_private_file(file_path: &Path, contents: &str) -> std::io::Result<()> {
 #[cfg(not(unix))]
 fn write_private_file(file_path: &Path, contents: &str) -> std::io::Result<()> {
     std::fs::write(file_path, contents)
+}
+
+/// Where the local CA lives when the database gives no folder: SendMock's data folder, where
+/// the default database is, so `sendmock trust` and every server use the same CA.
+pub fn default_ca_folder() -> PathBuf {
+    dirs::data_dir()
+        .map(|data_folder| data_folder.join("sendmock"))
+        .unwrap_or_else(|| std::env::temp_dir().join("sendmock"))
+}
+
+/// The local CA certificate for the names (made when there is none): its path and PEM.
+pub fn load_local_ca_certificate(
+    ca_folder: &Path,
+    extra_names: &[String],
+) -> Result<(PathBuf, String), CertificateAuthorityError> {
+    let certificate_names = list_certificate_names(extra_names);
+    let (_, ca_certificate_pem) = load_or_create_ca(ca_folder, &certificate_names)?;
+    Ok((ca_folder.join(CA_CERTIFICATE_FILE), ca_certificate_pem))
 }
 
 /// A server certificate for the names, issued by the local CA at each start and valid for a

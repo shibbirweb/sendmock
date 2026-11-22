@@ -174,8 +174,9 @@ pub use sms_replies::{
 pub use smtp_chaos::{SmtpChaos, read_smtp_chaos, take_chaos_rejection};
 pub use smtp_delivery::{SmtpMessage, record_smtp_session, store_smtp_message};
 pub use system::{
-    ActivityBucket, AppInfo, AppStats, CurrencyAmount, GetHealthOperation, GetInfoOperation,
-    GetStatsOperation, GetTlsCaOperation, HealthStatus, TlsCertificateAuthority,
+    ActivityBucket, AppInfo, AppStats, CurrencyAmount, FixedTrustInspector, GetHealthOperation,
+    GetInfoOperation, GetStatsOperation, GetTlsCaOperation, GetTlsTrustOperation, HealthStatus,
+    SharedTrustInspector, TlsCertificateAuthority, TlsTrustPlace, TlsTrustReport, TrustInspector,
 };
 pub use twilio_accounts::{TwilioSubaccount, TwilioSubaccountTokenReveal};
 pub use updates::{
@@ -202,6 +203,7 @@ pub fn build_operation_registry() -> OperationRegistry {
     operation_registry.register(GetHealthOperation);
     operation_registry.register(GetInfoOperation);
     operation_registry.register(GetTlsCaOperation);
+    operation_registry.register(GetTlsTrustOperation);
     operation_registry.register(GetSeedStatusOperation);
     operation_registry.register(ExportSeedOperation);
     operation_registry.register(ValidateSeedOperation);

@@ -68,7 +68,8 @@ pub struct OperationContext {
     pub traffic_pruner: TrafficPruner,
     /// Set once the SMTP listener runs, so samples can go through it.
     pub sample_email_sender: Option<Arc<dyn SampleEmailSender>>,
-    pub update_checker: UpdateChecker,
+    /// What the binary gives about this machine: the update check and the trust stores.
+    pub machine: MachineServices,
     /// Templates from `--templates-dir`, replaced when the directory changes.
     pub file_templates: crate::webhooks::FileTemplateLibrary,
     /// Downloads `MediaUrl` links; set by the binary, which owns the HTTP client.
@@ -120,6 +121,14 @@ impl SmsDeliveryStores {
             opt_outs: SmsOptOutRepository::new(Arc::clone(database)),
         }
     }
+}
+
+/// Services about the machine SendMock runs on, which the binary sets.
+#[derive(Clone, Default)]
+pub struct MachineServices {
+    pub update_checker: UpdateChecker,
+    /// Checks this machine's trust stores for the local CA.
+    pub trust_inspector: Option<crate::system::SharedTrustInspector>,
 }
 
 /// What payments keep beside the payments themselves.
@@ -276,7 +285,7 @@ impl OperationContext {
             instance_details: Arc::new(instance_details),
             event_bus: EventBus::default(),
             sample_email_sender: None,
-            update_checker: UpdateChecker::default(),
+            machine: MachineServices::default(),
             file_templates: crate::webhooks::FileTemplateLibrary::default(),
             media_fetcher: None,
             email_network_clients: crate::email::EmailNetworkClients::default(),
@@ -316,6 +325,14 @@ impl OperationContext {
         status_callback_sender: Arc<dyn StatusCallbackSender>,
     ) -> Self {
         self.status_callback_sender = Some(status_callback_sender);
+        self
+    }
+
+    pub fn with_trust_inspector(
+        mut self,
+        trust_inspector: crate::system::SharedTrustInspector,
+    ) -> Self {
+        self.machine.trust_inspector = Some(trust_inspector);
         self
     }
 
@@ -361,7 +378,7 @@ impl OperationContext {
     }
 
     pub fn with_update_checker(mut self, update_checker: UpdateChecker) -> Self {
-        self.update_checker = update_checker;
+        self.machine.update_checker = update_checker;
         self
     }
 

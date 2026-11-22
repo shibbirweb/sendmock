@@ -14,6 +14,12 @@ export const systemSurfaces: SurfaceCatalogue = {
     mcp: "sendmock_tls_ca",
     ui: "Settings > Connection > Provider APIs over HTTPS > Download the CA",
   },
+  "GET /api/v1/tls/trust": {
+    phase: "A28",
+    cli: "sendmock trust",
+    mcp: "sendmock_tls_trust",
+    ui: "Settings > Connection > Provider APIs over HTTPS > Trusted by",
+  },
   "GET /api/v1/info": {
     phase: "0",
     cli: "sendmock status",

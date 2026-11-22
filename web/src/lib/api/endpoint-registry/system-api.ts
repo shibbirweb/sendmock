@@ -29,6 +29,14 @@ const systemEndpoints = tagEndpoints("System", [
   },
   {
     method: "GET",
+    path: "/api/v1/tls/trust",
+    summary:
+      "What trusts the local CA on this machine: the system store and each runtime.",
+    response: typeRef("TlsTrustReport"),
+    errorStatuses: [404],
+  },
+  {
+    method: "GET",
     path: "/api/v1/stats",
     summary: "Counts and rates shown on the Overview.",
     response: typeRef("AppStats"),

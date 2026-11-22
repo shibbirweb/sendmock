@@ -296,7 +296,8 @@ fn build_operation_context(database: Database, listeners: &BoundListeners) -> Op
         listeners.addresses.smtp_addr,
     ))))
     .with_update_checker(build_update_checker())
-    .with_setup_fetcher(Arc::new(HttpSetupFetcher));
+    .with_setup_fetcher(Arc::new(HttpSetupFetcher))
+    .with_trust_inspector(Arc::new(crate::trust_command::LocalTrustInspector));
     let operation_context = with_email_network_clients(operation_context);
     let operation_context = match HttpMediaFetcher::new() {
         Some(media_fetcher) => operation_context.with_media_fetcher(Arc::new(media_fetcher)),

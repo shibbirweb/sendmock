@@ -19439,6 +19439,41 @@
       ]
     },
     {
+      "command": "sendmock trust",
+      "slug": "trust",
+      "usage": "sendmock trust",
+      "summary": "What trusts the local CA on this machine: the system store and each runtime.",
+      "area": "System",
+      "area_slug": "system",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/tls/trust",
+          "operation_id": "getTlsTrust",
+          "summary": "What trusts the local CA on this machine: the system store and each runtime.",
+          "area_slug": "system",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [],
+      "example": "sendmock trust",
+      "output": "TlsTrustReport",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_tls_trust"
+      ],
+      "ui": [
+        "Settings > Connection > Provider APIs over HTTPS > Trusted by"
+      ]
+    },
+    {
       "command": "sendmock update check",
       "slug": "update-check",
       "usage": "sendmock update check",

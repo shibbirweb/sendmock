@@ -216,6 +216,7 @@ These make SendMock useful from any test framework without polling loops:
 | GET | `/updates` | opt-in update check against GitHub Releases for the running channel: the newest version, its date, release notes and the upgrade command for the install method; `409` while `update_check_mode` is `off`, `502` when GitHub cannot be reached |
 | GET | `/health` | liveness for Docker/CI (also `sendmock health` CLI for the Docker HEALTHCHECK) |
 | GET | `/tls/ca` | the local CA (path and PEM) to trust for the HTTPS provider port, 404 when SendMock has none (A23, PL-20) |
+| GET | `/tls/trust` | which places on this machine trust the local CA: the system store, each PHP, Java and Python runtime found, and Node (what `sendmock trust --check` prints); `sendmock trust` itself runs in the binary, adding the CA where it is missing (`--undo` removes what it added) (A28, PL-25) |
 
 ## Projects
 

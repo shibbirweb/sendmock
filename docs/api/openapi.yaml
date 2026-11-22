@@ -106,6 +106,26 @@ paths:
       x-sendmock-cli: sendmock tls ca
       x-sendmock-mcp: sendmock_tls_ca
       x-sendmock-ui: Settings > Connection > Provider APIs over HTTPS > Download the CA
+  /api/v1/tls/trust:
+    get:
+      operationId: getTlsTrust
+      summary: "What trusts the local CA on this machine: the system store and each runtime."
+      tags:
+        - System
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TlsTrustReport"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock trust
+      x-sendmock-mcp: sendmock_tls_trust
+      x-sendmock-ui: Settings > Connection > Provider APIs over HTTPS > Trusted by
   /api/v1/stats:
     get:
       operationId: getStats
@@ -18464,6 +18484,49 @@ components:
         - pem
         - provider_tls_address
       description: SendMock's local CA, to trust for the HTTPS provider port.
+    TlsTrustPlace:
+      type: object
+      properties:
+        place:
+          type: string
+          description: The system store or a runtime.
+          examples:
+            - PHP 8.4.1 (/opt/homebrew/bin/php)
+        state:
+          type: string
+          enum:
+            - trusted
+            - missing
+            - manual
+          description: "`trusted`, `missing` (`sendmock trust` adds it) or `manual` (set the line in `detail`)."
+          examples:
+            - missing
+        detail:
+          type: string
+          description: What the place is, or the line or command to run.
+          examples:
+            - Its CA file is /opt/homebrew/etc/openssl@3/cert.pem
+      required:
+        - place
+        - state
+        - detail
+      description: One place that can trust the local CA, and its state.
+    TlsTrustReport:
+      type: object
+      properties:
+        ca_path:
+          type: string
+          description: Where the local CA certificate is.
+          examples:
+            - /home/sam/.local/share/sendmock/provider-ca-certificate.pem
+        places:
+          type: array
+          items:
+            $ref: "#/components/schemas/TlsTrustPlace"
+      required:
+        - ca_path
+        - places
+      description: "Answer of `GET /tls/trust`: what trusts SendMock's local CA on this machine."
     TwilioAccountStatus:
       type: string
       enum:

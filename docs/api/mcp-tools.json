@@ -28079,6 +28079,42 @@
       ]
     },
     {
+      "name": "sendmock_tls_trust",
+      "toolset": "core",
+      "summary": "What trusts the local CA on this machine: the system store and each runtime.",
+      "area": "System",
+      "area_slug": "system",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/tls/trust",
+          "operation_id": "getTlsTrust",
+          "summary": "What trusts the local CA on this machine: the system store and each runtime.",
+          "area_slug": "system",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [],
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "example_arguments": {},
+      "output": "TlsTrustReport",
+      "cli": [
+        "sendmock trust"
+      ],
+      "ui": [
+        "Settings > Connection > Provider APIs over HTTPS > Trusted by"
+      ]
+    },
+    {
       "name": "sendmock_traffic_delete_all",
       "toolset": "admin",
       "summary": "Delete every captured item in every project and keep every setting and configuration list.",

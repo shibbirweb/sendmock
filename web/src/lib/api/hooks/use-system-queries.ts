@@ -11,6 +11,7 @@ import type {
   AppStats,
   ResetSummary,
   TlsCertificateAuthority,
+  TlsTrustReport,
 } from "@/lib/api/types";
 
 /** Counts for the sidebar and Overview; not asked for until the server serves them. */
@@ -114,5 +115,16 @@ export function useDailyUpdateCheck({ isEnabled }: { isEnabled: boolean }) {
 export function useDownloadTlsCa() {
   return useMutation({
     mutationFn: () => requestApi<TlsCertificateAuthority>("/tls/ca"),
+  });
+}
+
+/** What trusts the local CA on this machine (PL-25). */
+export function useTlsTrust(isEnabled: boolean) {
+  return useQuery({
+    queryKey: ["system", "tls-trust"] as const,
+    queryFn: ({ signal }) =>
+      requestApi<TlsTrustReport>("/tls/trust", { abortSignal: signal }),
+    enabled: isEnabled,
+    retry: false,
   });
 }

@@ -67,6 +67,25 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock trust",
+    "usage": "sendmock trust",
+    "aliases": [],
+    "summary": "What trusts the local CA on this machine: the system store and each runtime.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/tls/trust",
+        "operation_id": "getTlsTrust",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_tls_trust"
+    ]
+  },
+  {
     "command": "sendmock seed status",
     "usage": "sendmock seed status",
     "aliases": [],

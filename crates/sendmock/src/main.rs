@@ -40,6 +40,7 @@ mod startup_error;
 mod startup_setup;
 mod template_directory_task;
 mod tls_provider;
+mod trust_command;
 mod update_check_task;
 mod version_output;
 mod webhook_dispatch_task;
@@ -61,9 +62,10 @@ fn main() -> ExitCode {
         return sendmail_shim::run_sendmail_shim(&sendmail_arguments);
     }
     let operation_registry = build_operation_registry();
-    let root_command = ci_command::add_ci_flags(ai_install::add_install_flags(
-        CliArguments::command().subcommands(build_operation_commands(&operation_registry)),
-    ));
+    let root_command =
+        trust_command::add_trust_flags(ci_command::add_ci_flags(ai_install::add_install_flags(
+            CliArguments::command().subcommands(build_operation_commands(&operation_registry)),
+        )));
     let root_matches = root_command.clone().get_matches();
     if let Some(matched_operation) = find_matched_operation(&operation_registry, &root_matches) {
         match matched_operation.operation.definition().operation_id {
@@ -75,6 +77,9 @@ fn main() -> ExitCode {
             }
             ci_command::CI_INIT_OPERATION_ID => {
                 return ci_command::run_ci_init_command(&matched_operation);
+            }
+            trust_command::TLS_TRUST_OPERATION_ID => {
+                return trust_command::run_trust_command(&matched_operation);
             }
             _ => {}
         }

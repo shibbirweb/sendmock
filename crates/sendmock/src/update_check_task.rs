@@ -47,6 +47,7 @@ pub async fn run_update_check_task(
             continue;
         }
         let Ok(update_check_result) = operation_context
+            .machine
             .update_checker
             .check(&operation_context)
             .await

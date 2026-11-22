@@ -142,6 +142,12 @@ jobs:
         working-directory: examples/email-providers/php-laravel-mailgun-https
         run: ./send-over-https-test.sh
 
+      # AC: PL-25.4
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: After sendmock trust, Laravel's mailgun mailer sends over HTTPS with no CA setting
+        working-directory: examples/email-providers/php-laravel-mailgun-https
+        run: ./send-after-trust-test.sh
+
       - if: needs.changes.outputs.is_affected == 'true'
         uses: ./.github/actions/check-sendmock-offline
 
