@@ -11,23 +11,36 @@ use support::reply_webhook_fixture::{
     APP_NUMBER, INBOUND_URL, ReplyWebhookFixture, TWILIO_AUTH_TOKEN, read_form_fields, read_header,
 };
 use support::scripted_twiml_app::ScriptedTwimlApp;
+use support::test_app::call_api;
 
 const SHOP_SUBACCOUNT_SID: &str = "AC22222222222222222222222222222222";
-const SHOP_AUTH_TOKEN: &str = "shop-token-1234";
 const LONDON_CONTACT: &str = "+447700900123";
 
-async fn add_shop_subaccount(fixture: &ReplyWebhookFixture) {
+/// Adds the Shop subaccount with a token SendMock generates and answers that token, read
+/// back the way a user reveals it.
+async fn add_shop_subaccount(fixture: &ReplyWebhookFixture) -> String {
     fixture
         .post(
             "/api/v1/twilio/subaccounts",
             &json!({
                 "account_sid": SHOP_SUBACCOUNT_SID,
                 "friendly_name": "Shop",
-                "auth_token": SHOP_AUTH_TOKEN,
+                "auth_token": null,
                 "debugger_url": null,
             }),
         )
         .await;
+    let (_, revealed) = call_api(
+        &fixture.app_router,
+        "GET",
+        &format!("/api/v1/twilio/subaccounts/{SHOP_SUBACCOUNT_SID}/auth-token"),
+        None,
+    )
+    .await;
+    revealed["auth_token"]
+        .as_str()
+        .unwrap_or_default()
+        .to_owned()
 }
 
 /// A text from `from_number` to the app's number; answers the stored message and the fields
@@ -57,7 +70,7 @@ async fn receive_text_from(
 #[tokio::test]
 async fn a_text_to_a_subaccounts_number_is_stored_named_and_signed_with_that_account() {
     let fixture = ReplyWebhookFixture::new(ScriptedTwimlApp::default()).await;
-    add_shop_subaccount(&fixture).await;
+    let shop_auth_token = add_shop_subaccount(&fixture).await;
     fixture
         .create_number(json!({ "account_sid": SHOP_SUBACCOUNT_SID }))
         .await;
@@ -69,7 +82,7 @@ async fn a_text_to_a_subaccounts_number_is_stored_named_and_signed_with_that_acc
     assert_eq!(webhook_fields["AccountSid"], SHOP_SUBACCOUNT_SID);
     assert_eq!(
         signature,
-        sign_twilio_request(INBOUND_URL, &webhook_fields, SHOP_AUTH_TOKEN)
+        sign_twilio_request(INBOUND_URL, &webhook_fields, &shop_auth_token)
     );
     assert_ne!(
         signature,

@@ -198,13 +198,13 @@ async fn a_twilio_401_keeps_twilios_body_and_the_log_says_why() {
             .as_str()
             .unwrap_or_default()
             .starts_with("Unknown account AC99999999999999999999999999999999"),
-        "{unknown_account_note}"
+        "the log note names the unknown account"
     );
     assert!(
         borrowed_path_note
             .as_str()
             .unwrap_or_default()
             .starts_with(&format!("The path's account {MAIN_ACCOUNT_SID} is not")),
-        "{borrowed_path_note}"
+        "the log note names the account in the path"
     );
 }
