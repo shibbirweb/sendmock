@@ -1,5 +1,6 @@
 import type { HttpMethod } from "@/lib/api/types";
 import { inboundEmailTemplateDefinitions } from "@/mocks/fixtures/inbound-email-template-definitions";
+import { mailgunTemplateDefinitions } from "@/mocks/fixtures/mailgun-template-definitions";
 import { paymentTemplateDefinitions } from "@/mocks/fixtures/payment-template-definitions";
 import { twilioDebuggerTemplateDefinitions } from "@/mocks/fixtures/twilio-debugger-template-definitions";
 import { whatsappTemplateDefinitions } from "@/mocks/fixtures/whatsapp-template-definitions";
@@ -200,46 +201,7 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
       "https://developers.telnyx.com/docs/messaging/messages/receiving-webhooks",
     verified_on: verifiedOn,
   },
-  "mailgun.routes": {
-    method: "POST",
-    content_type: formType,
-    header_templates: {},
-    body_template:
-      "{% set mailgun_timestamp = event.created_at | unix %}{% set mailgun_token = random_hex(50) %}sender={{ data.from.address | urlencode }}&recipient={{ data.to[0].address | urlencode }}&subject={{ data.subject | urlencode }}&body-plain={{ data.text_body | urlencode }}&timestamp={{ mailgun_timestamp }}&token={{ mailgun_token }}&signature={{ mailgun_signature(vars.mailgun_signing_key, mailgun_timestamp, mailgun_token) }}",
-    doc_url:
-      "https://documentation.mailgun.com/docs/mailgun/user-manual/receive-forward-store/",
-    verified_on: verifiedOn,
-  },
-  "mailgun.events": {
-    method: "POST",
-    content_type: jsonType,
-    header_templates: {},
-    body_template: `{% set mailgun_timestamp = event.created_at | unix %}{% set mailgun_token = random_hex(50) %}{
-  "signature": {
-    "timestamp": "{{ mailgun_timestamp }}",
-    "token": "{{ mailgun_token }}",
-    "signature": "{{ mailgun_signature(vars.mailgun_signing_key, mailgun_timestamp, mailgun_token) }}"
-  },
-  "event-data": {
-    "id": "{{ event.id }}",
-    "timestamp": {{ mailgun_timestamp }},
-    "event": "{{ event.type | mailgun_event }}",
-    "recipient": "{{ data.to[0].address }}",{% if event.type == "email.clicked" %}
-    "url": "{{ data.url }}",{% endif %}
-    "message": {
-      "headers": {
-        "message-id": "{{ (data.provider_message_id or data.message_id or data.id) | regex_replace('^<|>$', '') }}",
-        "from": "{{ data.from.address }}",
-        "to": "{{ data.to[0].address }}",
-        "subject": "{{ data.subject }}"
-      }
-    }
-  }
-}`,
-    doc_url:
-      "https://documentation.mailgun.com/docs/mailgun/user-manual/events/webhooks/",
-    verified_on: verifiedOn,
-  },
+  ...mailgunTemplateDefinitions,
   "postmark.webhooks": {
     method: "POST",
     content_type: jsonType,

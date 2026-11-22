@@ -4,11 +4,11 @@
 
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
-use sendmock_mail::{decompress_raw_message, parse_email};
+use sendmock_mail::{EmailDeliveryEvent, decompress_raw_message, parse_email};
 use sendmock_store::EmailRecord;
 use serde_json::{Map, Value, json};
 
-use crate::email::{EmailAddress, EmailSummary, read_stored_user_variables};
+use crate::email::{EmailAddress, EmailSummary, build_bounce_data, read_stored_user_variables};
 use crate::{OperationContext, OperationError};
 
 /// Larger attachments are named and linked but not inlined, so a webhook body stays small.
@@ -46,6 +46,45 @@ async fn build_attachment_data(
             })
         })
         .collect())
+}
+
+/// A bounced email's last bounce from its timeline, under `bounce` and the flat names events
+/// have always used, so previews and renders of a bounced email show it; nothing otherwise.
+async fn read_stored_bounce_fields(
+    operation_context: &OperationContext,
+    stored_email: &EmailRecord,
+) -> Result<Vec<(String, Value)>, OperationError> {
+    if stored_email.delivery_status.as_deref() != Some("bounced") {
+        return Ok(Vec::new());
+    }
+    let timeline = operation_context
+        .email_repository
+        .list_timeline(&stored_email.email_id)
+        .await?;
+    let Some(bounce) = timeline
+        .iter()
+        .rev()
+        .filter(|timeline_entry| timeline_entry.kind == "bounced")
+        .find_map(|timeline_entry| {
+            EmailDeliveryEvent::read_described_bounce(&timeline_entry.detail)
+        })
+    else {
+        return Ok(Vec::new());
+    };
+    let EmailDeliveryEvent::Bounced {
+        bounce_type,
+        smtp_code,
+        diagnostic,
+    } = &bounce
+    else {
+        return Ok(Vec::new());
+    };
+    Ok(vec![
+        ("bounce".to_owned(), json!(build_bounce_data(&bounce))),
+        ("bounce_type".to_owned(), json!(bounce_type.as_str())),
+        ("smtp_code".to_owned(), json!(smtp_code)),
+        ("diagnostic".to_owned(), json!(diagnostic)),
+    ])
 }
 
 /// The email's list fields with its message id, copies, bodies, headers and attachments.
@@ -87,6 +126,7 @@ pub async fn build_email_template_data(
             ),
         ),
     ]);
+    email_data.extend(read_stored_bounce_fields(operation_context, stored_email).await?);
     email_data.extend([
         ("message_id".to_owned(), json!(stored_email.message_id)),
         ("cc".to_owned(), json!(cc)),

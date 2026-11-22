@@ -1,3 +1,4 @@
+mod bounce_data;
 mod change_email_operations;
 mod delivery_event_recording;
 mod delivery_outcome_runner;
@@ -37,6 +38,7 @@ mod simulate_outcome_operation;
 mod spam_check_operation;
 mod spam_checker;
 
+pub(crate) use bounce_data::build_bounce_data;
 pub use change_email_operations::{
     DeleteAllEmailsOperation, DeleteEmailOperation, UpdateEmailOperation,
 };

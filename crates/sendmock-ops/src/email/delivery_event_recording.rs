@@ -2,6 +2,7 @@ use sendmock_mail::EmailDeliveryEvent;
 use sendmock_store::TimelineRecord;
 use serde_json::{Value, json};
 
+use super::bounce_data::build_bounce_data;
 use super::email_summary::EmailSummary;
 use crate::mailgun::record_mailgun_complaint;
 use crate::{AppEventType, OperationContext, OperationError, publish_event};
@@ -42,6 +43,10 @@ fn build_event_data(
             ("bounce_type".to_owned(), json!(bounce_type)),
             ("smtp_code".to_owned(), json!(smtp_code)),
             ("diagnostic".to_owned(), json!(diagnostic)),
+            (
+                "bounce".to_owned(),
+                json!(build_bounce_data(delivery_event)),
+            ),
         ]);
     }
     event_data
