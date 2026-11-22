@@ -17172,7 +17172,7 @@ components:
         id:
           $ref: "#/components/schemas/Ulid"
         reported_status:
-          $ref: "#/components/schemas/SmsStatus"
+          $ref: "#/components/schemas/SmsCallbackReportedStatus"
         attempt:
           type: number
         request:
@@ -17201,6 +17201,17 @@ components:
         - error_message
         - created_at
       description: One call to the message's status callback URL, in the provider's format.
+    SmsCallbackReportedStatus:
+      type: string
+      enum:
+        - queued
+        - sent
+        - delivered
+        - undelivered
+        - failed
+        - received
+        - debugger
+      description: "What a callback attempt reported: the message's status, or `debugger` for a Twilio Debugger event sent for the message."
     SmsChannel:
       type: string
       enum:

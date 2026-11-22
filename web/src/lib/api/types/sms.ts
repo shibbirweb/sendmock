@@ -143,10 +143,23 @@ export type SmsReplyWebhookAttempt = {
   created_at: IsoTimestamp;
 };
 
+/**
+ * What a callback attempt reported: the message's status, or `debugger` for a
+ * Twilio Debugger event sent for the message.
+ */
+export type SmsCallbackReportedStatus =
+  | "queued"
+  | "sent"
+  | "delivered"
+  | "undelivered"
+  | "failed"
+  | "received"
+  | "debugger";
+
 /** One call to the message's status callback URL, in the provider's format. */
 export type SmsCallbackAttempt = {
   id: Ulid;
-  reported_status: SmsStatus;
+  reported_status: SmsCallbackReportedStatus;
   attempt: number;
   request: RecordedHttpRequest;
   response: RecordedHttpResponse | null;

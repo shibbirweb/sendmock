@@ -40,6 +40,7 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ### Fixed
 
+- **Twilio Debugger attempts are named:** a Twilio Debugger event sent for a message now shows as **Twilio Debugger** in the SMS drawer's status callback list instead of an empty label, and the API documents `debugger` as a `reported_status`.
 - **A status set by hand stays:** setting an SMS to delivered, undelivered or failed by hand (SMS drawer, `sendmock sms status`, the API or MCP) now ends its simulated lifecycle, so a later simulated step no longer overwrites it and status callbacks stay in status order. The answer (`status_callback_timing`) and the drawer's message say when the status callback is sent.
 - **Twilio messages stay in their account:** on the Twilio API, fetching, canceling or listing messages under `/Accounts/{AccountSid}/` now sees only that account's messages, so the main account gets Twilio's 20404 for a subaccount's message instead of reading it as its own, and every answer names the account that really sent it.
 - **Inbound SMS name the right Twilio account:** a text to a number owned by a Twilio subaccount is stored under that subaccount, its `twilio.inbound_sms` webhook carries the subaccount's `AccountSid` and is signed with its token, and TwiML replies to it are sent under the same account. Webhook rules on `twilio.inbound_sms` and `twilio.status_callback` now send the message's account (or the main account) as `AccountSid` instead of a placeholder SID.

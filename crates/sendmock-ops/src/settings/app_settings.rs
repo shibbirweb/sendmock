@@ -46,7 +46,6 @@ pub struct AppSettings {
     /// On: a view counts as an open even when a webhook rule would send `email.opened` to your
     /// app. Off (the default): such a view is not counted, so browsing the inbox never tells
     /// your app a customer read the email.
-    #[serde(default)]
     pub count_views_with_webhook_rules: bool,
     pub opened_event_mode: OpenedEventMode,
     /// Rejects the next N SMTP messages, to test your app's retries.
