@@ -11,9 +11,14 @@ pub struct LaunchChoice {
 }
 
 impl LaunchChoice {
-    /// SMTP alone, on its default address: today's start.
+    /// The services a start with no flags runs: SMTP and the provider APIs, on their defaults.
     pub fn defaults() -> Self {
-        Self::from_services([(LaunchService::Smtp, LaunchService::Smtp.default_address())])
+        Self::from_services(
+            LaunchService::ALL
+                .into_iter()
+                .filter(|service| service.is_always_on() || service.is_on_by_default())
+                .map(|service| (service, service.default_address())),
+        )
     }
 
     pub fn from_services(services: impl IntoIterator<Item = (LaunchService, SocketAddr)>) -> Self {
@@ -28,11 +33,16 @@ impl LaunchChoice {
         self.addresses.contains_key(&service)
     }
 
-    /// Fills the address of each chosen service a flag or variable did not set; those win.
+    /// Fills the address of each chosen service a flag or variable did not set, and turns off
+    /// a service that is on by default but not chosen; flags and variables win.
     pub fn apply_to(&self, serve_arguments: &mut ServeArguments) {
-        for (service, address) in &self.addresses {
-            if service.read_address(serve_arguments).is_none() {
-                service.write_address(serve_arguments, *address);
+        for service in LaunchService::ALL {
+            if service.is_set_by_flag(serve_arguments) {
+                continue;
+            }
+            match self.addresses.get(&service) {
+                Some(address) => service.write_address(serve_arguments, *address),
+                None => service.turn_off(serve_arguments),
             }
         }
     }
@@ -43,6 +53,12 @@ impl LaunchChoice {
             .addresses
             .iter()
             .map(|(service, address)| format!("{} {address}", service.flag()))
+            .chain(
+                LaunchService::ALL
+                    .into_iter()
+                    .filter(|service| service.is_on_by_default() && !self.is_ticked(*service))
+                    .map(|service| format!("{} none", service.flag())),
+            )
             .collect();
         format!("sendmock serve {}", flags.join(" "))
     }
@@ -51,6 +67,7 @@ impl LaunchChoice {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::config::ListenerSetting;
 
     fn address(text: &str) -> SocketAddr {
         text.parse()
@@ -87,7 +104,37 @@ mod tests {
 
         assert_eq!(
             choice.describe_command(),
-            "sendmock serve --smtp-addr 127.0.0.1:1025 --catcher-addr 127.0.0.1:8030"
+            "sendmock serve --smtp-addr 127.0.0.1:1025 --catcher-addr 127.0.0.1:8030 --provider-addr none"
+        );
+    }
+
+    // AC: PL-24.1
+    #[test]
+    fn a_choice_without_the_provider_apis_turns_their_default_port_off() {
+        let choice =
+            LaunchChoice::from_services([(LaunchService::Catcher, address("127.0.0.1:8030"))]);
+        let mut serve_arguments = ServeArguments::default();
+
+        choice.apply_to(&mut serve_arguments);
+
+        assert_eq!(serve_arguments.provider_addr, Some(ListenerSetting::Off));
+    }
+
+    // AC: PL-24.1
+    #[test]
+    fn the_defaults_start_smtp_and_the_provider_apis_and_none_from_a_flag_wins() {
+        let mut serve_arguments = ServeArguments {
+            provider_addr: Some(ListenerSetting::Off),
+            ..ServeArguments::default()
+        };
+
+        LaunchChoice::defaults().apply_to(&mut serve_arguments);
+
+        assert!(LaunchChoice::defaults().is_ticked(LaunchService::Provider));
+        assert_eq!(serve_arguments.provider_addr, Some(ListenerSetting::Off));
+        assert_eq!(
+            LaunchChoice::defaults().describe_command(),
+            "sendmock serve --smtp-addr 127.0.0.1:1025 --provider-addr 127.0.0.1:8026"
         );
     }
 }

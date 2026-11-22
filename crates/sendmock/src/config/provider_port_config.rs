@@ -1,15 +1,22 @@
-use std::net::SocketAddr;
+use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::path::PathBuf;
 
 use super::ConfigError;
 use super::config_file::ConfigFile;
+use super::listener_setting::ListenerSetting;
 use crate::cli_arguments::ServeArguments;
+
+/// Provider SDKs reach SendMock here unless `--provider-addr` moves it or `none` turns it off.
+pub const DEFAULT_PROVIDER_ADDR: SocketAddr =
+    SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 8026);
 
 /// The provider listeners: one for every provider at their real paths, and one per provider
 /// given its own port.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct ProviderPortConfig {
     pub provider_addr: Option<SocketAddr>,
+    /// True when nothing set the address, so a busy default port starts SendMock without it.
+    pub is_default_provider_addr: bool,
     /// Bound on the provider address's host, or the HTTP address's host without one.
     pub dedicated_ports: Vec<(String, SocketAddr)>,
     /// The provider routes over HTTPS, when on.
@@ -32,8 +39,9 @@ impl ProviderPortConfig {
         config_file: &ConfigFile,
         http_addr: SocketAddr,
     ) -> Result<Self, ConfigError> {
-        let provider_addr = serve_arguments.provider_addr.or(config_file.provider_addr);
-        let host_address = provider_addr.unwrap_or(http_addr).ip();
+        let provider_setting = serve_arguments.provider_addr.or(config_file.provider_addr);
+        let configured_provider_addr = provider_setting.and_then(ListenerSetting::address);
+        let host_address = configured_provider_addr.unwrap_or(http_addr).ip();
         let port_settings: Vec<(String, u16)> = if serve_arguments.provider_ports.is_empty() {
             config_file
                 .provider_ports
@@ -68,7 +76,11 @@ impl ProviderPortConfig {
                 },
             });
         Ok(Self {
-            provider_addr,
+            provider_addr: match provider_setting {
+                Some(setting) => setting.address(),
+                None => Some(DEFAULT_PROVIDER_ADDR),
+            },
+            is_default_provider_addr: provider_setting.is_none(),
             tls,
             dedicated_ports: port_settings
                 .into_iter()
@@ -99,6 +111,61 @@ fn parse_port_setting(port_setting: &str) -> Result<(String, u16), ConfigError> 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn resolve_provider_ports(
+        serve_arguments: &ServeArguments,
+        config_file: &ConfigFile,
+    ) -> ProviderPortConfig {
+        ProviderPortConfig::resolve(serve_arguments, config_file, http_addr())
+            .unwrap_or_else(|config_error| panic!("{config_error}"))
+    }
+
+    // AC: PL-24.1
+    #[test]
+    fn the_provider_port_is_on_by_default_at_8026() {
+        let provider_ports =
+            resolve_provider_ports(&ServeArguments::default(), &ConfigFile::default());
+
+        assert_eq!(provider_ports.provider_addr, Some(DEFAULT_PROVIDER_ADDR));
+        assert!(provider_ports.is_default_provider_addr);
+    }
+
+    // AC: PL-24.1
+    #[test]
+    fn none_from_the_flag_or_the_file_turns_it_off() {
+        let off_by_flag = resolve_provider_ports(
+            &ServeArguments {
+                provider_addr: Some(ListenerSetting::Off),
+                ..ServeArguments::default()
+            },
+            &ConfigFile::default(),
+        );
+        let off_by_file = resolve_provider_ports(
+            &ServeArguments::default(),
+            &ConfigFile {
+                provider_addr: Some(ListenerSetting::Off),
+                ..ConfigFile::default()
+            },
+        );
+
+        assert_eq!(off_by_flag.provider_addr, None);
+        assert_eq!(off_by_file.provider_addr, None);
+        assert!(!off_by_flag.is_default_provider_addr);
+    }
+
+    #[test]
+    fn a_set_address_is_not_the_default() {
+        let provider_ports = resolve_provider_ports(
+            &ServeArguments {
+                provider_addr: "127.0.0.1:9026".parse().ok(),
+                ..ServeArguments::default()
+            },
+            &ConfigFile::default(),
+        );
+
+        assert_eq!(provider_ports.provider_addr, "127.0.0.1:9026".parse().ok());
+        assert!(!provider_ports.is_default_provider_addr);
+    }
 
     const HTTP_ADDR: &str = "127.0.0.1:8025";
 
@@ -155,7 +222,7 @@ mod tests {
             from_file
                 .ok()
                 .map(|config| (config.provider_addr, config.dedicated_ports.len())),
-            Some((None, 1))
+            Some((Some(DEFAULT_PROVIDER_ADDR), 1))
         );
         assert!(
             ProviderPortConfig::resolve(&bad_arguments, &ConfigFile::default(), http_addr())

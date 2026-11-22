@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 
 use serde::Deserialize;
 
+use super::listener_setting::ListenerSetting;
 use super::{ConfigError, LogFormat, LogLevel};
 
 /// `sendmock.toml`. Every key is optional; an unknown key is an error, so a typo never
@@ -15,7 +16,8 @@ pub struct ConfigFile {
     pub http_addr: Option<SocketAddr>,
     pub smtp_addr: Option<SocketAddr>,
     pub smtps_addr: Option<SocketAddr>,
-    pub provider_addr: Option<SocketAddr>,
+    /// An address, or `"none"` to start without the provider port.
+    pub provider_addr: Option<ListenerSetting>,
     pub provider_tls_addr: Option<SocketAddr>,
     pub provider_tls_cert: Option<PathBuf>,
     pub provider_tls_key: Option<PathBuf>,

@@ -12,6 +12,10 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 - **Startup banner:** starting SendMock in a terminal (`sendmock`, `sendmock serve`, `--last`, `--services`) first prints its wordmark in braille dots with the version under it, sized to the terminal's width and in colour where the terminal supports it. Pipes, files, `--ready-json`, `--log-format json` and `sendmock mcp` print exactly what they did before. Turn it off with `--no-banner`, `SENDMOCK_NO_BANNER=1` or `banner = false` in `sendmock.toml`; see the Configuration guide, The startup banner.
 
+### Changed
+
+- **The provider port is on by default:** `sendmock serve` now serves the provider APIs (Twilio, Mailgun, SendGrid, ...) at `127.0.0.1:8026` without `--provider-addr`, so provider SDKs reach SendMock with no extra flag. `--provider-addr none` (or `SENDMOCK_PROVIDER_ADDR=none`, or `provider_addr = "none"` in `sendmock.toml`) turns it off, and if port 8026 is busy SendMock says so and starts without it. `sendmock status`, `GET /api/v1/info` and the MCP status tool warn while it is off. The Docker image and the Helm chart keep it off until you set its address.
+
 ### Fixed
 
 - **Secure tokens for demo Twilio subaccounts:** in the website's demo and the web UI's mock mode, a new Twilio subaccount's auth token and SID now come from the browser's cryptographically secure random source instead of `Math.random()`.

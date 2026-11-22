@@ -41,9 +41,11 @@ spec:
               value: "0.0.0.0:8025"
             - name: SENDMOCK_SMTP_ADDR
               value: "0.0.0.0:1025"
-            {{- if .Values.providerPort.enabled }}
             - name: SENDMOCK_PROVIDER_ADDR
+            {{- if .Values.providerPort.enabled }}
               value: "0.0.0.0:8026"
+            {{- else }}
+              value: "none"
             {{- end }}
             {{- range $name, $value := .Values.env }}
             - name: {{ $name }}

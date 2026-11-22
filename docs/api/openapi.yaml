@@ -8923,6 +8923,11 @@ components:
           items:
             type: string
           description: The `operationId`s this binary serves; the UI shows Not available yet for the rest.
+        warnings:
+          type: array
+          items:
+            type: string
+          description: Setup worth fixing, such as the provider port being off; empty when there is nothing.
       required:
         - version
         - channel
@@ -8937,6 +8942,7 @@ components:
         - database_size_bytes
         - is_container
         - available_operations
+        - warnings
     AppSettings:
       type: object
       properties:

@@ -195,6 +195,11 @@ export type AppInfo = {
    * rest (UI-12).
    */
   available_operations: string[];
+  /**
+   * Setup worth fixing, such as the provider port being off; empty when there is
+   * nothing (PL-24.3).
+   */
+  warnings: string[];
 };
 
 /** What `POST /api/v1/samples/{kind}` can create (UI-04.2). */

@@ -142,7 +142,7 @@ fn last_run_prints_the_saved_choice_as_json_and_clear_deletes_it() -> io::Result
     assert_eq!(saved["services"]["catcher"], "127.0.0.1:8030");
     assert_eq!(
         saved["command"],
-        "sendmock serve --smtp-addr 127.0.0.1:1025 --catcher-addr 127.0.0.1:8030"
+        "sendmock serve --smtp-addr 127.0.0.1:1025 --catcher-addr 127.0.0.1:8030 --provider-addr none"
     );
     assert!(cleared.status.success());
     assert!(!working_directory.path().join("last-run.toml").exists());
