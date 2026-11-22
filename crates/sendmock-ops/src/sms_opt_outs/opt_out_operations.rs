@@ -49,6 +49,7 @@ impl Operation for DeleteSmsOptOutOperation {
             method: HttpMethod::Delete,
             path: "/api/v1/sms/opt-outs/{sender}/{contactNumber}",
             summary: "Lift one opt-out, as if the contact texted START.",
+            is_destructive: true,
             cli_usage: "sendmock sms opt-outs delete <sender> <contactNumber>",
             mcp_tool: "sendmock_sms_opt_out_delete",
             success_status: SuccessStatus::NoContent,

@@ -43,12 +43,12 @@ Any other key, such as `template_id` or `name`, is refused by `sendmock setup va
 
 ## From the CLI, API and AI
 
-| Do this | CLI | REST | MCP |
+| Do this | CLI | API | MCP tool |
 | --- | --- | --- | --- |
-| list the templates | `sendmock email templates list` | `GET /api/v1/emails/templates` | `sendmock_email_template_list` |
-| add one | `sendmock email templates create --id welcome-email --subject "Welcome" --text "Hi"` | `POST /api/v1/emails/templates` | `sendmock_email_template_create` |
-| change one | `sendmock email templates update welcome-email --subject "Hello"` | `PATCH /api/v1/emails/templates/{templateId}` | `sendmock_email_template_update` |
-| delete one | `sendmock email templates delete welcome-email --yes` | `DELETE /api/v1/emails/templates/{templateId}` | `sendmock_email_template_delete` |
+| list the templates | [`sendmock email templates list`](/cli/email-templates/#email-templates-list) | [`GET /api/v1/emails/templates`](/api/email-templates/#getEmailsTemplates) | [`sendmock_email_template_list`](/mcp/email-templates/#sendmock_email_template_list) |
+| add one | [`sendmock email templates create`](/cli/email-templates/#email-templates-create) | [`POST /api/v1/emails/templates`](/api/email-templates/#postEmailsTemplates) | [`sendmock_email_template_create`](/mcp/email-templates/#sendmock_email_template_create) |
+| change one | [`sendmock email templates update <templateId>`](/cli/email-templates/#email-templates-update) | [`PATCH /api/v1/emails/templates/{templateId}`](/api/email-templates/#patchEmailsTemplatesByTemplateId) | [`sendmock_email_template_update`](/mcp/email-templates/#sendmock_email_template_update) |
+| delete one | [`sendmock email templates delete <templateId>`](/cli/email-templates/#email-templates-delete) | [`DELETE /api/v1/emails/templates/{templateId}`](/api/email-templates/#deleteEmailsTemplatesByTemplateId) | [`sendmock_email_template_delete`](/mcp/email-templates/#sendmock_email_template_delete) |
 
 ## Related
 
