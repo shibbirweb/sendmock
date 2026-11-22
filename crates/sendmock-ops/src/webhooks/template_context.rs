@@ -4,6 +4,7 @@
 use sendmock_store::{EmailListFilter, EmailRecord, SmsRecord};
 use serde_json::{Map, Value, json};
 
+use super::sample_email_data::build_sample_email_data;
 use crate::email::EmailSummary;
 use crate::events::AppEvent;
 use crate::payments::{build_sample_payment_event_data, load_payment_event};
@@ -48,28 +49,6 @@ fn build_sample_sms_data() -> Value {
         "error_code": null,
         "messaging_service_sid": null,
         "extracted": { "otp": ["482913"], "links": [] },
-    })
-}
-
-/// The email a preview uses when none is stored yet.
-fn build_sample_email_data() -> Value {
-    json!({
-        "id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
-        "received_at": "2026-01-01T09:00:00Z",
-        "from": { "name": "Acme", "address": "no-reply@acme.test" },
-        "to": [{ "name": "Ann Lee", "address": "ann@example.com" }],
-        "subject": "Your Acme sign-in code",
-        "snippet": "Your code is 482913. It expires in 10 minutes.",
-        "size_bytes": 2048,
-        "attachment_count": 0,
-        "is_read": false,
-        "tags": [],
-        "source": "smtp",
-        "delivery_status": null,
-        "open_count": 0,
-        "has_otp": true,
-        "direction": "inbound",
-        "response_kind": null,
     })
 }
 

@@ -52,6 +52,7 @@ mod rule_preview_operation;
 mod rule_subscriber;
 mod rule_validation;
 mod rule_view;
+mod sample_email_data;
 mod saved_delivery_inputs;
 mod saved_delivery_operations;
 mod saved_delivery_send_operation;
