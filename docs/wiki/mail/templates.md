@@ -7,6 +7,8 @@ description: Local stand-ins for your provider's email templates, so template se
 
 Apps that send through SendGrid dynamic templates, Postmark templates, Brevo templates or Mailgun templates send only a template id or name and its data; the provider holds the template. **Mail > Templates** keeps a local stand-in under the same id, so a template send is stored with the subject and bodies the provider would have sent, rendered from the send's template data with the same template language as [webhook templates](../webhooks/templates.md).
 
+![The Mail Templates screen with its local email templates](../images/mail-templates.jpg)
+
 ## What it solves
 
 - **Template sends store an empty email.** Without a stand-in, a send that names only a template id has no subject or body to show; with one, it is stored as the provider would have sent it.
