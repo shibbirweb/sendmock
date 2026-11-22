@@ -124,7 +124,7 @@ On top of its own criteria, a feature is done only when:
 | [WH-12](03-webhooks.md#wh-12-inbound-routes-mailgun-style) | Inbound routes (Mailgun style) | UI in U2, backend Phase 4 | 7 | Accepted |
 | [WH-13](03-webhooks.md#wh-13-webhooks-shown-and-chosen-on-every-simulation) | Webhooks shown and chosen on every simulation | Phase 5 (W22) | 5 | Accepted |
 | [WH-14](03-webhooks.md#wh-14-webhook-payload-shown-and-edited-before-a-simulation) | Webhook payload shown and edited before a simulation | Phase 5 (W23) | 4 | Accepted |
-| [WH-15](03-webhooks.md#wh-15-webhook-tests-in-cicd-pipelines) | Webhook tests in CI/CD pipelines | 1.4.0 (A19) | 9 | In progress |
+| [WH-15](03-webhooks.md#wh-15-webhook-tests-in-cicd-pipelines) | Webhook tests in CI/CD pipelines | 1.5.0 (A19) | 9 | In progress |
 | [HC-01](04-catcher-platform.md#hc-01-capture-requests) | Capture requests | UI in U2, backend Phase 4 | 7 | Accepted |
 | [HC-02](04-catcher-platform.md#hc-02-mock-responses) | Mock responses | UI in U2, backend Phase 4 | 4 | Accepted |
 | [HC-03](04-catcher-platform.md#hc-03-presets) | Presets | Phase 4 (Slack, Discord, Telegram, FCM), Phase 5 (Teams, Google Chat, Expo, OneSignal) | 2 | Accepted |
