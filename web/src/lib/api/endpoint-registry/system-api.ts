@@ -58,9 +58,11 @@ const systemEndpoints = tagEndpoints("System", [
   {
     method: "POST",
     path: "/api/v1/reset",
-    summary: "Delete all traffic and restore the seed configuration.",
-    response: null,
-    successStatus: 204,
+    summary:
+      "Delete all traffic and apply the seed applied last again, keeping the rest of the configuration; with config, also remove every configured item and restore the built-in providers. Answers what it cleared, removed and kept.",
+    requestBody: typeRef("ResetRequest"),
+    response: typeRef("ResetSummary"),
+    errorStatuses: [422],
   },
   {
     method: "DELETE",

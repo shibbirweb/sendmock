@@ -59,4 +59,41 @@ impl SeedStateRepository {
             })
             .await
     }
+
+    /// Forgets the seed applied last, so a later reset has nothing to restore.
+    pub async fn delete_state(&self) -> Result<(), StoreError> {
+        self.database
+            .write(|connection| {
+                connection.execute("DELETE FROM seed_state WHERE id = 1", [])?;
+                Ok(())
+            })
+            .await
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{DatabaseLocation, EMBEDDED_MIGRATIONS};
+
+    #[tokio::test]
+    async fn a_deleted_state_is_gone() -> Result<(), StoreError> {
+        let repository = SeedStateRepository::new(Arc::new(Database::open(
+            DatabaseLocation::InMemory,
+            EMBEDDED_MIGRATIONS,
+        )?));
+        repository
+            .save_state(SeedStateRecord {
+                seed_toml: String::new(),
+                source_path: None,
+                applied_at_unix_ms: 1,
+                applied_items_json: "[]".to_owned(),
+            })
+            .await?;
+
+        repository.delete_state().await?;
+
+        assert!(repository.find_state().await?.is_none());
+        Ok(())
+    }
 }

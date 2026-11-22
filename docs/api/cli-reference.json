@@ -13000,8 +13000,8 @@
     {
       "command": "sendmock reset",
       "slug": "reset",
-      "usage": "sendmock reset --yes",
-      "summary": "Delete all traffic and restore the seed configuration.",
+      "usage": "sendmock reset --yes [flags]",
+      "summary": "Delete all traffic and apply the seed applied last again, keeping the rest of the configuration; with config, also remove every configured item and restore the built-in providers. Answers what it cleared, removed and kept.",
       "area": "System",
       "area_slug": "system",
       "operations": [
@@ -13009,7 +13009,7 @@
           "method": "POST",
           "path": "/api/v1/reset",
           "operation_id": "postReset",
-          "summary": "Delete all traffic and restore the seed configuration.",
+          "summary": "Delete all traffic and apply the seed applied last again, keeping the rest of the configuration; with config, also remove every configured item and restore the built-in providers. Answers what it cleared, removed and kept.",
           "area_slug": "system",
           "selector": null
         }
@@ -13028,10 +13028,40 @@
           "allowed_values": null,
           "description": "Confirms a destructive command; without it the command stops.",
           "example": true
+        },
+        {
+          "flag": "--config",
+          "input": {
+            "name": "config",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Also remove every configured item, put the settings and providers back to what SendMock ships with, and forget the seed.",
+          "example": false
+        },
+        {
+          "flag": "--confirm-removed-count",
+          "input": {
+            "name": "confirm_removed_count",
+            "location": "body"
+          },
+          "type": "number",
+          "value_label": "<confirm-removed-count>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "With `config`: how many configured items the reset said it would remove.",
+          "example": 0
         }
       ],
-      "example": "sendmock reset --yes",
-      "output": null,
+      "example": "sendmock reset --yes --no-config --confirm-removed-count 0",
+      "output": "ResetSummary",
       "exit_codes": [
         0,
         1,
@@ -15016,7 +15046,7 @@
     {
       "command": "sendmock setup import",
       "slug": "setup-import",
-      "usage": "sendmock setup import <file> --yes [flags]",
+      "usage": "sendmock setup import <file> [flags]",
       "summary": "Apply a setup from its text or a URL, merging or replacing; 422 with the errors and nothing applied when it is invalid.",
       "area": "Setup",
       "area_slug": "setup",
@@ -15046,18 +15076,6 @@
         }
       ],
       "flags": [
-        {
-          "flag": "--yes",
-          "input": null,
-          "type": "boolean",
-          "value_label": null,
-          "is_required": false,
-          "is_repeatable": false,
-          "takes_json": false,
-          "allowed_values": null,
-          "description": "Confirms a destructive command; without it the command stops.",
-          "example": true
-        },
         {
           "flag": "--url",
           "input": {
@@ -15171,7 +15189,7 @@
           "example": null
         }
       ],
-      "example": "sendmock setup import input.txt --yes --url null --sha256 null",
+      "example": "sendmock setup import input.txt --url null --sha256 null",
       "output": "SetupValidation",
       "exit_codes": [
         0,

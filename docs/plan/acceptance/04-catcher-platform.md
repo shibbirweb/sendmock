@@ -325,7 +325,7 @@ Phase 5. Plan: [30-phase-5.md](../30-phase-5.md) (W8).
 
 1.5.0 (A28), planned 2026-11-22 from a user's report on 1.4.0 (owner request). Plan: [32-after-1-0.md](../32-after-1-0.md#a28-plug-and-play-for-mailgun-and-twilio-apps-em-24-to-em-27-sm-22-to-sm-24-pl-24-to-pl-27-ai-08) (A28).
 
-- [ ] PL-26.1 `setup validate` runs the same checks as `setup import`, so a file validate passes always imports (R-13).
+- [ ] PL-26.1 `setup validate` runs every check `setup import` runs before it writes anything (the text, the format version, the secrets and each item read into its section's type), so an unknown key or a wrong type is refused by both, with its place (R-13). (Narrowed 2026-11-22 while building, from "runs the same checks as `setup import`, so a file validate passes always imports": a refusal the API makes while applying, such as a rule naming an endpoint that does not exist, needs the items written, and a dry run would need a copy of the live configuration with its secrets, which SendMock never copies; import names such an item with its section and number and applies nothing after it.)
 - [ ] PL-26.2 A merge import never says it deletes data and asks to confirm only when something is removed, naming what (R-16).
 - [ ] PL-26.3 `reset` prints what it cleared and what it kept, and `reset --config` also removes configuration and restores the built-in providers after a confirmation with the counts; its help says what each does (R-12).
 - [ ] PL-26.4 PATCH on providers, numbers and the other configuration merges a partial body into the stored object, and a masked or missing secret keeps the stored value (R-19).

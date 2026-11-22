@@ -171,7 +171,7 @@ async fn reset_deletes_traffic_and_restores_exactly_the_seed() {
 
     let (status, _) = call_api(&app_router, "POST", "/api/v1/reset", None).await;
 
-    assert_eq!(status, 204);
+    assert_eq!(status, 200);
     assert_eq!(export_seed(&app_router).await, seeded_export);
     let numbers = list(&app_router, "/api/v1/numbers").await;
     assert_eq!(numbers.len(), 1);

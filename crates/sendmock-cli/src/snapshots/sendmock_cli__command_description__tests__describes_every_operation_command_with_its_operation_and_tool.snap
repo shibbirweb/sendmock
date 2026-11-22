@@ -202,7 +202,7 @@ expression: command_descriptions
   },
   {
     "command": "sendmock setup import",
-    "usage": "sendmock setup import <file> --yes",
+    "usage": "sendmock setup import <file>",
     "aliases": [],
     "summary": "Apply a setup from its text or a URL, merging or replacing; 422 with the errors and nothing applied when it is invalid.",
     "arguments": [
@@ -6467,9 +6467,12 @@ expression: command_descriptions
     "command": "sendmock reset",
     "usage": "sendmock reset --yes",
     "aliases": [],
-    "summary": "Delete all traffic and restore the seed configuration.",
+    "summary": "Delete all traffic and apply the seed applied last again, keeping the rest of the configuration; with config, also remove every configured item and restore the built-in providers. Answers what it cleared, removed and kept.",
     "arguments": [],
-    "flags": [],
+    "flags": [
+      "--config",
+      "--confirm-removed-count"
+    ],
     "operations": [
       {
         "method": "POST",

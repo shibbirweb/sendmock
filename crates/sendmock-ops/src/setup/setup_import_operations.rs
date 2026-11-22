@@ -67,10 +67,11 @@ impl Operation for ImportSetupOperation {
             path: "/api/v1/setup/import",
             summary: "Apply a setup from its text or a URL, merging or replacing; 422 with the errors and nothing applied when it is invalid.",
             is_destructive: true,
-            cli_usage: "sendmock setup import <file> --yes",
+            cli_usage: "sendmock setup import <file>",
             mcp_tool: "sendmock_setup_import",
             cli_arguments: SETUP_FILE_ARGUMENT,
             cli_environment_inputs: PASSPHRASE_ENVIRONMENT_INPUT,
+            server_confirmation_input: Some("confirm_removed_count"),
             ..OperationDefinition::DEFAULTS
         }
     }
@@ -98,10 +99,7 @@ impl Operation for ImportSetupOperation {
         if is_unconfirmed_replace {
             return Err(OperationError::Unprocessable {
                 code: "setup_replace_unconfirmed",
-                message: format!(
-                    "This replace removes {removed_count} items; send confirm_removed_count = {removed_count} to go ahead",
-                    removed_count = setup_validation.removed_count
-                ),
+                message: describe_unconfirmed_removal(&setup_validation),
             });
         }
         apply_setup_text(
@@ -116,5 +114,76 @@ impl Operation for ImportSetupOperation {
         )
         .await?;
         Ok(setup_validation)
+    }
+}
+
+/// Names each item a replace would remove, so the person confirming knows what goes.
+fn describe_unconfirmed_removal(setup_validation: &SetupValidation) -> String {
+    let removed_items: Vec<String> = setup_validation
+        .changes
+        .iter()
+        .flat_map(|section_change| {
+            section_change
+                .removed
+                .iter()
+                .map(move |item_name| format!("{} {item_name}", section_change.item_kind))
+        })
+        .collect();
+    format!(
+        "This replace removes {removed_count} items: {}. Send confirm_removed_count = {removed_count} (--confirm-removed-count {removed_count}) to go ahead",
+        removed_items.join(", "),
+        removed_count = setup_validation.removed_count
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::super::setup_wire::SetupSectionChange;
+    use super::*;
+    use crate::setup::SetupFileFormat;
+
+    // AC: PL-26.2
+    #[test]
+    fn a_replace_that_removes_items_names_each_one() {
+        let setup_validation = SetupValidation {
+            is_valid: true,
+            format: SetupFileFormat::Toml,
+            format_version: 2,
+            upgraded_from_format_version: None,
+            has_encrypted_secrets: false,
+            errors: Vec::new(),
+            summary: Vec::new(),
+            changes: vec![SetupSectionChange {
+                section: "webhook.endpoints".to_owned(),
+                item_kind: "Webhook endpoint".to_owned(),
+                added: Vec::new(),
+                changed: Vec::new(),
+                removed: vec!["Shop".to_owned(), "CRM".to_owned()],
+            }],
+            removed_count: 2,
+        };
+
+        let message = describe_unconfirmed_removal(&setup_validation);
+
+        assert!(
+            message.starts_with(
+                "This replace removes 2 items: Webhook endpoint Shop, Webhook endpoint CRM."
+            ),
+            "{message}"
+        );
+        assert!(message.contains("--confirm-removed-count 2"));
+    }
+
+    // AC: PL-26.2
+    #[test]
+    fn the_cli_needs_no_yes_for_an_import_since_the_server_confirms_removals() {
+        let definition = ImportSetupOperation.definition();
+
+        assert!(definition.is_destructive);
+        assert_eq!(
+            definition.server_confirmation_input,
+            Some("confirm_removed_count")
+        );
+        assert!(!definition.cli_usage.contains("--yes"));
     }
 }

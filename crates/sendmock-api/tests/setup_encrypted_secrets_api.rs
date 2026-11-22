@@ -234,7 +234,7 @@ async fn the_seed_state_keeps_no_secret_and_reset_keeps_the_imported_ones() {
 
     let (status, answer) = call_api(&target_router, "POST", "/api/v1/reset", None).await;
 
-    assert_eq!(status, 204, "{answer}");
+    assert_eq!(status, 200, "{answer}");
     let seed_state = target_context
         .setup_stores
         .seed_state

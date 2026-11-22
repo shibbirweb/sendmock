@@ -135,8 +135,8 @@ pub use seed::{
     ApplySeedOperation, EnvironmentReader, ExportSeedOperation, FixedEnvironment,
     GetSeedStatusOperation, ProcessEnvironment, SeedChangedItem, SeedFileRequest, SeedItemChange,
     SeedItemCount, SeedStatus, SeedValidation, SeedValidationError, SetupCheck, SetupImportOptions,
-    ValidateSeedOperation, apply_seed_toml, apply_setup_text, check_setup_text, restore_seed_state,
-    validate_seed_toml, write_setup_text,
+    ValidateSeedOperation, apply_seed_toml, apply_setup_text, check_setup_text,
+    remove_all_configuration, restore_seed_state, validate_seed_toml, write_setup_text,
 };
 pub use settings::{
     AppSettings, AppSettingsStore, AppSettingsUpdate, EmailOutcomeProfile, SmsSimulationProfile,

@@ -191,12 +191,24 @@ paths:
   /api/v1/reset:
     post:
       operationId: postReset
-      summary: Delete all traffic and restore the seed configuration.
+      summary: Delete all traffic and apply the seed applied last again, keeping the rest of the configuration; with config, also remove every configured item and restore the built-in providers. Answers what it cleared, removed and kept.
       tags:
         - System
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetRequest"
       responses:
-        "204":
-          description: No content.
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResetSummary"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
         default:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock reset --yes
@@ -417,7 +429,7 @@ paths:
           $ref: "#/components/responses/Unprocessable"
         default:
           $ref: "#/components/responses/Error"
-      x-sendmock-cli: sendmock setup import <file> --yes
+      x-sendmock-cli: sendmock setup import <file>
       x-sendmock-mcp: sendmock_setup_import
       x-sendmock-ui: Settings > Setup > Import a setup
   /api/v1/setup/migrate:
@@ -15165,6 +15177,56 @@ components:
         - line
         - column
       description: A render problem and where it comes from, e.g. "body" at line 3.
+    ResetItemCount:
+      type: object
+      properties:
+        kind:
+          type: string
+        count:
+          type: number
+      required:
+        - kind
+        - count
+      description: How many items of one kind, such as `Webhook endpoint` or `emails`.
+    ResetRequest:
+      type: object
+      properties:
+        config:
+          type: boolean
+          description: Also remove every configured item, put the settings and providers back to what SendMock ships with, and forget the seed.
+        confirm_removed_count:
+          type:
+            - number
+            - "null"
+          description: "With `config`: how many configured items the reset said it would remove."
+      description: Body of `POST /api/v1/reset`; with no body, a reset that keeps the configuration.
+    ResetSummary:
+      type: object
+      properties:
+        cleared:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResetItemCount"
+          description: Traffic deleted, by kind; kinds with nothing to delete are left out.
+        removed:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResetItemCount"
+          description: Configured items removed by a `config` reset, by kind; empty otherwise.
+        kept:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResetItemCount"
+          description: Configured items that stayed, by kind.
+        restored_seed:
+          type: boolean
+          description: True when the seed applied last was applied again.
+      required:
+        - cleared
+        - removed
+        - kept
+        - restored_seed
+      description: What a reset did.
     RetryPolicy:
       type: object
       properties:

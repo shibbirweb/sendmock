@@ -19157,7 +19157,7 @@
     {
       "name": "sendmock_reset",
       "toolset": "admin",
-      "summary": "Delete all traffic and restore the seed configuration.",
+      "summary": "Delete all traffic and apply the seed applied last again, keeping the rest of the configuration; with config, also remove every configured item and restore the built-in providers. Answers what it cleared, removed and kept.",
       "area": "System",
       "area_slug": "system",
       "operations": [
@@ -19165,7 +19165,7 @@
           "method": "POST",
           "path": "/api/v1/reset",
           "operation_id": "postReset",
-          "summary": "Delete all traffic and restore the seed configuration.",
+          "summary": "Delete all traffic and apply the seed applied last again, keeping the rest of the configuration; with config, also remove every configured item and restore the built-in providers. Answers what it cleared, removed and kept.",
           "area_slug": "system",
           "selector": null
         }
@@ -19176,13 +19176,59 @@
         "destructive_hint": true,
         "idempotent_hint": false
       },
-      "properties": [],
+      "properties": [
+        {
+          "name": "config",
+          "input": {
+            "name": "config",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Also remove every configured item, put the settings and providers back to what SendMock ships with, and forget the seed.",
+          "example": false
+        },
+        {
+          "name": "confirm_removed_count",
+          "input": {
+            "name": "confirm_removed_count",
+            "location": "body"
+          },
+          "type": "number",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "With `config`: how many configured items the reset said it would remove.",
+          "example": 0
+        }
+      ],
       "input_schema": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "config": {
+            "type": "boolean",
+            "description": "Also remove every configured item, put the settings and providers back to what SendMock ships with, and forget the seed.",
+            "examples": [
+              false
+            ]
+          },
+          "confirm_removed_count": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "With `config`: how many configured items the reset said it would remove.",
+            "examples": [
+              0
+            ]
+          }
+        }
       },
-      "example_arguments": {},
-      "output": null,
+      "example_arguments": {
+        "config": false,
+        "confirm_removed_count": 0
+      },
+      "output": "ResetSummary",
       "cli": [
         "sendmock reset --yes"
       ],
@@ -21158,7 +21204,7 @@
       "aliases": [],
       "annotations": {
         "read_only_hint": false,
-        "destructive_hint": true,
+        "destructive_hint": false,
         "idempotent_hint": false
       },
       "properties": [
@@ -21377,7 +21423,7 @@
       },
       "output": "SetupValidation",
       "cli": [
-        "sendmock setup import <file> --yes"
+        "sendmock setup import <file>"
       ],
       "ui": [
         "Settings > Setup > Import a setup"

@@ -275,7 +275,7 @@ public class SettingsTests
 | apply a seed file | [`sendmock seed apply <file>`](/cli/seed/#seed-apply) | [`POST /api/v1/seed/apply`](/api/seed/#postSeedApply) | [`sendmock_seed_apply`](/mcp/seed/#sendmock_seed_apply) |
 | export a setup | [`sendmock setup export`](/cli/setup/#setup-export) | [`POST /api/v1/setup/export`](/api/setup/#postSetupExport) | [`sendmock_setup_export`](/mcp/setup/#sendmock_setup_export) |
 | preview a setup's import | [`sendmock setup validate <file>`](/cli/setup/#setup-validate) | [`POST /api/v1/setup/validate`](/api/setup/#postSetupValidate) | [`sendmock_setup_validate`](/mcp/setup/#sendmock_setup_validate) |
-| import a setup | [`sendmock setup import <file> --yes`](/cli/setup/#setup-import) | [`POST /api/v1/setup/import`](/api/setup/#postSetupImport) | [`sendmock_setup_import`](/mcp/setup/#sendmock_setup_import) |
+| import a setup | [`sendmock setup import <file>`](/cli/setup/#setup-import) | [`POST /api/v1/setup/import`](/api/setup/#postSetupImport) | [`sendmock_setup_import`](/mcp/setup/#sendmock_setup_import) |
 | upgrade an older setup file | [`sendmock setup migrate <file>`](/cli/setup/#setup-migrate) | [`POST /api/v1/setup/migrate`](/api/setup/#postSetupMigrate) | [`sendmock_setup_migrate`](/mcp/setup/#sendmock_setup_migrate) |
 | list projects | [`sendmock projects list`](/cli/projects/#projects-list) | [`GET /api/v1/projects`](/api/projects/#getProjects) | [`sendmock_project_list`](/mcp/projects/#sendmock_project_list) |
 | add a project | [`sendmock projects create`](/cli/projects/#projects-create) | [`POST /api/v1/projects`](/api/projects/#postProjects) | [`sendmock_project_create`](/mcp/projects/#sendmock_project_create) |

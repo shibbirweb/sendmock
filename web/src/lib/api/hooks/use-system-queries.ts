@@ -9,6 +9,7 @@ import type {
   AppSettingsUpdate,
   UpdateCheckResult,
   AppStats,
+  ResetSummary,
   TlsCertificateAuthority,
 } from "@/lib/api/types";
 
@@ -62,7 +63,7 @@ export function useResetToSeed() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => requestApi<void>("/reset", { method: "POST" }),
+    mutationFn: () => requestApi<ResetSummary>("/reset", { method: "POST" }),
     onSuccess: () => {
       void queryClient.invalidateQueries();
     },

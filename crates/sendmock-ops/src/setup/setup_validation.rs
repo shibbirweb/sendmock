@@ -7,7 +7,7 @@ use super::setup_secret_cipher::ENCRYPTED_SECRET_PREFIX;
 use super::setup_secret_opener::SetupSecretOpener;
 use super::setup_version_policy::SetupVersionDecision;
 use super::setup_wire::{SetupImportMode, SetupValidation, SetupValidationError};
-use crate::seed::check_setup_text;
+use crate::seed::{check_seed_items, check_setup_text};
 use crate::{OperationContext, OperationError};
 
 /// Checks a setup without applying it: its problems by line or key path, its format version
@@ -37,17 +37,20 @@ pub async fn validate_setup(
             return Ok(setup_validation);
         }
     };
-    if let SetupVersionDecision::Upgrade {
-        from_format_version,
-        ..
-    } = prepared_setup.version_decision
-    {
-        setup_validation.upgraded_from_format_version = Some(from_format_version);
-    }
+    setup_validation.upgraded_from_format_version =
+        read_upgraded_format_version(&prepared_setup.version_decision);
     add_check_problems(&mut setup_validation, setup_text, setup_format);
     if let Some(passphrase) = passphrase.filter(|_| setup_validation.has_encrypted_secrets) {
         check_passphrase(
             &mut setup_validation,
+            &prepared_setup.setup_document,
+            passphrase,
+        );
+    }
+    if setup_validation.errors.is_empty() {
+        add_item_problems(
+            &mut setup_validation,
+            operation_context,
             &prepared_setup.setup_document,
             passphrase,
         );
@@ -85,6 +88,34 @@ fn start_validation(
         changes: Vec::new(),
         removed_count: 0,
     }
+}
+
+fn read_upgraded_format_version(version_decision: &SetupVersionDecision) -> Option<i64> {
+    match version_decision {
+        SetupVersionDecision::Upgrade {
+            from_format_version,
+            ..
+        } => Some(*from_format_version),
+        _ => None,
+    }
+}
+
+/// The items an import would refuse when it reads them, before anything is written.
+fn add_item_problems(
+    setup_validation: &mut SetupValidation,
+    operation_context: &OperationContext,
+    setup_document: &toml::Table,
+    passphrase: Option<&str>,
+) {
+    setup_validation.errors.extend(
+        check_seed_items(operation_context, setup_document, passphrase)
+            .into_iter()
+            .map(|item_problem| SetupValidationError {
+                line: None,
+                location: Some(item_problem.location),
+                message: item_problem.message,
+            }),
+    );
 }
 
 fn check_passphrase(

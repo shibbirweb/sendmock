@@ -3,6 +3,7 @@ import { http, HttpResponse } from "msw";
 import type {
   AppSettings,
   AppSettingsUpdate,
+  ResetSummary,
   SeedChangedItem,
   SeedFileRequest,
   SeedStatus,
@@ -134,6 +135,8 @@ export const settingsHandlers = [
         endpointRecord.name,
       ]),
     );
+    const clearedEmailCount = mockDatabase.emails.length;
+    const clearedSmsCount = mockDatabase.smsMessages.length;
     replaceMockDatabase(readMockConditions().dataSize);
     // The mock makes new ids on reset; a real server keeps them.
     mockDatabase.savedDeliveries = keptSavedDeliveries.map((savedDelivery) => ({
@@ -146,7 +149,21 @@ export const settingsHandlers = [
         )?.id ?? savedDelivery.endpoint_id,
     }));
 
-    return new HttpResponse(null, { status: 204 });
+    const resetSummary: ResetSummary = {
+      cleared: [
+        { kind: "emails", count: clearedEmailCount },
+        { kind: "SMS messages", count: clearedSmsCount },
+      ].filter((clearedCount) => clearedCount.count > 0),
+      removed: [],
+      kept: [
+        {
+          kind: "Webhook endpoint",
+          count: mockDatabase.webhookEndpoints.length,
+        },
+      ].filter((keptCount) => keptCount.count > 0),
+      restored_seed: false,
+    };
+    return HttpResponse.json(resetSummary);
   }),
 
   http.get("*/api/v1/updates", async () => {

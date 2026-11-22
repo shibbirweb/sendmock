@@ -29,7 +29,7 @@ test.beforeAll(async ({ request }) => {
 /** Reset deletes every message, log and verification but keeps configuration. */
 test.beforeEach(async ({ request }) => {
   const resetResponse = await request.post("/api/v1/reset");
-  expect(resetResponse.status()).toBe(204);
+  expect(resetResponse.status()).toBe(200);
 });
 
 // A sample verification makes a service when there is none, and later specs expect

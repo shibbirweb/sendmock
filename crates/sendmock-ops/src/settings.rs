@@ -3,6 +3,7 @@ mod app_settings_store;
 mod app_settings_update;
 mod otp_extractor_cache;
 mod reset_operation;
+mod reset_summary;
 mod setting_choices;
 mod settings_operations;
 mod settings_validation;

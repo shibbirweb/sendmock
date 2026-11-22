@@ -14,6 +14,9 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ### Changed
 
+- **Setup validate catches what import refuses:** `sendmock setup validate` (and Preview in Settings > Setup) now reads every item the way an import does, so an unknown key or a wrong type is reported with its place before you import, instead of only when the import runs.
+- **Merge imports no longer ask to confirm:** `sendmock setup import` needs no `--yes` for a merge, which only adds and updates. A replace that would remove items names each one and asks you to run it again with `--confirm-removed-count <count>`.
+- **Reset says what it did:** `sendmock reset` and `POST /api/v1/reset` answer what they cleared (emails, SMS, deliveries and the rest) and which configuration stayed, instead of an empty answer. The new `--config` option also removes every configured item and puts the settings and providers back to what SendMock ships with, after you confirm the counts it names; see Seed file, Reset before every test run.
 - **The provider port is on by default:** `sendmock serve` now serves the provider APIs (Twilio, Mailgun, SendGrid, ...) at `127.0.0.1:8026` without `--provider-addr`, so provider SDKs reach SendMock with no extra flag. `--provider-addr none` (or `SENDMOCK_PROVIDER_ADDR=none`, or `provider_addr = "none"` in `sendmock.toml`) turns it off, and if port 8026 is busy SendMock says so and starts without it. `sendmock status`, `GET /api/v1/info` and the MCP status tool warn while it is off. The Docker image and the Helm chart keep it off until you set its address.
 
 ### Fixed
