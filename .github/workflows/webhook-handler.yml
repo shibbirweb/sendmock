@@ -8,13 +8,6 @@ name: Webhook handler
 
 on:
   pull_request:
-    paths:
-      - crates/sendmock-webhooks/**
-      - crates/sendmock-ops/src/webhooks/**
-      - crates/sendmock-ops/src/events/**
-      - crates/sendmock-ops/builtin/**
-      - examples/webhooks/**
-      - .github/workflows/webhook-handler.yml
   push:
     branches:
       - develop
@@ -28,20 +21,58 @@ on:
       - .github/workflows/webhook-handler.yml
   workflow_dispatch:
   workflow_call:
+    inputs:
+      run_every_job:
+        description: Run every job without reading the pull request's changes (a calling workflow decides)
+        type: boolean
+        default: true
+      skip_every_job:
+        description: Report every job with its steps skipped, when the calling workflow has nothing to do
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 jobs:
-  binary:
-    name: Release binary
+  changes:
+    name: Changed paths
     runs-on: ubuntu-latest
+    outputs:
+      is_affected: ${{ steps.changed-paths.outputs.is_affected }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            .github/actions
+            scripts/ci
 
-      - uses: oven-sh/setup-bun@v2
+      - id: changed-paths
+        uses: ./.github/actions/changed-paths
+        with:
+          run-every-job: ${{ github.event_name != 'pull_request' || inputs.run_every_job == true }}
+          skip-every-job: ${{ inputs.skip_every_job == true }}
+          paths: |
+            crates/sendmock-webhooks/**
+            crates/sendmock-ops/src/webhooks/**
+            crates/sendmock-ops/src/events/**
+            crates/sendmock-ops/builtin/**
+            examples/webhooks/**
+            .github/workflows/webhook-handler.yml
 
-      - name: Live UI the binary embeds
+  binary:
+    name: Release binary
+    needs: changes
+    runs-on: ubuntu-latest
+    steps:
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/checkout@v7
+
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: oven-sh/setup-bun@v2
+
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Live UI the binary embeds
         working-directory: web
         env:
           VITE_API_MODE: live
@@ -49,17 +80,21 @@ jobs:
           bun install --frozen-lockfile
           bun run build
 
-      - name: Toolchain from rust-toolchain.toml
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Toolchain from rust-toolchain.toml
         run: rustup toolchain install
 
-      - uses: Swatinem/rust-cache@v2
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: Swatinem/rust-cache@v2
         with:
           save-if: ${{ github.event_name != 'pull_request' }}
 
-      - name: Release build
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Release build
         run: cargo build --release --locked -p sendmock
 
-      - uses: actions/upload-artifact@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/upload-artifact@v7
         with:
           name: sendmock-for-webhook-handlers
           path: target/release/sendmock
@@ -67,21 +102,25 @@ jobs:
 
   express:
     name: Express handler
-    needs: binary
+    needs: [changes, binary]
     runs-on: ubuntu-latest
     env:
       SENDMOCK_URL: http://127.0.0.1:8025
     steps:
-      - uses: actions/checkout@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/checkout@v7
 
-      - uses: actions/download-artifact@v8
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/download-artifact@v8
         with:
           name: sendmock-for-webhook-handlers
           path: sendmock-binary
 
-      - uses: oven-sh/setup-bun@v2
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: oven-sh/setup-bun@v2
 
-      - name: Start SendMock
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Start SendMock
         run: |
           chmod +x sendmock-binary/sendmock
           ./sendmock-binary/sendmock --db memory > sendmock.log 2>&1 &
@@ -92,21 +131,23 @@ jobs:
           cat sendmock.log
           exit 1
 
-      - uses: actions/setup-node@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/setup-node@v7
         with:
           node-version: "22"
 
-      - name: Fail, retry, fix and replay with the Express handler
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Fail, retry, fix and replay with the Express handler
         working-directory: examples/webhooks/express-handler
         run: bun install && node done-when.js
 
       - name: SendMock log
-        if: failure()
+        if: ${{ (failure()) && needs.changes.outputs.is_affected == 'true' }}
         run: cat sendmock.log
 
   libraries:
     name: ${{ matrix.library }}
-    needs: binary
+    needs: [changes, binary]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -131,16 +172,20 @@ jobs:
     env:
       SENDMOCK_URL: http://127.0.0.1:8025
     steps:
-      - uses: actions/checkout@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/checkout@v7
 
-      - uses: actions/download-artifact@v8
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/download-artifact@v8
         with:
           name: sendmock-for-webhook-handlers
           path: sendmock-binary
 
-      - uses: oven-sh/setup-bun@v2
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: oven-sh/setup-bun@v2
 
-      - name: Start SendMock
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Start SendMock
         run: |
           chmod +x sendmock-binary/sendmock
           ./sendmock-binary/sendmock --db memory > sendmock.log 2>&1 &
@@ -152,31 +197,53 @@ jobs:
           exit 1
 
       - uses: actions/setup-node@v7
-        if: matrix.language == 'node'
+        if: ${{ (matrix.language == 'node') && needs.changes.outputs.is_affected == 'true' }}
         with:
           node-version: "22"
 
       - uses: actions/setup-python@v7
-        if: matrix.language == 'python'
+        if: ${{ (matrix.language == 'python') && needs.changes.outputs.is_affected == 'true' }}
         with:
           python-version: "3.13"
 
       - uses: shivammathur/setup-php@v2
-        if: matrix.language == 'php'
+        if: ${{ (matrix.language == 'php') && needs.changes.outputs.is_affected == 'true' }}
         with:
           php-version: "8.3"
           tools: composer
 
       - uses: actions/setup-go@v7
-        if: matrix.language == 'go'
+        if: ${{ (matrix.language == 'go') && needs.changes.outputs.is_affected == 'true' }}
         with:
           go-version: "1.23"
           cache-dependency-path: examples/webhooks/go-standard-webhooks/go.sum
 
-      - name: Verify a delivery with the ${{ matrix.library }} library
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Verify a delivery with the ${{ matrix.library }} library
         working-directory: examples/webhooks/${{ matrix.folder }}
         run: ${{ matrix.run }}
 
       - name: SendMock log
-        if: failure()
+        if: ${{ (failure()) && needs.changes.outputs.is_affected == 'true' }}
         run: cat sendmock.log
+
+  # A required check like every job above: it fails unless each job passed or was skipped.
+  passed:
+    name: Webhook handler passed
+    if: always()
+    needs:
+      - changes
+      - binary
+      - express
+      - libraries
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job passed or was skipped
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          failed_jobs="$(echo "$JOB_RESULTS" | jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | "\(.key): \(.value.result)"')"
+          if [ -n "$failed_jobs" ]; then
+            echo "::error::Not every job passed: $failed_jobs"
+            exit 1
+          fi

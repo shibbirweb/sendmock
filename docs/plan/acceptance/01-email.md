@@ -235,3 +235,40 @@ Phase 5 (W20), for the next beta (0.1.0-beta.4), added 2026-11-13 (owner request
 - [x] EM-23.4 A complaint simulated in SendMock (Simulate, the `complaint@` alias or an outcome rule) adds the address for that domain, and a later send to it through Mailgun is accepted but not delivered, recorded as a `failed` event with reason `suppress-complaint`.
 - [x] EM-23.5 The Mailgun provider's sheet lists each domain's complaints and clears them, and REST, CLI and MCP list and clear them too.
 - [x] EM-23.6 In CI, the Mailgun PHP SDK reads the events of a sent email and adds, reads and deletes a complaint, and the provider docs list the new paths.
+
+## EM-24 Mailgun sends and ids
+
+1.5.0 (A28), planned 2026-11-22 from a user's report on 1.4.0 (owner request). Plan: [32-after-1-0.md](../32-after-1-0.md#a28-plug-and-play-for-mailgun-and-twilio-apps-em-24-to-em-27-sm-22-to-sm-24-pl-24-to-pl-27-ai-08) (A28).
+
+- [ ] EM-24.1 A Mailgun send with `template` and no `text` or `html` is accepted and stored with its template id, as on Mailgun (R-02).
+- [ ] EM-24.2 `h:X-Mailgun-Variables` and every `v:*` field of a `/messages` send, and the `X-Mailgun-Variables` header of a `/messages.mime` send, are stored as the email's user variables and read by templates as `data.user_variables` (R-08).
+- [ ] EM-24.3 A provider send keeps the provider's message id on the stored email; templates read it as `data.provider_message_id`, the email API shows it, and the built-in Mailgun templates use it, so a webhook carries the id the send answered (R-26).
+- [ ] EM-24.4 Every provider route percent-decodes its path parameters before matching, so `DELETE /v3/{domain}/complaints/user%40example.org` removes the complaint as `user@example.org` does (R-28).
+- [ ] EM-24.5 The Mailgun PHP and Node SDKs send with `template` and with `v:` variables in CI, and the webhooks for those emails carry the variables and the id the SDK got back.
+
+## EM-25 Mailgun webhooks as Mailgun sends them
+
+1.5.0 (A28), planned 2026-11-22 from a user's report on 1.4.0 (owner request). Plan: [32-after-1-0.md](../32-after-1-0.md#a28-plug-and-play-for-mailgun-and-twilio-apps-em-24-to-em-27-sm-22-to-sm-24-pl-24-to-pl-27-ai-08) (A28).
+
+- [ ] EM-25.1 `mailgun.events` carries `user-variables` on every event of an email that has them, and `delivery-status`, `severity` and `reason` per event, matching a fixture from Mailgun's documented events (R-03).
+- [ ] EM-25.2 A simulated soft bounce is sent as `severity: temporary` with its SMTP code and message, a hard bounce as `permanent`; template data has `data.bounce.type`, `data.bounce.code` and `data.bounce.message` (the flat fields stay as aliases), and previews and renders of a bounced email show them (R-33).
+- [ ] EM-25.3 `mailgun.routes` sends Mailgun's store-and-notify fields (`from`, `To`, `Message-Id`, `In-Reply-To`, `References`, the stripped text, HTML and signature, `body-html`, `message-headers`, `attachment-count`, the attachments, `content-id-map`, `message-url`), matching a fixture from Mailgun's documentation (R-06).
+- [ ] EM-25.4 Each built-in template lists only the events its provider sends: inbound templates list `email.inbound`, event templates do not, and a rule built from the rule tool's inbound example fires for simulated inbound mail and replies (R-04, R-24).
+- [ ] EM-25.5 Simulate warns before sending when a chosen endpoint's template does not list the event (R-24).
+
+## EM-26 Stored messages and local email templates
+
+1.5.0 (A28), planned 2026-11-22 from a user's report on 1.4.0 (owner request). Plan: [32-after-1-0.md](../32-after-1-0.md#a28-plug-and-play-for-mailgun-and-twilio-apps-em-24-to-em-27-sm-22-to-sm-24-pl-24-to-pl-27-ai-08) (A28).
+
+- [ ] EM-26.1 `GET /v3/domains/{domain}/messages/{key}` answers Mailgun's full stored-message shape for the provider id or SendMock's id, templates have `data.message_url`, and Mailgun events have a `storage` field with `url` and `key` (R-07).
+- [ ] EM-26.2 Local email templates are listed, created, updated and deleted on REST, CLI, MCP and Mail > Templates in the UI (R-29).
+- [ ] EM-26.3 `GET /v3/{domain}/templates/{name}` (with `active=yes`) answers from the local email templates in Mailgun's shape, and 404 as Mailgun does for an unknown name (R-10).
+- [ ] EM-26.4 The `[[email.templates]]` keys are documented, and a setup file with an unknown key is refused by validate and import with the key's name (R-18).
+
+## EM-27 Simulating email events with the app's data
+
+1.5.0 (A28), planned 2026-11-22 from a user's report on 1.4.0 (owner request). Plan: [32-after-1-0.md](../32-after-1-0.md#a28-plug-and-play-for-mailgun-and-twilio-apps-em-24-to-em-27-sm-22-to-sm-24-pl-24-to-pl-27-ai-08) (A28).
+
+- [ ] EM-27.1 The Simulate open, click, bounce and complaint dialogs, REST actions and MCP tools take user variables, which are merged into the webhook payload before it is signed (R-09).
+- [ ] EM-27.2 Viewing an email in the inbox does not record an open or send a webhook by default when a webhook rule would send one; the viewer says so and offers Count as an open, and the setting keeps the old behaviour (R-25).
+- [ ] EM-27.3 The guide shows testing opens and bounces of SMTP-sent mail with user variables, without editing payloads.

@@ -339,4 +339,10 @@ export const toolFeatureSummaries: Record<string, FeatureSummary> = {
     outcome:
       "Start the services you need without remembering a flag for each one, in a terminal, a script or an agent.",
   },
+  "PL-23": {
+    summary:
+      "Starting SendMock in a terminal first prints the website footer's SendMock wordmark in braille dots, fitted to the terminal's width, with the version under it; scripts, pipes, JSON output and MCP see nothing new.",
+    outcome:
+      "See at a glance that SendMock is starting and which version it is.",
+  },
 };

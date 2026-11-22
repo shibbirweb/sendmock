@@ -8,9 +8,9 @@ type ExampleAppsWorkflow = {
   jobs: {
     binary: { steps: WorkflowStep[] };
     app: { strategy: { matrix: { include: MatrixEntry[] } } };
-    presets: { needs: string; steps: WorkflowStep[] };
+    presets: { needs: string[]; steps: WorkflowStep[] };
     recipes: {
-      needs: string;
+      needs: string[];
       strategy: { matrix: { include: { language: string; folder: string }[] } };
       steps: WorkflowStep[];
     };
@@ -50,7 +50,7 @@ describe("Example apps workflow", () => {
       (step) => step["working-directory"] === "examples/http-presets/node",
     );
 
-    expect(exampleAppsWorkflow.jobs.presets.needs).toBe("binary");
+    expect(exampleAppsWorkflow.jobs.presets.needs).toEqual(["changes", "binary"]);
     expect(presetsStep?.run).toContain("node done-when.js");
     expect(existsSync("examples/http-presets/node/done-when.js")).toBe(true);
   });
@@ -61,7 +61,7 @@ describe("Example apps workflow", () => {
       (step.run ?? "").includes("stand-in-app.mjs"),
     );
 
-    expect(recipesJob.needs).toBe("binary");
+    expect(recipesJob.needs).toEqual(["changes", "binary"]);
     expect(startStep?.run).toContain(
       "--seed examples/recipes/sendmock.seed.toml",
     );

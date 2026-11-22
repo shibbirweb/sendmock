@@ -2,10 +2,6 @@ name: CI pipeline example
 
 on:
   pull_request:
-    paths:
-      - crates/**
-      - examples/ci/**
-      - .github/workflows/ci-examples.yml
   push:
     branches:
       - develop
@@ -25,15 +21,40 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ci-example:
-    name: sendmock ci run on the example shop
+  changes:
+    name: Changed paths
     runs-on: ubuntu-latest
+    outputs:
+      is_affected: ${{ steps.changed-paths.outputs.is_affected }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            .github/actions
+            scripts/ci
 
-      - uses: oven-sh/setup-bun@v2
+      - id: changed-paths
+        uses: ./.github/actions/changed-paths
+        with:
+          run-every-job: ${{ github.event_name != 'pull_request' }}
+          paths: |
+            crates/**
+            examples/ci/**
+            .github/workflows/ci-examples.yml
 
-      - name: Live UI the binary embeds
+  ci-example:
+    name: sendmock ci run on the example shop
+    needs: changes
+    runs-on: ubuntu-latest
+    steps:
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/checkout@v7
+
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: oven-sh/setup-bun@v2
+
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Live UI the binary embeds
         working-directory: web
         env:
           VITE_API_MODE: live
@@ -41,25 +62,49 @@ jobs:
           bun install --frozen-lockfile
           bun run build
 
-      - name: Toolchain from rust-toolchain.toml
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Toolchain from rust-toolchain.toml
         run: rustup toolchain install
 
-      - uses: Swatinem/rust-cache@v2
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: Swatinem/rust-cache@v2
         with:
           save-if: ${{ github.event_name != 'pull_request' }}
 
-      - name: Release build
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Release build
         run: cargo build --release --locked -p sendmock
 
-      - uses: actions/setup-node@v7
+      - if: needs.changes.outputs.is_affected == 'true'
+        uses: actions/setup-node@v7
         with:
           node-version: "22"
 
-      - name: Run the example both ways, and a broken app
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Run the example both ways, and a broken app
         env:
           SENDMOCK_BINARY: ${{ github.workspace }}/target/release/sendmock
         run: examples/ci/run-ci-example-test.sh
 
       - name: SendMock log
-        if: failure()
+        if: ${{ (failure()) && needs.changes.outputs.is_affected == 'true' }}
         run: cat sendmock-server.log || true
+
+  # A required check like every job above: it fails unless each job passed or was skipped.
+  passed:
+    name: CI pipeline example passed
+    if: always()
+    needs:
+      - changes
+      - ci-example
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job passed or was skipped
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          failed_jobs="$(echo "$JOB_RESULTS" | jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | "\(.key): \(.value.result)"')"
+          if [ -n "$failed_jobs" ]; then
+            echo "::error::Not every job passed: $failed_jobs"
+            exit 1
+          fi

@@ -191,7 +191,7 @@ describe("SMS clients workflow", () => {
       "uses: ./.github/workflows/sms-clients.yml",
     );
     expect(releaseWorkflow).toMatch(
-      /needs: \[plan, checksums, smtp-clients, sms-clients[^\]]*\]/,
+      /needs: \[changes, plan, checksums, smtp-clients, sms-clients[^\]]*\]/,
     );
   });
 

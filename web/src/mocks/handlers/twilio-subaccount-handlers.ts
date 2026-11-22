@@ -15,14 +15,9 @@ import {
   createNotFoundResponse,
 } from "@/mocks/handlers/handler-utils";
 import { maskSecretValue } from "@/mocks/payments/render-gateway-templates";
+import { createSecureRandomHex } from "@/mocks/secure-random-hex";
 
 const accountSidPattern = /^AC[0-9a-fA-F]{32}$/;
-
-function createHex32(): string {
-  return Array.from({ length: 32 }, () =>
-    Math.floor(Math.random() * 16).toString(16),
-  ).join("");
-}
 
 function describeSubaccount(
   subaccount: MockTwilioSubaccount,
@@ -47,7 +42,7 @@ function readChangedToken(
       sentToken === "" || sentToken === maskSecretValue(storedToken);
     return isUnchanged ? storedToken : sentToken;
   }
-  return sentToken === "" ? createHex32() : sentToken;
+  return sentToken === "" ? createSecureRandomHex(32) : sentToken;
 }
 
 function validateChanges(changes: TwilioSubaccountChanges): string | null {
@@ -87,7 +82,7 @@ export const twilioSubaccountHandlers = [
       );
     }
     const accountSid =
-      requestedSid === "" ? `AC${createHex32()}` : requestedSid;
+      requestedSid === "" ? `AC${createSecureRandomHex(32)}` : requestedSid;
     if (findSubaccount(accountSid) !== undefined) {
       return createErrorResponse(
         409,

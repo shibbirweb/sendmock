@@ -115,3 +115,24 @@ jobs:
           # Empty for a push, and for a fork, whose token cannot comment.
           PULL_REQUEST_NUMBER: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.number || '' }}
         run: bun scripts/test-builds-report.ts test-builds
+
+  # A required check like every job above: it fails unless each job passed or was skipped.
+  passed:
+    name: Test builds passed
+    if: always()
+    needs:
+      - version
+      - build
+      - test
+      - report
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job passed or was skipped
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          failed_jobs="$(echo "$JOB_RESULTS" | jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | "\(.key): \(.value.result)"')"
+          if [ -n "$failed_jobs" ]; then
+            echo "::error::Not every job passed: $failed_jobs"
+            exit 1
+          fi
