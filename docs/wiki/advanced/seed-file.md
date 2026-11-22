@@ -125,7 +125,7 @@ text = "Hi {{ first_name }}, your {{ plan }} plan is ready."
 html = "<p>Hi {{ first_name }}, your <b>{{ plan }}</b> plan is ready.</p>"
 ```
 
-A template send whose id matches is stored with this subject (unless the send names its own) and these bodies, rendered from the send's template data with the same template language as webhook templates. A template needs a `text` or an `html` body.
+A template send whose id matches is stored with this subject (unless the send names its own) and these bodies, rendered from the send's template data with the same template language as webhook templates. The keys are `id` (required), `subject`, `text` and `html`; a template needs a `text` or an `html` body, and any other key (such as `template_id`) is refused by validate and import with its name. **Mail > Templates** manages the same templates; see [Templates](../mail/templates.md).
 
 ## Payment flows, methods and gateways
 

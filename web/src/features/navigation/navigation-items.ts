@@ -5,6 +5,7 @@ import {
   ChartColumnIcon,
   CreditCardIcon,
   FileCode2Icon,
+  FileTextIcon,
   GaugeIcon,
   GlobeIcon,
   InboxIcon,
@@ -88,6 +89,15 @@ export const navigationItems: NavigationItem[] = [
         upcomingDescription:
           "SendGrid, Mailgun, Postmark and other email APIs your app can send to, plus your own.",
         icon: ServerCogIcon,
+      },
+      {
+        title: "Templates",
+        path: "/mail/templates",
+        docsPath: "mail/templates/",
+        listOperationKey: "GET /api/v1/emails/templates",
+        upcomingDescription:
+          "Local stand-ins for your provider's email templates, used by template sends.",
+        icon: FileTextIcon,
       },
     ],
   },

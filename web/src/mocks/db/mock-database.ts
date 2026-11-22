@@ -1,6 +1,7 @@
 import type {
   ApiRequestLogEntry,
   AppSettings,
+  EmailTemplate,
   SavedScenario,
   CapturedHttpRequest,
   EmailDetail,
@@ -135,6 +136,8 @@ export type MockDatabase = {
   messagingServices: MessagingService[];
   twilioSubaccounts: MockTwilioSubaccount[];
   mailgunComplaints: MailgunComplaint[];
+  /** Local stand-ins for providers' email templates (EM-26.2). */
+  emailTemplates: EmailTemplate[];
   smsOutcomeRules: SmsOutcomeRule[];
   emailOutcomeRules: EmailOutcomeRule[];
   messageRules: MessageRuleSets;
@@ -199,6 +202,14 @@ function buildConfiguration() {
     virtualNumbers,
     messagingServices: buildMessagingServiceFixtures(virtualNumbers),
     twilioSubaccounts: buildTwilioSubaccountFixtures(),
+    emailTemplates: [
+      {
+        id: "welcome-email",
+        subject: "Welcome, {{ first_name }}",
+        text: "Hi {{ first_name }}, thanks for joining Acme.",
+        html: null,
+      },
+    ],
     mailgunComplaints: [
       {
         domain: "mg.acme.test",

@@ -25,6 +25,7 @@ tags:
   - name: Test helpers
   - name: Automation
   - name: Email
+  - name: Email templates
   - name: Inbound routes
   - name: Tag rules
   - name: Forward rules
@@ -2433,6 +2434,112 @@ paths:
       x-sendmock-cli: sendmock sendmail
       x-sendmock-mcp: sendmock_email_send_raw
       x-sendmock-ui: Mail > Import .eml > Sent by your app
+  /api/v1/emails/templates:
+    get:
+      operationId: getEmailsTemplates
+      summary: "Local email templates: a provider send naming one gets its subject and bodies."
+      tags:
+        - Email templates
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EmailTemplate"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email templates list
+      x-sendmock-mcp: sendmock_email_template_list
+      x-sendmock-ui: Mail > Templates
+    post:
+      operationId: postEmailsTemplates
+      summary: Add a local email template under a provider's template id or name.
+      tags:
+        - Email templates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailTemplate"
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email templates create
+      x-sendmock-mcp: sendmock_email_template_create
+      x-sendmock-ui: Mail > Templates > New template
+  /api/v1/emails/templates/{templateId}:
+    patch:
+      operationId: patchEmailsTemplatesByTemplateId
+      summary: Change a local email template's subject or bodies.
+      tags:
+        - Email templates
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          description: The webhook template's ID, e.g. `slack.incoming_webhook` or `custom.ops_alert`.
+          schema:
+            type: string
+          example: slack.incoming_webhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailTemplateChangesPatch"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email templates update <templateId>
+      x-sendmock-mcp: sendmock_email_template_update
+      x-sendmock-ui: Mail > Templates > a template > Save
+    delete:
+      operationId: deleteEmailsTemplatesByTemplateId
+      summary: Remove a local email template; sends naming it keep their own bodies.
+      tags:
+        - Email templates
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          description: The webhook template's ID, e.g. `slack.incoming_webhook` or `custom.ops_alert`.
+          schema:
+            type: string
+          example: slack.incoming_webhook
+      responses:
+        "204":
+          description: No content.
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email templates delete <templateId>
+      x-sendmock-mcp: sendmock_email_template_delete
+      x-sendmock-ui: Mail > Templates > a template > Delete
   /api/v1/inbound-routes:
     get:
       operationId: getInboundRoutes
@@ -10774,6 +10881,50 @@ components:
         - response_kind
         - project
       description: Fields shown in the mail list.
+    EmailTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "The provider's template id or name: SendGrid's `d-...`, Postmark's number or alias, Mailgun's template name."
+          examples:
+            - welcome-email
+        subject:
+          type: string
+          description: The subject, used when the send gives none; can use the template data.
+          examples:
+            - Welcome, {{ first_name }}
+        text:
+          type:
+            - string
+            - "null"
+          description: The plain-text body; at least one of `text` and `html`.
+          examples:
+            - Hi {{ first_name }}, thanks for joining.
+        html:
+          type:
+            - string
+            - "null"
+          description: The HTML body.
+      required:
+        - id
+        - subject
+        - text
+        - html
+      description: A local stand-in for a provider's email template.
+    EmailTemplateChangesPatch:
+      type: object
+      properties:
+        subject:
+          type: string
+        text:
+          type:
+            - string
+            - "null"
+        html:
+          type:
+            - string
+            - "null"
     EmailTemplateData:
       type: object
       properties:

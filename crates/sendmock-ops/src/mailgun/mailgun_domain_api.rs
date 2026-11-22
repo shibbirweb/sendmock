@@ -1,6 +1,7 @@
 use super::mailgun_complaint_recording::MAILGUN_PROVIDER_KEY;
 use super::mailgun_complaints_api::answer_complaints;
 use super::mailgun_events_api::{EventsQuery, answer_events};
+use super::mailgun_templates_api::answer_template;
 use crate::providers::{ProviderHttpRequest, ProviderOutcome, ProviderRoute};
 use crate::{OperationContext, OperationError};
 
@@ -8,6 +9,7 @@ use crate::{OperationContext, OperationError};
 enum DomainTarget<'path> {
     Events { page_token: Option<&'path str> },
     Complaints { address: Option<&'path str> },
+    Template { name: &'path str },
 }
 
 fn read_domain_target(request_path: &str) -> Option<(&str, DomainTarget<'_>)> {
@@ -27,6 +29,7 @@ fn read_domain_target(request_path: &str) -> Option<(&str, DomainTarget<'_>)> {
     match resource {
         "events" => Some((domain, DomainTarget::Events { page_token: item })),
         "complaints" => Some((domain, DomainTarget::Complaints { address: item })),
+        "templates" => item.map(|name| (domain, DomainTarget::Template { name })),
         _ => None,
     }
 }
@@ -68,6 +71,10 @@ pub async fn answer_mailgun_domain_request(
         DomainTarget::Complaints { address } => {
             answer_complaints(operation_context, domain, address, request, &base_url).await?
         }
+        DomainTarget::Template { name } if request.method == "GET" => {
+            Some(answer_template(operation_context, name).await?)
+        }
+        DomainTarget::Template { .. } => None,
     };
     Ok(response.map(|response| ProviderOutcome {
         response,

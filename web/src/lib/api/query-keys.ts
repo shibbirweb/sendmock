@@ -78,6 +78,7 @@ export const queryKeys = {
   mailgun: {
     complaints: ["mailgun", "complaints"] as const,
   },
+  emailTemplates: ["email-templates"] as const,
   webhooks: {
     all: ["webhooks"] as const,
     endpoints: ["webhooks", "endpoints"] as const,

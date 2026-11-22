@@ -746,6 +746,95 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock email templates list",
+    "usage": "sendmock email templates list",
+    "aliases": [],
+    "summary": "Local email templates: a provider send naming one gets its subject and bodies.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/templates",
+        "operation_id": "getEmailsTemplates",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_template_list"
+    ]
+  },
+  {
+    "command": "sendmock email templates create",
+    "usage": "sendmock email templates create",
+    "aliases": [],
+    "summary": "Add a local email template under a provider's template id or name.",
+    "arguments": [],
+    "flags": [
+      "--html",
+      "--id",
+      "--subject",
+      "--text"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/emails/templates",
+        "operation_id": "postEmailsTemplates",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_template_create"
+    ]
+  },
+  {
+    "command": "sendmock email templates update",
+    "usage": "sendmock email templates update <templateId>",
+    "aliases": [],
+    "summary": "Change a local email template's subject or bodies.",
+    "arguments": [
+      "templateId"
+    ],
+    "flags": [
+      "--html",
+      "--subject",
+      "--text"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/emails/templates/{templateId}",
+        "operation_id": "patchEmailsTemplatesByTemplateId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_template_update"
+    ]
+  },
+  {
+    "command": "sendmock email templates delete",
+    "usage": "sendmock email templates delete <templateId>",
+    "aliases": [],
+    "summary": "Remove a local email template; sends naming it keep their own bodies.",
+    "arguments": [
+      "templateId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/emails/templates/{templateId}",
+        "operation_id": "deleteEmailsTemplatesByTemplateId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_template_delete"
+    ]
+  },
+  {
     "command": "sendmock email inbound",
     "usage": "sendmock email inbound",
     "aliases": [],

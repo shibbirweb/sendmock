@@ -4345,6 +4345,290 @@
       ]
     },
     {
+      "command": "sendmock email templates create",
+      "slug": "email-templates-create",
+      "usage": "sendmock email templates create [flags]",
+      "summary": "Add a local email template under a provider's template id or name.",
+      "area": "Email templates",
+      "area_slug": "email-templates",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/emails/templates",
+          "operation_id": "postEmailsTemplates",
+          "summary": "Add a local email template under a provider's template id or name.",
+          "area_slug": "email-templates",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--id",
+          "input": {
+            "name": "id",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<id>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The provider's template id or name: SendGrid's `d-...`, Postmark's number or alias, Mailgun's template name.",
+          "example": "welcome-email"
+        },
+        {
+          "flag": "--subject",
+          "input": {
+            "name": "subject",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<subject>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The subject, used when the send gives none; can use the template data.",
+          "example": "Welcome, {{ first_name }}"
+        },
+        {
+          "flag": "--text",
+          "input": {
+            "name": "text",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<text>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The plain-text body; at least one of `text` and `html`.",
+          "example": "Hi {{ first_name }}, thanks for joining."
+        },
+        {
+          "flag": "--html",
+          "input": {
+            "name": "html",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<html>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The HTML body.",
+          "example": ""
+        }
+      ],
+      "example": "sendmock email templates create --id welcome-email --subject 'Welcome, {{ first_name }}' --text 'Hi {{ first_name }}, thanks for joining.' --html ''",
+      "output": "EmailTemplate",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_email_template_create"
+      ],
+      "ui": [
+        "Mail > Templates > New template"
+      ]
+    },
+    {
+      "command": "sendmock email templates delete",
+      "slug": "email-templates-delete",
+      "usage": "sendmock email templates delete <templateId> [flags]",
+      "summary": "Remove a local email template; sends naming it keep their own bodies.",
+      "area": "Email templates",
+      "area_slug": "email-templates",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/emails/templates/{templateId}",
+          "operation_id": "deleteEmailsTemplatesByTemplateId",
+          "summary": "Remove a local email template; sends naming it keep their own bodies.",
+          "area_slug": "email-templates",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "templateId",
+          "input": {
+            "name": "templateId",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The webhook template's ID, e.g. `slack.incoming_webhook` or `custom.ops_alert`.",
+          "example": "slack.incoming_webhook",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--yes",
+          "input": null,
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Confirms a destructive command; without it the command stops.",
+          "example": true
+        }
+      ],
+      "example": "sendmock email templates delete slack.incoming_webhook --yes",
+      "output": null,
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_email_template_delete"
+      ],
+      "ui": [
+        "Mail > Templates > a template > Delete"
+      ]
+    },
+    {
+      "command": "sendmock email templates list",
+      "slug": "email-templates-list",
+      "usage": "sendmock email templates list",
+      "summary": "Local email templates: a provider send naming one gets its subject and bodies.",
+      "area": "Email templates",
+      "area_slug": "email-templates",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/emails/templates",
+          "operation_id": "getEmailsTemplates",
+          "summary": "Local email templates: a provider send naming one gets its subject and bodies.",
+          "area_slug": "email-templates",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [],
+      "example": "sendmock email templates list",
+      "output": "EmailTemplate[]",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_email_template_list"
+      ],
+      "ui": [
+        "Mail > Templates"
+      ]
+    },
+    {
+      "command": "sendmock email templates update",
+      "slug": "email-templates-update",
+      "usage": "sendmock email templates update <templateId> [flags]",
+      "summary": "Change a local email template's subject or bodies.",
+      "area": "Email templates",
+      "area_slug": "email-templates",
+      "operations": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/emails/templates/{templateId}",
+          "operation_id": "patchEmailsTemplatesByTemplateId",
+          "summary": "Change a local email template's subject or bodies.",
+          "area_slug": "email-templates",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "templateId",
+          "input": {
+            "name": "templateId",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The webhook template's ID, e.g. `slack.incoming_webhook` or `custom.ops_alert`.",
+          "example": "slack.incoming_webhook",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--subject",
+          "input": {
+            "name": "subject",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<subject>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "",
+          "example": ""
+        },
+        {
+          "flag": "--text",
+          "input": {
+            "name": "text",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<text>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "",
+          "example": ""
+        },
+        {
+          "flag": "--html",
+          "input": {
+            "name": "html",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<html>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "",
+          "example": ""
+        }
+      ],
+      "example": "sendmock email templates update slack.incoming_webhook --subject '' --text ''",
+      "output": "EmailTemplate",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_email_template_update"
+      ],
+      "ui": [
+        "Mail > Templates > a template > Save"
+      ]
+    },
+    {
       "command": "sendmock email thumbnail",
       "slug": "email-thumbnail",
       "usage": "sendmock email thumbnail <emailId> <attachmentIndex>",

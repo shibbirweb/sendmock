@@ -21,6 +21,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as MailIndexRouteImport } from './routes/mail/index'
 import { Route as MailEmailIdRouteImport } from './routes/mail/$emailId'
 import { Route as MailProvidersRouteImport } from './routes/mail_.providers'
+import { Route as MailTemplatesRouteImport } from './routes/mail_.templates'
 import { Route as PaySessionIdRouteImport } from './routes/pay/$sessionId'
 import { Route as PaymentsIndexRouteImport } from './routes/payments/index'
 import { Route as PaymentsFlowsRouteImport } from './routes/payments/flows'
@@ -100,6 +101,11 @@ const MailEmailIdRoute = MailEmailIdRouteImport.update({
 const MailProvidersRoute = MailProvidersRouteImport.update({
   id: '/mail_/providers',
   path: '/mail/providers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MailTemplatesRoute = MailTemplatesRouteImport.update({
+  id: '/mail_/templates',
+  path: '/mail/templates',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PaySessionIdRoute = PaySessionIdRouteImport.update({
@@ -216,6 +222,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
   '/mail/providers': typeof MailProvidersRoute
+  '/mail/templates': typeof MailTemplatesRoute
   '/pay/$sessionId': typeof PaySessionIdRoute
   '/payments/flows': typeof PaymentsFlowsRoute
   '/payments/gateways': typeof PaymentsGatewaysRoute
@@ -249,6 +256,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
   '/mail/providers': typeof MailProvidersRoute
+  '/mail/templates': typeof MailTemplatesRoute
   '/pay/$sessionId': typeof PaySessionIdRoute
   '/payments/flows': typeof PaymentsFlowsRoute
   '/payments/gateways': typeof PaymentsGatewaysRoute
@@ -283,6 +291,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/mail/$emailId': typeof MailEmailIdRoute
   '/mail_/providers': typeof MailProvidersRoute
+  '/mail_/templates': typeof MailTemplatesRoute
   '/pay/$sessionId': typeof PaySessionIdRoute
   '/payments/flows': typeof PaymentsFlowsRoute
   '/payments/gateways': typeof PaymentsGatewaysRoute
@@ -319,6 +328,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/mail/$emailId'
     | '/mail/providers'
+    | '/mail/templates'
     | '/pay/$sessionId'
     | '/payments/flows'
     | '/payments/gateways'
@@ -352,6 +362,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/mail/$emailId'
     | '/mail/providers'
+    | '/mail/templates'
     | '/pay/$sessionId'
     | '/payments/flows'
     | '/payments/gateways'
@@ -385,6 +396,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/mail/$emailId'
     | '/mail_/providers'
+    | '/mail_/templates'
     | '/pay/$sessionId'
     | '/payments/flows'
     | '/payments/gateways'
@@ -419,6 +431,7 @@ export interface RootRouteChildren {
   ScenariosRoute: typeof ScenariosRoute
   SettingsRoute: typeof SettingsRoute
   MailProvidersRoute: typeof MailProvidersRoute
+  MailTemplatesRoute: typeof MailTemplatesRoute
   PaySessionIdRoute: typeof PaySessionIdRoute
   PaymentsFlowsRoute: typeof PaymentsFlowsRoute
   PaymentsGatewaysRoute: typeof PaymentsGatewaysRoute
@@ -523,6 +536,13 @@ declare module '@tanstack/react-router' {
       path: '/mail/providers'
       fullPath: '/mail/providers'
       preLoaderRoute: typeof MailProvidersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mail_/templates': {
+      id: '/mail_/templates'
+      path: '/mail/templates'
+      fullPath: '/mail/templates'
+      preLoaderRoute: typeof MailTemplatesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pay/$sessionId': {
@@ -704,6 +724,7 @@ const rootRouteChildren: RootRouteChildren = {
   ScenariosRoute: ScenariosRoute,
   SettingsRoute: SettingsRoute,
   MailProvidersRoute: MailProvidersRoute,
+  MailTemplatesRoute: MailTemplatesRoute,
   PaySessionIdRoute: PaySessionIdRoute,
   PaymentsFlowsRoute: PaymentsFlowsRoute,
   PaymentsGatewaysRoute: PaymentsGatewaysRoute,

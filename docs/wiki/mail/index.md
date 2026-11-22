@@ -5,7 +5,7 @@ description: Catch every email your app sends over SMTP or a provider API, read 
 
 > Try it in the [demo](/demo/mail).
 
-Every email your app sends lands in **Mail > Inbox**, whatever the recipient, and nothing is delivered to a real inbox. **Mail** opens the inbox; [Mail > Providers](./providers.md) lists the email APIs SendMock answers.
+Every email your app sends lands in **Mail > Inbox**, whatever the recipient, and nothing is delivered to a real inbox. **Mail** opens the inbox; [Mail > Providers](./providers.md) lists the email APIs SendMock answers. [Mail > Templates](./templates.md) keeps local stand-ins for your provider's email templates.
 
 ![The Mail screen with an email open on its HTML preview](../images/mail.jpg)
 

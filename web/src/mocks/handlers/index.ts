@@ -1,6 +1,7 @@
 import { automationHandlers } from "@/mocks/handlers/automation-handlers";
 import { definitionLookupHandlers } from "@/mocks/handlers/definition-lookup-handlers";
 import { emailDetailHandlers } from "@/mocks/handlers/email-detail-handlers";
+import { emailTemplateHandlers } from "@/mocks/handlers/email-template-handlers";
 import { emailImportHandlers } from "@/mocks/handlers/email-import-handlers";
 import { messageProviderHandlers } from "@/mocks/handlers/message-provider-handlers";
 import { whatsappCloudHandlers } from "@/mocks/handlers/whatsapp-cloud-handlers";
@@ -71,6 +72,7 @@ export const mockHandlers = [
   ...messageRuleHandlers,
   ...projectHandlers,
   ...pushHandlers,
+  ...emailTemplateHandlers,
   ...emailDetailHandlers,
   ...nativeSendHandlers,
   ...emailHandlers,
