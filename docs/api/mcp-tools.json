@@ -25585,7 +25585,7 @@
           "01JB7T9Q2RENDPOINT00000000"
         ]
       },
-      "output": "SmsMessageDetail",
+      "output": "SmsStatusChangeAnswer",
       "cli": [
         "sendmock sms status <smsId> <status>"
       ],

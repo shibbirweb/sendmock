@@ -1,4 +1,6 @@
+use schemars::JsonSchema;
 use sendmock_store::SmsStatusChangeRecord;
+use serde::Serialize;
 use serde_json::json;
 
 use super::sms_detail::{SmsMessageDetail, load_sms_detail};
@@ -112,7 +114,7 @@ pub struct SetSmsStatusOperation;
 
 impl Operation for SetSmsStatusOperation {
     type Input = SmsStatusUpdate;
-    type Output = SmsMessageDetail;
+    type Output = SmsStatusChangeAnswer;
 
     fn definition(&self) -> OperationDefinition {
         OperationDefinition {
@@ -131,7 +133,7 @@ impl Operation for SetSmsStatusOperation {
         &self,
         operation_context: &OperationContext,
         input: SmsStatusUpdate,
-    ) -> Result<SmsMessageDetail, OperationError> {
+    ) -> Result<SmsStatusChangeAnswer, OperationError> {
         let operation_context = &input.webhook_choice.apply_to(operation_context).await?;
         if !SMS_STATUSES.contains(&input.status.as_str()) {
             return Err(OperationError::InvalidInput {
@@ -148,6 +150,7 @@ impl Operation for SetSmsStatusOperation {
         };
         let updated_sms =
             apply_status_change(operation_context, &input.sms_id, status_change.clone()).await?;
+        let status_callback_timing = describe_callback_timing(&updated_sms);
         let background_context = operation_context.clone();
         let sms_for_callback = updated_sms.clone();
         tokio::spawn(async move {
@@ -157,7 +160,28 @@ impl Operation for SetSmsStatusOperation {
                 tracing::warn!(error = %callback_error, "could not record the status callback");
             }
         });
-        load_sms_detail(operation_context, updated_sms).await
+        Ok(SmsStatusChangeAnswer {
+            message: load_sms_detail(operation_context, updated_sms).await?,
+            status_callback_timing,
+        })
+    }
+}
+
+/// The message after a status set by hand, and when its status callback is sent.
+#[derive(Debug, Clone, PartialEq, Serialize, JsonSchema)]
+pub struct SmsStatusChangeAnswer {
+    #[serde(flatten)]
+    pub message: SmsMessageDetail,
+    /// When the status callback for this change is sent, in words.
+    pub status_callback_timing: String,
+}
+
+fn describe_callback_timing(sms: &sendmock_store::SmsRecord) -> String {
+    match sms.status_callback_url.as_deref() {
+        Some(callback_url) => format!(
+            "The status callback is sent to {callback_url} now, in the background, and retried if your app does not answer with a 2xx. Later simulated steps no longer change a final status."
+        ),
+        None => "No status callback: the message has no status callback URL.".to_owned(),
     }
 }
 

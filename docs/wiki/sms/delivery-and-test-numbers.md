@@ -49,6 +49,10 @@ Rules such as "my QA number always fails with 30007" or "every `+1555777*` numbe
 
 Step by step: [Recipe: failed SMS](../recipes/failed-sms.md).
 
+## Statuses set by hand
+
+A status you set by hand (`sendmock sms status <smsId> failed`, or the status buttons in the SMS drawer) is applied at once, and its status callback is sent right away in the background, retried until your app answers with a 2xx. A final status (delivered, undelivered or failed) ends the message's simulated lifecycle: steps the profile still had planned no longer change it, so the callbacks your app gets stay in status order. The answer's `status_callback_timing` (and the drawer's message) says when the callback is sent, or that the message has no status callback URL.
+
 ## From the CLI, API and AI
 
 | Do this | CLI | API | MCP tool |

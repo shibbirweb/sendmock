@@ -164,6 +164,15 @@ export type SmsMessageDetail = SmsMessage & {
   reply_webhook_attempts: SmsReplyWebhookAttempt[];
 };
 
+/** Answer of POST /api/v1/sms/{smsId}/status: the message, and when its status callback is sent. */
+export type SmsStatusChangeAnswer = SmsMessageDetail & {
+  /**
+   * When the status callback for this change is sent, in words.
+   * @example "No status callback: the message has no status callback URL."
+   */
+  status_callback_timing: string;
+};
+
 /** Body of PATCH /api/v1/sms/threads/{threadId}. */
 export type SmsThreadUpdate = {
   /**

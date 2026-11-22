@@ -18280,7 +18280,7 @@
         }
       ],
       "example": "sendmock sms status 01JB7T9Q2R5W8X3Y6Z1A4B7C9D delivered --error-code 30003 --webhook 01JB7T9Q2RENDPOINT00000000",
-      "output": "SmsMessageDetail",
+      "output": "SmsStatusChangeAnswer",
       "exit_codes": [
         0,
         1,

@@ -3382,7 +3382,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SmsMessageDetail"
+                $ref: "#/components/schemas/SmsStatusChangeAnswer"
         "404":
           $ref: "#/components/responses/NotFound"
         default:
@@ -17467,6 +17467,141 @@ components:
         - status
         - at
         - error_code
+    SmsStatusChangeAnswer:
+      type: object
+      properties:
+        status_callback_timing:
+          type: string
+          description: When the status callback for this change is sent, in words.
+          examples:
+            - "No status callback: the message has no status callback URL."
+        status_history:
+          type: array
+          items:
+            $ref: "#/components/schemas/SmsStatusChange"
+        request_body:
+          anyOf:
+            - type: object
+              additionalProperties: {}
+            - type: "null"
+        api_request_id:
+          anyOf:
+            - $ref: "#/components/schemas/Ulid"
+            - type: "null"
+        callback_attempts:
+          type: array
+          items:
+            $ref: "#/components/schemas/SmsCallbackAttempt"
+        reply_webhook_attempts:
+          type: array
+          items:
+            $ref: "#/components/schemas/SmsReplyWebhookAttempt"
+          description: Inbound only, oldest first; every Resend adds attempts.
+        id:
+          $ref: "#/components/schemas/Ulid"
+        provider_id:
+          type: string
+        direction:
+          $ref: "#/components/schemas/SmsDirection"
+        channel:
+          $ref: "#/components/schemas/SmsChannel"
+        api:
+          $ref: "#/components/schemas/SmsApi"
+        from_number:
+          type: string
+        to_number:
+          type: string
+        body:
+          type: string
+        encoding:
+          $ref: "#/components/schemas/SmsEncoding"
+        segments:
+          type: number
+        media:
+          type: array
+          items:
+            $ref: "#/components/schemas/SmsMedia"
+        status:
+          $ref: "#/components/schemas/SmsStatus"
+        error_code:
+          type:
+            - string
+            - "null"
+        status_callback_url:
+          type:
+            - string
+            - "null"
+        messaging_service_sid:
+          type:
+            - string
+            - "null"
+        account:
+          type:
+            - string
+            - "null"
+        extracted:
+          $ref: "#/components/schemas/ExtractedData"
+        opened_at:
+          anyOf:
+            - $ref: "#/components/schemas/IsoTimestamp"
+            - type: "null"
+        open_count:
+          type: number
+        is_read:
+          type: boolean
+          description: "Whether someone looked at it in SendMock: inbound messages arrive unread, messages your app sent arrive read, and marking a conversation unread marks its newest message unread."
+        reply_webhook:
+          anyOf:
+            - $ref: "#/components/schemas/SmsReplyWebhookResult"
+            - type: "null"
+          description: "Inbound only: what the number's reply webhook answered; null when it has none."
+        in_reply_to_sms_id:
+          anyOf:
+            - $ref: "#/components/schemas/Ulid"
+            - type: "null"
+          description: "A TwiML reply: the inbound message it answers."
+        created_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+        updated_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+        project:
+          type: string
+          description: "The project the message was sent to: `default` unless the sender named another."
+          examples:
+            - default
+      required:
+        - account
+        - api
+        - api_request_id
+        - body
+        - callback_attempts
+        - channel
+        - created_at
+        - direction
+        - encoding
+        - error_code
+        - extracted
+        - from_number
+        - id
+        - in_reply_to_sms_id
+        - is_read
+        - media
+        - messaging_service_sid
+        - open_count
+        - opened_at
+        - project
+        - provider_id
+        - reply_webhook
+        - reply_webhook_attempts
+        - request_body
+        - segments
+        - status
+        - status_callback_timing
+        - status_callback_url
+        - status_history
+        - to_number
+        - updated_at
+      description: "Answer of POST /api/v1/sms/{smsId}/status: the message, and when its status callback is sent."
     SmsStatusUpdate:
       type: object
       properties:

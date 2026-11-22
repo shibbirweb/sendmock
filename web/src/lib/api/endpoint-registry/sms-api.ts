@@ -147,7 +147,7 @@ const smsEndpoints = tagEndpoints("SMS", [
     path: "/api/v1/sms/{smsId}/status",
     summary: "Set a delivery status by hand and fire its callback.",
     requestBody: typeRef("SmsStatusUpdate"),
-    response: typeRef("SmsMessageDetail"),
+    response: typeRef("SmsStatusChangeAnswer"),
     errorStatuses: [404],
   },
   {
