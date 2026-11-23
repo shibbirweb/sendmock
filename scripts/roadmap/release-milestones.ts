@@ -30,6 +30,7 @@ export const releasedMilestones = new Set([
   "1.3.1",
   "1.4.0",
   "1.4.1",
+  "1.5.0",
 ]);
 
 /**
