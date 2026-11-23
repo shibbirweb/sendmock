@@ -181,20 +181,18 @@ async fn a_csv_row_naming_a_new_messaging_service_creates_it_with_that_sid() {
         }),
     )
     .await;
-    let (_, service) = call_api(
-        &app_router,
-        "GET",
-        &format!("/api/v1/messaging-services/{service_sid}"),
-        None,
-    )
-    .await;
+    let (_, services) = call_api(&app_router, "GET", "/api/v1/messaging-services", None).await;
+    let service = list_items(&services)
+        .into_iter()
+        .find(|service| service["sid"] == service_sid)
+        .unwrap_or(Value::Null);
     let (_, numbers) = call_api(&app_router, "GET", "/api/v1/numbers", None).await;
     let shop_line = list_items(&numbers)
         .into_iter()
         .find(|number| number["number"] == "+15550007001")
         .unwrap_or(Value::Null);
 
-    assert_eq!(service["sid"], service_sid, "{service}");
+    assert_eq!(service["sid"], service_sid, "{services}");
     assert_eq!(shop_line["messaging_service_sid"], service_sid, "{numbers}");
     assert_eq!(service["number_ids"], json!([shop_line["id"]]), "{service}");
 }
