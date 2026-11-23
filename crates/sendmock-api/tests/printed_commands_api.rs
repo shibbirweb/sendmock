@@ -48,8 +48,12 @@ fn find_printed_commands(text: &str) -> Vec<Vec<String>> {
             continue;
         }
         let mut words = Vec::new();
-        for token in text[match_index + "sendmock ".len()..].split(' ') {
-            let word = token.trim_end_matches(['`', '.', ',', ')', ';', ':', '\n']);
+        let command_line = text[match_index + "sendmock ".len()..]
+            .split('\n')
+            .next()
+            .unwrap_or_default();
+        for token in command_line.split(' ') {
+            let word = token.trim_end_matches(['`', '.', ',', ')', ';', ':']);
             let is_command_word = word
                 .chars()
                 .next()
@@ -145,5 +149,22 @@ fn a_misspelled_command_is_reported() {
             &command_words
         ),
         vec!["sendmock webhooks variables list".to_owned()]
+    );
+}
+
+#[test]
+fn a_command_at_the_end_of_a_line_is_read_whole() {
+    let command_words = vec![vec![
+        "webhook".to_owned(),
+        "var".to_owned(),
+        "list".to_owned(),
+    ]];
+
+    assert_eq!(
+        find_unknown_commands(
+            "# the signing key (sendmock webhook var list).\nMAILGUN_DOMAIN=mg.test\nsendmock webhook var list\nnext",
+            &command_words
+        ),
+        Vec::<String>::new()
     );
 }
