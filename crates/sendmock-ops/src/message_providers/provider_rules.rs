@@ -358,7 +358,7 @@ mod tests {
             assert_eq!(
                 find_field_problem(&twilio, &shipped_providers).map(|(field_name, _)| field_name),
                 Some("credentials"),
-                "{wrong_account_sid:?}"
+                "a malformed account SID is refused"
             );
         }
         set_account_sid(&mut twilio, "AC0123456789abcdef0123456789ABCDEF");
