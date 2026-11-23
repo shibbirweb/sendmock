@@ -234,6 +234,9 @@ export const numbersHandlers = [
 
     const messagingService: MessagingService = {
       ...serviceInput,
+      inbound_mode: serviceInput.inbound_mode ?? "defer_to_sender",
+      inbound_url: serviceInput.inbound_url ?? null,
+      inbound_fallback_url: serviceInput.inbound_fallback_url ?? null,
       opt_out_keywords: serviceInput.opt_out_keywords ?? true,
       friendly_name: serviceInput.friendly_name.trim(),
       number_ids: [],

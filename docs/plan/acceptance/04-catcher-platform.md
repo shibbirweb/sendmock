@@ -322,6 +322,7 @@ Phase 5. Plan: [30-phase-5.md](../30-phase-5.md) (W8).
 - [ ] PL-25.4 After `sendmock trust`, Laravel's `mailgun` mailer on Herd PHP reaches the HTTPS provider port with no other change, and the docs show using an existing local CA (mkcert) with `--provider-tls-cert`.
 - [ ] PL-25.5 For a PHP with no main php.ini whose scanned ini files set `openssl.cafile` or `curl.cainfo` (Herd), `sendmock trust --check` names that file and the CA files it sets, and `sendmock trust` writes the combined bundle and prints the lines to set there instead of changing the file (R-42).
 - [ ] PL-25.6 `sendmock trust` checks and adds the CA of the running server (also one started with `--db <path>`) when one answers, else the data folder's, and says which CA it used (R-42).
+- [ ] PL-25.7 `sendmock trust --bundle-only` writes the combined PHP and Python bundles and prints their paths without changing the system store, Java or any ini file, and a PHP bundle's name has no empty part (`php-8.5.12.pem`) (R-49).
 
 ## PL-26 Setup and configuration that agree
 

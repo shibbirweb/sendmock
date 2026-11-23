@@ -52,4 +52,10 @@ pub trait TrustTarget {
     fn prepare_manual_step(&self, _local_ca: &LocalCa) -> Option<Result<String, String>> {
         None
     }
+
+    /// For `sendmock trust --bundle-only`: writes this place's combined CA bundle in SendMock's
+    /// trust folder and says where, changing nothing else; `None` for places with no bundle.
+    fn write_bundle_only(&self, _local_ca: &LocalCa) -> Option<Result<String, String>> {
+        None
+    }
 }

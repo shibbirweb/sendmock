@@ -11555,13 +11555,13 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": [
             "webhook",
             "defer_to_sender",
             "drop"
           ],
-          "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.",
+          "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook, the default) or `drop`.",
           "example": "webhook"
         },
         {
@@ -11573,7 +11573,7 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "Used when `inbound_mode` is `webhook`.",
+          "description": "Used when `inbound_mode` is `webhook`; none when left out.",
           "example": "http://localhost:3000/sms/inbound"
         },
         {
@@ -11585,7 +11585,7 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "Called when `inbound_url` fails.",
+          "description": "Called when `inbound_url` fails; none when left out.",
           "example": "http://localhost:3000/sms/inbound-fallback"
         },
         {
@@ -11635,7 +11635,7 @@
           },
           "inbound_mode": {
             "$ref": "#/$defs/MessagingServiceInboundMode",
-            "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.",
+            "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook, the default) or `drop`.",
             "examples": [
               "webhook"
             ]
@@ -11645,7 +11645,7 @@
               "string",
               "null"
             ],
-            "description": "Used when `inbound_mode` is `webhook`.",
+            "description": "Used when `inbound_mode` is `webhook`; none when left out.",
             "examples": [
               "http://localhost:3000/sms/inbound"
             ]
@@ -11655,7 +11655,7 @@
               "string",
               "null"
             ],
-            "description": "Called when `inbound_url` fails.",
+            "description": "Called when `inbound_url` fails; none when left out.",
             "examples": [
               "http://localhost:3000/sms/inbound-fallback"
             ]
@@ -11669,8 +11669,7 @@
           }
         },
         "required": [
-          "friendly_name",
-          "inbound_mode"
+          "friendly_name"
         ],
         "$defs": {
           "MessagingServiceInboundMode": {
@@ -11690,7 +11689,6 @@
       },
       "example_arguments": {
         "friendly_name": "Notifications",
-        "inbound_mode": "webhook",
         "sid": "MG00000000000000000000000000000001",
         "number_ids": [
           "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
@@ -11876,7 +11874,7 @@
             "defer_to_sender",
             "drop"
           ],
-          "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.",
+          "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook, the default) or `drop`.",
           "example": "webhook"
         },
         {
@@ -11888,7 +11886,7 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "Used when `inbound_mode` is `webhook`.",
+          "description": "Used when `inbound_mode` is `webhook`; none when left out.",
           "example": "http://localhost:3000/sms/inbound"
         },
         {
@@ -11900,7 +11898,7 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "Called when `inbound_url` fails.",
+          "description": "Called when `inbound_url` fails; none when left out.",
           "example": "http://localhost:3000/sms/inbound-fallback"
         },
         {
@@ -11947,7 +11945,7 @@
           },
           "inbound_mode": {
             "$ref": "#/$defs/MessagingServiceInboundMode",
-            "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.",
+            "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook, the default) or `drop`.",
             "examples": [
               "webhook"
             ]
@@ -11957,7 +11955,7 @@
               "string",
               "null"
             ],
-            "description": "Used when `inbound_mode` is `webhook`.",
+            "description": "Used when `inbound_mode` is `webhook`; none when left out.",
             "examples": [
               "http://localhost:3000/sms/inbound"
             ]
@@ -11967,7 +11965,7 @@
               "string",
               "null"
             ],
-            "description": "Called when `inbound_url` fails.",
+            "description": "Called when `inbound_url` fails; none when left out.",
             "examples": [
               "http://localhost:3000/sms/inbound-fallback"
             ]

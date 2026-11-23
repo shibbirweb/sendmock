@@ -57,7 +57,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 138 / 168 features, 698 / 865 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 138 / 168 features, 698 / 868 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -86,7 +86,7 @@ On top of its own criteria, a feature is done only when:
 | [EM-23](01-email.md#em-23-mailgun-events-and-complaints-apis) | Mailgun events and complaints APIs | 1.4.0 (A23) | 6 | Accepted |
 | [EM-24](01-email.md#em-24-mailgun-sends-and-ids) | Mailgun sends and ids | 1.5.0 (A28) | 6 | Not started |
 | [EM-25](01-email.md#em-25-mailgun-webhooks-as-mailgun-sends-them) | Mailgun webhooks as Mailgun sends them | 1.5.0 (A28) | 6 | Not started |
-| [EM-26](01-email.md#em-26-stored-messages-and-local-email-templates) | Stored messages and local email templates | 1.5.0 (A28) | 5 | Not started |
+| [EM-26](01-email.md#em-26-stored-messages-and-local-email-templates) | Stored messages and local email templates | 1.5.0 (A28) | 6 | Not started |
 | [EM-27](01-email.md#em-27-simulating-email-events-with-the-apps-data) | Simulating email events with the app's data | 1.5.0 (A28) | 3 | Not started |
 | [SM-01](02-sms-verify.md#sm-01-native-sms-api) | Native SMS API | Phase 2 | 5 | Accepted |
 | [SM-02](02-sms-verify.md#sm-02-twilio-messages-api) | Twilio Messages API | Phase 2 | 4 | Accepted |
@@ -109,7 +109,7 @@ On top of its own criteria, a feature is done only when:
 | [SM-19](02-sms-verify.md#sm-19-twilio-accounts-and-subaccounts) | Twilio accounts and subaccounts | 1.4.0 (A23) | 8 | Accepted |
 | [SM-20](02-sms-verify.md#sm-20-twilio-phone-numbers-api) | Twilio phone numbers API | 1.4.0 (A23) | 5 | Accepted |
 | [SM-21](02-sms-verify.md#sm-21-twilio-debugger-webhook) | Twilio Debugger webhook | 1.4.0 (A23) | 4 | Accepted |
-| [SM-22](02-sms-verify.md#sm-22-twilio-accounts-in-every-place) | Twilio accounts in every place | 1.5.0 (A28) | 8 | Not started |
+| [SM-22](02-sms-verify.md#sm-22-twilio-accounts-in-every-place) | Twilio accounts in every place | 1.5.0 (A28) | 9 | Not started |
 | [SM-23](02-sms-verify.md#sm-23-opt-out-keywords) | Opt-out keywords | 1.5.0 (A28) | 4 | Not started |
 | [SM-24](02-sms-verify.md#sm-24-statuses-set-by-hand) | Statuses set by hand | 1.5.0 (A28) | 2 | Not started |
 | [VF-01](02-sms-verify.md#vf-01-verify-services) | Verify services | UI in U1, backend Phase 2 | 3 | Accepted |
@@ -159,7 +159,7 @@ On top of its own criteria, a feature is done only when:
 | [PL-22](04-catcher-platform.md#pl-22-interactive-launcher) | Interactive launcher | 1.4.0 (A24) | 7 | Accepted |
 | [PL-23](04-catcher-platform.md#pl-23-startup-banner) | Startup banner | 1.5.0 (A27) | 7 | Not started |
 | [PL-24](04-catcher-platform.md#pl-24-provider-ports-on-by-default) | Provider ports on by default | 1.5.0 (A28) | 3 | Not started |
-| [PL-25](04-catcher-platform.md#pl-25-trust-the-local-ca-everywhere) | Trust the local CA everywhere | 1.5.0 (A28) | 6 | Not started |
+| [PL-25](04-catcher-platform.md#pl-25-trust-the-local-ca-everywhere) | Trust the local CA everywhere | 1.5.0 (A28) | 7 | Not started |
 | [PL-26](04-catcher-platform.md#pl-26-setup-and-configuration-that-agree) | Setup and configuration that agree | 1.5.0 (A28) | 6 | Not started |
 | [PL-27](04-catcher-platform.md#pl-27-stack-presets) | Stack presets | 1.5.0 (A28) | 6 | Not started |
 | [PN-01](09-push.md#pn-01-push-notifications) | Push notifications | 0.1.0-beta.1 (A7) | 6 | Accepted |

@@ -203,3 +203,29 @@ fn trust_writes_a_combined_bundle_for_that_php_and_leaves_its_ini_as_it_was() {
         ini_before
     );
 }
+
+// AC: PL-25.7
+#[test]
+fn bundle_only_writes_the_bundle_under_a_name_with_no_stray_dash_and_changes_no_ini() {
+    let folder = tempfile::tempdir().unwrap_or_else(|error| panic!("{error}"));
+    let local_ca = build_local_ca(folder.path());
+    let (php, herd_ini) = build_herd_php(folder.path());
+    let ini_before = std::fs::read_to_string(&herd_ini).unwrap_or_default();
+
+    let written = php.write_bundle_only(&local_ca);
+
+    let written_text = match written {
+        Some(Ok(written_text)) => written_text,
+        other => panic!("a written bundle: {other:?}"),
+    };
+    let bundle_path = local_ca.bundle_folder.join("php-8.5.0.pem");
+    assert!(bundle_path.exists(), "{written_text}");
+    assert!(
+        written_text.contains(&bundle_path.display().to_string()),
+        "{written_text}"
+    );
+    assert_eq!(
+        std::fs::read_to_string(&herd_ini).unwrap_or_default(),
+        ini_before
+    );
+}

@@ -55,7 +55,11 @@ Some SDKs always call `https://`, with no way to choose plain HTTP. Laravel's `m
 
    It works on the CA of the SendMock that answers at `--server` (one started with `--db <path>` keeps its CA beside that database), or the CA in SendMock's data folder when none answers, and the first line says which. The same report is at `GET /api/v1/tls/trust`, in the MCP tool `sendmock_tls_trust`, and under **Trusted by** in Settings > Connection.
 
-   A PHP with no main `php.ini` that takes its CA files from an ini file in its scan folder (Laravel Herd's PHP does) is reported as `manual`, naming that file and the `openssl.cafile` and `curl.cainfo` it sets. `sendmock trust` leaves that file alone: it writes a bundle of that PHP's CA file plus the local CA and prints the path to set both settings to.
+   A PHP with no main `php.ini` that takes its CA files from an ini file in its scan folder (Laravel Herd's PHP does) is reported as `manual`, naming that file and the `openssl.cafile` and `curl.cainfo` it sets. `sendmock trust` leaves that file alone: it writes a bundle of that PHP's CA file plus the local CA and prints the path to set both settings to. To write only the bundles (PHP's and Python's) and change nothing else, not even the system store:
+
+   ```bash
+   sendmock trust --bundle-only
+   ```
 
 3. Run it again whenever you like: places that already trust the CA are left as they are. To take everything out again:
 

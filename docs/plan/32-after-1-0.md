@@ -1007,5 +1007,13 @@ The report's preset (section 6, `sendmock preset laravel-mailgun-twilio --app-ur
 | R-46 | `sendmock integrate` prints a command that does not exist | Confirmed: `sendmock webhooks variables list`; the command is `sendmock webhook var list` | The snippet prints `sendmock webhook var list`, and a test checks every `sendmock` command printed by snippets and presets against the CLI | AI-08 |
 | R-47 | An empty Twilio `account_sid` is saved and the default SID is used silently | Confirmed: credentials are checked only for valid names | Saving the Twilio provider refuses an `account_sid` that is not `AC` and 32 letters or digits | SM-22 |
 
+**Re-test of the fixed build (2026-11-23, owner request: fix these in 1.5.0 too):** all nine items above confirmed fixed. Still open:
+
+| # | Finding | Checked | Fix | Feature |
+|---|---------|---------|-----|---------|
+| R-48 | A Messaging Service still needs `inbound_mode` (and the schema `inbound_url`, `inbound_fallback_url`) | Confirmed: `inbound_mode` has no default and the URLs are required in the schema | Create takes only `friendly_name`: `inbound_mode` defaults to `defer_to_sender` (as the services SendMock makes for an unknown SID), the URLs to none | SM-22 |
+| R-49 | No way to write only the trust bundle, and its name has a stray `-` | Confirmed: the bundle is written only by a full `sendmock trust`, which also changes the system store and Java; a PHP with no main php.ini gets `php-8.5.12-.pem` | `sendmock trust --bundle-only` writes the PHP and Python bundles and prints their paths, changing nothing else; the check names it; the name drops the empty ini part (`php-8.5.12.pem`) | PL-25 |
+| R-50 | An inbound message's `message-url` uses the domain `inbound` (cosmetic) | Confirmed | `message-url` uses the receiving domain, the first recipient's | EM-26 |
+
 **Proof:** API tests for each reproduction (template values from `X-Mailgun-Variables`, an empty Messaging Service, an endpoint made from three fields, an empty `account_sid` refused, a preset with a bad CSV leaving nothing behind, a CSV that names a new service), a fixture test of `mailgun.store_notify` against Mailgun's store-and-notify fields, unit tests of the PHP and CA checks with the fake command runner, and the snippet command check.
 

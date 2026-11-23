@@ -1,7 +1,7 @@
 //! A route's request, queued as a webhook delivery so it is retried, logged and replayable
 //! like any other (WH-12.4).
 
-use sendmock_store::{InboundRouteRecord, WebhookDeliveryRecord};
+use sendmock_store::{EmailRecord, InboundRouteRecord, WebhookDeliveryRecord};
 
 use super::mailgun_route_request::{MailgunRouteDetails, build_mailgun_route_request};
 use super::route_runner::RoutedEmail;
@@ -26,9 +26,14 @@ async fn read_signing_key(operation_context: &OperationContext) -> Result<String
         .map_or_else(|| DEFAULT_SIGNING_KEY.to_owned(), |variable| variable.value))
 }
 
-/// Where `GET` reads a stored message back, on the provider port when there is one.
-fn build_message_url(operation_context: &OperationContext, email_id: &str) -> String {
-    crate::webhooks::build_message_url(&operation_context.instance_details, "inbound", email_id)
+/// Where `GET` reads a stored message back, under the domain that received it, on the
+/// provider port when there is one.
+fn build_message_url(operation_context: &OperationContext, stored_email: &EmailRecord) -> String {
+    crate::webhooks::build_message_url(
+        &operation_context.instance_details,
+        &crate::webhooks::find_receiving_domain(stored_email),
+        &stored_email.email_id,
+    )
 }
 
 pub async fn queue_route_delivery(
@@ -57,7 +62,7 @@ pub async fn queue_route_delivery(
                 random_source.next_u64(),
             ],
             message_url: is_store_notification
-                .then(|| build_message_url(operation_context, &stored_email.email_id)),
+                .then(|| build_message_url(operation_context, stored_email)),
             raw_message: &routed_email.raw_message,
             attachments: &routed_email.attachments,
             attachment_url_base: format!(

@@ -7,6 +7,8 @@ use std::collections::BTreeMap;
 
 use serde_json::{Map, Value, json};
 
+use sendmock_store::EmailRecord;
+
 use crate::InstanceDetails;
 
 /// RFC 3676's signature separator, on a line of its own.
@@ -72,6 +74,30 @@ pub fn map_content_ids(attachment_data: &[Value]) -> Map<String, Value> {
         .collect()
 }
 
+/// The domain that received an email, as Mailgun names it in an inbound message's
+/// `message-url`: the first envelope recipient's (else the first `To`), or `inbound` when
+/// there is none.
+pub fn find_receiving_domain(stored_email: &EmailRecord) -> String {
+    pick_receiving_domain(
+        stored_email.envelope_to.iter().map(String::as_str).chain(
+            stored_email
+                .to
+                .iter()
+                .map(|recipient| recipient.address.as_str()),
+        ),
+    )
+}
+
+fn pick_receiving_domain<'address>(
+    recipient_addresses: impl Iterator<Item = &'address str>,
+) -> String {
+    recipient_addresses
+        .filter_map(|address| address.rsplit_once('@').map(|(_, domain)| domain.trim()))
+        .find(|domain| !domain.is_empty())
+        .unwrap_or("inbound")
+        .to_owned()
+}
+
 /// Where Mailgun's stored-message API reads the message back (`message-url`, the events'
 /// `storage.url`): on the provider port when there is one, under `/providers/mailgun` if not.
 pub fn build_message_url(
@@ -93,6 +119,17 @@ pub fn build_message_url(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // AC: EM-26.6
+    #[test]
+    fn the_receiving_domain_comes_from_the_first_recipient() {
+        assert_eq!(
+            pick_receiving_domain(["support@mg.shop.test", "sam@other.test"].into_iter()),
+            "mg.shop.test"
+        );
+        assert_eq!(pick_receiving_domain(["no-at-sign"].into_iter()), "inbound");
+        assert_eq!(pick_receiving_domain(std::iter::empty()), "inbound");
+    }
 
     // AC: EM-25.3
     #[test]

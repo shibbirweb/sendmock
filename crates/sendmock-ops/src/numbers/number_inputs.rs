@@ -37,11 +37,13 @@ impl InboundWebhookMethod {
     }
 }
 
-/// What happens to inbound messages to a service's numbers.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, JsonSchema)]
+/// What happens to inbound messages to a service's numbers; a new service defers to each
+/// number's own webhook, as the services SendMock makes for an unknown SID do.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum MessagingServiceInboundMode {
     Webhook,
+    #[default]
     DeferToSender,
     Drop,
 }
@@ -118,13 +120,17 @@ pub struct MessagingServiceInput {
     /// Messaging Service starts.
     #[serde(default)]
     pub number_ids: Vec<String>,
-    /// `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.
+    /// `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook, the
+    /// default) or `drop`.
+    #[serde(default)]
     pub inbound_mode: MessagingServiceInboundMode,
-    /// Used when `inbound_mode` is `webhook`.
-    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
+    /// Used when `inbound_mode` is `webhook`; none when left out.
+    #[serde(default)]
+    #[schemars(schema_with = "crate::nullable_schema::<String>")]
     pub inbound_url: Option<String>,
-    /// Called when `inbound_url` fails.
-    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
+    /// Called when `inbound_url` fails; none when left out.
+    #[serde(default)]
+    #[schemars(schema_with = "crate::nullable_schema::<String>")]
     pub inbound_fallback_url: Option<String>,
     /// Whether a text of STOP to one of its numbers opts the contact out of the whole
     /// service (Twilio's Advanced Opt-Out, with the provider's switch on); on when left out.

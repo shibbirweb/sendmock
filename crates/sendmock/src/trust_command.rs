@@ -13,6 +13,7 @@ mod php_scanned_ini;
 mod php_target;
 mod python_target;
 mod system_store_target;
+mod trust_output;
 mod trust_target;
 #[cfg(test)]
 mod trust_target_tests;
@@ -24,12 +25,12 @@ use std::sync::Arc;
 use clap::{Arg, ArgAction, Command};
 use sendmock_cli::{CliExitCode, MatchedOperation, resolve_server_url};
 use sendmock_ops::{TlsTrustPlace, TlsTrustReport, TrustInspector};
-use serde_json::json;
 
 pub use command_runner::{CommandRunner, SystemCommandRunner};
 pub use trust_target::{LocalCa, TrustCheck, TrustState, TrustTarget};
 
 use local_ca_source::{choose_local_ca, read_existing_folder_ca};
+use trust_output::{print_checks, print_manual_steps, print_plan, write_bundles_only};
 
 /// The operation whose command `sendmock trust` is.
 pub const TLS_TRUST_OPERATION_ID: &str = "getTlsTrust";
@@ -43,6 +44,10 @@ pub fn add_trust_flags(root_command: Command) -> Command {
                 "Report what trusts the local CA and change nothing",
             ))
             .arg(flag("undo", "Remove what sendmock trust added"))
+            .arg(flag(
+                "bundle-only",
+                "Only write the combined CA bundles PHP and Python can point at, and print their paths",
+            ))
             .arg(flag("yes", "Change the trust stores without asking"))
     })
 }
@@ -128,6 +133,7 @@ pub fn run_trust_command(matched_operation: &MatchedOperation) -> ExitCode {
             is_check: read_flag(matched_operation, "check"),
             is_undo: read_flag(matched_operation, "undo"),
             is_confirmed: read_flag(matched_operation, "yes"),
+            is_bundle_only: read_flag(matched_operation, "bundle-only"),
         },
         read_flag(matched_operation, "json"),
         &server_url,
@@ -139,6 +145,8 @@ pub struct TrustAction {
     pub is_check: bool,
     pub is_undo: bool,
     pub is_confirmed: bool,
+    /// Write the combined bundles and change nothing else (no system store, no ini files).
+    pub is_bundle_only: bool,
 }
 
 /// Checks, adds or removes the local CA, as `sendmock trust` and `sendmock preset` run it.
@@ -151,6 +159,9 @@ pub fn run_trust(trust_action: TrustAction, as_json: bool, server_url: &str) -> 
         }
     };
     let local_ca = chosen_ca.local_ca;
+    if trust_action.is_bundle_only {
+        return write_bundles_only(&local_ca, &chosen_ca.source);
+    }
     let trust_targets = list_trust_targets(Arc::new(SystemCommandRunner));
     let checks: Vec<TrustCheck> = trust_targets
         .iter()
@@ -181,73 +192,6 @@ pub fn run_trust(trust_action: TrustAction, as_json: bool, server_url: &str) -> 
         return CliExitCode::Error.into();
     }
     apply_plan(&trust_targets, &local_ca, &checks, &planned, is_undo)
-}
-
-fn print_checks(local_ca: &LocalCa, ca_source: &str, checks: &[TrustCheck], as_json: bool) {
-    if as_json {
-        let places: Vec<_> = checks
-            .iter()
-            .map(|check| json!({ "place": check.place, "state": check.state.as_str(), "detail": check.detail }))
-            .collect();
-        let report = json!({
-            "ca_path": local_ca.certificate_path.display().to_string(),
-            "ca_source": ca_source,
-            "places": places,
-        });
-        println!(
-            "{}",
-            serde_json::to_string_pretty(&report).unwrap_or_default()
-        );
-        return;
-    }
-    println!(
-        "The local CA ({ca_source}): {}",
-        local_ca.certificate_path.display()
-    );
-    for check in checks {
-        println!(
-            "  {:<8} {}: {}",
-            check.state.as_str(),
-            check.place,
-            check.detail
-        );
-    }
-}
-
-fn print_plan(
-    local_ca: &LocalCa,
-    ca_source: &str,
-    checks: &[TrustCheck],
-    planned: &[usize],
-    is_undo: bool,
-) {
-    println!(
-        "The local CA ({ca_source}): {}",
-        local_ca.certificate_path.display()
-    );
-    for (index, check) in checks.iter().enumerate() {
-        let action = match (planned.contains(&index), is_undo) {
-            (true, false) => "add to",
-            (true, true) => "remove from",
-            (false, _) => check.state.as_str(),
-        };
-        println!("  {action:<11} {}", check.place);
-    }
-    if planned.is_empty() {
-        println!("Nothing to change.");
-    }
-}
-
-/// Prepares and prints what to set by hand where SendMock changes nothing, such as the combined
-/// bundle for a PHP whose CA files come from Herd's own ini file.
-fn print_manual_steps(trust_targets: &[Box<dyn TrustTarget>], local_ca: &LocalCa) {
-    for trust_target in trust_targets {
-        match trust_target.prepare_manual_step(local_ca) {
-            Some(Ok(manual_step)) => println!("  set by hand: {manual_step}"),
-            Some(Err(reason)) => eprintln!("  could not prepare a manual step: {reason}"),
-            None => {}
-        }
-    }
 }
 
 /// Asks on a terminal; elsewhere nothing changes without `--yes`.

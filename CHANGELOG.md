@@ -28,6 +28,9 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ### Changed
 
+- **Create a Messaging Service from a name:** `sendmock sms services create --friendly-name Clinic` (or a POST with only `friendly_name`) is enough; the service defers to each number's own webhook until you change it.
+- **`sendmock trust --bundle-only`:** writes only the combined CA bundles for PHP and Python and prints their paths, without touching the system store, Java or any `php.ini`. A PHP bundle's file name no longer has a stray `-` (`php-8.5.12.pem`).
+- **Mailgun `message-url` names the receiving domain:** an inbound message's `message-url` now uses the domain that received it, as Mailgun's does, instead of `inbound`.
 - **Mailgun template values from `X-Mailgun-Variables`:** a Mailgun template send now fills the template from `h:X-Mailgun-Variables` as well as `t:variables`, as Mailgun does, and `t:variables` wins a key both give.
 - **Create without every field:** `POST /api/v1/webhooks/endpoints` (and `sendmock webhook endpoint create`) needs only a name and a URL; the other fields take a new endpoint's defaults. A Messaging Service can be created with no numbers, as on Twilio; in Strict Twilio test mode a send through a service with no number for the recipient is refused with Twilio's 21704 or 21703.
 - **Safer preset imports:** `sendmock preset ... --import-numbers` checks the whole CSV before it sets anything up, names every bad line and changes nothing when one is wrong, and creates a Messaging Service a line names that does not exist yet.

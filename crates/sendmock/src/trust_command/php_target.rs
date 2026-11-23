@@ -104,11 +104,13 @@ impl PhpTarget {
                 }
             })
             .collect();
-        local_ca.bundle_folder.join(format!(
-            "php-{}-{}.pem",
-            settings.version,
-            ini_key.trim_matches('-')
-        ))
+        let ini_key = ini_key.trim_matches('-');
+        let bundle_name = if ini_key.is_empty() {
+            format!("php-{}.pem", settings.version)
+        } else {
+            format!("php-{}-{ini_key}.pem", settings.version)
+        };
+        local_ca.bundle_folder.join(bundle_name)
     }
 
     /// The CA file PHP uses now (or a system bundle) with the local CA added, in SendMock's
@@ -140,11 +142,13 @@ fn describe_manual_step(settings: &PhpSettings, bundle_path: &Path) -> String {
     let bundle_text = bundle_path.display();
     match find_ca_setting_file(&settings.scanned_inis) {
         Some(ca_setting_file) => format!(
-            "It loads no main php.ini; {} sets {}. Set openssl.cafile and curl.cainfo there to {bundle_text}",
+            "It loads no main php.ini; {} sets {}. Set openssl.cafile and curl.cainfo there to {bundle_text} (sendmock trust --bundle-only writes it)",
             ca_setting_file.ini_path,
             describe_settings(&ca_setting_file)
         ),
-        None => format!("It loads no php.ini; set openssl.cafile and curl.cainfo to {bundle_text}"),
+        None => format!(
+            "It loads no php.ini; set openssl.cafile and curl.cainfo to {bundle_text} (sendmock trust --bundle-only writes it)"
+        ),
     }
 }
 
@@ -237,6 +241,19 @@ impl TrustTarget for PhpTarget {
             self.write_bundle(local_ca, &settings)
                 .map(|bundle_path| describe_manual_step(&settings, &bundle_path)),
         )
+    }
+
+    fn write_bundle_only(&self, local_ca: &LocalCa) -> Option<Result<String, String>> {
+        let Some(settings) = self.read_settings() else {
+            return Some(Err("PHP did not run".to_owned()));
+        };
+        let place = self.place_name(Some(&settings));
+        Some(self.write_bundle(local_ca, &settings).map(|bundle_path| {
+            format!(
+                "{place}: wrote {}; set openssl.cafile and curl.cainfo to it",
+                bundle_path.display()
+            )
+        }))
     }
 
     fn remove(&self, local_ca: &LocalCa) -> Result<String, String> {

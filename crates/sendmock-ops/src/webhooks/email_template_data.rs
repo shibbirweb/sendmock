@@ -9,7 +9,8 @@ use sendmock_store::EmailRecord;
 use serde_json::{Map, Value, json};
 
 use super::email_forward_fields::{
-    build_message_url, list_header_pairs, map_content_ids, read_first_header, split_reply_text,
+    build_message_url, find_receiving_domain, list_header_pairs, map_content_ids,
+    read_first_header, split_reply_text,
 };
 use crate::email::{EmailAddress, EmailSummary, build_bounce_data, read_stored_user_variables};
 use crate::{OperationContext, OperationError};
@@ -166,7 +167,7 @@ pub async fn build_email_template_data(
     let sending_domain = provider_send
         .as_ref()
         .and_then(|send| send.sending_domain.clone())
-        .unwrap_or_else(|| "inbound".to_owned());
+        .unwrap_or_else(|| find_receiving_domain(stored_email));
     email_data.extend(build_forward_fields(stored_email, &attachment_data));
     email_data.extend([
         ("message_id".to_owned(), json!(stored_email.message_id)),

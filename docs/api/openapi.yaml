@@ -13173,21 +13173,21 @@ components:
             - - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
         inbound_mode:
           $ref: "#/components/schemas/MessagingServiceInboundMode"
-          description: "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`."
+          description: "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook, the default) or `drop`."
           examples:
             - webhook
         inbound_url:
           type:
             - string
             - "null"
-          description: Used when `inbound_mode` is `webhook`.
+          description: Used when `inbound_mode` is `webhook`; none when left out.
           examples:
             - http://localhost:3000/sms/inbound
         inbound_fallback_url:
           type:
             - string
             - "null"
-          description: Called when `inbound_url` fails.
+          description: Called when `inbound_url` fails; none when left out.
           examples:
             - http://localhost:3000/sms/inbound-fallback
         opt_out_keywords:
@@ -13197,9 +13197,6 @@ components:
             - true
       required:
         - friendly_name
-        - inbound_fallback_url
-        - inbound_mode
-        - inbound_url
       description: "Body of POST /api/v1/messaging-services: the service, and the SID to give it."
     MessagingServiceInboundMode:
       type: string
@@ -13225,21 +13222,21 @@ components:
             - - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
         inbound_mode:
           $ref: "#/components/schemas/MessagingServiceInboundMode"
-          description: "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`."
+          description: "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook, the default) or `drop`."
           examples:
             - webhook
         inbound_url:
           type:
             - string
             - "null"
-          description: Used when `inbound_mode` is `webhook`.
+          description: Used when `inbound_mode` is `webhook`; none when left out.
           examples:
             - http://localhost:3000/sms/inbound
         inbound_fallback_url:
           type:
             - string
             - "null"
-          description: Called when `inbound_url` fails.
+          description: Called when `inbound_url` fails; none when left out.
           examples:
             - http://localhost:3000/sms/inbound-fallback
         opt_out_keywords:

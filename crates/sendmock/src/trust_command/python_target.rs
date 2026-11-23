@@ -87,6 +87,10 @@ impl TrustTarget for PythonTarget {
         ))
     }
 
+    fn write_bundle_only(&self, local_ca: &LocalCa) -> Option<Result<String, String>> {
+        Some(self.add(local_ca))
+    }
+
     fn remove(&self, local_ca: &LocalCa) -> Result<String, String> {
         let bundle_path = local_ca.bundle_folder.join(BUNDLE_FILE);
         if bundle_path.exists() {

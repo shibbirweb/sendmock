@@ -284,20 +284,20 @@ export type MessagingServiceInput = {
    */
   number_ids?: Ulid[];
   /**
-   * What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.
+   * What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook, the default) or `drop`.
    * @example "webhook"
    */
-  inbound_mode: MessagingServiceInboundMode;
+  inbound_mode?: MessagingServiceInboundMode;
   /**
-   * Used when `inbound_mode` is `webhook`.
+   * Used when `inbound_mode` is `webhook`; none when left out.
    * @example "http://localhost:3000/sms/inbound"
    */
-  inbound_url: string | null;
+  inbound_url?: string | null;
   /**
-   * Called when `inbound_url` fails.
+   * Called when `inbound_url` fails; none when left out.
    * @example "http://localhost:3000/sms/inbound-fallback"
    */
-  inbound_fallback_url: string | null;
+  inbound_fallback_url?: string | null;
   /**
    * Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.
    * @example true

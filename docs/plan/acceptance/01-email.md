@@ -267,6 +267,7 @@ Phase 5 (W20), for the next beta (0.1.0-beta.4), added 2026-11-13 (owner request
 - [ ] EM-26.3 `GET /v3/{domain}/templates/{name}` (with `active=yes`) answers from the local email templates in Mailgun's shape, and 404 as Mailgun does for an unknown name (R-10).
 - [ ] EM-26.4 The `[[email.templates]]` keys are documented, and a setup file with an unknown key is refused by validate and import with the key's name (R-18).
 - [ ] EM-26.5 Each attachment of a stored message (`GET /v3/domains/{domain}/messages/{key}`) has the `url` it can be downloaded from (R-43).
+- [ ] EM-26.6 An inbound message's `message-url` names the domain that received it (the first recipient's), as Mailgun's does (R-50).
 
 ## EM-27 Simulating email events with the app's data
 

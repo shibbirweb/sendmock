@@ -14,17 +14,16 @@ export function validateMessagingServiceInput(
   if (serviceInput.friendly_name.trim() === "") {
     fieldErrors.friendly_name = "Enter a name";
   }
+  const inboundUrl = serviceInput.inbound_url ?? null;
+  const inboundFallbackUrl = serviceInput.inbound_fallback_url ?? null;
   if (serviceInput.inbound_mode === "webhook") {
-    if (serviceInput.inbound_url === null) {
+    if (inboundUrl === null) {
       fieldErrors.inbound_url = "Enter the request URL";
-    } else if (!isHttpUrl(serviceInput.inbound_url)) {
+    } else if (!isHttpUrl(inboundUrl)) {
       fieldErrors.inbound_url = httpUrlError;
     }
   }
-  if (
-    serviceInput.inbound_fallback_url !== null &&
-    !isHttpUrl(serviceInput.inbound_fallback_url)
-  ) {
+  if (inboundFallbackUrl !== null && !isHttpUrl(inboundFallbackUrl)) {
     fieldErrors.inbound_fallback_url = httpUrlError;
   }
 

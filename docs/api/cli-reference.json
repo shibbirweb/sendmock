@@ -18209,7 +18209,7 @@
           },
           "type": "string",
           "value_label": "<inbound-mode>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": [
@@ -18217,7 +18217,7 @@
             "defer_to_sender",
             "drop"
           ],
-          "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.",
+          "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook, the default) or `drop`.",
           "example": "webhook"
         },
         {
@@ -18232,7 +18232,7 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "Used when `inbound_mode` is `webhook`.",
+          "description": "Used when `inbound_mode` is `webhook`; none when left out.",
           "example": "http://localhost:3000/sms/inbound"
         },
         {
@@ -18247,7 +18247,7 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "Called when `inbound_url` fails.",
+          "description": "Called when `inbound_url` fails; none when left out.",
           "example": "http://localhost:3000/sms/inbound-fallback"
         },
         {
@@ -18266,7 +18266,7 @@
           "example": true
         }
       ],
-      "example": "sendmock sms services create --friendly-name Notifications --inbound-mode webhook --sid MG00000000000000000000000000000001 --number-id 01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
+      "example": "sendmock sms services create --friendly-name Notifications --sid MG00000000000000000000000000000001 --number-id 01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
       "output": "MessagingService",
       "exit_codes": [
         0,
@@ -18455,7 +18455,7 @@
             "defer_to_sender",
             "drop"
           ],
-          "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.",
+          "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook, the default) or `drop`.",
           "example": "webhook"
         },
         {
@@ -18470,7 +18470,7 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "Used when `inbound_mode` is `webhook`.",
+          "description": "Used when `inbound_mode` is `webhook`; none when left out.",
           "example": "http://localhost:3000/sms/inbound"
         },
         {
@@ -18485,7 +18485,7 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "Called when `inbound_url` fails.",
+          "description": "Called when `inbound_url` fails; none when left out.",
           "example": "http://localhost:3000/sms/inbound-fallback"
         },
         {

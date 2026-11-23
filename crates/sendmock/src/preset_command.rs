@@ -101,6 +101,7 @@ pub fn run_preset_command(matched_operation: &MatchedOperation) -> ExitCode {
             is_check: false,
             is_undo: false,
             is_confirmed: false,
+            is_bundle_only: false,
         };
         let _ = run_trust(trust_action, false, &server_url);
     }
