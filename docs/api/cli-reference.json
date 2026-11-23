@@ -711,6 +711,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock email click 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --url 'https://app.test/verify?token=abc123' --source api --user-agent 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)'",
@@ -1184,6 +1201,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock email forward 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --to support@inbound.app.test --body 'Can you look at this one?' --from user@example.test",
@@ -1734,6 +1768,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock email inbound --from 'Sam <sam@customer.test>' --to support@inbound.app.test",
@@ -2358,6 +2409,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock email open 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --source api --user-agent 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)'",
@@ -2729,6 +2797,8 @@
               }
             ],
             "check_credentials": false,
+            "opt_out_keywords": true,
+            "opt_out_auto_replies": false,
             "operations": [
               {
                 "kind": "send",
@@ -2811,7 +2881,7 @@
           }
         }
       ],
-      "example": "sendmock email providers preview twilio --provider '{\"key\":\"sendgrid\",\"name\":\"SendGrid\",\"accent\":\"#1a82e2\",\"is_enabled\":true,\"host\":\"api.sendgrid.com\",\"credentials\":[{\"name\":\"api_key\",\"value\":\"SG.test_key_123\",\"is_secret\":true}],\"check_credentials\":false,\"operations\":[{\"kind\":\"send\",\"method\":\"POST\",\"path\":\"/v3/{domain}/messages\",\"request_format\":\"multipart\"}],\"field_mapping\":[{\"part\":\"to\",\"source\":\"personalizations[0].to[*].email\"}],\"validation_rules\":[{\"part\":\"to\",\"check\":\"required\",\"max_length\":null,\"error_kind\":\"missing_field\"}],\"success_response\":{\"status\":202,\"headers\":[{\"name\":\"X-Message-Id\",\"template\":\"{{ message.provider_id }}\"}],\"body\":\"{\\\"id\\\": \\\"{{ message.provider_id }}\\\"}\"},\"error_responses\":[{\"kind\":\"missing_field\",\"status\":202,\"headers\":[{\"name\":\"X-Message-Id\",\"template\":\"{{ message.provider_id }}\"}],\"body\":\"{\\\"id\\\": \\\"{{ message.provider_id }}\\\"}\"}],\"message_id_template\":\"<{{ uuid() }}@sendmock.local>\",\"callback_template_key\":\"sendgrid-event\",\"status_names\":{\"delivered\":\"delivered\",\"bounced\":\"bounce\",\"complained\":\"spamreport\"},\"outcome_error_codes\":{\"invalid_number\":\"21211\",\"unreachable\":\"30003\"}}'",
+      "example": "sendmock email providers preview twilio --provider '{\"key\":\"sendgrid\",\"name\":\"SendGrid\",\"accent\":\"#1a82e2\",\"is_enabled\":true,\"host\":\"api.sendgrid.com\",\"credentials\":[{\"name\":\"api_key\",\"value\":\"SG.test_key_123\",\"is_secret\":true}],\"check_credentials\":false,\"opt_out_keywords\":true,\"opt_out_auto_replies\":false,\"operations\":[{\"kind\":\"send\",\"method\":\"POST\",\"path\":\"/v3/{domain}/messages\",\"request_format\":\"multipart\"}],\"field_mapping\":[{\"part\":\"to\",\"source\":\"personalizations[0].to[*].email\"}],\"validation_rules\":[{\"part\":\"to\",\"check\":\"required\",\"max_length\":null,\"error_kind\":\"missing_field\"}],\"success_response\":{\"status\":202,\"headers\":[{\"name\":\"X-Message-Id\",\"template\":\"{{ message.provider_id }}\"}],\"body\":\"{\\\"id\\\": \\\"{{ message.provider_id }}\\\"}\"},\"error_responses\":[{\"kind\":\"missing_field\",\"status\":202,\"headers\":[{\"name\":\"X-Message-Id\",\"template\":\"{{ message.provider_id }}\"}],\"body\":\"{\\\"id\\\": \\\"{{ message.provider_id }}\\\"}\"}],\"message_id_template\":\"<{{ uuid() }}@sendmock.local>\",\"callback_template_key\":\"sendgrid-event\",\"status_names\":{\"delivered\":\"delivered\",\"bounced\":\"bounce\",\"complained\":\"spamreport\"},\"outcome_error_codes\":{\"invalid_number\":\"21211\",\"unreachable\":\"30003\"}}'",
       "output": "MessageProviderPreview",
       "exit_codes": [
         0,
@@ -3011,7 +3081,7 @@
           },
           "type": "string",
           "value_label": "<key>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -3026,7 +3096,7 @@
           },
           "type": "string",
           "value_label": "<name>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -3041,7 +3111,7 @@
           },
           "type": "string",
           "value_label": "<accent>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -3056,7 +3126,7 @@
           },
           "type": "boolean",
           "value_label": null,
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -3086,7 +3156,7 @@
           },
           "type": "ProviderCredential[]",
           "value_label": "<credentials>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -3107,11 +3177,41 @@
           },
           "type": "boolean",
           "value_label": null,
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
           "description": "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer.",
+          "example": false
+        },
+        {
+          "flag": "--opt-out-keywords",
+          "input": {
+            "name": "opt_out_keywords",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others.",
+          "example": true
+        },
+        {
+          "flag": "--opt-out-auto-replies",
+          "input": {
+            "name": "opt_out_auto_replies",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages.",
           "example": false
         },
         {
@@ -3122,7 +3222,7 @@
           },
           "type": "ProviderOperation[]",
           "value_label": "<operations>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -3144,7 +3244,7 @@
           },
           "type": "ProviderFieldMapping[]",
           "value_label": "<field-mapping>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -3164,7 +3264,7 @@
           },
           "type": "ProviderValidationRule[]",
           "value_label": "<validation-rules>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -3186,7 +3286,7 @@
           },
           "type": "ProviderResponseTemplate",
           "value_label": "<success-response>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -3210,7 +3310,7 @@
           },
           "type": "ProviderErrorResponse[]",
           "value_label": "<error-responses>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -3237,7 +3337,7 @@
           },
           "type": "string",
           "value_label": "<message-id-template>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -3267,7 +3367,7 @@
           },
           "type": "object",
           "value_label": "<status-names>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -3286,7 +3386,7 @@
           },
           "type": "object",
           "value_label": "<outcome-error-codes>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -3297,7 +3397,7 @@
           }
         }
       ],
-      "example": "sendmock email providers update twilio --key sendgrid --name SendGrid --accent '#1a82e2' --enabled --credentials '[{\"name\":\"api_key\",\"value\":\"SG.test_key_123\",\"is_secret\":true}]' --no-check-credentials --operations '[{\"kind\":\"send\",\"method\":\"POST\",\"path\":\"/v3/{domain}/messages\",\"request_format\":\"multipart\"}]' --field-mapping '[{\"part\":\"to\",\"source\":\"personalizations[0].to[*].email\"}]' --validation-rules '[{\"part\":\"to\",\"check\":\"required\",\"max_length\":null,\"error_kind\":\"missing_field\"}]' --success-response '{\"status\":202,\"headers\":[{\"name\":\"X-Message-Id\",\"template\":\"{{ message.provider_id }}\"}],\"body\":\"{\\\"id\\\": \\\"{{ message.provider_id }}\\\"}\"}' --error-responses '[{\"kind\":\"missing_field\",\"status\":202,\"headers\":[{\"name\":\"X-Message-Id\",\"template\":\"{{ message.provider_id }}\"}],\"body\":\"{\\\"id\\\": \\\"{{ message.provider_id }}\\\"}\"}]' --message-id-template '<{{ uuid() }}@sendmock.local>' --status-names '{\"delivered\":\"delivered\",\"bounced\":\"bounce\",\"complained\":\"spamreport\"}' --outcome-error-codes '{\"invalid_number\":\"21211\",\"unreachable\":\"30003\"}' --host api.sendgrid.com --callback-template-key sendgrid-event",
+      "example": "sendmock email providers update twilio --key sendgrid --name SendGrid",
       "output": "MessageProviderDefinition",
       "exit_codes": [
         0,
@@ -3572,6 +3672,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock email reply 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --body 'Thanks, that fixed it!' --from user@example.test",
@@ -3949,6 +4066,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock email simulate 01JB7T9Q2R5W8X3Y6Z1A4B7C9D bounced --bounce-type hard --webhook 01JB7T9Q2RENDPOINT00000000",
@@ -4342,6 +4476,290 @@
       ],
       "ui": [
         "Settings > Email > Tag rules > Edit, enabled switch"
+      ]
+    },
+    {
+      "command": "sendmock email templates create",
+      "slug": "email-templates-create",
+      "usage": "sendmock email templates create [flags]",
+      "summary": "Add a local email template under a provider's template id or name.",
+      "area": "Email templates",
+      "area_slug": "email-templates",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/emails/templates",
+          "operation_id": "postEmailsTemplates",
+          "summary": "Add a local email template under a provider's template id or name.",
+          "area_slug": "email-templates",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--id",
+          "input": {
+            "name": "id",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<id>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The provider's template id or name: SendGrid's `d-...`, Postmark's number or alias, Mailgun's template name.",
+          "example": "welcome-email"
+        },
+        {
+          "flag": "--subject",
+          "input": {
+            "name": "subject",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<subject>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The subject, used when the send gives none; can use the template data.",
+          "example": "Welcome, {{ first_name }}"
+        },
+        {
+          "flag": "--text",
+          "input": {
+            "name": "text",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<text>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The plain-text body; at least one of `text` and `html`.",
+          "example": "Hi {{ first_name }}, thanks for joining."
+        },
+        {
+          "flag": "--html",
+          "input": {
+            "name": "html",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<html>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The HTML body.",
+          "example": "<p>Hi {{ first_name }}, thanks for joining.</p>"
+        }
+      ],
+      "example": "sendmock email templates create --id welcome-email --subject 'Welcome, {{ first_name }}' --text 'Hi {{ first_name }}, thanks for joining.' --html '<p>Hi {{ first_name }}, thanks for joining.</p>'",
+      "output": "EmailTemplate",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_email_template_create"
+      ],
+      "ui": [
+        "Mail > Templates > New template"
+      ]
+    },
+    {
+      "command": "sendmock email templates delete",
+      "slug": "email-templates-delete",
+      "usage": "sendmock email templates delete <templateId> [flags]",
+      "summary": "Remove a local email template; sends naming it keep their own bodies.",
+      "area": "Email templates",
+      "area_slug": "email-templates",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/emails/templates/{templateId}",
+          "operation_id": "deleteEmailsTemplatesByTemplateId",
+          "summary": "Remove a local email template; sends naming it keep their own bodies.",
+          "area_slug": "email-templates",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "templateId",
+          "input": {
+            "name": "templateId",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The webhook template's ID, e.g. `slack.incoming_webhook` or `custom.ops_alert`.",
+          "example": "slack.incoming_webhook",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--yes",
+          "input": null,
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Confirms a destructive command; without it the command stops.",
+          "example": true
+        }
+      ],
+      "example": "sendmock email templates delete slack.incoming_webhook --yes",
+      "output": null,
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_email_template_delete"
+      ],
+      "ui": [
+        "Mail > Templates > a template > Delete"
+      ]
+    },
+    {
+      "command": "sendmock email templates list",
+      "slug": "email-templates-list",
+      "usage": "sendmock email templates list",
+      "summary": "Local email templates: a provider send naming one gets its subject and bodies.",
+      "area": "Email templates",
+      "area_slug": "email-templates",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/emails/templates",
+          "operation_id": "getEmailsTemplates",
+          "summary": "Local email templates: a provider send naming one gets its subject and bodies.",
+          "area_slug": "email-templates",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [],
+      "example": "sendmock email templates list",
+      "output": "EmailTemplate[]",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_email_template_list"
+      ],
+      "ui": [
+        "Mail > Templates"
+      ]
+    },
+    {
+      "command": "sendmock email templates update",
+      "slug": "email-templates-update",
+      "usage": "sendmock email templates update <templateId> [flags]",
+      "summary": "Change a local email template's subject or bodies.",
+      "area": "Email templates",
+      "area_slug": "email-templates",
+      "operations": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/emails/templates/{templateId}",
+          "operation_id": "patchEmailsTemplatesByTemplateId",
+          "summary": "Change a local email template's subject or bodies.",
+          "area_slug": "email-templates",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "templateId",
+          "input": {
+            "name": "templateId",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The webhook template's ID, e.g. `slack.incoming_webhook` or `custom.ops_alert`.",
+          "example": "slack.incoming_webhook",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--subject",
+          "input": {
+            "name": "subject",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<subject>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The subject, used when the send gives none; can use the template data.",
+          "example": "Welcome, {{ first_name }}"
+        },
+        {
+          "flag": "--text",
+          "input": {
+            "name": "text",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<text>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The plain-text body; at least one of `text` and `html`.",
+          "example": "Hi {{ first_name }}, thanks for joining."
+        },
+        {
+          "flag": "--html",
+          "input": {
+            "name": "html",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<html>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The HTML body.",
+          "example": "<p>Hi {{ first_name }}, thanks for joining.</p>"
+        }
+      ],
+      "example": "sendmock email templates update slack.incoming_webhook --subject 'Welcome, {{ first_name }}' --text 'Hi {{ first_name }}, thanks for joining.'",
+      "output": "EmailTemplate",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_email_template_update"
+      ],
+      "ui": [
+        "Mail > Templates > a template > Save"
       ]
     },
     {
@@ -4993,7 +5411,7 @@
           },
           "type": "HttpMockResponse",
           "value_label": "<default-response>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -5007,7 +5425,7 @@
           }
         }
       ],
-      "example": "sendmock http bin update 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --default-response '{\"status_code\":200,\"headers\":{\"Content-Type\":\"application/json\"},\"body\":\"{\\\"ok\\\": true}\"}'",
+      "example": "sendmock http bin update 01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
       "output": "HttpBin",
       "exit_codes": [
         0,
@@ -6114,7 +6532,7 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "email, sms or http (default email).",
+          "description": "email, sms, http, mailgun or twilio (default email).",
           "example": "email"
         },
         {
@@ -6917,24 +7335,6 @@
           "example": "http://localhost:3000/sms/inbound"
         },
         {
-          "flag": "--inbound-method",
-          "input": {
-            "name": "inbound_method",
-            "location": "body"
-          },
-          "type": "string",
-          "value_label": "<inbound-method>",
-          "is_required": true,
-          "is_repeatable": false,
-          "takes_json": false,
-          "allowed_values": [
-            "POST",
-            "GET"
-          ],
-          "description": "The HTTP method of the reply webhook.",
-          "example": "POST"
-        },
-        {
           "flag": "--inbound-fallback-url",
           "input": {
             "name": "inbound_fallback_url",
@@ -6993,9 +7393,57 @@
           "allowed_values": null,
           "description": "The Messaging Service this number belongs to, `MG...`; null for none.",
           "example": "MG00000000000000000000000000000001"
+        },
+        {
+          "flag": "--inbound-method",
+          "input": {
+            "name": "inbound_method",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<inbound-method>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "POST",
+            "GET"
+          ],
+          "description": "The HTTP method of the reply webhook; POST when left out, as on Twilio.",
+          "example": "POST"
+        },
+        {
+          "flag": "--account-sid",
+          "input": {
+            "name": "account_sid",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<account-sid>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.",
+          "example": null
+        },
+        {
+          "flag": "--opt-out-keywords",
+          "input": {
+            "name": "opt_out_keywords",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Whether a text of STOP to this number opts the contact out; on when left out.",
+          "example": true
         }
       ],
-      "example": "sendmock numbers add --number +15550001111 --label 'Support line' --channel sms --inbound-method POST --inbound-url http://localhost:3000/sms/inbound --inbound-fallback-url http://localhost:3000/sms/inbound-fallback",
+      "example": "sendmock numbers add --number +15550001111 --label 'Support line' --channel sms --inbound-url http://localhost:3000/sms/inbound --inbound-fallback-url http://localhost:3000/sms/inbound-fallback",
       "output": "VirtualNumber",
       "exit_codes": [
         0,
@@ -7147,7 +7595,7 @@
           },
           "type": "string",
           "value_label": "<number>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -7162,7 +7610,7 @@
           },
           "type": "string",
           "value_label": "<label>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -7177,7 +7625,7 @@
           },
           "type": "string[]",
           "value_label": "<channel>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": true,
           "takes_json": false,
           "allowed_values": [
@@ -7203,24 +7651,6 @@
           "allowed_values": null,
           "description": "Reply webhook (Twilio \"A message comes in\"); null means rules only.",
           "example": "http://localhost:3000/sms/inbound"
-        },
-        {
-          "flag": "--inbound-method",
-          "input": {
-            "name": "inbound_method",
-            "location": "body"
-          },
-          "type": "string",
-          "value_label": "<inbound-method>",
-          "is_required": true,
-          "is_repeatable": false,
-          "takes_json": false,
-          "allowed_values": [
-            "POST",
-            "GET"
-          ],
-          "description": "The HTTP method of the reply webhook.",
-          "example": "POST"
         },
         {
           "flag": "--inbound-fallback-url",
@@ -7281,9 +7711,57 @@
           "allowed_values": null,
           "description": "The Messaging Service this number belongs to, `MG...`; null for none.",
           "example": "MG00000000000000000000000000000001"
+        },
+        {
+          "flag": "--inbound-method",
+          "input": {
+            "name": "inbound_method",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<inbound-method>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": [
+            "POST",
+            "GET"
+          ],
+          "description": "The HTTP method of the reply webhook; POST when left out, as on Twilio.",
+          "example": "POST"
+        },
+        {
+          "flag": "--account-sid",
+          "input": {
+            "name": "account_sid",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<account-sid>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.",
+          "example": null
+        },
+        {
+          "flag": "--opt-out-keywords",
+          "input": {
+            "name": "opt_out_keywords",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Whether a text of STOP to this number opts the contact out; on when left out.",
+          "example": true
         }
       ],
-      "example": "sendmock numbers update 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --number +15550001111 --label 'Support line' --channel sms --inbound-method POST --inbound-url http://localhost:3000/sms/inbound --inbound-fallback-url http://localhost:3000/sms/inbound-fallback",
+      "example": "sendmock numbers update 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --number +15550001111 --label 'Support line'",
       "output": "VirtualNumber",
       "exit_codes": [
         0,
@@ -9751,7 +10229,7 @@
           },
           "type": "string",
           "value_label": "<key>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -9766,7 +10244,7 @@
           },
           "type": "string",
           "value_label": "<name>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -9781,7 +10259,7 @@
           },
           "type": "string",
           "value_label": "<picker-tab>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -9796,7 +10274,7 @@
           },
           "type": "PaymentFlowStep[]",
           "value_label": "<steps>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -9812,7 +10290,7 @@
           ]
         }
       ],
-      "example": "sendmock payments flows update card --key wallet_otp --name 'Wallet with OTP' --picker-tab 'Mobile banking' --steps '[{\"type\":\"otp\",\"title\":\"Enter the code sent to your phone\",\"field_label\":\"Verification code\",\"hint\":\"We sent a 6 digit code to your {method} number.\",\"button_label\":\"Verify\"}]'",
+      "example": "sendmock payments flows update card --key wallet_otp --name 'Wallet with OTP'",
       "output": "PaymentFlowDefinition",
       "exit_codes": [
         0,
@@ -10409,7 +10887,7 @@
           },
           "type": "string",
           "value_label": "<key>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -10424,7 +10902,7 @@
           },
           "type": "string",
           "value_label": "<name>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -10439,7 +10917,7 @@
           },
           "type": "string",
           "value_label": "<accent>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -10454,7 +10932,7 @@
           },
           "type": "boolean",
           "value_label": null,
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -10469,7 +10947,7 @@
           },
           "type": "string[]",
           "value_label": "<method-key>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": true,
           "takes_json": false,
           "allowed_values": null,
@@ -10487,7 +10965,7 @@
           },
           "type": "GatewayCredential[]",
           "value_label": "<credentials>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -10523,7 +11001,7 @@
           },
           "type": "string",
           "value_label": "<redirect-method>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": [
@@ -10541,7 +11019,7 @@
           },
           "type": "GatewayRedirectField[]",
           "value_label": "<redirect-fields>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -10562,7 +11040,7 @@
           },
           "type": "string",
           "value_label": "<notification-content-type>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": [
@@ -10580,7 +11058,7 @@
           },
           "type": "object",
           "value_label": "<event-names>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -10601,7 +11079,7 @@
           },
           "type": "string",
           "value_label": "<notification-body>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -10616,7 +11094,7 @@
           },
           "type": "GatewayHeaderTemplate[]",
           "value_label": "<notification-headers>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -10629,7 +11107,7 @@
           ]
         }
       ],
-      "example": "sendmock payments gateways update stripe --key upay --name Upay --accent '#e2136e' --enabled --method-key upay_wallet --method-key card --credentials '[{\"name\":\"webhook_secret\",\"value\":\"whsec_test_123\",\"is_secret\":true}]' --redirect-method POST --redirect-fields '[{\"name\":\"session_id\",\"template\":\"{{ payment.reference }}\",\"send_on\":\"always\"}]' --notification-content-type json --event-names '{\"payment.succeeded\":\"PAYMENT_SUCCESS\",\"payment.failed\":\"PAYMENT_FAILED\",\"payment.refunded\":\"\",\"checkout.completed\":\"\",\"checkout.expired\":\"\"}' --notification-body '{\"status\": \"{{ event.name }}\", \"txn_id\": \"{{ payment.reference }}\"}' --notification-headers '[{\"name\":\"stripe-signature\",\"template\":\"{{ stripe_signature(merchant.webhook_secret) }}\"}]'",
+      "example": "sendmock payments gateways update stripe --key upay --name Upay",
       "output": "PaymentGatewayDefinition",
       "exit_codes": [
         0,
@@ -11201,7 +11679,7 @@
           },
           "type": "string",
           "value_label": "<key>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -11216,7 +11694,7 @@
           },
           "type": "string",
           "value_label": "<name>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -11231,7 +11709,7 @@
           },
           "type": "string",
           "value_label": "<flow>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -11246,7 +11724,7 @@
           },
           "type": "string",
           "value_label": "<accent>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -11261,7 +11739,7 @@
           },
           "type": "boolean",
           "value_label": null,
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -11276,7 +11754,7 @@
           },
           "type": "TestCardValue[]",
           "value_label": "<test-cards>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -11297,7 +11775,7 @@
           },
           "type": "TestNumberValue[]",
           "value_label": "<test-numbers>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -11318,7 +11796,7 @@
           },
           "type": "string",
           "value_label": "<otp>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -11333,7 +11811,7 @@
           },
           "type": "string",
           "value_label": "<pin>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -11348,7 +11826,7 @@
           },
           "type": "string",
           "value_label": "<default-outcome>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": [
@@ -11366,7 +11844,7 @@
           },
           "type": "string",
           "value_label": "<test-account>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -11374,7 +11852,7 @@
           "example": "sb-buyer@personal.example.com"
         }
       ],
-      "example": "sendmock payments methods update bkash --key upay_wallet --name 'Upay wallet' --flow wallet --accent '#e2136e' --enabled --test-cards '[{\"number\":\"4242424242424242\",\"outcome\":\"succeed\",\"decline_reason\":\"insufficient_funds\"}]' --test-numbers '[{\"number\":\"01770000001\",\"outcome\":\"succeed\",\"decline_reason\":\"insufficient_funds\"}]' --otp 123456 --pin 12121 --default-outcome succeed --test-account sb-buyer@personal.example.com",
+      "example": "sendmock payments methods update bkash --key upay_wallet --name 'Upay wallet'",
       "output": "PaymentMethodDefinition",
       "exit_codes": [
         0,
@@ -11650,6 +12128,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock payments simulate 01JB7T9Q2R5W8X3Y6Z1A4B7C9D refund --decline-reason insufficient_funds --refund-amount-minor 500",
@@ -12257,6 +12752,136 @@
       ],
       "ui": [
         "Payments (new and changed payments appear live)"
+      ]
+    },
+    {
+      "command": "sendmock preset",
+      "slug": "preset",
+      "usage": "sendmock preset <presetName> [flags]",
+      "summary": "Set SendMock up for a stack in one step; a second run changes nothing.",
+      "area": "Setup",
+      "area_slug": "setup",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/presets/{presetName}/apply",
+          "operation_id": "postPresetsByPresetNameApply",
+          "summary": "Set SendMock up for a stack in one step; a second run changes nothing.",
+          "area_slug": "setup",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "presetName",
+          "input": {
+            "name": "presetName",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The preset's name, from `GET /api/v1/presets`.",
+          "example": "laravel-mailgun-twilio",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--app-url",
+          "input": {
+            "name": "app_url",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<app-url>",
+          "is_required": true,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Where SendMock reaches your app.",
+          "example": "http://localhost:8000"
+        },
+        {
+          "flag": "--options",
+          "input": {
+            "name": "options",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<options>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "The preset's options by name (its webhook paths); left out, their defaults.",
+          "example": {
+            "mailgun_events_path": "/webhooks/mailgun/events"
+          }
+        },
+        {
+          "flag": "--numbers-csv",
+          "input": {
+            "name": "numbers_csv",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<numbers-csv>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Numbers to add, one per line: `number,label,subaccount_sid,messaging_service_sid` (a first line starting with `number` is a header).",
+          "example": "+15550001111,Clinic line,AC22222222222222222222222222222222,"
+        }
+      ],
+      "example": "sendmock preset laravel-mailgun-twilio --app-url http://localhost:8000 --numbers-csv '+15550001111,Clinic line,AC22222222222222222222222222222222,'",
+      "output": "PresetApplyResult",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_preset_apply"
+      ],
+      "ui": [
+        "Settings > Setup > Presets > Apply"
+      ]
+    },
+    {
+      "command": "sendmock presets",
+      "slug": "presets",
+      "usage": "sendmock presets",
+      "summary": "The stack presets: what each sets up and its options.",
+      "area": "Setup",
+      "area_slug": "setup",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/presets",
+          "operation_id": "getPresets",
+          "summary": "The stack presets: what each sets up and its options.",
+          "area_slug": "setup",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [],
+      "example": "sendmock presets",
+      "output": "StackPreset[]",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_preset_list"
+      ],
+      "ui": [
+        "Settings > Setup > Presets"
       ]
     },
     {
@@ -13000,8 +13625,8 @@
     {
       "command": "sendmock reset",
       "slug": "reset",
-      "usage": "sendmock reset --yes",
-      "summary": "Delete all traffic and restore the seed configuration.",
+      "usage": "sendmock reset --yes [flags]",
+      "summary": "Delete all traffic and apply the seed applied last again, keeping the rest of the configuration; with config, also remove every configured item and restore the built-in providers. Answers what it cleared, removed and kept.",
       "area": "System",
       "area_slug": "system",
       "operations": [
@@ -13009,7 +13634,7 @@
           "method": "POST",
           "path": "/api/v1/reset",
           "operation_id": "postReset",
-          "summary": "Delete all traffic and restore the seed configuration.",
+          "summary": "Delete all traffic and apply the seed applied last again, keeping the rest of the configuration; with config, also remove every configured item and restore the built-in providers. Answers what it cleared, removed and kept.",
           "area_slug": "system",
           "selector": null
         }
@@ -13028,10 +13653,40 @@
           "allowed_values": null,
           "description": "Confirms a destructive command; without it the command stops.",
           "example": true
+        },
+        {
+          "flag": "--config",
+          "input": {
+            "name": "config",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Also remove every configured item, put the settings and providers back to what SendMock ships with, and forget the seed.",
+          "example": false
+        },
+        {
+          "flag": "--confirm-removed-count",
+          "input": {
+            "name": "confirm_removed_count",
+            "location": "body"
+          },
+          "type": "number",
+          "value_label": "<confirm-removed-count>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "With `config`: how many configured items the reset said it would remove.",
+          "example": 12
         }
       ],
-      "example": "sendmock reset --yes",
-      "output": null,
+      "example": "sendmock reset --yes --no-config --confirm-removed-count 12",
+      "output": "ResetSummary",
       "exit_codes": [
         0,
         1,
@@ -13423,7 +14078,7 @@
           },
           "type": "number",
           "value_label": "<priority>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -13438,7 +14093,7 @@
           },
           "type": "string",
           "value_label": "<description>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -13453,7 +14108,7 @@
           },
           "type": "InboundRouteFilter",
           "value_label": "<filter>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -13471,7 +14126,7 @@
           },
           "type": "InboundRouteAction[]",
           "value_label": "<actions>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -13484,7 +14139,7 @@
           ]
         }
       ],
-      "example": "sendmock route update 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --priority 10 --description 'Ticket replies to the helpdesk' --filter '{\"kind\":\"match_recipient\",\"pattern\":\"reply\\\\+(?P<token>.+)@reply.app.test\"}' --actions '[{\"kind\":\"forward_url\",\"url\":\"http://localhost:8000/webhooks/mail\"}]'",
+      "example": "sendmock route update 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --priority 10 --description 'Ticket replies to the helpdesk'",
       "output": "InboundRoute",
       "exit_codes": [
         0,
@@ -13619,6 +14274,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock sample email --to user@example.test --subject 'Hello from SendMock'",
@@ -14621,6 +15293,21 @@
           "example": true
         },
         {
+          "flag": "--count-views-with-webhook-rules",
+          "input": {
+            "name": "count_views_with_webhook_rules",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "On: a view counts as an open even when a webhook rule would send `email.opened` to your app. Off (the default): such a view is not counted.",
+          "example": false
+        },
+        {
           "flag": "--opened-event-mode",
           "input": {
             "name": "opened_event_mode",
@@ -15016,7 +15703,7 @@
     {
       "command": "sendmock setup import",
       "slug": "setup-import",
-      "usage": "sendmock setup import <file> --yes [flags]",
+      "usage": "sendmock setup import <file> [flags]",
       "summary": "Apply a setup from its text or a URL, merging or replacing; 422 with the errors and nothing applied when it is invalid.",
       "area": "Setup",
       "area_slug": "setup",
@@ -15046,18 +15733,6 @@
         }
       ],
       "flags": [
-        {
-          "flag": "--yes",
-          "input": null,
-          "type": "boolean",
-          "value_label": null,
-          "is_required": false,
-          "is_repeatable": false,
-          "takes_json": false,
-          "allowed_values": null,
-          "description": "Confirms a destructive command; without it the command stops.",
-          "example": true
-        },
         {
           "flag": "--url",
           "input": {
@@ -15169,9 +15844,21 @@
           "allowed_values": null,
           "description": "For `replace` imports: how many items the validation said would be removed; the import is refused when it differs.",
           "example": null
+        },
+        {
+          "flag": "--yes",
+          "input": null,
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Confirms a destructive command; without it the command stops.",
+          "example": true
         }
       ],
-      "example": "sendmock setup import input.txt --yes --url null --sha256 null",
+      "example": "sendmock setup import input.txt --url null --sha256 null --yes",
       "output": "SetupValidation",
       "exit_codes": [
         0,
@@ -15712,6 +16399,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock sms inbound --from +8801700000000 --to +15550001111 --body STOP --channel sms --webhook 01JB7T9Q2RENDPOINT00000000",
@@ -16075,6 +16779,23 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock sms open 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --source api --user-agent 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5)'",
@@ -16138,6 +16859,160 @@
       ],
       "ui": [
         "SMS > message ticks (read)"
+      ]
+    },
+    {
+      "command": "sendmock sms opt-outs clear",
+      "slug": "sms-opt-outs-clear",
+      "usage": "sendmock sms opt-outs clear --yes",
+      "summary": "Lift every opt-out.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/sms/opt-outs",
+          "operation_id": "deleteSmsOptOuts",
+          "summary": "Lift every opt-out.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [
+        {
+          "flag": "--yes",
+          "input": null,
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Confirms a destructive command; without it the command stops.",
+          "example": true
+        }
+      ],
+      "example": "sendmock sms opt-outs clear --yes",
+      "output": null,
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_sms_opt_out_clear"
+      ],
+      "ui": [
+        "Numbers > Opt-outs > Lift all"
+      ]
+    },
+    {
+      "command": "sendmock sms opt-outs delete",
+      "slug": "sms-opt-outs-delete",
+      "usage": "sendmock sms opt-outs delete <sender> <contactNumber> [flags]",
+      "summary": "Lift one opt-out, as if the contact texted START.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/sms/opt-outs/{sender}/{contactNumber}",
+          "operation_id": "deleteSmsOptOutsBySenderByContactNumber",
+          "summary": "Lift one opt-out, as if the contact texted START.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [
+        {
+          "name": "sender",
+          "input": {
+            "name": "sender",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "Your number (E.164) or the Messaging Service SID an opt-out is kept under, from `GET /api/v1/sms/opt-outs`.",
+          "example": "+15550001111",
+          "reads_file": false
+        },
+        {
+          "name": "contactNumber",
+          "input": {
+            "name": "contactNumber",
+            "location": "path"
+          },
+          "type": "string",
+          "allowed_values": null,
+          "description": "The contact's number, E.164.",
+          "example": "+15550002222",
+          "reads_file": false
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--yes",
+          "input": null,
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Confirms a destructive command; without it the command stops.",
+          "example": true
+        }
+      ],
+      "example": "sendmock sms opt-outs delete +15550001111 +15550002222 --yes",
+      "output": null,
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_sms_opt_out_delete"
+      ],
+      "ui": [
+        "Numbers > Opt-outs > Lift"
+      ]
+    },
+    {
+      "command": "sendmock sms opt-outs list",
+      "slug": "sms-opt-outs-list",
+      "usage": "sendmock sms opt-outs list",
+      "summary": "Contacts who texted STOP, newest first.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/sms/opt-outs",
+          "operation_id": "getSmsOptOuts",
+          "summary": "Contacts who texted STOP, newest first.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [],
+      "example": "sendmock sms opt-outs list",
+      "output": "SmsOptOut[]",
+      "exit_codes": [
+        0,
+        1,
+        2
+      ],
+      "mcp": [
+        "sendmock_sms_opt_out_list"
+      ],
+      "ui": [
+        "Numbers > Opt-outs"
       ]
     },
     {
@@ -16446,6 +17321,8 @@
               }
             ],
             "check_credentials": false,
+            "opt_out_keywords": true,
+            "opt_out_auto_replies": false,
             "operations": [
               {
                 "kind": "send",
@@ -16528,7 +17405,7 @@
           }
         }
       ],
-      "example": "sendmock sms providers preview twilio --provider '{\"key\":\"sendgrid\",\"name\":\"SendGrid\",\"accent\":\"#1a82e2\",\"is_enabled\":true,\"host\":\"api.sendgrid.com\",\"credentials\":[{\"name\":\"api_key\",\"value\":\"SG.test_key_123\",\"is_secret\":true}],\"check_credentials\":false,\"operations\":[{\"kind\":\"send\",\"method\":\"POST\",\"path\":\"/v3/{domain}/messages\",\"request_format\":\"multipart\"}],\"field_mapping\":[{\"part\":\"to\",\"source\":\"personalizations[0].to[*].email\"}],\"validation_rules\":[{\"part\":\"to\",\"check\":\"required\",\"max_length\":null,\"error_kind\":\"missing_field\"}],\"success_response\":{\"status\":202,\"headers\":[{\"name\":\"X-Message-Id\",\"template\":\"{{ message.provider_id }}\"}],\"body\":\"{\\\"id\\\": \\\"{{ message.provider_id }}\\\"}\"},\"error_responses\":[{\"kind\":\"missing_field\",\"status\":202,\"headers\":[{\"name\":\"X-Message-Id\",\"template\":\"{{ message.provider_id }}\"}],\"body\":\"{\\\"id\\\": \\\"{{ message.provider_id }}\\\"}\"}],\"message_id_template\":\"<{{ uuid() }}@sendmock.local>\",\"callback_template_key\":\"sendgrid-event\",\"status_names\":{\"delivered\":\"delivered\",\"bounced\":\"bounce\",\"complained\":\"spamreport\"},\"outcome_error_codes\":{\"invalid_number\":\"21211\",\"unreachable\":\"30003\"}}'",
+      "example": "sendmock sms providers preview twilio --provider '{\"key\":\"sendgrid\",\"name\":\"SendGrid\",\"accent\":\"#1a82e2\",\"is_enabled\":true,\"host\":\"api.sendgrid.com\",\"credentials\":[{\"name\":\"api_key\",\"value\":\"SG.test_key_123\",\"is_secret\":true}],\"check_credentials\":false,\"opt_out_keywords\":true,\"opt_out_auto_replies\":false,\"operations\":[{\"kind\":\"send\",\"method\":\"POST\",\"path\":\"/v3/{domain}/messages\",\"request_format\":\"multipart\"}],\"field_mapping\":[{\"part\":\"to\",\"source\":\"personalizations[0].to[*].email\"}],\"validation_rules\":[{\"part\":\"to\",\"check\":\"required\",\"max_length\":null,\"error_kind\":\"missing_field\"}],\"success_response\":{\"status\":202,\"headers\":[{\"name\":\"X-Message-Id\",\"template\":\"{{ message.provider_id }}\"}],\"body\":\"{\\\"id\\\": \\\"{{ message.provider_id }}\\\"}\"},\"error_responses\":[{\"kind\":\"missing_field\",\"status\":202,\"headers\":[{\"name\":\"X-Message-Id\",\"template\":\"{{ message.provider_id }}\"}],\"body\":\"{\\\"id\\\": \\\"{{ message.provider_id }}\\\"}\"}],\"message_id_template\":\"<{{ uuid() }}@sendmock.local>\",\"callback_template_key\":\"sendgrid-event\",\"status_names\":{\"delivered\":\"delivered\",\"bounced\":\"bounce\",\"complained\":\"spamreport\"},\"outcome_error_codes\":{\"invalid_number\":\"21211\",\"unreachable\":\"30003\"}}'",
       "output": "MessageProviderPreview",
       "exit_codes": [
         0,
@@ -16728,7 +17605,7 @@
           },
           "type": "string",
           "value_label": "<key>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -16743,7 +17620,7 @@
           },
           "type": "string",
           "value_label": "<name>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -16758,7 +17635,7 @@
           },
           "type": "string",
           "value_label": "<accent>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -16773,7 +17650,7 @@
           },
           "type": "boolean",
           "value_label": null,
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -16803,7 +17680,7 @@
           },
           "type": "ProviderCredential[]",
           "value_label": "<credentials>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -16824,11 +17701,41 @@
           },
           "type": "boolean",
           "value_label": null,
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
           "description": "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer.",
+          "example": false
+        },
+        {
+          "flag": "--opt-out-keywords",
+          "input": {
+            "name": "opt_out_keywords",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others.",
+          "example": true
+        },
+        {
+          "flag": "--opt-out-auto-replies",
+          "input": {
+            "name": "opt_out_auto_replies",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages.",
           "example": false
         },
         {
@@ -16839,7 +17746,7 @@
           },
           "type": "ProviderOperation[]",
           "value_label": "<operations>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -16861,7 +17768,7 @@
           },
           "type": "ProviderFieldMapping[]",
           "value_label": "<field-mapping>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -16881,7 +17788,7 @@
           },
           "type": "ProviderValidationRule[]",
           "value_label": "<validation-rules>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -16903,7 +17810,7 @@
           },
           "type": "ProviderResponseTemplate",
           "value_label": "<success-response>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -16927,7 +17834,7 @@
           },
           "type": "ProviderErrorResponse[]",
           "value_label": "<error-responses>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -16954,7 +17861,7 @@
           },
           "type": "string",
           "value_label": "<message-id-template>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -16984,7 +17891,7 @@
           },
           "type": "object",
           "value_label": "<status-names>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -17003,7 +17910,7 @@
           },
           "type": "object",
           "value_label": "<outcome-error-codes>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -17014,7 +17921,7 @@
           }
         }
       ],
-      "example": "sendmock sms providers update twilio --key sendgrid --name SendGrid --accent '#1a82e2' --enabled --credentials '[{\"name\":\"api_key\",\"value\":\"SG.test_key_123\",\"is_secret\":true}]' --no-check-credentials --operations '[{\"kind\":\"send\",\"method\":\"POST\",\"path\":\"/v3/{domain}/messages\",\"request_format\":\"multipart\"}]' --field-mapping '[{\"part\":\"to\",\"source\":\"personalizations[0].to[*].email\"}]' --validation-rules '[{\"part\":\"to\",\"check\":\"required\",\"max_length\":null,\"error_kind\":\"missing_field\"}]' --success-response '{\"status\":202,\"headers\":[{\"name\":\"X-Message-Id\",\"template\":\"{{ message.provider_id }}\"}],\"body\":\"{\\\"id\\\": \\\"{{ message.provider_id }}\\\"}\"}' --error-responses '[{\"kind\":\"missing_field\",\"status\":202,\"headers\":[{\"name\":\"X-Message-Id\",\"template\":\"{{ message.provider_id }}\"}],\"body\":\"{\\\"id\\\": \\\"{{ message.provider_id }}\\\"}\"}]' --message-id-template '<{{ uuid() }}@sendmock.local>' --status-names '{\"delivered\":\"delivered\",\"bounced\":\"bounce\",\"complained\":\"spamreport\"}' --outcome-error-codes '{\"invalid_number\":\"21211\",\"unreachable\":\"30003\"}' --host api.sendgrid.com --callback-template-key sendgrid-event",
+      "example": "sendmock sms providers update twilio --key sendgrid --name SendGrid",
       "output": "MessageProviderDefinition",
       "exit_codes": [
         0,
@@ -17248,6 +18155,21 @@
       "arguments": [],
       "flags": [
         {
+          "flag": "--sid",
+          "input": {
+            "name": "sid",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<sid>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The SID to give the service, `MG` and 32 hex digits, so an app's configured SID works unchanged; left out, a new one is generated.",
+          "example": "MG00000000000000000000000000000001"
+        },
+        {
           "flag": "--friendly-name",
           "input": {
             "name": "friendly_name",
@@ -17270,11 +18192,11 @@
           },
           "type": "string[]",
           "value_label": "<number-id>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": true,
           "takes_json": false,
           "allowed_values": null,
-          "description": "The virtual numbers in the sender pool, by ID.",
+          "description": "The virtual numbers in the sender pool, by ID; none when left out, as a new Twilio Messaging Service starts.",
           "example": [
             "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
           ]
@@ -17287,7 +18209,7 @@
           },
           "type": "string",
           "value_label": "<inbound-mode>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": [
@@ -17295,7 +18217,7 @@
             "defer_to_sender",
             "drop"
           ],
-          "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.",
+          "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook, the default) or `drop`.",
           "example": "webhook"
         },
         {
@@ -17310,7 +18232,7 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "Used when `inbound_mode` is `webhook`.",
+          "description": "Used when `inbound_mode` is `webhook`; none when left out.",
           "example": "http://localhost:3000/sms/inbound"
         },
         {
@@ -17325,11 +18247,26 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "Called when `inbound_url` fails.",
+          "description": "Called when `inbound_url` fails; none when left out.",
           "example": "http://localhost:3000/sms/inbound-fallback"
+        },
+        {
+          "flag": "--opt-out-keywords",
+          "input": {
+            "name": "opt_out_keywords",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.",
+          "example": true
         }
       ],
-      "example": "sendmock sms services create --friendly-name Notifications --number-id 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --inbound-mode webhook --inbound-url http://localhost:3000/sms/inbound --inbound-fallback-url http://localhost:3000/sms/inbound-fallback",
+      "example": "sendmock sms services create --friendly-name Notifications --sid MG00000000000000000000000000000001 --number-id 01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
       "output": "MessagingService",
       "exit_codes": [
         0,
@@ -17478,7 +18415,7 @@
           },
           "type": "string",
           "value_label": "<friendly-name>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -17493,11 +18430,11 @@
           },
           "type": "string[]",
           "value_label": "<number-id>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": true,
           "takes_json": false,
           "allowed_values": null,
-          "description": "The virtual numbers in the sender pool, by ID.",
+          "description": "The virtual numbers in the sender pool, by ID; none when left out, as a new Twilio Messaging Service starts.",
           "example": [
             "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
           ]
@@ -17510,7 +18447,7 @@
           },
           "type": "string",
           "value_label": "<inbound-mode>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": [
@@ -17518,7 +18455,7 @@
             "defer_to_sender",
             "drop"
           ],
-          "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.",
+          "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook, the default) or `drop`.",
           "example": "webhook"
         },
         {
@@ -17533,7 +18470,7 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "Used when `inbound_mode` is `webhook`.",
+          "description": "Used when `inbound_mode` is `webhook`; none when left out.",
           "example": "http://localhost:3000/sms/inbound"
         },
         {
@@ -17548,11 +18485,26 @@
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
-          "description": "Called when `inbound_url` fails.",
+          "description": "Called when `inbound_url` fails; none when left out.",
           "example": "http://localhost:3000/sms/inbound-fallback"
+        },
+        {
+          "flag": "--opt-out-keywords",
+          "input": {
+            "name": "opt_out_keywords",
+            "location": "body"
+          },
+          "type": "boolean",
+          "value_label": null,
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.",
+          "example": true
         }
       ],
-      "example": "sendmock sms services update MG00000000000000000000000000000001 --friendly-name Notifications --number-id 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --inbound-mode webhook --inbound-url http://localhost:3000/sms/inbound --inbound-fallback-url http://localhost:3000/sms/inbound-fallback",
+      "example": "sendmock sms services update MG00000000000000000000000000000001 --friendly-name Notifications --number-id 01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
       "output": "MessagingService",
       "exit_codes": [
         0,
@@ -17722,10 +18674,27 @@
               }
             }
           ]
+        },
+        {
+          "flag": "--user-variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "value_label": "<user-variables>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": true,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "example": "sendmock sms status 01JB7T9Q2R5W8X3Y6Z1A4B7C9D delivered --error-code 30003 --webhook 01JB7T9Q2RENDPOINT00000000",
-      "output": "SmsMessageDetail",
+      "output": "SmsStatusChangeAnswer",
       "exit_codes": [
         0,
         1,
@@ -18221,7 +19190,7 @@
           },
           "type": "string",
           "value_label": "<friendly-name>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -18278,7 +19247,7 @@
           "example": null
         }
       ],
-      "example": "sendmock sms twilio subaccounts update AC33333333333333333333333333333333 --friendly-name 'Acme Clinic' --status active --auth-token null",
+      "example": "sendmock sms twilio subaccounts update AC33333333333333333333333333333333 --friendly-name 'Acme Clinic' --status active",
       "output": "TwilioSubaccount",
       "exit_codes": [
         0,
@@ -18607,6 +19576,41 @@
       ],
       "ui": [
         "Settings > General > Delete all traffic"
+      ]
+    },
+    {
+      "command": "sendmock trust",
+      "slug": "trust",
+      "usage": "sendmock trust",
+      "summary": "What trusts the local CA on this machine: the system store and each runtime.",
+      "area": "System",
+      "area_slug": "system",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/tls/trust",
+          "operation_id": "getTlsTrust",
+          "summary": "What trusts the local CA on this machine: the system store and each runtime.",
+          "area_slug": "system",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "arguments": [],
+      "flags": [],
+      "example": "sendmock trust",
+      "output": "TlsTrustReport",
+      "exit_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mcp": [
+        "sendmock_tls_trust"
+      ],
+      "ui": [
+        "Settings > Connection > Provider APIs over HTTPS > Trusted by"
       ]
     },
     {
@@ -19240,7 +20244,7 @@
           },
           "type": "string",
           "value_label": "<friendly-name>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -19255,7 +20259,7 @@
           },
           "type": "number",
           "value_label": "<code-length>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -19285,7 +20289,7 @@
           },
           "type": "number",
           "value_label": "<ttl-seconds>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -19293,7 +20297,7 @@
           "example": 600
         }
       ],
-      "example": "sendmock verify services update MG00000000000000000000000000000001 --friendly-name Shop --code-length 6 --ttl-seconds 600 --fixed-code 123456",
+      "example": "sendmock verify services update MG00000000000000000000000000000001 --friendly-name Shop --code-length 6",
       "output": "VerifyService",
       "exit_codes": [
         0,
@@ -20097,7 +21101,7 @@
           },
           "type": "string",
           "value_label": "<method>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": [
@@ -20118,7 +21122,7 @@
           },
           "type": "object",
           "value_label": "<headers>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -20135,7 +21139,7 @@
           },
           "type": "object",
           "value_label": "<extra-fields>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -20152,7 +21156,7 @@
           },
           "type": "string",
           "value_label": "<template-id>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -20167,7 +21171,7 @@
           },
           "type": "string",
           "value_label": "<template-mode>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": [
@@ -20185,7 +21189,7 @@
           },
           "type": "number",
           "value_label": "<timeout-ms>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -20200,7 +21204,7 @@
           },
           "type": "RetryPolicy",
           "value_label": "<retry-policy>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -20225,7 +21229,7 @@
           },
           "type": "boolean",
           "value_label": null,
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -20240,7 +21244,7 @@
           },
           "type": "NameValueTemplate[]",
           "value_label": "<query-params>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -20260,7 +21264,7 @@
           },
           "type": "string",
           "value_label": "<body-mode>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": [
@@ -20280,7 +21284,7 @@
           },
           "type": "EndpointBodyField[]",
           "value_label": "<body-fields>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -20301,7 +21305,7 @@
           },
           "type": "string",
           "value_label": "<fields-encoding>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": [
@@ -20320,7 +21324,7 @@
           },
           "type": "string",
           "value_label": "<raw-content-type>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -20335,7 +21339,7 @@
           },
           "type": "string",
           "value_label": "<raw-body>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -20350,7 +21354,7 @@
           },
           "type": "string",
           "value_label": "<render-mode>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": [
@@ -20361,7 +21365,7 @@
           "example": "strict"
         }
       ],
-      "example": "sendmock webhook endpoint create --name 'Orders app' --url http://localhost:3000/webhooks/sendmock --method POST --headers '{\"Authorization\":\"Bearer {{ vars.app_token }}\"}' --extra-fields '{\"environment\":\"local\"}' --template-id native --template-mode linked --timeout-ms 10000 --retry-policy '{\"max_attempts\":5,\"backoff_seconds\":[1,5,30,120,600],\"retry_on_client_errors\":false}' --enabled --query-params '[{\"name\":\"X-Source\",\"value\":\"sendmock-{{ event.type }}\"}]' --body-mode template --body-fields '[{\"name\":\"user.email\",\"value_type\":\"text\",\"value\":\"{{ data.to[0].address }}\"}]' --fields-encoding json --raw-content-type application/json --raw-body '{\"text\": \"New email: {{ data.subject }}\"}' --render-mode strict",
+      "example": "sendmock webhook endpoint create --name 'Orders app' --url http://localhost:3000/webhooks/sendmock --method POST --template-mode linked",
       "output": "WebhookEndpoint",
       "exit_codes": [
         0,
@@ -21212,13 +22216,13 @@
             "name": "endpoint",
             "location": "body"
           },
-          "type": "WebhookEndpointInput",
+          "type": "object",
           "value_label": "<endpoint>",
           "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
-          "description": "The endpoint settings to render, saved or not; left out, the saved endpoint `endpoint_id` names is rendered as stored.",
+          "description": "The endpoint settings to render, saved or not, as many fields as you like: the rest come from the saved endpoint `endpoint_id` names, or a new endpoint's defaults. Left out, the saved endpoint is rendered as stored.",
           "example": {
             "name": "Orders app",
             "url": "http://localhost:3000/webhooks/sendmock",
@@ -24297,7 +25301,7 @@
           },
           "type": "string",
           "value_label": "<name>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -24312,7 +25316,7 @@
           },
           "type": "string",
           "value_label": "<kind>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": [
@@ -24337,7 +25341,7 @@
           },
           "type": "string",
           "value_label": "<scope>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": [
@@ -24370,7 +25374,7 @@
           },
           "type": "string",
           "value_label": "<value>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -24403,7 +25407,7 @@
           },
           "type": "string",
           "value_label": "<description>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -24411,7 +25415,7 @@
           "example": "Tenant every webhook is sent for"
         }
       ],
-      "example": "sendmock webhook var update 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --name tenant_id --kind text --scope global --value acme --description 'Tenant every webhook is sent for' --random-mode per_send",
+      "example": "sendmock webhook var update 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --name tenant_id --kind text",
       "output": "WebhookVariable",
       "exit_codes": [
         0,

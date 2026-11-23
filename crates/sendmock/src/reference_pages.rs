@@ -5,6 +5,7 @@
 mod configuration_flags_page;
 mod magic_numbers_page;
 mod markdown_table;
+mod template_data_page;
 mod template_filters_page;
 mod webhook_templates_page;
 
@@ -28,6 +29,10 @@ fn check_reference_page(page_file_name: &str, rendered_page: &str) {
     let committed_page = fs::read_to_string(&page_path)
         .unwrap_or_default()
         .replace("\r\n", "\n");
+    if committed_page != rendered_page {
+        // Tests do not run on every machine, so the fresh page is printed for copying.
+        eprintln!("--- fresh {page_file_name} ---\n{rendered_page}--- end ---");
+    }
     assert!(
         committed_page == rendered_page,
         "docs/wiki/reference/{page_file_name} is out of date: run \
@@ -71,6 +76,15 @@ mod tests {
         check_reference_page(
             "template-filters.md",
             &template_filters_page::render_template_filters_page(),
+        );
+    }
+
+    // AC: AI-08.1
+    #[tokio::test]
+    async fn template_data_page_lists_every_field_of_real_email_and_sms_events() {
+        check_reference_page(
+            "template-data.md",
+            &template_data_page::render_template_data_page().await,
         );
     }
 

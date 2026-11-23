@@ -98,6 +98,11 @@ function ApiRequestDetails({ apiRequest }: { apiRequest: ApiRequestLogEntry }) {
             , as no built-in operation serves this path.
           </p>
         )}
+        {apiRequest.note !== null && (
+          <p className="text-xs text-muted-foreground">
+            Why: {apiRequest.note}
+          </p>
+        )}
       </div>
       <HttpHeadersList
         title="Request headers"

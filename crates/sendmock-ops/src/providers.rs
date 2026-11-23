@@ -21,6 +21,7 @@ mod read_operation_kinds;
 mod request_checks;
 mod request_reader;
 mod send_operation_kind;
+mod template_data;
 mod twilio_account_guard;
 mod twilio_account_shape;
 mod twilio_accounts_api;
@@ -30,9 +31,11 @@ mod twilio_incoming_number_shape;
 mod twilio_incoming_numbers_api;
 mod twilio_messaging_services;
 mod twilio_service_numbers_api;
+mod twilio_unauthorized_reason;
 mod twilio_verify_api;
 mod twilio_verify_services;
 mod twilio_verify_verifications;
+mod user_variables;
 mod vonage_verify_api;
 mod whatsapp_cloud_api;
 mod whatsapp_cloud_content;
@@ -58,7 +61,7 @@ pub use provider_catalog::{
     load_area_providers, save_area_provider,
 };
 pub(crate) use provider_form_fields::{read_provider_form_fields, read_provider_form_files};
-pub use provider_http::{ProviderHttpRequest, ProviderHttpResponse};
+pub use provider_http::{ProviderHttpRequest, ProviderHttpResponse, decode_path_segments};
 pub use provider_runtime::{
     ProviderOutcome, answer_provider_request, load_sms_provider_definitions,
 };

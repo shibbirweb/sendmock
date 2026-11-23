@@ -7,7 +7,9 @@ use super::delivery_queue::DeliveryTrigger;
 use super::delivery_request_rendering::render_delivery_request;
 use super::delivery_template_context::{DeliveryContextDetails, to_send_time_values};
 use super::endpoint_inputs::WebhookEndpointInput;
-use super::endpoint_settings::{EndpointBodyMode, EndpointRequestSettings};
+use super::endpoint_settings::{
+    EndpointBodyMode, EndpointRequestSettings, default_request_settings,
+};
 use super::endpoint_template::read_detached_template;
 use super::endpoint_view::read_request_settings;
 use super::request_part_renderer::RenderProblem;
@@ -15,14 +17,17 @@ use super::secret_value_masking::{load_secret_values, mask_request_secrets};
 use super::template_context::{ChosenMessage, TemplateSubject, find_template_subject};
 use super::template_store::find_resolved_template;
 use super::template_view::TemplateDraft;
-use crate::{HttpMethod, Operation, OperationContext, OperationDefinition, OperationError};
+use crate::{
+    HttpMethod, Operation, OperationContext, OperationDefinition, OperationError, PartialChanges,
+};
 
 /// Body of `POST /api/v1/webhooks/endpoints/preview` (WH-07.15).
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
 pub struct EndpointPreviewRequest {
-    /// The endpoint settings to render, saved or not; left out, the saved endpoint
-    /// `endpoint_id` names is rendered as stored.
-    pub endpoint: Option<WebhookEndpointInput>,
+    /// The endpoint settings to render, saved or not, as many fields as you like: the rest
+    /// come from the saved endpoint `endpoint_id` names, or a new endpoint's defaults.
+    /// Left out, the saved endpoint is rendered as stored.
+    pub endpoint: Option<PartialChanges<WebhookEndpointInput>>,
     /// A saved endpoint's own variables are used too; alone, its stored settings are rendered.
     pub endpoint_id: Option<String>,
     /// Render against this email; without an email, SMS or request ID the sample event is used.
@@ -70,14 +75,21 @@ async fn read_previewed_endpoint(
         }
         None => None,
     };
-    let endpoint_input = match (&input.endpoint, &stored_endpoint) {
-        (Some(endpoint_input), _) => endpoint_input.clone(),
-        (None, Some(stored_endpoint)) => WebhookEndpointInput {
-            request_settings: read_request_settings(stored_endpoint)?,
-            name: stored_endpoint.name.clone(),
-            url: stored_endpoint.url.clone(),
-            is_enabled: stored_endpoint.is_enabled,
-        },
+    let stored_fields = match &stored_endpoint {
+        Some(stored_endpoint) => Some(serde_json::json!({
+            "name": stored_endpoint.name,
+            "url": stored_endpoint.url,
+            "is_enabled": stored_endpoint.is_enabled,
+            "settings": read_request_settings(stored_endpoint)?,
+        })),
+        None => None,
+    };
+    let endpoint_input = match (&input.endpoint, stored_fields) {
+        (Some(endpoint_changes), stored_fields) => {
+            endpoint_changes.merge_onto(&build_merge_base(stored_fields))?
+        }
+        (None, Some(stored_fields)) => PartialChanges::<WebhookEndpointInput>::default()
+            .merge_onto(&build_merge_base(Some(stored_fields)))?,
         (None, None) => {
             return Err(match input.endpoint_id.as_deref() {
                 Some(endpoint_id) => OperationError::NotFound {
@@ -101,6 +113,32 @@ async fn read_previewed_endpoint(
         endpoint_input,
         detached_template,
     })
+}
+
+/// What a partial endpoint is completed with: the saved endpoint's fields, or a new endpoint's
+/// (no name or URL yet, on, and the default request settings).
+pub(super) fn build_merge_base(stored_fields: Option<serde_json::Value>) -> serde_json::Value {
+    let (name, url, is_enabled, settings) = match stored_fields {
+        Some(stored_fields) => (
+            stored_fields["name"].clone(),
+            stored_fields["url"].clone(),
+            stored_fields["is_enabled"].clone(),
+            stored_fields["settings"].clone(),
+        ),
+        None => (
+            serde_json::json!(""),
+            serde_json::json!(""),
+            serde_json::json!(true),
+            default_request_settings(),
+        ),
+    };
+    let mut merge_base = settings;
+    if let serde_json::Value::Object(base_fields) = &mut merge_base {
+        base_fields.insert("name".to_owned(), name);
+        base_fields.insert("url".to_owned(), url);
+        base_fields.insert("is_enabled".to_owned(), is_enabled);
+    }
+    merge_base
 }
 
 /// The first event a Template-mode endpoint's template is made for, so the sample fits it.

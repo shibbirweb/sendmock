@@ -1,3 +1,4 @@
+use crate::PartialChanges;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -64,8 +65,9 @@ pub struct TwilioSubaccountInput {
 pub struct TwilioSubaccountUpdate {
     /// The subaccount SID, `AC...`, from `GET /api/v1/twilio/subaccounts`.
     pub account_sid: String,
+    /// Only the fields to change; the rest, the token included, stay.
     #[serde(flatten)]
-    pub changes: TwilioSubaccountChanges,
+    pub changes: PartialChanges<TwilioSubaccountChanges>,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]

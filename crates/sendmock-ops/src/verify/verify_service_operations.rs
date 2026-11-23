@@ -221,7 +221,10 @@ impl Operation for UpdateVerifyServiceOperation {
     ) -> Result<VerifyService, OperationError> {
         let existing_service =
             find_service_or_not_found(operation_context, &input.service_sid).await?;
-        let changed_service = build_verify_service(input.changes, existing_service)?;
+        let merged_changes = input
+            .changes
+            .merge_onto(&VerifyService::from(existing_service.clone()))?;
+        let changed_service = build_verify_service(merged_changes, existing_service)?;
         operation_context
             .verify_service_repository
             .save_service(changed_service.clone())

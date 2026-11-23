@@ -67,6 +67,25 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock trust",
+    "usage": "sendmock trust",
+    "aliases": [],
+    "summary": "What trusts the local CA on this machine: the system store and each runtime.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/tls/trust",
+        "operation_id": "getTlsTrust",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_tls_trust"
+    ]
+  },
+  {
     "command": "sendmock seed status",
     "usage": "sendmock seed status",
     "aliases": [],
@@ -202,7 +221,7 @@ expression: command_descriptions
   },
   {
     "command": "sendmock setup import",
-    "usage": "sendmock setup import <file> --yes",
+    "usage": "sendmock setup import <file>",
     "aliases": [],
     "summary": "Apply a setup from its text or a URL, merging or replacing; 422 with the errors and nothing applied when it is invalid.",
     "arguments": [
@@ -251,6 +270,50 @@ expression: command_descriptions
     ],
     "mcp": [
       "sendmock_setup_migrate"
+    ]
+  },
+  {
+    "command": "sendmock presets",
+    "usage": "sendmock presets",
+    "aliases": [],
+    "summary": "The stack presets: what each sets up and its options.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/presets",
+        "operation_id": "getPresets",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_preset_list"
+    ]
+  },
+  {
+    "command": "sendmock preset",
+    "usage": "sendmock preset <presetName>",
+    "aliases": [],
+    "summary": "Set SendMock up for a stack in one step; a second run changes nothing.",
+    "arguments": [
+      "presetName"
+    ],
+    "flags": [
+      "--app-url",
+      "--numbers-csv",
+      "--options"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/presets/{presetName}/apply",
+        "operation_id": "postPresetsByPresetNameApply",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_preset_apply"
     ]
   },
   {
@@ -457,6 +520,7 @@ expression: command_descriptions
     ],
     "flags": [
       "--bounce-type",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],
@@ -483,6 +547,7 @@ expression: command_descriptions
     "flags": [
       "--source",
       "--user-agent",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],
@@ -531,6 +596,7 @@ expression: command_descriptions
       "--source",
       "--url",
       "--user-agent",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],
@@ -700,6 +766,7 @@ expression: command_descriptions
       "--include-original",
       "--reply-all",
       "--subject",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],
@@ -730,6 +797,7 @@ expression: command_descriptions
       "--include-original",
       "--subject",
       "--to",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],
@@ -746,6 +814,95 @@ expression: command_descriptions
     ]
   },
   {
+    "command": "sendmock email templates list",
+    "usage": "sendmock email templates list",
+    "aliases": [],
+    "summary": "Local email templates: a provider send naming one gets its subject and bodies.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/emails/templates",
+        "operation_id": "getEmailsTemplates",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_template_list"
+    ]
+  },
+  {
+    "command": "sendmock email templates create",
+    "usage": "sendmock email templates create",
+    "aliases": [],
+    "summary": "Add a local email template under a provider's template id or name.",
+    "arguments": [],
+    "flags": [
+      "--html",
+      "--id",
+      "--subject",
+      "--text"
+    ],
+    "operations": [
+      {
+        "method": "POST",
+        "path": "/api/v1/emails/templates",
+        "operation_id": "postEmailsTemplates",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_template_create"
+    ]
+  },
+  {
+    "command": "sendmock email templates update",
+    "usage": "sendmock email templates update <templateId>",
+    "aliases": [],
+    "summary": "Change a local email template's subject or bodies.",
+    "arguments": [
+      "templateId"
+    ],
+    "flags": [
+      "--html",
+      "--subject",
+      "--text"
+    ],
+    "operations": [
+      {
+        "method": "PATCH",
+        "path": "/api/v1/emails/templates/{templateId}",
+        "operation_id": "patchEmailsTemplatesByTemplateId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_template_update"
+    ]
+  },
+  {
+    "command": "sendmock email templates delete",
+    "usage": "sendmock email templates delete <templateId>",
+    "aliases": [],
+    "summary": "Remove a local email template; sends naming it keep their own bodies.",
+    "arguments": [
+      "templateId"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/emails/templates/{templateId}",
+        "operation_id": "deleteEmailsTemplatesByTemplateId",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_email_template_delete"
+    ]
+  },
+  {
     "command": "sendmock email inbound",
     "usage": "sendmock email inbound",
     "aliases": [],
@@ -758,6 +915,7 @@ expression: command_descriptions
       "--subject",
       "--text",
       "--to",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],
@@ -1246,6 +1404,7 @@ expression: command_descriptions
     ],
     "flags": [
       "--error-code",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],
@@ -1272,6 +1431,7 @@ expression: command_descriptions
     "flags": [
       "--source",
       "--user-agent",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],
@@ -1321,6 +1481,7 @@ expression: command_descriptions
       "--media",
       "--template-id",
       "--to",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],
@@ -1380,6 +1541,66 @@ expression: command_descriptions
     ],
     "mcp": [
       "sendmock_sms_reply_webhook_resend"
+    ]
+  },
+  {
+    "command": "sendmock sms opt-outs list",
+    "usage": "sendmock sms opt-outs list",
+    "aliases": [],
+    "summary": "Contacts who texted STOP, newest first.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "GET",
+        "path": "/api/v1/sms/opt-outs",
+        "operation_id": "getSmsOptOuts",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_opt_out_list"
+    ]
+  },
+  {
+    "command": "sendmock sms opt-outs delete",
+    "usage": "sendmock sms opt-outs delete <sender> <contactNumber>",
+    "aliases": [],
+    "summary": "Lift one opt-out, as if the contact texted START.",
+    "arguments": [
+      "sender",
+      "contactNumber"
+    ],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/sms/opt-outs/{sender}/{contactNumber}",
+        "operation_id": "deleteSmsOptOutsBySenderByContactNumber",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_opt_out_delete"
+    ]
+  },
+  {
+    "command": "sendmock sms opt-outs clear",
+    "usage": "sendmock sms opt-outs clear --yes",
+    "aliases": [],
+    "summary": "Lift every opt-out.",
+    "arguments": [],
+    "flags": [],
+    "operations": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/sms/opt-outs",
+        "operation_id": "deleteSmsOptOuts",
+        "selector": null
+      }
+    ],
+    "mcp": [
+      "sendmock_sms_opt_out_clear"
     ]
   },
   {
@@ -2181,6 +2402,7 @@ expression: command_descriptions
       "--dispute-evidence",
       "--dispute-outcome",
       "--refund-amount-minor",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],
@@ -4000,6 +4222,7 @@ expression: command_descriptions
     "summary": "Add a number.",
     "arguments": [],
     "flags": [
+      "--account-sid",
       "--channel",
       "--inbound-fallback-url",
       "--inbound-method",
@@ -4008,6 +4231,7 @@ expression: command_descriptions
       "--label",
       "--messaging-service-sid",
       "--number",
+      "--opt-out-keywords",
       "--status-callback-url"
     ],
     "operations": [
@@ -4034,6 +4258,7 @@ expression: command_descriptions
       "numberId"
     ],
     "flags": [
+      "--account-sid",
       "--channel",
       "--inbound-fallback-url",
       "--inbound-method",
@@ -4042,6 +4267,7 @@ expression: command_descriptions
       "--label",
       "--messaging-service-sid",
       "--number",
+      "--opt-out-keywords",
       "--status-callback-url"
     ],
     "operations": [
@@ -4110,7 +4336,9 @@ expression: command_descriptions
       "--inbound-fallback-url",
       "--inbound-mode",
       "--inbound-url",
-      "--number-id"
+      "--number-id",
+      "--opt-out-keywords",
+      "--sid"
     ],
     "operations": [
       {
@@ -4137,7 +4365,8 @@ expression: command_descriptions
       "--inbound-fallback-url",
       "--inbound-mode",
       "--inbound-url",
-      "--number-id"
+      "--number-id",
+      "--opt-out-keywords"
     ],
     "operations": [
       {
@@ -4614,6 +4843,8 @@ expression: command_descriptions
       "--message-id-template",
       "--name",
       "--operations",
+      "--opt-out-auto-replies",
+      "--opt-out-keywords",
       "--outcome-error-codes",
       "--status-names",
       "--success-response",
@@ -4845,6 +5076,8 @@ expression: command_descriptions
       "--message-id-template",
       "--name",
       "--operations",
+      "--opt-out-auto-replies",
+      "--opt-out-keywords",
       "--outcome-error-codes",
       "--status-names",
       "--success-response",
@@ -6422,6 +6655,7 @@ expression: command_descriptions
       "--chaos-smtp-reject-code",
       "--chaos-smtp-reject-next-count",
       "--chaos-smtp-reject-recipient-pattern",
+      "--count-views-with-webhook-rules",
       "--email-outcome-bounce-rate-percent",
       "--email-outcome-complaint-rate-percent",
       "--email-outcome-profile",
@@ -6467,9 +6701,12 @@ expression: command_descriptions
     "command": "sendmock reset",
     "usage": "sendmock reset --yes",
     "aliases": [],
-    "summary": "Delete all traffic and restore the seed configuration.",
+    "summary": "Delete all traffic and apply the seed applied last again, keeping the rest of the configuration; with config, also remove every configured item and restore the built-in providers. Answers what it cleared, removed and kept.",
     "arguments": [],
-    "flags": [],
+    "flags": [
+      "--config",
+      "--confirm-removed-count"
+    ],
     "operations": [
       {
         "method": "POST",
@@ -6513,6 +6750,7 @@ expression: command_descriptions
       "--html",
       "--subject",
       "--to",
+      "--user-variables",
       "--webhook",
       "--webhook-requests"
     ],

@@ -84,6 +84,16 @@ pub struct SmsListFilter {
     pub created_after_unix_ms: Option<i64>,
     /// Only this project's messages; every project's when not set.
     pub project_key: Option<String>,
+    /// Only the messages a Twilio account owns.
+    pub owner_account: Option<SmsOwnerAccount>,
+}
+
+/// A Twilio account as the owner of messages: those stored under its SID and, for the main
+/// account, those stored under no account.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SmsOwnerAccount {
+    pub account_sid: String,
+    pub is_main: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

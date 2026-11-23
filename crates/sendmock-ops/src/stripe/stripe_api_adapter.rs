@@ -228,5 +228,6 @@ pub async fn answer_stripe_request(
         created_message: None,
         secret_values,
         is_unknown_path,
+        note: None,
     }))
 }

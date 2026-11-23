@@ -10,7 +10,7 @@ use support::test_app::{build_test_app, call_api};
 use tower::ServiceExt;
 
 const MESSAGES_PATH: &str =
-    "/providers/twilio/2010-04-01/Accounts/ACtest00000000000000000000000000/Messages.json";
+    "/providers/twilio/2010-04-01/Accounts/ACtest0000000000000000000000000000/Messages.json";
 const SERVICES_PATH: &str = "/providers/twilio/v1/Services";
 
 async fn call_form(
@@ -115,6 +115,64 @@ async fn an_unknown_service_is_created_leniently_and_refused_in_strict_mode() {
         strict_error["message"],
         "The Messaging Service Sid MG22222222222222222222222222222222 is invalid."
     );
+}
+
+// AC: SM-22.7
+#[tokio::test]
+async fn a_service_made_without_numbers_sends_from_the_test_sender_and_gets_21704_in_strict_mode() {
+    let (app_router, _) = build_test_app();
+    let empty_service_sid = "MG33333333333333333333333333333333";
+    let send_form = format!("To=%2B8801700000000&MessagingServiceSid={empty_service_sid}&Body=Hi");
+
+    let (create_status, created_service) = call_api(
+        &app_router,
+        "POST",
+        "/api/v1/messaging-services",
+        Some(&json!({
+            "sid": empty_service_sid, "friendly_name": "Shop", "inbound_mode": "defer_to_sender",
+            "inbound_url": null, "inbound_fallback_url": null,
+        })),
+    )
+    .await;
+    let (lenient_status, lenient_message) =
+        call_form(&app_router, "POST", MESSAGES_PATH, &send_form).await;
+    let strict_mode = json!({ "is_strict_twilio_test_mode": true });
+    call_api(&app_router, "PATCH", "/api/v1/settings", Some(&strict_mode)).await;
+    let (strict_status, strict_error) =
+        call_form(&app_router, "POST", MESSAGES_PATH, &send_form).await;
+
+    assert_eq!(create_status, 201, "{created_service}");
+    assert_eq!(created_service["number_ids"], json!([]));
+    assert_eq!(lenient_status, 201, "{lenient_message}");
+    assert_eq!(lenient_message["from"], "+15005550006");
+    assert_eq!(strict_status, 400, "{strict_error}");
+    assert_eq!(strict_error["code"], 21704);
+    assert_eq!(
+        strict_error["message"],
+        "The Messaging Service contains no phone numbers"
+    );
+}
+
+// AC: SM-22.9
+#[tokio::test]
+async fn a_service_made_from_only_a_name_takes_a_new_services_defaults() {
+    let (app_router, _) = build_test_app();
+
+    let (create_status, created_service) = call_api(
+        &app_router,
+        "POST",
+        "/api/v1/messaging-services",
+        Some(&json!({ "friendly_name": "Clinic" })),
+    )
+    .await;
+
+    assert_eq!(create_status, 201, "{created_service}");
+    assert_eq!(created_service["friendly_name"], "Clinic");
+    assert_eq!(created_service["inbound_mode"], "defer_to_sender");
+    assert_eq!(created_service["inbound_url"], Value::Null);
+    assert_eq!(created_service["inbound_fallback_url"], Value::Null);
+    assert_eq!(created_service["number_ids"], json!([]));
+    assert_eq!(created_service["opt_out_keywords"], true);
 }
 
 // AC: SM-03.3

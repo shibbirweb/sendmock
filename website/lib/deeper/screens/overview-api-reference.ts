@@ -51,6 +51,7 @@ const apiTagNames = [
   "Test helpers",
   "Automation",
   "Email",
+  "Email templates",
   "Inbound routes",
   "Tag rules",
   "Forward rules",

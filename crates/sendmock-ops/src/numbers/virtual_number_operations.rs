@@ -108,8 +108,11 @@ impl Operation for UpdateVirtualNumberOperation {
             .ok_or_else(|| OperationError::NotFound {
                 message: format!("No number with id {}", input.number_id),
             })?;
+        let merged_changes = input
+            .changes
+            .merge_onto(&VirtualNumber::from(existing_number.clone()))?;
         let changed_number =
-            build_virtual_number(operation_context, input.changes, Some(existing_number)).await?;
+            build_virtual_number(operation_context, merged_changes, Some(existing_number)).await?;
         operation_context
             .virtual_number_repository
             .update_number(changed_number.clone())

@@ -44,11 +44,14 @@ export function EndpointChoice({
   isChecked,
   onCheckedChange,
   payloadControls,
+  templateWarning,
 }: {
   webhookEndpoint: WebhookEndpoint;
   isChecked: boolean;
   onCheckedChange: (isChecked: boolean) => void;
   payloadControls?: React.ReactNode;
+  /** Shown under the URL when its template is not made for the event (EM-25.5). */
+  templateWarning?: string | null;
 }) {
   const checkboxId = React.useId();
 
@@ -79,6 +82,11 @@ export function EndpointChoice({
         >
           {webhookEndpoint.url}
         </label>
+        {templateWarning && (
+          <p role="note" className="text-xs text-warning">
+            {templateWarning}
+          </p>
+        )}
       </div>
       {isChecked && payloadControls !== undefined && (
         <div className="flex shrink-0 items-center gap-1">

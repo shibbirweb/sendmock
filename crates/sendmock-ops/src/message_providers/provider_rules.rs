@@ -7,6 +7,8 @@ use sendmock_core::{
 use serde_json::json;
 
 use crate::providers::MessageProviderDefinition;
+
+const TWILIO_PROVIDER_KEY: &str = "twilio";
 use crate::{OperationContext, OperationError};
 
 /// Paths SendMock answers itself, never a provider's.
@@ -52,7 +54,9 @@ fn find_field_problem(
     if !is_hex_colour(&provider.accent) {
         return Some(("accent", "Use a colour like #1e5bb8".to_owned()));
     }
-    if let Some(problem) = find_credential_problem(provider) {
+    if let Some(problem) =
+        find_credential_problem(provider).or_else(|| find_twilio_account_problem(provider))
+    {
         return Some(("credentials", problem));
     }
     if let Some(problem) = find_operations_problem(provider, area_providers) {
@@ -92,6 +96,25 @@ fn find_credential_problem(provider: &MessageProviderDefinition) -> Option<Strin
         }
     }
     None
+}
+
+/// The Twilio provider's `account_sid` is the main account's SID, which webhooks and the
+/// Accounts API use, so it must look like one: `AC` and 32 letters or digits.
+fn find_twilio_account_problem(provider: &MessageProviderDefinition) -> Option<String> {
+    if provider.key != TWILIO_PROVIDER_KEY {
+        return None;
+    }
+    let account_sid = provider.find_credential("account_sid")?.trim();
+    let is_account_sid_shape = account_sid
+        .strip_prefix("AC")
+        .is_some_and(|sid_characters| {
+            sid_characters.len() == 32
+                && sid_characters
+                    .chars()
+                    .all(|character| character.is_ascii_alphanumeric())
+        });
+    (!is_account_sid_shape)
+        .then(|| "account_sid needs AC and 32 letters or digits, as Twilio's are".to_owned())
 }
 
 fn find_operations_problem(
@@ -184,12 +207,13 @@ fn find_route_clash(
         })
 }
 
+/// A part may be read from several sources (Mailgun's user variables come from `v:*` and
+/// `X-Mailgun-Variables`); only the same part from the same source twice is refused.
 fn find_field_mapping_problem(provider: &MessageProviderDefinition) -> Option<String> {
-    let mut seen_parts = HashSet::new();
-    let duplicate_part = provider
-        .field_mapping
-        .iter()
-        .find(|field_mapping| !seen_parts.insert(field_mapping.part.as_str()));
+    let mut seen_mappings = HashSet::new();
+    let duplicate_mapping = provider.field_mapping.iter().find(|field_mapping| {
+        !seen_mappings.insert((field_mapping.part.as_str(), field_mapping.source.trim()))
+    });
     if provider
         .field_mapping
         .iter()
@@ -197,7 +221,13 @@ fn find_field_mapping_problem(provider: &MessageProviderDefinition) -> Option<St
     {
         return Some("Every mapped part needs a source".to_owned());
     }
-    duplicate_part.map(|field_mapping| format!("{} is mapped twice", field_mapping.part))
+    duplicate_mapping.map(|field_mapping| {
+        format!(
+            "{} is mapped from {} twice",
+            field_mapping.part,
+            field_mapping.source.trim()
+        )
+    })
 }
 
 /// Template errors (unknown functions or filters, a `{{` without `}}`) in the message id and
@@ -261,7 +291,7 @@ mod tests {
     use sendmock_core::{FixedClock, SeededRandomSource};
 
     use super::*;
-    use crate::providers::builtin_sms_providers;
+    use crate::providers::{ProviderFieldMapping, builtin_email_providers, builtin_sms_providers};
 
     fn find_builtin(provider_key: &str) -> MessageProviderDefinition {
         builtin_sms_providers()
@@ -270,28 +300,89 @@ mod tests {
             .unwrap_or_else(|| panic!("{provider_key} is shipped"))
     }
 
-    // AC: SM-16.8
+    // AC: SM-16.8 PL-26.4
     #[test]
     fn every_shipped_provider_passes_the_save_rules() {
         let template_functions = StandardTemplateFunctions::new(
             Arc::new(FixedClock::new(0)),
             Arc::new(SeededRandomSource::new(7)),
         );
-        let shipped_providers = builtin_sms_providers();
 
-        for provider in &shipped_providers {
+        for shipped_providers in [builtin_sms_providers(), builtin_email_providers()] {
+            assert_shipped_providers_pass(&template_functions, &shipped_providers);
+        }
+    }
+
+    fn assert_shipped_providers_pass(
+        template_functions: &StandardTemplateFunctions,
+        shipped_providers: &[MessageProviderDefinition],
+    ) {
+        for provider in shipped_providers {
             assert_eq!(
-                find_field_problem(provider, &shipped_providers),
+                find_field_problem(provider, shipped_providers),
                 None,
                 "{}",
                 provider.key
             );
             assert!(
-                find_template_errors(&template_functions, provider).is_empty(),
+                find_template_errors(template_functions, provider).is_empty(),
                 "{}",
                 provider.key
             );
         }
+    }
+
+    // AC: SM-22.8
+    #[test]
+    fn the_twilio_account_sid_must_be_ac_and_32_letters_or_digits() {
+        let shipped_providers = builtin_sms_providers();
+        let mut twilio = find_builtin("twilio");
+        let set_account_sid = |provider: &mut MessageProviderDefinition, account_sid: &str| {
+            if let Some(credential) = provider
+                .credentials
+                .iter_mut()
+                .find(|credential| credential.name == "account_sid")
+            {
+                credential.value = account_sid.to_owned();
+            }
+        };
+
+        assert_eq!(find_twilio_account_problem(&twilio), None);
+        for wrong_account_sid in [
+            "",
+            "AC123",
+            "ACtest00000000000000000000000000",
+            "MG0000000000000000000000000000000",
+        ] {
+            set_account_sid(&mut twilio, wrong_account_sid);
+            assert_eq!(
+                find_field_problem(&twilio, &shipped_providers).map(|(field_name, _)| field_name),
+                Some("credentials"),
+                "a malformed account SID is refused"
+            );
+        }
+        set_account_sid(&mut twilio, "AC0123456789abcdef0123456789ABCDEF");
+        assert_eq!(find_twilio_account_problem(&twilio), None);
+    }
+
+    // AC: EM-24.2
+    #[test]
+    fn a_part_may_have_several_sources_but_not_the_same_source_twice() {
+        let mut provider = builtin_email_providers()
+            .into_iter()
+            .find(|provider| provider.key == "mailgun")
+            .unwrap_or_else(|| panic!("mailgun is shipped"));
+        assert_eq!(find_field_mapping_problem(&provider), None);
+
+        provider.field_mapping.push(ProviderFieldMapping {
+            part: "user_variables".to_owned(),
+            source: "v:*".to_owned(),
+        });
+
+        assert_eq!(
+            find_field_mapping_problem(&provider),
+            Some("user_variables is mapped from v:* twice".to_owned())
+        );
     }
 
     // AC: SM-16.4

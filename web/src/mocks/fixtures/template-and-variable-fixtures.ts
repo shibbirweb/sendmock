@@ -24,6 +24,18 @@ const emailOutcomeEvents: AppEventType[] = [
   "email.complained",
 ];
 
+/** What a provider's delivery webhooks report; Mailgun and Postmark send no event for a send. */
+const emailDeliveryEvents: AppEventType[] = [
+  "email.opened",
+  "email.clicked",
+  "email.delivered",
+  "email.bounced",
+  "email.complained",
+];
+
+/** Mail sent to your app, which inbound formats forward (EM-25.4). */
+const inboundEmailEvents: AppEventType[] = ["email.inbound"];
+
 const allPaymentEvents: AppEventType[] = [
   "payment.created",
   "payment.authorized",
@@ -218,10 +230,18 @@ const builtinTemplateSpecs: TemplateSpec[] = [
   ],
   [
     "mailgun.routes",
-    "Mailgun: routes (inbound)",
+    "Mailgun: routes, forward (inbound)",
     "Mailgun",
     "email-provider",
-    emailOutcomeEvents,
+    inboundEmailEvents,
+    ["mailgun_signing_key"],
+  ],
+  [
+    "mailgun.store_notify",
+    "Mailgun: routes, store and notify (inbound)",
+    "Mailgun",
+    "email-provider",
+    inboundEmailEvents,
     ["mailgun_signing_key"],
   ],
   [
@@ -229,7 +249,7 @@ const builtinTemplateSpecs: TemplateSpec[] = [
     "Mailgun: event webhooks",
     "Mailgun",
     "email-provider",
-    emailOutcomeEvents,
+    emailDeliveryEvents,
     ["mailgun_signing_key"],
   ],
   [
@@ -237,7 +257,7 @@ const builtinTemplateSpecs: TemplateSpec[] = [
     "Postmark: delivery, bounce, spam and open webhooks",
     "Postmark",
     "email-provider",
-    emailOutcomeEvents,
+    emailDeliveryEvents,
     [],
   ],
   [
@@ -253,7 +273,7 @@ const builtinTemplateSpecs: TemplateSpec[] = [
     "SendGrid: Inbound Parse",
     "SendGrid",
     "email-provider",
-    ["email.received"],
+    inboundEmailEvents,
     [],
   ],
   [
@@ -269,7 +289,7 @@ const builtinTemplateSpecs: TemplateSpec[] = [
     "Postmark: inbound",
     "Postmark",
     "email-provider",
-    emailOutcomeEvents,
+    inboundEmailEvents,
     [],
   ],
   [

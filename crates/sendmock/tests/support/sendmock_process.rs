@@ -10,7 +10,8 @@ pub const READY_MESSAGE: &str = "SendMock is ready";
 const STARTUP_TIMEOUT: Duration = Duration::from_secs(20);
 
 /// A `sendmock` command that inherits no `SENDMOCK_*` variable from the machine running the
-/// tests, with SMTP on a free port so servers started in parallel never collide.
+/// tests, with SMTP on a free port and the provider port off unless a test sets one, so
+/// servers started in parallel never collide.
 pub fn sendmock_command(working_directory: &Path) -> Command {
     let mut command = Command::new(env!("CARGO_BIN_EXE_sendmock"));
     command.current_dir(working_directory);
@@ -20,6 +21,7 @@ pub fn sendmock_command(working_directory: &Path) -> Command {
         }
     }
     command.env("SENDMOCK_SMTP_ADDR", "127.0.0.1:0");
+    command.env("SENDMOCK_PROVIDER_ADDR", "none");
     command
 }
 

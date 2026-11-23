@@ -42,6 +42,7 @@ pub async fn build_messaging_service(
             "inbound_fallback_url",
             input.inbound_fallback_url,
         )?,
+        opt_out_keywords: input.opt_out_keywords,
         created_by,
         created_at_unix_ms,
     })
@@ -78,4 +79,13 @@ pub fn generate_service_sid(operation_context: &OperationContext) -> String {
         random_source.next_u64(),
         random_source.next_u64()
     )
+}
+
+/// `MG` and 32 hex digits, as Twilio writes Messaging Service SIDs.
+pub fn is_messaging_service_sid(service_sid: &str) -> bool {
+    service_sid.len() == 34
+        && service_sid.starts_with("MG")
+        && service_sid[2..]
+            .chars()
+            .all(|character| character.is_ascii_hexdigit())
 }

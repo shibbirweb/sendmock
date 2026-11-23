@@ -5,6 +5,26 @@ description: Connect PHP and Laravel apps to SendMock with laravel, Symfony or p
 
 > See [Connect your app](./index.md) for the ports.
 
+## Laravel with Mailgun and Twilio in one step
+
+The `laravel-mailgun-twilio` preset sets SendMock up for a Laravel app on Mailgun and Twilio: the Mailgun event and inbound webhooks with rules for opened, bounced, complained and inbound mail, Twilio's test sender `+15005550006` with your app's inbound and status URLs, the Twilio Debugger URL and a Mailgun signing key. Running it again changes nothing.
+
+1. Start SendMock with the HTTPS provider port, which Laravel's mailgun mailer needs.
+
+   ```bash
+   sendmock --provider-tls-addr 127.0.0.1:8027
+   ```
+
+2. Apply the preset with your app's URL. It runs `sendmock trust` first (it asks before changing anything; `--no-trust` skips it).
+
+   ```bash
+   sendmock preset laravel-mailgun-twilio --app-url http://localhost:8000
+   ```
+
+3. Copy the `.env` lines it prints into your app's `.env`.
+
+Each webhook path has a flag (`--mailgun-events-path`, `--mailgun-inbound-path`, `--twilio-inbound-path`, `--twilio-status-path`, `--twilio-debugger-path`; `sendmock presets` lists the defaults), and `--import-numbers numbers.csv` adds your numbers, one per line as `number,label,subaccount_sid,messaging_service_sid`. A Messaging Service SID that does not exist yet is created with that SID. The whole CSV is checked before anything is set up: if a line has a malformed number or an unknown subaccount, nothing changes and the error names every bad line. Settings > Setup has the same preset under **Presets**.
+
 ## Email
 
 Laravel `.env`:

@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 use clap::Args;
 
-use crate::config::{LogFormat, LogLevel};
+use crate::config::{ListenerSetting, LogFormat, LogLevel, parse_listener_setting};
 
 /// Flags for running the server. Each one can also come from its `SENDMOCK_*` variable;
 /// a flag wins over the variable, and both win over `sendmock.toml`.
@@ -25,9 +25,14 @@ pub struct ServeArguments {
     #[arg(long, env = "SENDMOCK_SMTPS_ADDR", value_name = "HOST:PORT")]
     pub smtps_addr: Option<SocketAddr>,
 
-    /// Address that serves the provider APIs at their real paths, for SDKs with a swapped base URL; off unless set
-    #[arg(long, env = "SENDMOCK_PROVIDER_ADDR", value_name = "HOST:PORT")]
-    pub provider_addr: Option<SocketAddr>,
+    /// Address that serves the provider APIs at their real paths, for SDKs with a swapped base URL; `none` turns it off [default: 127.0.0.1:8026]
+    #[arg(
+        long,
+        env = "SENDMOCK_PROVIDER_ADDR",
+        value_name = "HOST:PORT|none",
+        value_parser = parse_listener_setting
+    )]
+    pub provider_addr: Option<ListenerSetting>,
 
     /// Address that serves the provider APIs over HTTPS, next to --provider-addr; off unless set
     #[arg(long, env = "SENDMOCK_PROVIDER_TLS_ADDR", value_name = "HOST:PORT")]
@@ -240,4 +245,12 @@ pub struct ServeArguments {
         value_parser = clap::builder::FalseyValueParser::new()
     )]
     pub no_input: bool,
+
+    /// Start without the SendMock wordmark a terminal shows first; `banner = false` in sendmock.toml does the same
+    #[arg(
+        long,
+        env = "SENDMOCK_NO_BANNER",
+        value_parser = clap::builder::FalseyValueParser::new()
+    )]
+    pub no_banner: bool,
 }

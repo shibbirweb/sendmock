@@ -5,14 +5,14 @@ description: Test and debug email, SMS, payments, HTTP calls and webhooks locall
 
 # SendMock
 
-Written for SendMock 1.4.1. SendMock catches what an app sends (email over SMTP or a provider API, SMS, push notifications, payments, HTTP calls) and sends back what providers send (status callbacks, inbound messages, payment notifications), all on this machine.
+Written for SendMock 1.5.0. SendMock catches what an app sends (email over SMTP or a provider API, SMS, push notifications, payments, HTTP calls) and sends back what providers send (status callbacks, inbound messages, payment notifications), all on this machine.
 
 ## First step
 
 1. Check it runs: the MCP tool `sendmock_status`, or `sendmock status --json`.
 2. If it does not run, start it in the background with `sendmock serve`, or ask the user to start it.
 3. Prefer the MCP tools. Without them, use the CLI with `--json`; every tool has a command (`sendmock help --all --json` lists them).
-4. The MCP server starts with the toolsets `core`, `email`, `sms`, `verify`, `extract` and `webhooks`, enough to connect an app, read codes and links, and receive webhooks. The other workflows need another toolset: `logs` (SMTP and HTTP logs), `payments`, `http`, `scenario`, `rules`, `numbers`, `templates` (writing templates), `variables` or `admin` (seed, setup and settings). When a tool is missing, run its CLI command instead, or ask the user to add the toolset to the server's arguments (`sendmock mcp --toolsets all`, or a list).
+4. The MCP server starts with the toolsets `core`, `email`, `sms`, `verify`, `extract`, `webhooks`, `numbers`, `outcomes`, `setup` and `logs`, enough to connect an app, set up its numbers and outcome rules, read codes, links and the request log, and receive webhooks. The other workflows need another toolset: `payments`, `http`, `scenario`, `rules` (inbound routes, tag and forward rules), `templates` (writing templates), `variables` or `admin` (seed, reset and settings); a call to a hidden tool answers with the toolset to add. When a tool is missing, run its CLI command instead, or ask the user to add the toolset to the server's arguments (`sendmock mcp --toolsets all`, or a list).
 
 ## Workflows
 
@@ -75,6 +75,10 @@ The same for an SMS vendor: `sendmock_sms_provider_create`, `sendmock_sms_provid
 ### Twilio subaccounts
 
 For an app with one Twilio subaccount per customer: `sendmock_twilio_subaccount_create` with the subaccount's SID (or none for a new one), a name and an `${ENV_VAR}` token the user keeps, `sendmock_twilio_subaccount_list` to check it (tokens stay masked; the user reveals one with `sendmock sms twilio subaccounts token <accountSid> --reveal`). The app can also create and fetch subaccounts through Twilio's Accounts API on the provider port. Callbacks for a message sent under a subaccount are signed with its token; a suspended or closed subaccount refuses sends.
+
+### SMS opt-outs (STOP)
+
+The Twilio provider emulates Twilio's Advanced Opt-Out by default: an inbound STOP, STOPALL, UNSUBSCRIBE, CANCEL, END or QUIT to one of the app's numbers blocks later Twilio sends from that number (or its Messaging Service) to that contact with error 21610, until the contact texts START, YES or UNSTOP. Test the app's handling with `sendmock_sms_simulate_inbound` (body `STOP`), then a send. `sendmock_sms_opt_out_list` shows who opted out; `sendmock_sms_opt_out_delete` lifts one and `sendmock_sms_opt_out_clear` lifts all (ask the user first). The provider's `opt_out_keywords` turns it off and `opt_out_auto_replies` sends Twilio's default replies.
 
 ### Mailgun events and complaints
 

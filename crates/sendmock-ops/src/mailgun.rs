@@ -4,6 +4,7 @@ mod mailgun_complaints_api;
 mod mailgun_domain_api;
 mod mailgun_event_items;
 mod mailgun_events_api;
+mod mailgun_templates_api;
 
 pub use mailgun_complaint_operations::{
     ClearMailgunComplaintsOperation, ListMailgunComplaintsOperation, MailgunComplaint,

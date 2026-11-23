@@ -5,6 +5,7 @@ import type {
   RenderProblem,
   WebhookEndpointInput,
 } from "@/lib/api/types";
+import { defaultEndpointRequest } from "@/lib/webhooks/endpoint-request-defaults";
 import { type MockDatabase } from "@/mocks/db/mock-database";
 import { findTemplateDefinition } from "@/mocks/db/find-template-definition";
 import { buildTemplateContext } from "@/mocks/webhooks/build-template-context";
@@ -14,6 +15,24 @@ import {
   renderTemplateText,
   type TemplateContext,
 } from "@/mocks/webhooks/render-template-text";
+
+export const newEndpointDefaults: WebhookEndpointInput = {
+  name: "",
+  url: "",
+  method: "POST",
+  headers: {},
+  extra_fields: {},
+  template_id: "native",
+  template_mode: "linked",
+  timeout_ms: 10_000,
+  retry_policy: {
+    max_attempts: 5,
+    backoff_seconds: [1, 5, 30, 120, 600],
+    retry_on_client_errors: false,
+  },
+  is_enabled: true,
+  ...defaultEndpointRequest,
+};
 
 type RenderedPart = { renderedText: string; problems: RenderProblem[] };
 
@@ -253,14 +272,17 @@ export function renderEndpointRequest(
   mockDatabase: MockDatabase,
   previewRequest: EndpointPreviewRequest,
 ): EndpointPreviewResult | null {
-  const endpointInput =
-    previewRequest.endpoint ??
-    mockDatabase.webhookEndpoints.find(
-      (webhookEndpoint) => webhookEndpoint.id === previewRequest.endpoint_id,
-    );
-  if (endpointInput === undefined) {
+  const savedEndpoint = mockDatabase.webhookEndpoints.find(
+    (webhookEndpoint) => webhookEndpoint.id === previewRequest.endpoint_id,
+  );
+  if (previewRequest.endpoint === undefined && savedEndpoint === undefined) {
     return null;
   }
+  // A partial endpoint is completed from the saved one, or a new endpoint's defaults (PL-26.5).
+  const endpointInput: WebhookEndpointInput = {
+    ...(savedEndpoint ?? newEndpointDefaults),
+    ...previewRequest.endpoint,
+  };
   const templateEvents = mockDatabase.webhookTemplates.find(
     (webhookTemplate) => webhookTemplate.id === endpointInput.template_id,
   )?.events;

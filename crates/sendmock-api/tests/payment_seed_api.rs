@@ -216,7 +216,7 @@ async fn reset_puts_payment_definitions_back_as_the_seed_has_them() {
 
     let (status, _) = call_api(&app_router, "POST", "/api/v1/reset", None).await;
 
-    assert_eq!(status, 204);
+    assert_eq!(status, 200);
     assert_eq!(export_seed(&app_router).await, seed_toml);
     let (missing_status, _) = call_api(
         &app_router,

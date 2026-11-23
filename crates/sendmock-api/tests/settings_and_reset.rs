@@ -157,15 +157,127 @@ async fn reset_deletes_traffic_and_restores_the_default_settings() {
     )
     .await;
 
-    let (reset_status, _) = call_api(&app_router, "POST", "/api/v1/reset", None).await;
+    let (reset_status, reset_summary) = call_api(&app_router, "POST", "/api/v1/reset", None).await;
     let (_, email_page) = call_api(&app_router, "GET", "/api/v1/emails", None).await;
     let (_, request_page) = call_api(&app_router, "GET", "/api/v1/logs/http", None).await;
     let (_, settings) = call_api(&app_router, "GET", "/api/v1/settings", None).await;
 
-    assert_eq!(reset_status, 204);
+    assert_eq!(reset_status, 200);
     assert_eq!(email_page["total_count"], 0);
     assert_eq!(request_page["total_count"], 0);
     assert_eq!(settings["max_emails"], 1000);
+    assert!(
+        reset_summary["cleared"]
+            .as_array()
+            .is_some_and(|cleared| cleared.contains(&json!({ "kind": "emails", "count": 1 }))),
+        "{reset_summary}"
+    );
+    assert_eq!(reset_summary["restored_seed"], false);
+}
+
+fn webhook_endpoint(endpoint_name: &str) -> serde_json::Value {
+    json!({
+        "name": endpoint_name,
+        "url": "http://localhost:3000/webhooks/sendmock",
+        "method": "POST",
+        "headers": {},
+        "extra_fields": {},
+        "template_id": "native",
+        "template_mode": "linked",
+        "timeout_ms": 10_000,
+        "retry_policy": {
+            "max_attempts": 5,
+            "backoff_seconds": [1, 5, 30, 120, 600],
+            "retry_on_client_errors": false,
+        },
+        "is_enabled": true,
+        "query_params": [],
+        "body_mode": "template",
+        "body_fields": [],
+        "fields_encoding": "json",
+        "raw_content_type": "application/json",
+        "raw_body": "",
+        "render_mode": "strict",
+    })
+}
+
+const ENDPOINTS_PATH: &str = "/api/v1/webhooks/endpoints";
+
+async fn create_endpoints(app_router: &axum::Router, endpoint_names: &[&str]) {
+    for endpoint_name in endpoint_names {
+        call_api(
+            app_router,
+            "POST",
+            ENDPOINTS_PATH,
+            Some(&webhook_endpoint(endpoint_name)),
+        )
+        .await;
+    }
+}
+
+async fn count_endpoints(app_router: &axum::Router) -> Option<usize> {
+    let (_, endpoint_list) = call_api(app_router, "GET", ENDPOINTS_PATH, None).await;
+    endpoint_list.as_array().map(Vec::len)
+}
+
+async fn reset_with(
+    app_router: &axum::Router,
+    reset_request: serde_json::Value,
+) -> (u16, serde_json::Value) {
+    call_api(app_router, "POST", "/api/v1/reset", Some(&reset_request)).await
+}
+
+// AC: PL-26.3
+#[tokio::test]
+async fn reset_without_config_names_the_configuration_it_kept() {
+    let (app_router, _) = build_test_app();
+    create_endpoints(&app_router, &["Shop"]).await;
+
+    let (reset_status, reset_summary) = reset_with(&app_router, json!({})).await;
+
+    assert_eq!(reset_status, 200);
+    assert_eq!(reset_summary["removed"], json!([]));
+    let kept = reset_summary["kept"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default();
+    assert!(
+        kept.contains(&json!({ "kind": "Webhook endpoint", "count": 1 })),
+        "{reset_summary}"
+    );
+    assert_eq!(count_endpoints(&app_router).await, Some(1));
+}
+
+// AC: PL-26.3
+#[tokio::test]
+async fn reset_with_config_asks_to_confirm_the_counts_then_removes_the_configuration() {
+    let (app_router, _) = build_test_app();
+    create_endpoints(&app_router, &["Shop", "CRM"]).await;
+
+    let (refused_status, refusal) = reset_with(&app_router, json!({ "config": true })).await;
+    let endpoint_count_after_refusal = count_endpoints(&app_router).await;
+    let (reset_status, reset_summary) = reset_with(
+        &app_router,
+        json!({ "config": true, "confirm_removed_count": 2 }),
+    )
+    .await;
+
+    assert_eq!(refused_status, 422, "{refusal}");
+    assert!(
+        refusal.to_string().contains("2 Webhook endpoint"),
+        "{refusal}"
+    );
+    assert!(
+        refusal.to_string().contains("--confirm-removed-count 2"),
+        "{refusal}"
+    );
+    assert_eq!(endpoint_count_after_refusal, Some(2));
+    assert_eq!(reset_status, 200, "{reset_summary}");
+    assert_eq!(
+        reset_summary["removed"],
+        json!([{ "kind": "Webhook endpoint", "count": 2 }])
+    );
+    assert_eq!(count_endpoints(&app_router).await, Some(0));
 }
 
 // AC: EM-03.2

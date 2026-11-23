@@ -161,14 +161,72 @@ export type VirtualNumber = {
    * @example null
    */
   account_sid: string | null;
+  /**
+   * Whether a text of STOP to this number opts the contact out (Twilio's Advanced Opt-Out, with the provider's switch on).
+   * @example true
+   */
+  opt_out_keywords: boolean;
   created_by: CreatedBy;
 };
 
 /** Body of POST and PATCH /api/v1/numbers. */
-export type VirtualNumberInput = Omit<
-  VirtualNumber,
-  "id" | "created_by" | "phone_number_sid" | "account_sid"
->;
+export type VirtualNumberInput = {
+  /**
+   * E.164, without a channel prefix; `channels` says whether WhatsApp works.
+   * @example "+15550001111"
+   */
+  number: string;
+  /**
+   * A name for the number, e.g. the app or feature that uses it.
+   * @example "Support line"
+   */
+  label: string;
+  /**
+   * Where the number works: `sms`, `whatsapp` or both.
+   * @example ["sms"]
+   */
+  channels: NumberChannel[];
+  /**
+   * Reply webhook (Twilio "A message comes in"); null means rules only.
+   * @example "http://localhost:3000/sms/inbound"
+   */
+  inbound_url: string | null;
+  /**
+   * Called when the reply webhook fails, with `ErrorCode` and `ErrorUrl` added, as Twilio does.
+   * @example "http://localhost:3000/sms/inbound-fallback"
+   */
+  inbound_fallback_url: string | null;
+  /**
+   * Payload template for the inbound webhook, e.g. `twilio.inbound_sms`.
+   * @example "twilio.inbound_sms"
+   */
+  inbound_template_id: string | null;
+  /**
+   * Your app's URL for status changes of messages sent from this number.
+   * @example "http://localhost:3000/sms/status"
+   */
+  status_callback_url: string | null;
+  /**
+   * The Messaging Service this number belongs to, `MG...`; null for none.
+   * @example "MG00000000000000000000000000000001"
+   */
+  messaging_service_sid: string | null;
+  /**
+   * The HTTP method of the reply webhook; POST when left out, as on Twilio.
+   * @example "POST"
+   */
+  inbound_method?: InboundWebhookMethod;
+  /**
+   * The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.
+   * @example null
+   */
+  account_sid?: string | null;
+  /**
+   * Whether a text of STOP to this number opts the contact out; on when left out.
+   * @example true
+   */
+  opt_out_keywords?: boolean;
+};
 
 /** What a Messaging Service does with inbound messages to its numbers. */
 export type MessagingServiceInboundMode =
@@ -205,14 +263,56 @@ export type MessagingService = {
    * @example "http://localhost:3000/sms/inbound-fallback"
    */
   inbound_fallback_url: string | null;
+  /**
+   * Whether a text of STOP to one of its numbers opts the contact out of the whole service.
+   * @example true
+   */
+  opt_out_keywords: boolean;
   created_by: CreatedBy;
 };
 
 /** Body of POST and PATCH /api/v1/messaging-services. */
-export type MessagingServiceInput = Omit<
-  MessagingService,
-  "sid" | "created_by"
->;
+export type MessagingServiceInput = {
+  /**
+   * A name for the service.
+   * @example "Notifications"
+   */
+  friendly_name: string;
+  /**
+   * The virtual numbers in the sender pool, by ID; none when left out, as a new Twilio Messaging Service starts.
+   * @example ["01JB7T9Q2R5W8X3Y6Z1A4B7C9D"]
+   */
+  number_ids?: Ulid[];
+  /**
+   * What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook, the default) or `drop`.
+   * @example "webhook"
+   */
+  inbound_mode?: MessagingServiceInboundMode;
+  /**
+   * Used when `inbound_mode` is `webhook`; none when left out.
+   * @example "http://localhost:3000/sms/inbound"
+   */
+  inbound_url?: string | null;
+  /**
+   * Called when `inbound_url` fails; none when left out.
+   * @example "http://localhost:3000/sms/inbound-fallback"
+   */
+  inbound_fallback_url?: string | null;
+  /**
+   * Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.
+   * @example true
+   */
+  opt_out_keywords?: boolean;
+};
+
+/** Body of POST /api/v1/messaging-services: the service, and the SID to give it. */
+export type MessagingServiceCreateInput = MessagingServiceInput & {
+  /**
+   * The SID to give the service, `MG` and 32 hex digits, so an app's configured SID works unchanged; left out, a new one is generated.
+   * @example "MG00000000000000000000000000000001"
+   */
+  sid?: string | null;
+};
 
 /** Body of `POST /verify/{verificationSid}/force`. */
 export type VerificationForceRequest = {

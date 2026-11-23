@@ -32,7 +32,7 @@ type ProviderFixtureInput = Pick<
   Partial<
     Pick<
       MessageProviderRecord,
-      "credentials" | "outcome_error_codes" | "is_builtin"
+      "credentials" | "outcome_error_codes" | "is_builtin" | "opt_out_keywords"
     >
   >;
 
@@ -43,6 +43,8 @@ export function buildProviderFixture(
   return {
     is_enabled: true,
     check_credentials: false,
+    opt_out_keywords: false,
+    opt_out_auto_replies: false,
     credentials: [],
     outcome_error_codes: {},
     is_builtin: true,

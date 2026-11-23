@@ -75,6 +75,12 @@ pub struct EmailDetail {
     pub smtp_auth_user: Option<String>,
     #[schemars(required, schema_with = "crate::nullable_schema::<serde_json::Value>")]
     pub template: Option<serde_json::Value>,
+    /// The id the provider's send answered, such as Mailgun's `<...@domain>`; null for mail
+    /// that did not come through a provider's API.
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
+    pub provider_message_id: Option<String>,
+    /// The send's user variables, such as Mailgun's `v:` fields; empty when it had none.
+    pub user_variables: serde_json::Map<String, serde_json::Value>,
     #[schemars(required, schema_with = "crate::nullable_schema::<serde_json::Value>")]
     pub response_to: Option<serde_json::Value>,
     pub responses: Vec<serde_json::Value>,
@@ -120,6 +126,8 @@ impl From<&EmailRecord> for EmailDetail {
             smtp_session_id: email.smtp_session_id.clone(),
             smtp_auth_user: email.smtp_auth_user.clone(),
             template: None,
+            provider_message_id: None,
+            user_variables: serde_json::Map::new(),
             response_to: None,
             responses: Vec::new(),
         }

@@ -4,6 +4,7 @@ import {
   listOf,
   tagEndpoints,
   typeRef,
+  partialOf,
 } from "./endpoint-definition";
 
 /** The nine operations of one area's providers (docs/plan/22-configurable-providers.md). */
@@ -39,7 +40,7 @@ function buildProviderEndpoints(
       path: `${basePath}/{providerKey}`,
       summary:
         "Change a provider; 400 with the problems for template errors, bad paths or a path clash.",
-      requestBody: typeRef("MessageProviderInput"),
+      requestBody: partialOf("MessageProviderInput"),
       response: typeRef("MessageProviderDefinition"),
       errorStatuses: [400, 404],
     },

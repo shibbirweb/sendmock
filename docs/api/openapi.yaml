@@ -25,6 +25,7 @@ tags:
   - name: Test helpers
   - name: Automation
   - name: Email
+  - name: Email templates
   - name: Inbound routes
   - name: Tag rules
   - name: Forward rules
@@ -105,6 +106,26 @@ paths:
       x-sendmock-cli: sendmock tls ca
       x-sendmock-mcp: sendmock_tls_ca
       x-sendmock-ui: Settings > Connection > Provider APIs over HTTPS > Download the CA
+  /api/v1/tls/trust:
+    get:
+      operationId: getTlsTrust
+      summary: "What trusts the local CA on this machine: the system store and each runtime."
+      tags:
+        - System
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TlsTrustReport"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock trust
+      x-sendmock-mcp: sendmock_tls_trust
+      x-sendmock-ui: Settings > Connection > Provider APIs over HTTPS > Trusted by
   /api/v1/stats:
     get:
       operationId: getStats
@@ -191,12 +212,24 @@ paths:
   /api/v1/reset:
     post:
       operationId: postReset
-      summary: Delete all traffic and restore the seed configuration.
+      summary: Delete all traffic and apply the seed applied last again, keeping the rest of the configuration; with config, also remove every configured item and restore the built-in providers. Answers what it cleared, removed and kept.
       tags:
         - System
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetRequest"
       responses:
-        "204":
-          description: No content.
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResetSummary"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
         default:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock reset --yes
@@ -392,6 +425,62 @@ paths:
       x-sendmock-cli: sendmock setup validate <file>
       x-sendmock-mcp: sendmock_setup_validate
       x-sendmock-ui: Settings > Setup > Import a setup > Preview
+  /api/v1/presets:
+    get:
+      operationId: getPresets
+      summary: "The stack presets: what each sets up and its options."
+      tags:
+        - Setup
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StackPreset"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock presets
+      x-sendmock-mcp: sendmock_preset_list
+      x-sendmock-ui: Settings > Setup > Presets
+  /api/v1/presets/{presetName}/apply:
+    post:
+      operationId: postPresetsByPresetNameApply
+      summary: Set SendMock up for a stack in one step; a second run changes nothing.
+      tags:
+        - Setup
+      parameters:
+        - name: presetName
+          in: path
+          required: true
+          description: The preset's name, from `GET /api/v1/presets`.
+          schema:
+            type: string
+          example: laravel-mailgun-twilio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PresetApplyInput"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PresetApplyResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock preset <presetName>
+      x-sendmock-mcp: sendmock_preset_apply
+      x-sendmock-ui: Settings > Setup > Presets > Apply
   /api/v1/setup/import:
     post:
       operationId: postSetupImport
@@ -417,7 +506,7 @@ paths:
           $ref: "#/components/responses/Unprocessable"
         default:
           $ref: "#/components/responses/Error"
-      x-sendmock-cli: sendmock setup import <file> --yes
+      x-sendmock-cli: sendmock setup import <file>
       x-sendmock-mcp: sendmock_setup_import
       x-sendmock-ui: Settings > Setup > Import a setup
   /api/v1/setup/migrate:
@@ -1138,7 +1227,7 @@ paths:
         - name: channel
           in: query
           required: false
-          description: email, sms or http (default email).
+          description: email, sms, http, mailgun or twilio (default email).
           schema:
             type: string
           example: email
@@ -2421,6 +2510,112 @@ paths:
       x-sendmock-cli: sendmock sendmail
       x-sendmock-mcp: sendmock_email_send_raw
       x-sendmock-ui: Mail > Import .eml > Sent by your app
+  /api/v1/emails/templates:
+    get:
+      operationId: getEmailsTemplates
+      summary: "Local email templates: a provider send naming one gets its subject and bodies."
+      tags:
+        - Email templates
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EmailTemplate"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email templates list
+      x-sendmock-mcp: sendmock_email_template_list
+      x-sendmock-ui: Mail > Templates
+    post:
+      operationId: postEmailsTemplates
+      summary: Add a local email template under a provider's template id or name.
+      tags:
+        - Email templates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailTemplate"
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email templates create
+      x-sendmock-mcp: sendmock_email_template_create
+      x-sendmock-ui: Mail > Templates > New template
+  /api/v1/emails/templates/{templateId}:
+    patch:
+      operationId: patchEmailsTemplatesByTemplateId
+      summary: Change a local email template's subject or bodies.
+      tags:
+        - Email templates
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          description: The webhook template's ID, e.g. `slack.incoming_webhook` or `custom.ops_alert`.
+          schema:
+            type: string
+          example: slack.incoming_webhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailTemplateChangesPatch"
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email templates update <templateId>
+      x-sendmock-mcp: sendmock_email_template_update
+      x-sendmock-ui: Mail > Templates > a template > Save
+    delete:
+      operationId: deleteEmailsTemplatesByTemplateId
+      summary: Remove a local email template; sends naming it keep their own bodies.
+      tags:
+        - Email templates
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          description: The webhook template's ID, e.g. `slack.incoming_webhook` or `custom.ops_alert`.
+          schema:
+            type: string
+          example: slack.incoming_webhook
+      responses:
+        "204":
+          description: No content.
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock email templates delete <templateId>
+      x-sendmock-mcp: sendmock_email_template_delete
+      x-sendmock-ui: Mail > Templates > a template > Delete
   /api/v1/inbound-routes:
     get:
       operationId: getInboundRoutes
@@ -2485,7 +2680,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/InboundRouteInput"
+              $ref: "#/components/schemas/InboundRouteInputPatch"
       responses:
         "200":
           description: OK.
@@ -3263,7 +3458,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SmsMessageDetail"
+                $ref: "#/components/schemas/SmsStatusChangeAnswer"
         "404":
           $ref: "#/components/responses/NotFound"
         default:
@@ -3871,7 +4066,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/VerifyServiceInput"
+              $ref: "#/components/schemas/VerifyServiceInputPatch"
       responses:
         "200":
           description: OK.
@@ -3973,7 +4168,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/VirtualNumberInput"
+              $ref: "#/components/schemas/VirtualNumberInputPatch"
       responses:
         "200":
           description: OK.
@@ -4041,7 +4236,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/MessagingServiceInput"
+              $ref: "#/components/schemas/MessagingServiceCreateInput"
       responses:
         "201":
           description: Created.
@@ -4051,6 +4246,8 @@ paths:
                 $ref: "#/components/schemas/MessagingService"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
         default:
           $ref: "#/components/responses/Error"
       x-sendmock-cli: sendmock sms services create
@@ -4075,7 +4272,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/MessagingServiceInput"
+              $ref: "#/components/schemas/MessagingServiceInputPatch"
       responses:
         "200":
           description: OK.
@@ -4179,7 +4376,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TwilioSubaccountChanges"
+              $ref: "#/components/schemas/TwilioSubaccountChangesPatch"
       responses:
         "200":
           description: OK.
@@ -4296,6 +4493,70 @@ paths:
       x-sendmock-cli: sendmock email mailgun complaints clear <domain>
       x-sendmock-mcp: sendmock_email_mailgun_complaint_clear
       x-sendmock-ui: Mail > Providers > Mailgun > Complaints > Clear
+  /api/v1/sms/opt-outs:
+    get:
+      operationId: getSmsOptOuts
+      summary: Contacts who texted STOP, newest first.
+      tags:
+        - SMS
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SmsOptOut"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms opt-outs list
+      x-sendmock-mcp: sendmock_sms_opt_out_list
+      x-sendmock-ui: Numbers > Opt-outs
+    delete:
+      operationId: deleteSmsOptOuts
+      summary: Lift every opt-out.
+      tags:
+        - SMS
+      responses:
+        "204":
+          description: No content.
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms opt-outs clear --yes
+      x-sendmock-mcp: sendmock_sms_opt_out_clear
+      x-sendmock-ui: Numbers > Opt-outs > Lift all
+  /api/v1/sms/opt-outs/{sender}/{contactNumber}:
+    delete:
+      operationId: deleteSmsOptOutsBySenderByContactNumber
+      summary: Lift one opt-out, as if the contact texted START.
+      tags:
+        - SMS
+      parameters:
+        - name: sender
+          in: path
+          required: true
+          description: Your number (E.164) or the Messaging Service SID an opt-out is kept under, from `GET /api/v1/sms/opt-outs`.
+          schema:
+            type: string
+          example: "+15550001111"
+        - name: contactNumber
+          in: path
+          required: true
+          description: The contact's number, E.164.
+          schema:
+            type: string
+          example: "+15550002222"
+      responses:
+        "204":
+          description: No content.
+        "404":
+          $ref: "#/components/responses/NotFound"
+        default:
+          $ref: "#/components/responses/Error"
+      x-sendmock-cli: sendmock sms opt-outs delete <sender> <contactNumber>
+      x-sendmock-mcp: sendmock_sms_opt_out_delete
+      x-sendmock-ui: Numbers > Opt-outs > Lift
   /api/v1/emails/providers:
     get:
       operationId: getEmailsProviders
@@ -4389,7 +4650,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/MessageProviderInput"
+              $ref: "#/components/schemas/MessageProviderInputPatch"
       responses:
         "200":
           description: OK.
@@ -4652,7 +4913,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/MessageProviderInput"
+              $ref: "#/components/schemas/MessageProviderInputPatch"
       responses:
         "200":
           description: OK.
@@ -4914,7 +5175,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/HttpBinUpdate"
+              $ref: "#/components/schemas/HttpBinUpdatePatch"
       responses:
         "200":
           description: OK.
@@ -6132,7 +6393,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PaymentFlowInput"
+              $ref: "#/components/schemas/PaymentFlowInputPatch"
       responses:
         "200":
           description: OK.
@@ -6450,7 +6711,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PaymentGatewayInput"
+              $ref: "#/components/schemas/PaymentGatewayInputPatch"
       responses:
         "200":
           description: OK.
@@ -6681,7 +6942,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PaymentMethodInput"
+              $ref: "#/components/schemas/PaymentMethodInputPatch"
       responses:
         "200":
           description: OK.
@@ -6783,7 +7044,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/WebhookEndpointInput"
+              $ref: "#/components/schemas/WebhookEndpointCreateInput"
       responses:
         "201":
           description: Created.
@@ -8185,7 +8446,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/WebhookVariableInput"
+              $ref: "#/components/schemas/WebhookVariableInputPatch"
       responses:
         "200":
           description: OK.
@@ -8793,6 +9054,13 @@ components:
             - $ref: "#/components/schemas/ApiRequestCatcherAnswer"
             - type: "null"
           description: The attached bin and rule that answered; null when SendMock answered itself.
+        note:
+          type:
+            - string
+            - "null"
+          description: Why SendMock answered as it did when the answer alone does not say, such as the reason for a Twilio 401; null otherwise.
+          examples:
+            - Wrong auth token for AC22222222222222222222222222222222
         created_at:
           $ref: "#/components/schemas/IsoTimestamp"
       required:
@@ -8807,6 +9075,7 @@ components:
         - duration_ms
         - linked_message
         - catcher_answer
+        - note
         - created_at
     ApiStatusClass:
       type: string
@@ -8923,6 +9192,11 @@ components:
           items:
             type: string
           description: The `operationId`s this binary serves; the UI shows Not available yet for the rest.
+        warnings:
+          type: array
+          items:
+            type: string
+          description: Setup worth fixing, such as the provider port being off; empty when there is nothing.
       required:
         - version
         - channel
@@ -8937,6 +9211,7 @@ components:
         - database_size_bytes
         - is_container
         - available_operations
+        - warnings
     AppSettings:
       type: object
       properties:
@@ -9028,6 +9303,11 @@ components:
           description: Fires `email.opened` and `sms.opened` when you open a message in the UI.
           examples:
             - true
+        count_views_with_webhook_rules:
+          type: boolean
+          description: "On: a view counts as an open even when a webhook rule would send `email.opened` to your app. Off (the default): such a view is not counted."
+          examples:
+            - false
         opened_event_mode:
           type: string
           enum:
@@ -9136,6 +9416,7 @@ components:
         - is_magic_numbers_enabled
         - is_magic_addresses_enabled
         - fire_opened_events_on_view
+        - count_views_with_webhook_rules
         - opened_event_mode
         - chaos_smtp_reject_next_count
         - chaos_smtp_reject_code
@@ -9243,6 +9524,11 @@ components:
           description: Fires `email.opened` and `sms.opened` when you open a message in the UI.
           examples:
             - true
+        count_views_with_webhook_rules:
+          type: boolean
+          description: "On: a view counts as an open even when a webhook rule would send `email.opened` to your app. Off (the default): such a view is not counted."
+          examples:
+            - false
         opened_event_mode:
           type: string
           enum:
@@ -10145,6 +10431,12 @@ components:
           items:
             $ref: "#/components/schemas/WebhookRequestEdit"
           description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.
+          examples:
+            - order_id: A-1001
       required:
         - url
       description: Body of `POST /emails/{emailId}/clicks`.
@@ -10221,6 +10513,15 @@ components:
           anyOf:
             - $ref: "#/components/schemas/EmailTemplateData"
             - type: "null"
+        provider_message_id:
+          type:
+            - string
+            - "null"
+          description: The id the provider's send answered, such as Mailgun's `<...@domain>`; null for mail that did not come through a provider's API.
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: The send's user variables, such as Mailgun's `v:` fields; empty when it had none.
         response_to:
           anyOf:
             - $ref: "#/components/schemas/EmailResponseLink"
@@ -10298,6 +10599,7 @@ components:
         - open_count
         - opened_at
         - project
+        - provider_message_id
         - received_at
         - reply_to
         - response_kind
@@ -10313,6 +10615,7 @@ components:
         - template
         - text_body
         - to
+        - user_variables
     EmailDirection:
       type: string
       enum:
@@ -10364,6 +10667,12 @@ components:
           items:
             $ref: "#/components/schemas/WebhookRequestEdit"
           description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.
+          examples:
+            - order_id: A-1001
       required:
         - to
       description: Body of POST /api/v1/emails/{emailId}/forward (simulate the recipient forwarding).
@@ -10422,6 +10731,12 @@ components:
           items:
             $ref: "#/components/schemas/WebhookRequestEdit"
           description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.
+          examples:
+            - order_id: A-1001
       description: "Body of POST /api/v1/emails/inbound: an incoming email from fields, or raw MIME in `raw`."
     EmailOutcomeKind:
       type: string
@@ -10645,6 +10960,12 @@ components:
           items:
             $ref: "#/components/schemas/WebhookRequestEdit"
           description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.
+          examples:
+            - order_id: A-1001
       description: Body of POST /api/v1/emails/{emailId}/reply (simulate the recipient replying).
     EmailResponseKind:
       type: string
@@ -10745,6 +11066,61 @@ components:
         - response_kind
         - project
       description: Fields shown in the mail list.
+    EmailTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "The provider's template id or name: SendGrid's `d-...`, Postmark's number or alias, Mailgun's template name."
+          examples:
+            - welcome-email
+        subject:
+          type: string
+          description: The subject, used when the send gives none; can use the template data.
+          examples:
+            - Welcome, {{ first_name }}
+        text:
+          type:
+            - string
+            - "null"
+          description: The plain-text body; at least one of `text` and `html`.
+          examples:
+            - Hi {{ first_name }}, thanks for joining.
+        html:
+          type:
+            - string
+            - "null"
+          description: The HTML body.
+          examples:
+            - <p>Hi {{ first_name }}, thanks for joining.</p>
+      required:
+        - id
+        - subject
+        - text
+        - html
+      description: A local stand-in for a provider's email template.
+    EmailTemplateChangesPatch:
+      type: object
+      properties:
+        subject:
+          type: string
+          description: The subject, used when the send gives none; can use the template data.
+          examples:
+            - Welcome, {{ first_name }}
+        text:
+          type:
+            - string
+            - "null"
+          description: The plain-text body; at least one of `text` and `html`.
+          examples:
+            - Hi {{ first_name }}, thanks for joining.
+        html:
+          type:
+            - string
+            - "null"
+          description: The HTML body.
+          examples:
+            - <p>Hi {{ first_name }}, thanks for joining.</p>
     EmailTemplateData:
       type: object
       properties:
@@ -10874,8 +11250,100 @@ components:
       type: object
       properties:
         endpoint:
-          $ref: "#/components/schemas/WebhookEndpointInput"
-          description: The endpoint settings to render, saved or not; left out, the saved endpoint `endpoint_id` names is rendered as stored.
+          type: object
+          properties:
+            name:
+              type: string
+              description: A name for the endpoint, shown in lists and deliveries.
+              examples:
+                - Orders app
+            url:
+              type: string
+              description: Where deliveries are sent; can use templates.
+              examples:
+                - http://localhost:3000/webhooks/sendmock
+            method:
+              $ref: "#/components/schemas/HttpMethod"
+              description: The HTTP method of each delivery.
+              examples:
+                - POST
+            headers:
+              type: object
+              additionalProperties:
+                type: string
+              description: Extra headers layered on top of the template's.
+              examples:
+                - Authorization: Bearer {{ vars.app_token }}
+            extra_fields:
+              type: object
+              additionalProperties:
+                type: string
+              description: Extra body fields layered on top of the template's.
+              examples:
+                - environment: local
+            template_id:
+              type: string
+              description: The payload template, e.g. `native` (Standard Webhooks JSON) or `slack.incoming_webhook`.
+              examples:
+                - native
+            template_mode:
+              $ref: "#/components/schemas/TemplateMode"
+              description: "`linked` follows template updates, `detached` keeps its own copy."
+              examples:
+                - linked
+            timeout_ms:
+              type: number
+              description: How long to wait for your app's answer, in milliseconds.
+              examples:
+                - 10000
+            retry_policy:
+              $ref: "#/components/schemas/RetryPolicy"
+              description: When and how often failed deliveries are retried.
+            is_enabled:
+              type: boolean
+              description: Off endpoints receive no deliveries.
+              examples:
+                - true
+            query_params:
+              type: array
+              items:
+                $ref: "#/components/schemas/NameValueTemplate"
+              description: Query parameters added to the URL.
+            body_mode:
+              $ref: "#/components/schemas/EndpointBodyMode"
+              description: "How the body is built: `template` (the payload template), `fields` (name and value rows), `raw` (one text template) or `none`."
+              examples:
+                - template
+            body_fields:
+              type: array
+              items:
+                $ref: "#/components/schemas/EndpointBodyField"
+              description: The rows of `fields` mode.
+            fields_encoding:
+              type: string
+              enum:
+                - json
+                - form
+                - multipart
+              description: "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent)."
+              examples:
+                - json
+            raw_content_type:
+              type: string
+              description: The content type of `raw` mode.
+              examples:
+                - application/json
+            raw_body:
+              type: string
+              description: The body template of `raw` mode.
+              examples:
+                - '{"text": "New email: {{ data.subject }}"}'
+            render_mode:
+              $ref: "#/components/schemas/RenderMode"
+              description: "`strict` stops a delivery on an undefined variable, `lenient` renders it empty with a warning."
+              examples:
+                - strict
+          description: "The endpoint settings to render, saved or not, as many fields as you like: the rest come from the saved endpoint `endpoint_id` names, or a new endpoint's defaults. Left out, the saved endpoint is rendered as stored."
         endpoint_id:
           $ref: "#/components/schemas/Ulid"
           description: A saved endpoint's own variables are used too; alone, its stored settings are rendered.
@@ -11265,15 +11733,13 @@ components:
         - onesignal
         - generic
       description: Ready-made bins whose replies mimic the real service.
-    HttpBinUpdate:
+    HttpBinUpdatePatch:
       type: object
       properties:
         default_response:
           $ref: "#/components/schemas/HttpMockResponse"
           description: The reply sent when no rule matches.
-      required:
-        - default_response
-      description: Body of `PATCH /http/bins/{binId}`.
+      additionalProperties: false
     HttpFollowUpWebhook:
       type: object
       properties:
@@ -11645,6 +12111,27 @@ components:
         - filter
         - actions
       description: Body of POST /api/v1/inbound-routes and PATCH /api/v1/inbound-routes/{routeId}.
+    InboundRouteInputPatch:
+      type: object
+      properties:
+        priority:
+          type: number
+          description: Lower runs first.
+          examples:
+            - 10
+        description:
+          type: string
+          description: A name for the route, shown in the list.
+          examples:
+            - Ticket replies to the helpdesk
+        filter:
+          $ref: "#/components/schemas/InboundRouteFilter"
+          description: Which incoming emails the route takes.
+        actions:
+          type: array
+          items:
+            $ref: "#/components/schemas/InboundRouteAction"
+          description: What the route does with a matching email, in order.
     InboundRouteMatch:
       type: object
       properties:
@@ -11780,6 +12267,12 @@ components:
           items:
             $ref: "#/components/schemas/WebhookRequestEdit"
           description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.
+          examples:
+            - order_id: A-1001
       required:
         - body
         - from
@@ -11828,6 +12321,8 @@ components:
         - email
         - sms
         - http
+        - mailgun
+        - twilio
     IntegrationSnippet:
       type: object
       properties:
@@ -12179,6 +12674,18 @@ components:
           description: "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer."
           examples:
             - false
+        opt_out_keywords:
+          type:
+            - boolean
+            - "null"
+          description: "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others."
+          examples:
+            - true
+        opt_out_auto_replies:
+          type: boolean
+          description: "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages."
+          examples:
+            - false
         operations:
           type: array
           items:
@@ -12252,6 +12759,8 @@ components:
         - host
         - credentials
         - check_credentials
+        - opt_out_keywords
+        - opt_out_auto_replies
         - operations
         - field_mapping
         - validation_rules
@@ -12304,6 +12813,18 @@ components:
         check_credentials:
           type: boolean
           description: "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer."
+          examples:
+            - false
+        opt_out_keywords:
+          type:
+            - boolean
+            - "null"
+          description: "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others."
+          examples:
+            - true
+        opt_out_auto_replies:
+          type: boolean
+          description: "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages."
           examples:
             - false
         operations:
@@ -12366,6 +12887,8 @@ components:
         - host
         - credentials
         - check_credentials
+        - opt_out_keywords
+        - opt_out_auto_replies
         - operations
         - field_mapping
         - validation_rules
@@ -12376,6 +12899,110 @@ components:
         - status_names
         - outcome_error_codes
       description: Body of PATCH .../providers/{providerKey}; the key and area are fixed.
+    MessageProviderInputPatch:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The `/providers/<key>/...` path and the `provider` value stored on each message; lowercase, fixed after creation.
+          examples:
+            - sendgrid
+        name:
+          type: string
+          description: The provider's name, shown on messages and in pickers.
+          examples:
+            - SendGrid
+        accent:
+          type: string
+          description: "`#rrggbb`, used on its badge."
+          examples:
+            - "#1a82e2"
+        is_enabled:
+          type: boolean
+          description: Off providers answer nothing; their paths get SendMock's native 404.
+          examples:
+            - true
+        host:
+          type:
+            - string
+            - "null"
+          description: The provider's API host, used on the provider port to tell apart providers that share a path; null when not needed.
+          examples:
+            - api.sendgrid.com
+        credentials:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderCredential"
+          description: The credentials your app is configured with.
+        check_credentials:
+          type: boolean
+          description: "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer."
+          examples:
+            - false
+        opt_out_keywords:
+          type:
+            - boolean
+            - "null"
+          description: "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others."
+          examples:
+            - true
+        opt_out_auto_replies:
+          type: boolean
+          description: "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages."
+          examples:
+            - false
+        operations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderOperation"
+          description: The requests it answers.
+        field_mapping:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderFieldMapping"
+          description: Where each part of a sent message is read from; anything else is kept as metadata.
+        validation_rules:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderValidationRule"
+          description: The checks run on each send, in order.
+        success_response:
+          $ref: "#/components/schemas/ProviderResponseTemplate"
+          description: The answer to a request that passes every check.
+        error_responses:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderErrorResponse"
+          description: The answer for each kind of error.
+        message_id_template:
+          type: string
+          description: The provider's id for each message, a template.
+          examples:
+            - <{{ uuid() }}@sendmock.local>
+        callback_template_key:
+          type:
+            - string
+            - "null"
+          description: The webhook template its status callbacks and inbound messages are sent with; null sends none.
+          examples:
+            - sendgrid-event
+        status_names:
+          type: object
+          additionalProperties:
+            type: string
+          description: The provider's name for each SendMock status.
+          examples:
+            - delivered: delivered
+              bounced: bounce
+              complained: spamreport
+        outcome_error_codes:
+          type: object
+          additionalProperties:
+            type: string
+          description: "SMS only: the provider's error code for each delivery outcome, so test numbers fail with its own codes."
+          examples:
+            - invalid_number: "21211"
+              unreachable: "30003"
     MessageProviderPreview:
       type: object
       properties:
@@ -12506,6 +13133,11 @@ components:
           description: Called when `inbound_url` fails.
           examples:
             - http://localhost:3000/sms/inbound-fallback
+        opt_out_keywords:
+          type: boolean
+          description: Whether a text of STOP to one of its numbers opts the contact out of the whole service.
+          examples:
+            - true
         created_by:
           $ref: "#/components/schemas/CreatedBy"
       required:
@@ -12515,7 +13147,57 @@ components:
         - inbound_mode
         - inbound_url
         - inbound_fallback_url
+        - opt_out_keywords
         - created_by
+    MessagingServiceCreateInput:
+      type: object
+      properties:
+        sid:
+          type:
+            - string
+            - "null"
+          description: The SID to give the service, `MG` and 32 hex digits, so an app's configured SID works unchanged; left out, a new one is generated.
+          examples:
+            - MG00000000000000000000000000000001
+        friendly_name:
+          type: string
+          description: A name for the service.
+          examples:
+            - Notifications
+        number_ids:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ulid"
+          description: The virtual numbers in the sender pool, by ID; none when left out, as a new Twilio Messaging Service starts.
+          examples:
+            - - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+        inbound_mode:
+          $ref: "#/components/schemas/MessagingServiceInboundMode"
+          description: "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook, the default) or `drop`."
+          examples:
+            - webhook
+        inbound_url:
+          type:
+            - string
+            - "null"
+          description: Used when `inbound_mode` is `webhook`; none when left out.
+          examples:
+            - http://localhost:3000/sms/inbound
+        inbound_fallback_url:
+          type:
+            - string
+            - "null"
+          description: Called when `inbound_url` fails; none when left out.
+          examples:
+            - http://localhost:3000/sms/inbound-fallback
+        opt_out_keywords:
+          type: boolean
+          description: Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.
+          examples:
+            - true
+      required:
+        - friendly_name
+      description: "Body of POST /api/v1/messaging-services: the service, and the SID to give it."
     MessagingServiceInboundMode:
       type: string
       enum:
@@ -12523,7 +13205,7 @@ components:
         - defer_to_sender
         - drop
       description: What a Messaging Service does with inbound messages to its numbers.
-    MessagingServiceInput:
+    MessagingServiceInputPatch:
       type: object
       properties:
         friendly_name:
@@ -12535,35 +13217,33 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Ulid"
-          description: The virtual numbers in the sender pool, by ID.
+          description: The virtual numbers in the sender pool, by ID; none when left out, as a new Twilio Messaging Service starts.
           examples:
             - - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
         inbound_mode:
           $ref: "#/components/schemas/MessagingServiceInboundMode"
-          description: "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`."
+          description: "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook, the default) or `drop`."
           examples:
             - webhook
         inbound_url:
           type:
             - string
             - "null"
-          description: Used when `inbound_mode` is `webhook`.
+          description: Used when `inbound_mode` is `webhook`; none when left out.
           examples:
             - http://localhost:3000/sms/inbound
         inbound_fallback_url:
           type:
             - string
             - "null"
-          description: Called when `inbound_url` fails.
+          description: Called when `inbound_url` fails; none when left out.
           examples:
             - http://localhost:3000/sms/inbound-fallback
-      required:
-        - friendly_name
-        - number_ids
-        - inbound_mode
-        - inbound_url
-        - inbound_fallback_url
-      description: Body of POST and PATCH /api/v1/messaging-services.
+        opt_out_keywords:
+          type: boolean
+          description: Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.
+          examples:
+            - true
     MimePart:
       type: object
       properties:
@@ -12805,6 +13485,12 @@ components:
           items:
             $ref: "#/components/schemas/WebhookRequestEdit"
           description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.
+          examples:
+            - order_id: A-1001
       description: Body of `POST /emails/{emailId}/open` and `POST /sms/{smsId}/open`.
     OpenRecord:
       type: object
@@ -13399,6 +14085,29 @@ components:
         - picker_tab
         - steps
       description: Body of POST and PATCH /api/v1/payments/flows; the key is fixed after creation.
+    PaymentFlowInputPatch:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The flow's key; fixed after creation.
+          examples:
+            - wallet_otp
+        name:
+          type: string
+          description: The flow's name.
+          examples:
+            - Wallet with OTP
+        picker_tab:
+          type: string
+          description: The checkout picker tab its methods show under, e.g. "Mobile banking".
+          examples:
+            - Mobile banking
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentFlowStep"
+          description: The steps in order.
     PaymentFlowStep:
       type: object
       properties:
@@ -13801,6 +14510,127 @@ components:
         - notification_body
         - notification_headers
       description: Body of PATCH /api/v1/payments/gateways/{gatewayKey}; the key is fixed.
+    PaymentGatewayInputPatch:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The `provider` value in the API and in `/providers/<key>/...` paths.
+          examples:
+            - upay
+        name:
+          type: string
+          description: The gateway's name, shown on checkout pages.
+          examples:
+            - Upay
+        accent:
+          type: string
+          description: "`#rrggbb`, used on its checkout pages."
+          examples:
+            - "#e2136e"
+        is_enabled:
+          type: boolean
+          description: Off gateways reject new checkouts.
+          examples:
+            - true
+        method_keys:
+          type: array
+          items:
+            type: string
+          description: The methods its checkout offers, in order.
+          examples:
+            - - upay_wallet
+              - card
+        credentials:
+          type: array
+          items:
+            $ref: "#/components/schemas/GatewayCredential"
+          description: The merchant credentials your app is configured with.
+        notification_endpoint_id:
+          anyOf:
+            - $ref: "#/components/schemas/Ulid"
+            - type: "null"
+          description: The webhook endpoint its IPN or webhook deliveries go to.
+          examples:
+            - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+        redirect_method:
+          type: string
+          enum:
+            - GET
+            - POST
+          description: "How the browser returns to your app: `GET` (query string) or `POST` (form)."
+          examples:
+            - POST
+        redirect_fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/GatewayRedirectField"
+          description: The parameters sent to your app on redirect.
+        notification_content_type:
+          type: string
+          enum:
+            - json
+            - form
+          description: "How the IPN or webhook body is sent: `json` or `form`."
+          examples:
+            - json
+        event_names:
+          type: object
+          properties:
+            payment.created:
+              type: string
+            payment.authorized:
+              type: string
+            payment.succeeded:
+              type: string
+            payment.failed:
+              type: string
+            payment.canceled:
+              type: string
+            payment.refunded:
+              type: string
+            payment.partially_refunded:
+              type: string
+            payment.dispute_opened:
+              type: string
+            payment.dispute_updated:
+              type: string
+            payment.dispute_closed:
+              type: string
+            checkout.completed:
+              type: string
+            checkout.expired:
+              type: string
+          required:
+            - payment.created
+            - payment.authorized
+            - payment.succeeded
+            - payment.failed
+            - payment.canceled
+            - payment.refunded
+            - payment.partially_refunded
+            - payment.dispute_opened
+            - payment.dispute_updated
+            - payment.dispute_closed
+            - checkout.completed
+            - checkout.expired
+          description: The gateway's name for each native event; blank sends nothing.
+          examples:
+            - payment.succeeded: PAYMENT_SUCCESS
+              payment.failed: PAYMENT_FAILED
+              payment.refunded: ""
+              checkout.completed: ""
+              checkout.expired: ""
+        notification_body:
+          type: string
+          description: The notification body, a template over the payment and the event.
+          examples:
+            - '{"status": "{{ event.name }}", "txn_id": "{{ payment.reference }}"}'
+        notification_headers:
+          type: array
+          items:
+            $ref: "#/components/schemas/GatewayHeaderTemplate"
+          description: Headers sent with each notification.
     PaymentGatewayPreview:
       type: object
       properties:
@@ -14110,6 +14940,67 @@ components:
         - default_outcome
         - test_account
       description: Body of POST and PATCH /api/v1/payments/methods; key and flow are fixed after creation.
+    PaymentMethodInputPatch:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The method's key; fixed after creation.
+          examples:
+            - upay_wallet
+        name:
+          type: string
+          description: The method's name on checkout pages.
+          examples:
+            - Upay wallet
+        flow:
+          type: string
+          description: The key of the flow its checkout runs.
+          examples:
+            - wallet
+        accent:
+          type: string
+          description: "`#rrggbb`, used on checkout pages."
+          examples:
+            - "#e2136e"
+        is_enabled:
+          type: boolean
+          description: Off methods are hidden on checkout pages.
+          examples:
+            - true
+        test_cards:
+          type: array
+          items:
+            $ref: "#/components/schemas/TestCardValue"
+          description: Read by a card form step.
+        test_numbers:
+          type: array
+          items:
+            $ref: "#/components/schemas/TestNumberValue"
+          description: Read by an account number or voucher code step.
+        otp:
+          type: string
+          description: Read by an OTP step.
+          examples:
+            - "123456"
+        pin:
+          type: string
+          description: Read by a PIN step.
+          examples:
+            - "12121"
+        default_outcome:
+          type: string
+          enum:
+            - succeed
+            - decline
+          description: The outcome when the flow has no deciding step.
+          examples:
+            - succeed
+        test_account:
+          type: string
+          description: Read by a signed-in account step.
+          examples:
+            - sb-buyer@personal.example.com
     PaymentMethodValueKind:
       type: string
       enum:
@@ -14241,6 +15132,12 @@ components:
           items:
             $ref: "#/components/schemas/WebhookRequestEdit"
           description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.
+          examples:
+            - order_id: A-1001
       required:
         - action
       description: Body of POST /api/v1/payments/{paymentId}/simulate.
@@ -14540,6 +15437,114 @@ components:
         - redirected
         - delayed
         - notification_sent
+    PresetApplyInput:
+      type: object
+      properties:
+        app_url:
+          type: string
+          description: Where SendMock reaches your app.
+          examples:
+            - http://localhost:8000
+        options:
+          type: object
+          additionalProperties:
+            type: string
+          description: The preset's options by name (its webhook paths); left out, their defaults.
+          examples:
+            - mailgun_events_path: /webhooks/mailgun/events
+        numbers_csv:
+          type:
+            - string
+            - "null"
+          description: "Numbers to add, one per line: `number,label,subaccount_sid,messaging_service_sid` (a first line starting with `number` is a header)."
+          examples:
+            - +15550001111,Clinic line,AC22222222222222222222222222222222,
+      required:
+        - app_url
+      description: Body of `POST /presets/{presetName}/apply`.
+    PresetApplyResult:
+      type: object
+      properties:
+        preset_name:
+          type: string
+          description: The preset applied.
+          examples:
+            - laravel-mailgun-twilio
+        applied:
+          type: array
+          items:
+            $ref: "#/components/schemas/SeedItemCount"
+          description: The items its setup file created or updated, by kind.
+        steps:
+          type: array
+          items:
+            type: string
+          description: "What else it did: the signing key, the Debugger URL, the numbers."
+          examples:
+            - - Made the Mailgun signing key.
+        smtp_address:
+          type: string
+          description: The SMTP address of this SendMock.
+          examples:
+            - 127.0.0.1:1025
+        provider_address:
+          type:
+            - string
+            - "null"
+          description: The provider port; null when it is off.
+          examples:
+            - 127.0.0.1:8026
+        provider_tls_address:
+          type:
+            - string
+            - "null"
+          description: The HTTPS provider port; null when it is off.
+          examples:
+            - null
+        warnings:
+          type: array
+          items:
+            type: string
+          description: What to fix, such as an HTTPS provider port that is off.
+          examples:
+            - []
+        env_block:
+          type: string
+          description: The lines for your app's `.env`; secrets are hidden from AI agents.
+          examples:
+            - |-
+              MAIL_MAILER=mailgun
+              MAILGUN_DOMAIN=mg.example.test
+      required:
+        - preset_name
+        - applied
+        - steps
+        - smtp_address
+        - provider_address
+        - provider_tls_address
+        - warnings
+        - env_block
+      description: What applying a preset did, and what your app needs.
+    PresetOptionView:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The option's name, as the apply body's `options` takes it.
+          examples:
+            - mailgun_events_path
+        default_value:
+          type: string
+          description: The value used when the option is left out.
+          examples:
+            - /webhooks/mailgun/events
+        description:
+          type: string
+      required:
+        - name
+        - default_value
+        - description
+      description: One option of a stack preset, with the value used when it is left out.
     Project:
       type: object
       properties:
@@ -14796,6 +15801,7 @@ components:
         - tags
         - template_id
         - template_data
+        - user_variables
         - raw
         - body
         - media_urls
@@ -15159,6 +16165,60 @@ components:
         - line
         - column
       description: A render problem and where it comes from, e.g. "body" at line 3.
+    ResetItemCount:
+      type: object
+      properties:
+        kind:
+          type: string
+        count:
+          type: number
+      required:
+        - kind
+        - count
+      description: How many items of one kind, such as `Webhook endpoint` or `emails`.
+    ResetRequest:
+      type: object
+      properties:
+        config:
+          type: boolean
+          description: Also remove every configured item, put the settings and providers back to what SendMock ships with, and forget the seed.
+          examples:
+            - false
+        confirm_removed_count:
+          type:
+            - number
+            - "null"
+          description: "With `config`: how many configured items the reset said it would remove."
+          examples:
+            - 12
+      description: Body of `POST /api/v1/reset`; with no body, a reset that keeps the configuration.
+    ResetSummary:
+      type: object
+      properties:
+        cleared:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResetItemCount"
+          description: Traffic deleted, by kind; kinds with nothing to delete are left out.
+        removed:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResetItemCount"
+          description: Configured items removed by a `config` reset, by kind; empty otherwise.
+        kept:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResetItemCount"
+          description: Configured items that stayed, by kind.
+        restored_seed:
+          type: boolean
+          description: True when the seed applied last was applied again.
+      required:
+        - cleared
+        - removed
+        - kept
+        - restored_seed
+      description: What a reset did.
     RetryPolicy:
       type: object
       properties:
@@ -15365,6 +16425,12 @@ components:
           items:
             $ref: "#/components/schemas/WebhookRequestEdit"
           description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.
+          examples:
+            - order_id: A-1001
       description: Optional body of POST /api/v1/samples/email (`sendmock email send-test`).
     SaveAsTemplateRequest:
       type: object
@@ -16083,6 +17149,12 @@ components:
           items:
             $ref: "#/components/schemas/WebhookRequestEdit"
           description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.
+          examples:
+            - order_id: A-1001
       required:
         - event
     SmsApi:
@@ -16096,7 +17168,7 @@ components:
         id:
           $ref: "#/components/schemas/Ulid"
         reported_status:
-          $ref: "#/components/schemas/SmsStatus"
+          $ref: "#/components/schemas/SmsCallbackReportedStatus"
         attempt:
           type: number
         request:
@@ -16125,6 +17197,17 @@ components:
         - error_message
         - created_at
       description: One call to the message's status callback URL, in the provider's format.
+    SmsCallbackReportedStatus:
+      type: string
+      enum:
+        - queued
+        - sent
+        - delivered
+        - undelivered
+        - failed
+        - received
+        - debugger
+      description: "What a callback attempt reported: the message's status, or `debugger` for a Twilio Debugger event sent for the message."
     SmsChannel:
       type: string
       enum:
@@ -16400,6 +17483,32 @@ components:
         - status_history
         - to_number
         - updated_at
+    SmsOptOut:
+      type: object
+      properties:
+        sender:
+          type: string
+          description: Your app's number, or the SID of the Messaging Service it was in, `MG...`.
+          examples:
+            - "+15550001111"
+        contact_number:
+          type: string
+          description: The contact's number, E.164.
+          examples:
+            - "+15550002222"
+        keyword:
+          type: string
+          description: The keyword the contact texted, as they wrote it.
+          examples:
+            - STOP
+        created_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+      required:
+        - sender
+        - contact_number
+        - keyword
+        - created_at
+      description: A contact who texted STOP to one of your numbers or Messaging Services.
     SmsOutcomeKind:
       type: string
       enum:
@@ -16712,6 +17821,141 @@ components:
         - status
         - at
         - error_code
+    SmsStatusChangeAnswer:
+      type: object
+      properties:
+        status_callback_timing:
+          type: string
+          description: When the status callback for this change is sent, in words.
+          examples:
+            - "No status callback: the message has no status callback URL."
+        status_history:
+          type: array
+          items:
+            $ref: "#/components/schemas/SmsStatusChange"
+        request_body:
+          anyOf:
+            - type: object
+              additionalProperties: {}
+            - type: "null"
+        api_request_id:
+          anyOf:
+            - $ref: "#/components/schemas/Ulid"
+            - type: "null"
+        callback_attempts:
+          type: array
+          items:
+            $ref: "#/components/schemas/SmsCallbackAttempt"
+        reply_webhook_attempts:
+          type: array
+          items:
+            $ref: "#/components/schemas/SmsReplyWebhookAttempt"
+          description: Inbound only, oldest first; every Resend adds attempts.
+        id:
+          $ref: "#/components/schemas/Ulid"
+        provider_id:
+          type: string
+        direction:
+          $ref: "#/components/schemas/SmsDirection"
+        channel:
+          $ref: "#/components/schemas/SmsChannel"
+        api:
+          $ref: "#/components/schemas/SmsApi"
+        from_number:
+          type: string
+        to_number:
+          type: string
+        body:
+          type: string
+        encoding:
+          $ref: "#/components/schemas/SmsEncoding"
+        segments:
+          type: number
+        media:
+          type: array
+          items:
+            $ref: "#/components/schemas/SmsMedia"
+        status:
+          $ref: "#/components/schemas/SmsStatus"
+        error_code:
+          type:
+            - string
+            - "null"
+        status_callback_url:
+          type:
+            - string
+            - "null"
+        messaging_service_sid:
+          type:
+            - string
+            - "null"
+        account:
+          type:
+            - string
+            - "null"
+        extracted:
+          $ref: "#/components/schemas/ExtractedData"
+        opened_at:
+          anyOf:
+            - $ref: "#/components/schemas/IsoTimestamp"
+            - type: "null"
+        open_count:
+          type: number
+        is_read:
+          type: boolean
+          description: "Whether someone looked at it in SendMock: inbound messages arrive unread, messages your app sent arrive read, and marking a conversation unread marks its newest message unread."
+        reply_webhook:
+          anyOf:
+            - $ref: "#/components/schemas/SmsReplyWebhookResult"
+            - type: "null"
+          description: "Inbound only: what the number's reply webhook answered; null when it has none."
+        in_reply_to_sms_id:
+          anyOf:
+            - $ref: "#/components/schemas/Ulid"
+            - type: "null"
+          description: "A TwiML reply: the inbound message it answers."
+        created_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+        updated_at:
+          $ref: "#/components/schemas/IsoTimestamp"
+        project:
+          type: string
+          description: "The project the message was sent to: `default` unless the sender named another."
+          examples:
+            - default
+      required:
+        - account
+        - api
+        - api_request_id
+        - body
+        - callback_attempts
+        - channel
+        - created_at
+        - direction
+        - encoding
+        - error_code
+        - extracted
+        - from_number
+        - id
+        - in_reply_to_sms_id
+        - is_read
+        - media
+        - messaging_service_sid
+        - open_count
+        - opened_at
+        - project
+        - provider_id
+        - reply_webhook
+        - reply_webhook_attempts
+        - request_body
+        - segments
+        - status
+        - status_callback_timing
+        - status_callback_url
+        - status_history
+        - to_number
+        - updated_at
+      description: "Answer of POST /api/v1/sms/{smsId}/status: the message, and when its status callback is sent."
     SmsStatusUpdate:
       type: object
       properties:
@@ -16739,6 +17983,12 @@ components:
           items:
             $ref: "#/components/schemas/WebhookRequestEdit"
           description: "Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads."
+        user_variables:
+          type: object
+          additionalProperties: {}
+          description: User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.
+          examples:
+            - order_id: A-1001
       required:
         - status
       description: "Body of `POST /sms/{smsId}/status`: a manual status change."
@@ -16870,6 +18120,25 @@ components:
         - name
         - score
         - description
+    StackPreset:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The preset's name.
+          examples:
+            - laravel-mailgun-twilio
+        description:
+          type: string
+        options:
+          type: array
+          items:
+            $ref: "#/components/schemas/PresetOptionView"
+      required:
+        - name
+        - description
+        - options
+      description: A stack preset, as `GET /presets` lists it.
     SubscriptionInterval:
       type: string
       enum:
@@ -17419,6 +18688,49 @@ components:
         - pem
         - provider_tls_address
       description: SendMock's local CA, to trust for the HTTPS provider port.
+    TlsTrustPlace:
+      type: object
+      properties:
+        place:
+          type: string
+          description: The system store or a runtime.
+          examples:
+            - PHP 8.4.1 (/opt/homebrew/bin/php)
+        state:
+          type: string
+          enum:
+            - trusted
+            - missing
+            - manual
+          description: "`trusted`, `missing` (`sendmock trust` adds it) or `manual` (set the line in `detail`)."
+          examples:
+            - missing
+        detail:
+          type: string
+          description: What the place is, or the line or command to run.
+          examples:
+            - Its CA file is /opt/homebrew/etc/openssl@3/cert.pem
+      required:
+        - place
+        - state
+        - detail
+      description: One place that can trust the local CA, and its state.
+    TlsTrustReport:
+      type: object
+      properties:
+        ca_path:
+          type: string
+          description: Where the local CA certificate is.
+          examples:
+            - /home/sam/.local/share/sendmock/provider-ca-certificate.pem
+        places:
+          type: array
+          items:
+            $ref: "#/components/schemas/TlsTrustPlace"
+      required:
+        - ca_path
+        - places
+      description: "Answer of `GET /tls/trust`: what trusts SendMock's local CA on this machine."
     TwilioAccountStatus:
       type: string
       enum:
@@ -17472,7 +18784,7 @@ components:
         - created_at
         - updated_at
       description: A subaccount of the Twilio provider's main account; its auth token is masked.
-    TwilioSubaccountChanges:
+    TwilioSubaccountChangesPatch:
       type: object
       properties:
         friendly_name:
@@ -17499,9 +18811,6 @@ components:
           description: Where Twilio Debugger events for this subaccount are sent; null for none.
           examples:
             - null
-      required:
-        - friendly_name
-      description: Body of `PATCH /api/v1/twilio/subaccounts/{accountSid}`.
     TwilioSubaccountInput:
       type: object
       properties:
@@ -17939,6 +19248,31 @@ components:
         - fixed_code
         - ttl_seconds
       description: Body of POST and PATCH /api/v1/verify/services.
+    VerifyServiceInputPatch:
+      type: object
+      properties:
+        friendly_name:
+          type: string
+          description: The name shown in the code message, e.g. "Your Shop verification code is ...".
+          examples:
+            - Shop
+        code_length:
+          type: number
+          description: Digits in each code, 4 to 10.
+          examples:
+            - 6
+        fixed_code:
+          type:
+            - string
+            - "null"
+          description: Always send this code instead of a random one, for deterministic tests; null for random.
+          examples:
+            - "123456"
+        ttl_seconds:
+          type: number
+          description: How long a code stays valid, in seconds.
+          examples:
+            - 600
     VirtualNumber:
       type: object
       properties:
@@ -18013,6 +19347,11 @@ components:
           description: The Twilio account the number belongs to; null for the main account.
           examples:
             - null
+        opt_out_keywords:
+          type: boolean
+          description: Whether a text of STOP to this number opts the contact out (Twilio's Advanced Opt-Out, with the provider's switch on).
+          examples:
+            - true
         created_by:
           $ref: "#/components/schemas/CreatedBy"
       required:
@@ -18028,6 +19367,7 @@ components:
         - messaging_service_sid
         - phone_number_sid
         - account_sid
+        - opt_out_keywords
         - created_by
     VirtualNumberInput:
       type: object
@@ -18056,11 +19396,6 @@ components:
           description: Reply webhook (Twilio "A message comes in"); null means rules only.
           examples:
             - http://localhost:3000/sms/inbound
-        inbound_method:
-          $ref: "#/components/schemas/InboundWebhookMethod"
-          description: The HTTP method of the reply webhook.
-          examples:
-            - POST
         inbound_fallback_url:
           type:
             - string
@@ -18089,17 +19424,105 @@ components:
           description: The Messaging Service this number belongs to, `MG...`; null for none.
           examples:
             - MG00000000000000000000000000000001
+        inbound_method:
+          $ref: "#/components/schemas/InboundWebhookMethod"
+          description: The HTTP method of the reply webhook; POST when left out, as on Twilio.
+          examples:
+            - POST
+        account_sid:
+          type:
+            - string
+            - "null"
+          description: The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.
+          examples:
+            - null
+        opt_out_keywords:
+          type: boolean
+          description: Whether a text of STOP to this number opts the contact out; on when left out.
+          examples:
+            - true
       required:
         - number
         - label
         - channels
         - inbound_url
-        - inbound_method
         - inbound_fallback_url
         - inbound_template_id
         - status_callback_url
         - messaging_service_sid
       description: Body of POST and PATCH /api/v1/numbers.
+    VirtualNumberInputPatch:
+      type: object
+      properties:
+        number:
+          type: string
+          description: E.164, without a channel prefix; `channels` says whether WhatsApp works.
+          examples:
+            - "+15550001111"
+        label:
+          type: string
+          description: A name for the number, e.g. the app or feature that uses it.
+          examples:
+            - Support line
+        channels:
+          type: array
+          items:
+            $ref: "#/components/schemas/NumberChannel"
+          description: "Where the number works: `sms`, `whatsapp` or both."
+          examples:
+            - - sms
+        inbound_url:
+          type:
+            - string
+            - "null"
+          description: Reply webhook (Twilio "A message comes in"); null means rules only.
+          examples:
+            - http://localhost:3000/sms/inbound
+        inbound_fallback_url:
+          type:
+            - string
+            - "null"
+          description: Called when the reply webhook fails, with `ErrorCode` and `ErrorUrl` added, as Twilio does.
+          examples:
+            - http://localhost:3000/sms/inbound-fallback
+        inbound_template_id:
+          type:
+            - string
+            - "null"
+          description: Payload template for the inbound webhook, e.g. `twilio.inbound_sms`.
+          examples:
+            - twilio.inbound_sms
+        status_callback_url:
+          type:
+            - string
+            - "null"
+          description: Your app's URL for status changes of messages sent from this number.
+          examples:
+            - http://localhost:3000/sms/status
+        messaging_service_sid:
+          type:
+            - string
+            - "null"
+          description: The Messaging Service this number belongs to, `MG...`; null for none.
+          examples:
+            - MG00000000000000000000000000000001
+        inbound_method:
+          $ref: "#/components/schemas/InboundWebhookMethod"
+          description: The HTTP method of the reply webhook; POST when left out, as on Twilio.
+          examples:
+            - POST
+        account_sid:
+          type:
+            - string
+            - "null"
+          description: The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.
+          examples:
+            - null
+        opt_out_keywords:
+          type: boolean
+          description: Whether a text of STOP to this number opts the contact out; on when left out.
+          examples:
+            - true
     WebhookDelivery:
       type: object
       properties:
@@ -18421,6 +19844,104 @@ components:
         - success_history
         - created_by
         - created_at
+    WebhookEndpointCreateInput:
+      type: object
+      properties:
+        name:
+          type: string
+          description: A name for the endpoint, shown in lists and deliveries.
+          examples:
+            - Orders app
+        url:
+          type: string
+          description: Where deliveries are sent; can use templates.
+          examples:
+            - http://localhost:3000/webhooks/sendmock
+        method:
+          $ref: "#/components/schemas/HttpMethod"
+          description: The HTTP method of each delivery.
+          examples:
+            - POST
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+          description: Extra headers layered on top of the template's.
+          examples:
+            - Authorization: Bearer {{ vars.app_token }}
+        extra_fields:
+          type: object
+          additionalProperties:
+            type: string
+          description: Extra body fields layered on top of the template's.
+          examples:
+            - environment: local
+        template_id:
+          type: string
+          description: The payload template, e.g. `native` (Standard Webhooks JSON) or `slack.incoming_webhook`.
+          examples:
+            - native
+        template_mode:
+          $ref: "#/components/schemas/TemplateMode"
+          description: "`linked` follows template updates, `detached` keeps its own copy."
+          examples:
+            - linked
+        timeout_ms:
+          type: number
+          description: How long to wait for your app's answer, in milliseconds.
+          examples:
+            - 10000
+        retry_policy:
+          $ref: "#/components/schemas/RetryPolicy"
+          description: When and how often failed deliveries are retried.
+        is_enabled:
+          type: boolean
+          description: Off endpoints receive no deliveries.
+          examples:
+            - true
+        query_params:
+          type: array
+          items:
+            $ref: "#/components/schemas/NameValueTemplate"
+          description: Query parameters added to the URL.
+        body_mode:
+          $ref: "#/components/schemas/EndpointBodyMode"
+          description: "How the body is built: `template` (the payload template), `fields` (name and value rows), `raw` (one text template) or `none`."
+          examples:
+            - template
+        body_fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/EndpointBodyField"
+          description: The rows of `fields` mode.
+        fields_encoding:
+          type: string
+          enum:
+            - json
+            - form
+            - multipart
+          description: "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent)."
+          examples:
+            - json
+        raw_content_type:
+          type: string
+          description: The content type of `raw` mode.
+          examples:
+            - application/json
+        raw_body:
+          type: string
+          description: The body template of `raw` mode.
+          examples:
+            - '{"text": "New email: {{ data.subject }}"}'
+        render_mode:
+          $ref: "#/components/schemas/RenderMode"
+          description: "`strict` stops a delivery on an undefined variable, `lenient` renders it empty with a warning."
+          examples:
+            - strict
+      required:
+        - name
+        - url
+      description: "Body of POST /api/v1/webhooks/endpoints: a name and a URL, and any other fields; the rest take a new endpoint's defaults, as Preview fills them."
     WebhookEndpointInput:
       type: object
       properties:
@@ -19183,6 +20704,55 @@ components:
         - random_mode
         - description
       description: Body of POST and PATCH /api/v1/webhooks/variables.
+    WebhookVariableInputPatch:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name templates read it by, as `{{ vars.<name> }}`.
+          examples:
+            - tenant_id
+        kind:
+          $ref: "#/components/schemas/VariableKind"
+          description: "`text`, `number`, `boolean`, `json` and `secret` are fixed values; `dynamic` is read from the event, `random` is generated, `computed` combines other variables and `prompt` is asked for on manual sends."
+          examples:
+            - text
+        scope:
+          type: string
+          enum:
+            - global
+            - endpoint
+          description: "`global` for every endpoint, or `endpoint` for one; endpoint values win."
+          examples:
+            - global
+        endpoint_id:
+          anyOf:
+            - $ref: "#/components/schemas/Ulid"
+            - type: "null"
+          description: The endpoint of an `endpoint` variable; null for global ones.
+          examples:
+            - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
+        value:
+          type: string
+          description: Static value, expression, generator or default; secrets are masked.
+          examples:
+            - acme
+        random_mode:
+          type:
+            - string
+            - "null"
+          enum:
+            - per_send
+            - fixed
+            - null
+          description: "For `random`: `per_send` generates a new value each time, `fixed` keeps one value until Regenerate; null for other kinds."
+          examples:
+            - per_send
+        description:
+          type: string
+          description: What the variable is for.
+          examples:
+            - Tenant every webhook is sent for
     WhatsappWebhookVerification:
       type: object
       properties:

@@ -172,6 +172,20 @@ export const templateFilterCatalog: TemplateReferenceHelper[] = [
     example: '{{ data.to_number | replace("+", "") }}',
   },
   {
+    name: "tojson",
+    signature: "tojson",
+    description:
+      "The value as JSON, quoted for text, as Jinja writes it; use it to put a field into a JSON body.",
+    example: "{{ data.user_variables | tojson }}",
+  },
+  {
+    name: "regex_replace",
+    signature: "regex_replace(pattern, replacement)",
+    description:
+      "Replaces every match of the regular expression with replacement.",
+    example: '{{ data.message_id | regex_replace("[<>]", "") }}',
+  },
+  {
     name: "regex_extract",
     signature: "regex_extract(pattern)",
     description: "The first match of the regular expression, or empty.",

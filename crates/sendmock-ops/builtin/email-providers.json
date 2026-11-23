@@ -2,6 +2,8 @@
   {
     "is_enabled": true,
     "check_credentials": false,
+    "opt_out_keywords": false,
+    "opt_out_auto_replies": false,
     "credentials": [
       {
         "name": "api_key",
@@ -147,6 +149,8 @@
   {
     "is_enabled": true,
     "check_credentials": false,
+    "opt_out_keywords": false,
+    "opt_out_auto_replies": false,
     "credentials": [
       {
         "name": "api_key",
@@ -214,6 +218,26 @@
         "source": "h:*"
       },
       {
+        "part": "template_id",
+        "source": "template"
+      },
+      {
+        "part": "template_data",
+        "source": "t:variables"
+      },
+      {
+        "part": "template_data",
+        "source": "h:X-Mailgun-Variables"
+      },
+      {
+        "part": "user_variables",
+        "source": "h:X-Mailgun-Variables"
+      },
+      {
+        "part": "user_variables",
+        "source": "v:*"
+      },
+      {
         "part": "raw",
         "source": "message.content"
       }
@@ -279,6 +303,8 @@
   {
     "is_enabled": true,
     "check_credentials": false,
+    "opt_out_keywords": false,
+    "opt_out_auto_replies": false,
     "credentials": [
       {
         "name": "server_token",
@@ -421,6 +447,8 @@
   {
     "is_enabled": true,
     "check_credentials": false,
+    "opt_out_keywords": false,
+    "opt_out_auto_replies": false,
     "credentials": [
       {
         "name": "api_key",
@@ -576,6 +604,8 @@
   {
     "is_enabled": true,
     "check_credentials": false,
+    "opt_out_keywords": false,
+    "opt_out_auto_replies": false,
     "credentials": [
       {
         "name": "access_key_id",
@@ -703,6 +733,8 @@
   {
     "is_enabled": true,
     "check_credentials": false,
+    "opt_out_keywords": false,
+    "opt_out_auto_replies": false,
     "credentials": [
       {
         "name": "api_key",

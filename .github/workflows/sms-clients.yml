@@ -108,16 +108,17 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # AC: SM-23.4
           - client: Twilio Node SDK
             language: node
             folder: node-twilio
             run: bun install && node send-and-verify.js
-          # AC: SM-19.8
+          # AC: SM-19.8 SM-22.6
           - client: Twilio Node SDK with a subaccount
             language: node
             folder: node-twilio-subaccounts
             run: bun install && node send-under-subaccount-and-verify.js
-          # AC: SM-19.8
+          # AC: SM-19.8 SM-22.6
           - client: Twilio PHP SDK with a subaccount
             language: php
             folder: php-twilio-subaccounts
@@ -141,6 +142,7 @@ jobs:
             language: python
             folder: python-twilio
             run: pip install --quiet -r requirements.txt && python send_and_verify.py
+          # AC: SM-23.4
           - client: Twilio PHP SDK
             language: php
             folder: php-twilio

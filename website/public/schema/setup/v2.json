@@ -40,6 +40,13 @@
             "null"
           ]
         },
+        "count_views_with_webhook_rules": {
+          "description": "Counts a view as an open even when a webhook rule would send `email.opened`.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
         "email_outcome_bounce_rate_percent": {
           "description": "Used by the `realistic` outcome profile.",
           "format": "uint32",
@@ -929,6 +936,10 @@
         "name": {
           "type": "string"
         },
+        "opt_out_keywords": {
+          "description": "`false` turns opt-out keywords off for the service's numbers.",
+          "type": "boolean"
+        },
         "sid": {
           "type": "string"
         }
@@ -1202,6 +1213,13 @@
       "additionalProperties": false,
       "description": "`[[numbers]]`, matched by `number`; applied after the Messaging Services it joins.",
       "properties": {
+        "account_sid": {
+          "description": "The SID of the subaccount that owns the number; left out, the main account.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "channels": {
           "default": [
             "sms"
@@ -1246,6 +1264,10 @@
         },
         "number": {
           "type": "string"
+        },
+        "opt_out_keywords": {
+          "description": "`false` turns opt-out keywords off for this number.",
+          "type": "boolean"
         },
         "status_callback": {
           "type": [

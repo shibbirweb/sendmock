@@ -13,6 +13,7 @@ mod delivery_signing;
 mod delivery_template_context;
 mod delivery_view;
 mod delivery_wait_operation;
+mod email_forward_fields;
 mod email_template_data;
 mod endpoint_body_rendering;
 mod endpoint_delivery_health;
@@ -29,6 +30,7 @@ mod endpoint_template_overrides;
 mod endpoint_test_operation;
 mod endpoint_validation;
 mod endpoint_view;
+mod event_template_data;
 mod file_template_library;
 mod follow_up_delivery;
 mod manual_send_operation;
@@ -50,6 +52,7 @@ mod rule_preview_operation;
 mod rule_subscriber;
 mod rule_validation;
 mod rule_view;
+mod sample_email_data;
 mod saved_delivery_inputs;
 mod saved_delivery_operations;
 mod saved_delivery_send_operation;
@@ -96,6 +99,7 @@ pub use delivery_replay_operation::ReplayWebhookDeliveryOperation;
 pub(crate) use delivery_request_rendering::RenderedDeliveryRequest;
 pub use delivery_view::WebhookDelivery;
 pub use delivery_wait_operation::WaitForWebhookOperation;
+pub(crate) use email_forward_fields::{build_message_url, find_receiving_domain, split_reply_text};
 pub(crate) use endpoint_inputs::{WebhookEndpointInput, WebhookEndpointReference};
 pub use endpoint_operations::{
     CreateWebhookEndpointOperation, DeleteWebhookEndpointOperation, GetWebhookEndpointOperation,
@@ -113,6 +117,7 @@ pub use endpoint_test_operation::TestWebhookEndpointOperation;
 pub(crate) use endpoint_validation::validate_endpoint_input;
 pub use endpoint_view::WebhookEndpoint;
 pub(crate) use endpoint_view::{read_request_settings, write_request_settings};
+pub use event_template_data::{EventTemplateData, read_event_template_data};
 pub use file_template_library::{
     FileTemplateLibrary, LoadedTemplateDirectory, load_template_directory,
 };
@@ -134,6 +139,7 @@ pub use rule_operations::{
 };
 pub use rule_preview_operation::PreviewWebhookRuleOperation;
 pub(crate) use rule_subscriber::find_firing_rules;
+pub(crate) use rule_subscriber::would_rules_fire_for_email;
 pub use rule_subscriber::{
     deliver_recorded_event, fire_matching_rules, run_webhook_rule_subscriber,
 };

@@ -14,6 +14,7 @@ mod sms_read_operations;
 mod sms_reply_webhook_views;
 mod sms_send_decision;
 mod sms_send_operations;
+mod sms_template_data;
 mod sms_thread_operations;
 mod sms_views;
 mod status_callback;
@@ -48,6 +49,7 @@ pub use sms_send_decision::{
     decide_outbound_send, describe_rejection, load_custom_outcome_rules, to_simulation_profile,
 };
 pub use sms_send_operations::{SendSmsOperation, SimulateInboundSmsOperation};
+pub(crate) use sms_template_data::add_number_countries;
 pub use sms_thread_operations::{DeleteSmsThreadOperation, UpdateSmsThreadOperation};
 pub use sms_views::{RecordedHttpRequest, RecordedHttpResponse, SmsMessage, SmsThread};
 pub(crate) use status_callback_attempt::send_callback_attempt;

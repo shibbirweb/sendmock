@@ -240,6 +240,7 @@ mod tests {
         let (operation_context, release_source) = checker_context(true, UpdateCheckMode::Off).await;
 
         let check_outcome = operation_context
+            .machine
             .update_checker
             .check(&operation_context)
             .await;
@@ -262,10 +263,12 @@ mod tests {
             checker_context(true, UpdateCheckMode::Manual).await;
 
         let first_check = operation_context
+            .machine
             .update_checker
             .check(&operation_context)
             .await;
         let second_check = operation_context
+            .machine
             .update_checker
             .check(&operation_context)
             .await;
@@ -292,10 +295,12 @@ mod tests {
             checker_context(false, UpdateCheckMode::Daily).await;
 
         let first_check = operation_context
+            .machine
             .update_checker
             .check(&operation_context)
             .await;
         let _ = operation_context
+            .machine
             .update_checker
             .check(&operation_context)
             .await;

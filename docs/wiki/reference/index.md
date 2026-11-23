@@ -9,6 +9,7 @@ Every reference here is generated from SendMock's code or its API contract, and 
 | --- | --- |
 | [Configuration flags](./configuration-flags.md) | every `sendmock serve` flag with its environment variable, `sendmock.toml` key and default |
 | [Magic numbers and addresses](./magic-numbers.md) | the test phone numbers and email addresses that simulate a delivery outcome |
+| [Template data](./template-data.md) | every field a webhook template reads for email and SMS events |
 | [Template filters](./template-filters.md) | every filter for webhook, provider and gateway templates |
 | [Built-in webhook templates](./webhook-templates.md) | every payload template SendMock ships, with its events and variables |
 | [CLI reference](/cli/) | every `sendmock` command with its arguments, flags and output |

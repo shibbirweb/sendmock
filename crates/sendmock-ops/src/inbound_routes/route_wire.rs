@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 
+use crate::PartialChanges;
 use schemars::JsonSchema;
 use sendmock_mail::RouteFilterRule;
 use serde::{Deserialize, Serialize};
@@ -70,10 +71,9 @@ pub struct InboundRouteInput {
 pub struct InboundRouteUpdate {
     /// The route's ID, from `GET /api/v1/inbound-routes`.
     pub route_id: String,
-    pub priority: i64,
-    pub description: String,
-    pub filter: InboundRouteFilter,
-    pub actions: Vec<InboundRouteAction>,
+    /// Only the fields to change; the rest stay.
+    #[serde(flatten)]
+    pub changes: PartialChanges<InboundRouteInput>,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]

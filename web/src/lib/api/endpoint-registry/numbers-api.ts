@@ -6,6 +6,7 @@ import {
   projectQueryParameter,
   tagEndpoints,
   typeRef,
+  partialOf,
 } from "./endpoint-definition";
 
 const verificationFilterParameters = [
@@ -87,7 +88,7 @@ const verifyEndpoints = tagEndpoints("Verify", [
     method: "PATCH",
     path: "/api/v1/verify/services/{serviceSid}",
     summary: "Change a Verify service.",
-    requestBody: typeRef("VerifyServiceInput"),
+    requestBody: partialOf("VerifyServiceInput"),
     response: typeRef("VerifyService"),
     errorStatuses: [400, 404],
   },
@@ -120,7 +121,7 @@ const numberEndpoints = tagEndpoints("Numbers", [
     method: "PATCH",
     path: "/api/v1/numbers/{numberId}",
     summary: "Change a number.",
-    requestBody: typeRef("VirtualNumberInput"),
+    requestBody: partialOf("VirtualNumberInput"),
     response: typeRef("VirtualNumber"),
     errorStatuses: [400, 404],
   },
@@ -141,16 +142,16 @@ const numberEndpoints = tagEndpoints("Numbers", [
     method: "POST",
     path: "/api/v1/messaging-services",
     summary: "Add a Messaging Service.",
-    requestBody: typeRef("MessagingServiceInput"),
+    requestBody: typeRef("MessagingServiceCreateInput"),
     response: typeRef("MessagingService"),
     successStatus: 201,
-    errorStatuses: [400],
+    errorStatuses: [400, 409],
   },
   {
     method: "PATCH",
     path: "/api/v1/messaging-services/{serviceSid}",
     summary: "Change a Messaging Service.",
-    requestBody: typeRef("MessagingServiceInput"),
+    requestBody: partialOf("MessagingServiceInput"),
     response: typeRef("MessagingService"),
     errorStatuses: [400, 404],
   },
@@ -186,7 +187,7 @@ const twilioAccountEndpoints = tagEndpoints("SMS", [
     path: "/api/v1/twilio/subaccounts/{accountSid}",
     summary:
       "Change a Twilio subaccount's name, status, token or Debugger URL.",
-    requestBody: typeRef("TwilioSubaccountChanges"),
+    requestBody: partialOf("TwilioSubaccountChanges"),
     response: typeRef("TwilioSubaccount"),
     errorStatuses: [400, 404],
   },
@@ -233,9 +234,35 @@ const mailgunComplaintEndpoints = tagEndpoints("Email", [
   },
 ]);
 
+/** Contacts who texted STOP, as Twilio's Advanced Opt-Out keeps them (SM-23, A28). */
+const optOutEndpoints = tagEndpoints("SMS", [
+  {
+    method: "GET",
+    path: "/api/v1/sms/opt-outs",
+    summary: "Contacts who texted STOP, newest first.",
+    response: listOf("SmsOptOut"),
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/sms/opt-outs/{sender}/{contactNumber}",
+    summary: "Lift one opt-out, as if the contact texted START.",
+    response: null,
+    successStatus: 204,
+    errorStatuses: [404],
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/sms/opt-outs",
+    summary: "Lift every opt-out.",
+    response: null,
+    successStatus: 204,
+  },
+]);
+
 export const numbersApi: ApiEndpoint[] = [
   ...verifyEndpoints,
   ...numberEndpoints,
   ...twilioAccountEndpoints,
   ...mailgunComplaintEndpoints,
+  ...optOutEndpoints,
 ];

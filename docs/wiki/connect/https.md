@@ -29,7 +29,64 @@ Some SDKs always call `https://`, with no way to choose plain HTTP. Laravel's `m
 
    The same is at `GET /api/v1/tls/ca`, and Settings > Connection shows the HTTPS address with **Download the CA**. `/api/v1/info` and `--ready-json` name the HTTPS address as `provider_tls_address` and `provider_tls_addr`.
 
-## Trust the CA on your machine
+## Trust the CA with one command
+
+`sendmock trust` adds the local CA to your system store and to the runtimes that ignore it, so your app reaches the HTTPS port with no setting of its own. It makes the CA if there is none yet, shows each place and what it will change, and asks first.
+
+1. Add the CA where it is missing.
+
+   ```bash
+   sendmock trust
+   ```
+
+   It changes:
+
+   - the system store: your login keychain on macOS, your Trusted Root store on Windows, the CA folder of your Linux distribution (through `sudo`, which may ask for your password);
+   - each PHP it finds (Herd's, Homebrew's and the one on your `PATH`): a bundle of the CA file that PHP reads now plus the local CA, and a marked block in its `php.ini` setting `openssl.cafile` and `curl.cainfo`;
+   - Java: the CA in the JDK's `cacerts` as `sendmock-local-ca` (run it with `sudo` when the JDK belongs to root).
+
+   For Python (`certifi`) it writes a combined bundle and prints the `SSL_CERT_FILE` and `REQUESTS_CA_BUNDLE` lines to set; for Node.js it prints the `NODE_EXTRA_CA_CERTS` line.
+
+2. Check what trusts the CA, changing nothing.
+
+   ```bash
+   sendmock trust --check
+   ```
+
+   It works on the CA of the SendMock that answers at `--server` (one started with `--db <path>` keeps its CA beside that database), or the CA in SendMock's data folder when none answers, and the first line says which. The same report is at `GET /api/v1/tls/trust`, in the MCP tool `sendmock_tls_trust`, and under **Trusted by** in Settings > Connection.
+
+   A PHP with no main `php.ini` that takes its CA files from an ini file in its scan folder (Laravel Herd's PHP does) is reported as `manual`, naming that file and the `openssl.cafile` and `curl.cainfo` it sets. `sendmock trust` leaves that file alone: it writes a bundle of that PHP's CA file plus the local CA and prints the path to set both settings to. To write only the bundles (PHP's and Python's) and change nothing else, not even the system store:
+
+   ```bash
+   sendmock trust --bundle-only
+   ```
+
+3. Run it again whenever you like: places that already trust the CA are left as they are. To take everything out again:
+
+   ```bash
+   sendmock trust --undo
+   ```
+
+Add `--yes` to change without asking, for scripts. A server started with `--provider-tls-names` uses a CA made for those names; trust it after starting that server.
+
+### Use your own local CA (mkcert)
+
+If you already trust a local CA, such as one made with mkcert, give SendMock a certificate from it instead:
+
+1. Make a certificate for the names your app calls.
+
+   ```bash
+   mkcert localhost 127.0.0.1 ::1
+   ```
+
+2. Start SendMock with it.
+
+   ```bash
+   sendmock --provider-tls-addr 127.0.0.1:8027 --provider-tls-cert localhost+2.pem --provider-tls-key localhost+2-key.pem
+   ```
+
+## Trust the CA by hand
+
 
 On macOS:
 

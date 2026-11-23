@@ -191,7 +191,11 @@ const automationEndpoints = tagEndpoints("Automation", [
     summary:
       "Copy-ready settings for a stack, as Settings > Connection shows them.",
     queryParameters: [
-      stringQuery("channel", "email, sms or http (default email).", "email"),
+      stringQuery(
+        "channel",
+        "email, sms, http, mailgun or twilio (default email).",
+        "email",
+      ),
       stringQuery(
         "host",
         "Where the app runs: local, docker-host or compose.",

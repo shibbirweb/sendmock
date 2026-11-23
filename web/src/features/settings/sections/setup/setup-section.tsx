@@ -1,10 +1,11 @@
 import { FeatureAvailabilityGate } from "@/features/availability/feature-availability-gate";
 import { CiUseCard } from "@/features/settings/sections/setup/ci-use-card";
+import { PresetCard } from "@/features/settings/sections/setup/preset-card";
 import { SeedStatusCard } from "@/features/settings/sections/setup/seed-status-card";
 import { SetupExportCard } from "@/features/settings/sections/setup/setup-export-card";
 import { SetupImportCard } from "@/features/settings/sections/setup/setup-import-card";
 
-/** Settings > Setup: the seed's status, and a setup's export and import (PL-04.6, PL-18). */
+/** Settings > Setup: the seed's status, a setup's export and import, and presets (PL-04.6, PL-18, PL-27). */
 export function SetupSection() {
   return (
     <div className="grid gap-4">
@@ -17,6 +18,7 @@ export function SetupSection() {
       </FeatureAvailabilityGate>
       <SetupExportCard />
       <SetupImportCard />
+      <PresetCard />
       <CiUseCard />
     </div>
   );

@@ -222,13 +222,15 @@ impl Operation for UpdatePaymentGatewayOperation {
         input: PaymentGatewayUpdate,
     ) -> Result<PaymentGatewayDefinition, OperationError> {
         let stored_gateway = find_payment_gateway(operation_context, &input.gateway_key).await?;
+        let merged_changes: PaymentGatewayFields =
+            input.changes.merge_onto(&stored_gateway.fields)?;
         let changed_fields = PaymentGatewayFields {
             key: stored_gateway.fields.key.clone(),
             credentials: merge_credentials(
                 &stored_gateway.fields.credentials,
-                input.changes.credentials.clone(),
+                merged_changes.credentials.clone(),
             ),
-            ..input.changes
+            ..merged_changes
         };
         check_gateway_fields(operation_context, &changed_fields).await?;
         let changed_gateway = PaymentGatewayRecord {

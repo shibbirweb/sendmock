@@ -12,6 +12,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { OptOutKeywordsSwitch } from "@/features/numbers/opt-out-keywords-switch";
 import { MessagingServicePoolField } from "@/features/numbers/messaging-services/messaging-service-pool-field";
 import { useMessagingServiceForm } from "@/features/numbers/messaging-services/use-messaging-service-form";
 import {
@@ -120,6 +121,14 @@ function MessagingServiceForm({
             </FormField>
           </div>
         )}
+        <OptOutKeywordsSwitch
+          switchId={`${fieldIdPrefix}-opt-out-keywords`}
+          hint="A text of STOP to one of its numbers opts the contact out of the whole service, with the provider's switch on."
+          isChecked={formValues.hasOptOutKeywords}
+          onCheckedChange={(isChecked) => {
+            updateFormValues({ hasOptOutKeywords: isChecked });
+          }}
+        />
       </div>
       <SheetFooter className="flex-row justify-end border-t">
         <Button type="button" variant="ghost" onClick={onDone}>

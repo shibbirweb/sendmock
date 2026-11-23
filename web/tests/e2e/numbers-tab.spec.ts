@@ -113,3 +113,43 @@ test("deleting a service leaves its numbers registered without a pool", async ({
   await expect(supportRow).toBeVisible();
   await expect(supportRow).toContainText("None");
 });
+
+test("SM-22.5 a number is given to a Twilio subaccount and keeps it when edited", async ({
+  page,
+}) => {
+  await page.goto("/numbers");
+  await page.getByRole("button", { name: "Add number" }).click();
+  const numberSheet = page.getByRole("dialog", { name: "Add a number" });
+
+  await numberSheet.getByLabel("Number").fill("+15550005555");
+  await numberSheet.getByLabel("Label").fill("Clinic line");
+  await expect(numberSheet.getByLabel("Twilio account")).toHaveText(
+    "Main account",
+  );
+  await numberSheet.getByLabel("Twilio account").click();
+  await page.getByRole("option", { name: "Acme Clinic" }).click();
+  await numberSheet.getByRole("button", { name: "Add number" }).click();
+
+  await page.getByRole("button", { name: "Edit +15550005555" }).click();
+  const editSheet = page.getByRole("dialog", { name: "Edit number" });
+  await expect(editSheet.getByLabel("Twilio account")).toHaveText(
+    "Acme Clinic",
+  );
+});
+
+test("SM-23.3 the Opt-outs tab lists contacts who texted STOP and lifts them", async ({
+  page,
+}) => {
+  await page.goto("/numbers?tab=opt-outs");
+  const optOutRow = page.getByRole("row").filter({ hasText: "+15550009999" });
+  await expect(optOutRow).toContainText("STOP");
+
+  await page
+    .getByRole("button", { name: "Lift the opt-out of +15550009999" })
+    .click();
+
+  await expect(optOutRow).toHaveCount(0);
+  await expect(
+    page.getByText("No opt-outs. A contact who texts STOP"),
+  ).toBeVisible();
+});

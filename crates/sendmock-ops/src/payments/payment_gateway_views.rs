@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 
+use crate::PartialChanges;
 use schemars::JsonSchema;
 use sendmock_payments::PaymentGatewayDraft;
 use serde::{Deserialize, Serialize};
@@ -130,7 +131,7 @@ pub struct PaymentGatewayUpdate {
     /// The gateway's key, from `GET /api/v1/payments/gateways`.
     pub gateway_key: String,
     #[serde(flatten)]
-    pub changes: PaymentGatewayFields,
+    pub changes: PartialChanges<PaymentGatewayFields>,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]

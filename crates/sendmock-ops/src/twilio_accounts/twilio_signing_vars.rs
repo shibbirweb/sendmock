@@ -69,26 +69,39 @@ pub async fn find_conversation_account(
 
 /// The variable Twilio templates sign with; a webhook variable of this name wins.
 pub const TWILIO_AUTH_TOKEN_VARIABLE: &str = "twilio_auth_token";
+/// The variable Twilio templates write as `AccountSid`; a webhook variable of this name wins.
+pub const TWILIO_ACCOUNT_SID_VARIABLE: &str = "twilio_account_sid";
 
-/// Gives an endpoint delivery `vars.twilio_auth_token` from the Twilio provider, as the token
-/// of the event's account (`data.account`) or the main account, unless a webhook variable
-/// already set it. So `twilio.inbound_sms` and `twilio.status_callback` sign like Twilio does
-/// without a variable to keep in step with the provider.
-pub async fn default_twilio_auth_token_variable(
+/// Gives an endpoint delivery `vars.twilio_account_sid` and `vars.twilio_auth_token` from the
+/// Twilio provider, as the event's account (`data.account`) or the main account, unless a
+/// webhook variable already set them. So `twilio.inbound_sms` and `twilio.status_callback`
+/// name and sign with the right account without a variable to keep in step with the provider.
+pub async fn default_twilio_account_variables(
     operation_context: &OperationContext,
     template_context: &Value,
     resolved_values: &mut Map<String, Value>,
 ) -> Result<(), OperationError> {
-    if resolved_values.contains_key(TWILIO_AUTH_TOKEN_VARIABLE) {
+    let is_account_set = resolved_values.contains_key(TWILIO_ACCOUNT_SID_VARIABLE);
+    let is_token_set = resolved_values.contains_key(TWILIO_AUTH_TOKEN_VARIABLE);
+    if is_account_set && is_token_set {
         return Ok(());
     }
     let directory = TwilioAccountDirectory::load(operation_context).await?;
     let event_account = template_context
         .pointer("/data/account")
         .and_then(Value::as_str);
-    resolved_values.insert(
-        TWILIO_AUTH_TOKEN_VARIABLE.to_owned(),
-        Value::from(directory.account_for(event_account).auth_token.clone()),
-    );
+    let signing_account = directory.account_for(event_account);
+    if !is_account_set {
+        resolved_values.insert(
+            TWILIO_ACCOUNT_SID_VARIABLE.to_owned(),
+            Value::from(signing_account.account_sid.clone()),
+        );
+    }
+    if !is_token_set {
+        resolved_values.insert(
+            TWILIO_AUTH_TOKEN_VARIABLE.to_owned(),
+            Value::from(signing_account.auth_token.clone()),
+        );
+    }
     Ok(())
 }

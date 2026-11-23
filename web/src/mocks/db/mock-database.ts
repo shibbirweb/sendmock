@@ -1,6 +1,7 @@
 import type {
   ApiRequestLogEntry,
   AppSettings,
+  EmailTemplate,
   SavedScenario,
   CapturedHttpRequest,
   EmailDetail,
@@ -27,6 +28,7 @@ import type {
   WebhookTemplateSummary,
   WebhookVariable,
   MailgunComplaint,
+  SmsOptOut,
   TwilioSubaccount,
 } from "@/lib/api/types";
 import {
@@ -135,6 +137,10 @@ export type MockDatabase = {
   messagingServices: MessagingService[];
   twilioSubaccounts: MockTwilioSubaccount[];
   mailgunComplaints: MailgunComplaint[];
+  /** Contacts who texted STOP (SM-23). */
+  smsOptOuts: SmsOptOut[];
+  /** Local stand-ins for providers' email templates (EM-26.2). */
+  emailTemplates: EmailTemplate[];
   smsOutcomeRules: SmsOutcomeRule[];
   emailOutcomeRules: EmailOutcomeRule[];
   messageRules: MessageRuleSets;
@@ -199,11 +205,27 @@ function buildConfiguration() {
     virtualNumbers,
     messagingServices: buildMessagingServiceFixtures(virtualNumbers),
     twilioSubaccounts: buildTwilioSubaccountFixtures(),
+    emailTemplates: [
+      {
+        id: "welcome-email",
+        subject: "Welcome, {{ first_name }}",
+        text: "Hi {{ first_name }}, thanks for joining Acme.",
+        html: null,
+      },
+    ],
     mailgunComplaints: [
       {
         domain: "mg.acme.test",
         address: "complaint@example.test",
         created_at: "2026-11-20T09:30:00Z",
+      },
+    ],
+    smsOptOuts: [
+      {
+        sender: "+15550001111",
+        contact_number: "+15550009999",
+        keyword: "STOP",
+        created_at: "2026-11-21T14:05:00Z",
       },
     ],
     verifyServices,

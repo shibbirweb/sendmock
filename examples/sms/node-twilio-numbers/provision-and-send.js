@@ -19,7 +19,7 @@ class SendMockRequestClient extends twilio.RequestClient {
   }
 }
 
-const client = twilio("ACtest00000000000000000000000000", "twilio-test-token", {
+const client = twilio("ACtest0000000000000000000000000000", "twilio-test-token", {
   httpClient: new SendMockRequestClient(),
 });
 

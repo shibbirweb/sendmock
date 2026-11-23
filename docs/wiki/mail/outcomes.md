@@ -47,6 +47,29 @@ Outcomes are events, so they go wherever your [rules](../webhooks/rules.md) send
 
 Step by step: [Recipe: bounces and complaints](../recipes/bounces-and-complaints.md).
 
+## Test opens and bounces with your app's own ids
+
+Mail your app sends over SMTP carries none of the ids your app's webhook handler looks for, such as an order or customer id. Give them to the simulated event as user variables, and every webhook it sends carries them (Mailgun's `user-variables`, `data.user_variables` in your own templates), merged over any the email was sent with, before the payload is signed. No payload editing needed.
+
+1. Send the email from your app over SMTP, as it does in production.
+2. Simulate the bounce with your app's ids:
+
+   ```bash
+   sendmock email simulate <emailId> bounced --user-variables '{"order_id": "A-1001", "customer_id": 42}'
+   ```
+
+3. Or record an open with them:
+
+   ```bash
+   sendmock email open <emailId> --user-variables '{"order_id": "A-1001"}'
+   ```
+
+4. Check your app handled the webhook for order A-1001.
+
+Over REST, add `"user_variables": {"order_id": "A-1001"}` to the body of `POST /api/v1/emails/{emailId}/simulate`, `/open` or `/click`; the MCP tools take the same field.
+
+Viewing an email in **Mail** does not count as an open when a webhook rule would send `email.opened` to your app, so browsing the inbox never tells your app a customer read the email. The viewer says so and offers **Count as an open**; **Count views your webhook rules would report** in [Settings > Email](../settings.md#email) counts them as before.
+
 ## From the CLI, API and AI
 
 | Do this | CLI | API | MCP tool |

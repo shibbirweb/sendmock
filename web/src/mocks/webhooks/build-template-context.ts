@@ -12,6 +12,8 @@ import {
   samplePaymentEventData,
   toPaymentEventData,
 } from "@/mocks/payments/payment-event-data";
+import { buildEmailForwardFields } from "@/mocks/webhooks/email-forward-fields";
+import { findNumberCountry } from "@/mocks/webhooks/number-country";
 import type { TemplateContext } from "@/mocks/webhooks/render-template-text";
 
 type ContextSubject = {
@@ -22,6 +24,7 @@ type ContextSubject = {
 
 function toEmailData(email: EmailDetail): Record<string, unknown> {
   return {
+    ...buildEmailForwardFields(email),
     id: email.id,
     message_id: email.message_id,
     from: email.from,
@@ -60,6 +63,9 @@ function toSmsData(smsMessage: SmsMessage): Record<string, unknown> {
     status: smsMessage.status,
     error_code: smsMessage.error_code,
     messaging_service_sid: smsMessage.messaging_service_sid,
+    account: smsMessage.account,
+    from_country: findNumberCountry(smsMessage.from_number),
+    to_country: findNumberCountry(smsMessage.to_number),
     extracted: smsMessage.extracted,
   };
 }
@@ -106,6 +112,8 @@ export function buildSampleSubject(eventType: AppEventType): ContextSubject {
         status: "delivered",
         error_code: null,
         messaging_service_sid: null,
+        from_country: "US",
+        to_country: "US",
         extracted: { otp: ["482913"], links: [] },
       },
     };

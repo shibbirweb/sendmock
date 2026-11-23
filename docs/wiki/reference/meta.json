@@ -4,6 +4,7 @@
     "index",
     "configuration-flags",
     "magic-numbers",
+    "template-data",
     "template-filters",
     "webhook-templates"
   ]

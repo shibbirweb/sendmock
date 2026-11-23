@@ -3,12 +3,26 @@ use std::collections::BTreeMap;
 use schemars::JsonSchema;
 use serde::Deserialize;
 
+use crate::PartialChanges;
+
 use super::endpoint_settings::{
     EndpointBodyField, EndpointBodyMode, EndpointRequestSettings, FieldsEncoding,
     NameValueTemplate, RenderMode, RetryPolicy, TemplateMode, WebhookHttpMethod,
 };
 
-/// Body of `POST /api/v1/webhooks/endpoints`.
+/// Body of `POST /api/v1/webhooks/endpoints`: a name and a URL, and any other fields; the rest
+/// take a new endpoint's defaults, as Preview fills them.
+#[derive(Debug, Clone, Deserialize, JsonSchema)]
+pub struct WebhookEndpointCreateInput {
+    /// A name for the endpoint, shown in lists and deliveries.
+    pub name: String,
+    /// Where deliveries are sent; can use templates.
+    pub url: String,
+    #[serde(flatten)]
+    pub other_fields: PartialChanges<WebhookEndpointInput>,
+}
+
+/// A whole endpoint: what create completes with defaults and PATCH merges onto.
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
 pub struct WebhookEndpointInput {
     /// A name for the endpoint, shown in lists and deliveries.

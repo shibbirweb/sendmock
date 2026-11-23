@@ -26,6 +26,8 @@ const editableFields = [
   "host",
   "credentials",
   "check_credentials",
+  "opt_out_keywords",
+  "opt_out_auto_replies",
   "operations",
   "field_mapping",
   "validation_rules",

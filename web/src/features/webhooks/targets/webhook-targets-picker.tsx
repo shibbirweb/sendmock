@@ -10,6 +10,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  type NameValueRow,
+  NameValueRowsEditor,
+} from "@/components/common/name-value-rows-editor";
 import { Input } from "@/components/ui/input";
 import type {
   WebhookPickerChoice,
@@ -29,8 +33,16 @@ import {
   replaceRequestEdit,
 } from "@/features/webhooks/targets/webhook-request-edits";
 import { TargetPayloadButton } from "@/features/webhooks/targets/webhook-target-links";
-import { useWebhookEndpoints } from "@/lib/api/hooks/use-webhook-queries";
-import type { WebhookEndpoint, WebhookRequestEdit } from "@/lib/api/types";
+import { findTemplateEventWarning } from "@/features/webhooks/targets/template-event-warning";
+import {
+  useWebhookEndpoints,
+  useWebhookTemplates,
+} from "@/lib/api/hooks/use-webhook-queries";
+import type {
+  AppEventType,
+  WebhookEndpoint,
+  WebhookRequestEdit,
+} from "@/lib/api/types";
 
 export type WebhookTargetsPickerRequest = {
   /** What the action does, e.g. "Hard bounce". */
@@ -41,6 +53,8 @@ export type WebhookTargetsPickerRequest = {
   initialEndpointIds: string[];
   /** Payloads edited earlier for this action. */
   initialRequestEdits: WebhookRequestEdit[];
+  /** User variables chosen earlier for this action. */
+  initialUserVariables?: Record<string, string>;
   /** The confirm button, e.g. "Use these" or "Simulate". */
   confirmLabel: string;
   onConfirm: (pickerChoice: WebhookPickerChoice) => void;
@@ -52,6 +66,7 @@ function PickerEndpointList({
   searchText,
   checkedEndpointIds,
   requestEdits,
+  eventType,
   onToggle,
   onOpenPayload,
 }: {
@@ -59,9 +74,11 @@ function PickerEndpointList({
   searchText: string;
   checkedEndpointIds: string[];
   requestEdits: WebhookRequestEdit[];
+  eventType: AppEventType | undefined;
   onToggle: (endpointId: string, isChecked: boolean) => void;
   onOpenPayload: (webhookEndpoint: WebhookEndpoint) => void;
 }) {
+  const templatesQuery = useWebhookTemplates();
   const visibleEndpoints = enabledEndpoints.filter((webhookEndpoint) =>
     matchesSearch(webhookEndpoint, searchText),
   );
@@ -76,6 +93,15 @@ function PickerEndpointList({
           key={webhookEndpoint.id}
           webhookEndpoint={webhookEndpoint}
           isChecked={checkedEndpointIds.includes(webhookEndpoint.id)}
+          templateWarning={
+            eventType === undefined
+              ? null
+              : findTemplateEventWarning(
+                  webhookEndpoint,
+                  templatesQuery.data ?? [],
+                  eventType,
+                )
+          }
           onCheckedChange={(isChecked) => {
             onToggle(webhookEndpoint.id, isChecked);
           }}
@@ -127,10 +153,22 @@ export function WebhookTargetsPicker({
     React.useState<WebhookPayloadRequest | null>(null);
   const [shownRequest, setShownRequest] =
     React.useState<WebhookTargetsPickerRequest | null>(null);
+  const [userVariableRows, setUserVariableRows] = React.useState<
+    NameValueRow[]
+  >([]);
   if (pickerRequest !== null && pickerRequest !== shownRequest) {
     setShownRequest(pickerRequest);
     setCheckedEndpointIds(pickerRequest.initialEndpointIds);
     setRequestEdits(pickerRequest.initialRequestEdits);
+    setUserVariableRows(
+      Object.entries(pickerRequest.initialUserVariables ?? {}).map(
+        ([rowName, rowValue], rowIndex) => ({
+          rowId: rowIndex,
+          rowName,
+          rowValue,
+        }),
+      ),
+    );
     setSearchText("");
   }
   const enabledEndpoints = (endpointsQuery.data ?? []).filter(
@@ -180,6 +218,7 @@ export function WebhookTargetsPicker({
           searchText={searchText}
           checkedEndpointIds={checkedEndpointIds}
           requestEdits={requestEdits}
+          eventType={eventType}
           onToggle={(endpointId, isChecked) => {
             setCheckedEndpointIds((previousIds) =>
               isChecked
@@ -210,6 +249,14 @@ export function WebhookTargetsPicker({
             });
           }}
         />
+        <NameValueRowsEditor
+          legend="User variables"
+          rowLabel="User variable"
+          namePlaceholder="order_id"
+          emptyText="None. Add your app's ids, such as an order id, to every webhook this action sends."
+          rows={userVariableRows}
+          onChange={setUserVariableRows}
+        />
         <DialogFooter>
           <p className="mr-auto self-center text-xs text-muted-foreground">
             {checkedEndpointIds.length === 0
@@ -229,6 +276,14 @@ export function WebhookTargetsPicker({
                 endpointIds,
                 requestEdits: requestEdits.filter((requestEdit) =>
                   endpointIds.includes(requestEdit.endpoint_id),
+                ),
+                userVariables: Object.fromEntries(
+                  userVariableRows
+                    .filter((variableRow) => variableRow.rowName.trim() !== "")
+                    .map((variableRow) => [
+                      variableRow.rowName.trim(),
+                      variableRow.rowValue,
+                    ]),
                 ),
               });
               onClose();

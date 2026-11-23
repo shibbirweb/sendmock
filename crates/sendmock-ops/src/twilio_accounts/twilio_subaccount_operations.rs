@@ -122,10 +122,13 @@ impl Operation for UpdateTwilioSubaccountOperation {
         input: TwilioSubaccountUpdate,
     ) -> Result<TwilioSubaccount, OperationError> {
         let existing_subaccount = find_existing(operation_context, &input.account_sid).await?;
+        let merged_changes = input
+            .changes
+            .merge_onto(&TwilioSubaccount::from(existing_subaccount.clone()))?;
         let changed_subaccount = build_subaccount(
             operation_context,
             input.account_sid,
-            input.changes,
+            merged_changes,
             Some(existing_subaccount),
         )?;
         operation_context

@@ -112,6 +112,12 @@ jobs:
         working-directory: examples/email-providers/node
         run: bun install && node done-when.js
 
+      # AC: EM-24.5
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Mailgun Node SDK sends with a template and variables, and the webhook carries them
+        working-directory: examples/email-providers/node
+        run: node mailgun-template-variables.js
+
       - if: needs.changes.outputs.is_affected == 'true'
         uses: shivammathur/setup-php@v2
         with:
@@ -124,11 +130,23 @@ jobs:
         working-directory: examples/email-providers/php-mailgun
         run: composer install --no-interaction --quiet && php send-and-verify.php
 
+      # AC: EM-24.5
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: Mailgun PHP SDK sends with a template and variables, and the webhook carries them
+        working-directory: examples/email-providers/php-mailgun
+        run: php send-template-and-verify.php
+
       # AC: PL-20.5
       - if: needs.changes.outputs.is_affected == 'true'
         name: Laravel's mailgun mailer sends over HTTPS with the local CA trusted
         working-directory: examples/email-providers/php-laravel-mailgun-https
         run: ./send-over-https-test.sh
+
+      # AC: PL-25.4
+      - if: needs.changes.outputs.is_affected == 'true'
+        name: After sendmock trust, Laravel's mailgun mailer sends over HTTPS with no CA setting
+        working-directory: examples/email-providers/php-laravel-mailgun-https
+        run: ./send-after-trust-test.sh
 
       - if: needs.changes.outputs.is_affected == 'true'
         uses: ./.github/actions/check-sendmock-offline

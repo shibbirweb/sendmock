@@ -23,7 +23,8 @@ export type StageBPhase =
   | "A17"
   | "A18"
   | "A19"
-  | "A23";
+  | "A23"
+  | "A28";
 
 export type OperationSurfaces = {
   /** When the binary starts serving it; the live UI shows Not available yet before (UI-12). */
@@ -50,6 +51,11 @@ export type OperationSurfaces = {
   cliArguments?: Record<string, string>;
   /** Flags the naming rules get wrong, by input, e.g. `{ timeout: "--wait" }`. */
   cliFlags?: Record<string, string>;
+  /**
+   * Removes data although the CLI asks no `--yes`, as the server confirms each removal
+   * itself (setup import's `confirm_removed_count`, PL-26.2); MCP marks it destructive.
+   */
+  confirmsOnServer?: boolean;
 };
 
 export type OperationSelector =

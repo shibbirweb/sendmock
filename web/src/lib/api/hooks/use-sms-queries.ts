@@ -12,6 +12,7 @@ import type {
   SmsMessage,
   SmsMessageDetail,
   SmsStatus,
+  SmsStatusChangeAnswer,
   SmsThread,
   WebhookChoice,
 } from "@/lib/api/types";
@@ -50,8 +51,8 @@ export function useSmsMessage(smsId: string) {
   });
 }
 
-function useSmsMutation<MutationInput>(
-  mutationRequest: (mutationInput: MutationInput) => Promise<unknown>,
+function useSmsMutation<MutationInput, MutationResult = unknown>(
+  mutationRequest: (mutationInput: MutationInput) => Promise<MutationResult>,
 ) {
   const queryClient = useQueryClient();
 
@@ -87,7 +88,7 @@ export function useSetSmsStatus() {
       errorCode?: string | null;
       webhookChoice?: WebhookChoice;
     }) =>
-      requestApi<SmsMessage>(`/sms/${smsId}/status`, {
+      requestApi<SmsStatusChangeAnswer>(`/sms/${smsId}/status`, {
         method: "POST",
         requestBody: {
           status: smsStatus,

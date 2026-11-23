@@ -173,10 +173,11 @@ impl Operation for UpdatePaymentFlowOperation {
         input: PaymentFlowUpdate,
     ) -> Result<PaymentFlowDefinition, OperationError> {
         let stored_flow = find_payment_flow(operation_context, &input.flow_key).await?;
+        let merged_changes: PaymentFlowInput = input.changes.merge_onto(&stored_flow)?;
         let changed_flow = PaymentFlowRecord {
-            name: input.changes.name,
-            picker_tab: input.changes.picker_tab,
-            steps: input.changes.steps,
+            name: merged_changes.name,
+            picker_tab: merged_changes.picker_tab,
+            steps: merged_changes.steps,
             ..stored_flow
         };
         check_flow_record(operation_context, &changed_flow, false).await?;

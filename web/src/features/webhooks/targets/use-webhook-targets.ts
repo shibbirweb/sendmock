@@ -46,6 +46,8 @@ export type WebhookTargetsState = {
     endpointId: string,
     requestEdit: WebhookRequestEdit | null,
   ) => void;
+  /** User variables for this action's webhooks, chosen in the picker (EM-27.1). */
+  userVariables: Record<string, string>;
   /** Sets the chosen endpoints and their edits at once, as the picker confirms. */
   applyChoice: (pickerChoice: WebhookPickerChoice) => void;
   /** Spread into the action's request body. */
@@ -56,6 +58,8 @@ export type WebhookTargetsState = {
 export type WebhookPickerChoice = {
   endpointIds: string[];
   requestEdits: WebhookRequestEdit[];
+  /** Your app's ids for this action's webhooks, merged into `user_variables` (EM-27.1). */
+  userVariables?: Record<string, string>;
 };
 
 /** Which webhooks a simulation will trigger, and the choice for this one action (WH-13.2, WH-13.4). */
@@ -78,6 +82,9 @@ export function useWebhookTargets(
   const [requestEdits, setRequestEdits] = React.useState<WebhookRequestEdit[]>(
     [],
   );
+  const [userVariables, setUserVariables] = React.useState<
+    Record<string, string>
+  >({});
   const targets = listWebhookTargets({
     matchResult: matchQuery.data,
     chosenEndpointIds,
@@ -105,16 +112,23 @@ export function useWebhookTargets(
         replaceRequestEdit(previousEdits, endpointId, requestEdit),
       );
     },
+    userVariables,
     applyChoice: (pickerChoice) => {
       setChosenEndpointIds(pickerChoice.endpointIds);
       setRequestEdits(pickerChoice.requestEdits);
+      setUserVariables(pickerChoice.userVariables ?? {});
     },
-    webhookChoice: toWebhookChoice({
-      chosenEndpointIds,
-      targetEndpointIds: targets.map(
-        (webhookTarget) => webhookTarget.endpointId,
-      ),
-      requestEdits,
-    }),
+    webhookChoice: {
+      ...toWebhookChoice({
+        chosenEndpointIds,
+        targetEndpointIds: targets.map(
+          (webhookTarget) => webhookTarget.endpointId,
+        ),
+        requestEdits,
+      }),
+      ...(Object.keys(userVariables).length === 0
+        ? {}
+        : { user_variables: userVariables }),
+    },
   };
 }

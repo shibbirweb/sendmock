@@ -17,7 +17,9 @@ use tokio_rustls::TlsAcceptor;
 use crate::config::ProviderTlsConfig;
 use crate::listener_binding::bind_listener;
 use crate::startup_error::StartupError;
-use local_certificate_authority::issue_server_certificate;
+pub use local_certificate_authority::{
+    CA_COMMON_NAME, default_ca_folder, issue_server_certificate, load_local_ca_certificate,
+};
 use tls_provider_listener::TlsProviderListener;
 
 /// The HTTPS provider listener, bound, with what `/api/v1/info` and `sendmock tls ca` report.
@@ -74,7 +76,7 @@ pub async fn bind_tls_provider_listener(
             _ => {
                 let ca_folder = generated_folder
                     .map(Path::to_path_buf)
-                    .unwrap_or_else(|| std::env::temp_dir().join("sendmock"));
+                    .unwrap_or_else(default_ca_folder);
                 let issued = issue_server_certificate(&ca_folder, &tls_config.extra_names)
                     .map_err(tls_error)?;
                 let ca_certificate = (issued.ca_certificate_path, issued.ca_certificate_pem);

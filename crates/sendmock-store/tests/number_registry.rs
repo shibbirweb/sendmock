@@ -30,6 +30,7 @@ fn virtual_number(number_id: &str, e164_number: &str) -> VirtualNumberRecord {
         messaging_service_sid: None,
         phone_number_sid: format!("PN{:0>32}", number_id),
         account_sid: None,
+        opt_out_keywords: true,
         created_by: "api".to_owned(),
         created_at_unix_ms: 1_000,
     }
@@ -46,6 +47,7 @@ fn messaging_service(service_sid: &str, number_ids: &[&str]) -> MessagingService
         inbound_mode: "defer_to_sender".to_owned(),
         inbound_url: None,
         inbound_fallback_url: None,
+        opt_out_keywords: true,
         created_by: "api".to_owned(),
         created_at_unix_ms: 2_000,
     }

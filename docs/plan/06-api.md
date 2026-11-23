@@ -119,7 +119,7 @@ Native payments, hosted checkout, simulate actions (Phase 4 adds `answer_dispute
 | Method | Path | Purpose |
 |--------|------|---------|
 | GET | `/logs/smtp`, `/logs/smtp/{sessionId}` | SMTP sessions with full transcripts (incl. failed sessions) |
-| GET | `/logs/http`, `/logs/http/{requestId}` | requests to native and provider APIs, including rejected ones |
+| GET | `/logs/http`, `/logs/http/{requestId}` | requests to native and provider APIs, including rejected ones; each entry's `note` says why SendMock answered as it did when the answer alone does not (a Twilio 401: a wrong token, an unknown account, or an account that is not the provider's; SM-22.4), null otherwise |
 | DELETE | `/logs/smtp/{sessionId}`, `/logs/smtp` | delete one SMTP session, or all (the list's filters narrow it) (A17, UI-14) |
 | DELETE | `/logs/http/{requestId}`, `/logs/http` | delete one API request log entry, or all (the list's filters narrow it) (A17, UI-14) |
 
@@ -192,11 +192,15 @@ These make SendMock useful from any test framework without polling loops:
 | POST | `/scenarios/{scenarioId}/run` | run a saved scenario; answers the same report as `/scenarios/run` |
 | GET | `/ai/agents`, `/ai/skill` | per AI agent the install command and MCP configuration, for the installed binary and through npx (`npx_install_command`, `npx_mcp_config`, added 2026-11-07 for AI-05.9); the agent skill as Markdown ([14](14-ai-integration.md#agent-skill)) |
 | POST | `/samples/{kind}` | create a sample through the normal path: `email` (sent over SMTP to SendMock itself, so an SMTP session is logged; optional `to`, `subject`, `html`), `sms` (native send), `verification` (started on the first Verify service, or a new "Sample" service), `http` (a Slack notification to the `slack` bin); returns `{ "kind": ..., "id": ... }`. CLI `sendmock sample <kind>`, MCP `sendmock_sample_send` |
-| POST | `/reset` | wipe traffic and restore the seed state (between test runs) |
+| GET, POST | `/emails/templates` | local email templates (EM-26.2, 1.5.0): list, and add one under a provider's template id or name (`EmailTemplate`: `id`, `subject`, `text`, `html`, a body required); 409 when the id exists |
+| PATCH, DELETE | `/emails/templates/{templateId}` | change a template's subject or bodies (partial body), or remove it |
+| POST | `/reset` | wipe traffic and restore the seed state (between test runs); from 1.5.0 (PL-26.3) it answers `ResetSummary` (`cleared` and `kept` counts by kind, `removed` and `restored_seed`) instead of 204, and the optional body `ResetRequest` takes `config: true` to also remove every configured item and restore the built-in providers, refused with 422 until `confirm_removed_count` matches the count it names |
 | DELETE | `/traffic` | delete every captured item in every project (emails, SMS, verifications, push notifications, HTTP requests, finished webhook deliveries, payments, subscriptions and both logs) and keep every setting and configuration list; publishes one `traffic.cleared` (A17, UI-14) |
 | POST | `/setup/export` | the configuration as a versioned setup file (A18, [32](32-after-1-0.md#a18-share-and-move-a-setup-versioned-export-and-import-pl-18)): `format` is `toml` (the default), `json` or `yaml`; `only` and `except` take section names (`webhook.endpoints`) or groups (`webhook`). Secrets are `${ENV_VAR}` references; `include_secrets` with a `passphrase` (8 characters or more) writes them encrypted. One POST, so the passphrase never travels in a URL and the CLI has one `sendmock setup export`; `GET /seed/export` stays for a plain TOML download |
 | POST | `/setup/validate` | check a setup without applying it, from its text or a `url` as import takes them: the format version and whether it is upgraded, errors by line or key path, whether it holds encrypted secrets (and whether a given `passphrase` opens them), and per section what would be added, changed and removed (`mode` is `merge` or `replace`), with `removed_count` |
 | POST | `/setup/import` | apply a setup: the file's text (`setup_text`), or a `url` with optional `sha256` and `headers` (fetched with the A18 limits), `format` when the text does not say, `mode` (`merge`, the default, or `replace`), `passphrase` for encrypted secrets, and for a `replace` that removes items the `confirm_removed_count` the preview showed (`setup_replace_unconfirmed` otherwise); answers what it changed, as validate lists it; 422 with the errors and nothing applied when the file is invalid, too new or too old |
+| GET | `/presets` | the stack presets SendMock ships (A28, PL-27): each one's name, what it sets up and its options with their defaults |
+| POST | `/presets/{presetName}/apply` | set SendMock up for a stack in one step: `app_url`, the app's webhook paths (each with a default), optional `numbers_csv` (`number,label,subaccount_sid,messaging_service_sid`); applies the preset's setup file (Merge, so a second run changes nothing), creates the signing key once, sets the Twilio Debugger URL and answers what it changed, the server's SMTP and provider addresses and the `.env` block (generated keys masked for MCP). The CLI (`sendmock preset <name>`) runs `sendmock trust` first and reads `--import-numbers <csv>` from a file |
 | POST | `/setup/migrate` | the file upgraded to this build's format version, in the same or another `format`, without applying it |
 | POST | `/seed/apply`, GET `/seed/export` | aliases of `/setup/import` (Merge, TOML) and `/setup/export` (TOML), kept so existing scripts work ([02-architecture.md](02-architecture.md#configuration-and-seed-file)) |
 | POST | `/seed/validate` | alias of `/setup/validate` for a TOML file |
@@ -210,10 +214,11 @@ These make SendMock useful from any test framework without polling loops:
 | Method | Path | Purpose |
 |--------|------|---------|
 | GET/PATCH | `/settings` | retention, email and SMS options, opened events, chaos toggles, OTP patterns; `PATCH` takes only the changed keys and returns field-level errors for invalid values |
-| GET | `/info` | version, uptime, listeners (`provider_address`, `catcher_address`, the catch-all catcher port added in Phase 5, and `pop3_address`, added after 1.0 as A6, each null when off), counts, DB size, `is_container` (true when SendMock runs in Docker, so the UI can default to container hostnames), and `available_operations` (the `operationId`s this binary serves, so the UI shows Not available yet for the rest; added to `AppInfo` in Phase 1, [07](07-ui.md#not-available-yet-stage-b)) |
+| GET | `/info` | version, uptime, listeners (`provider_address`, `catcher_address`, the catch-all catcher port added in Phase 5, and `pop3_address`, added after 1.0 as A6, each null when off), counts, DB size, `is_container` (true when SendMock runs in Docker, so the UI can default to container hostnames), `available_operations` (the `operationId`s this binary serves, so the UI shows Not available yet for the rest; added to `AppInfo` in Phase 1, [07](07-ui.md#not-available-yet-stage-b)), and `warnings` (added in 1.5.0 with PL-24: sentences about setup worth fixing, such as the provider port being off; empty when there is nothing; `sendmock status` and the MCP status tool show the same list) |
 | GET | `/updates` | opt-in update check against GitHub Releases for the running channel: the newest version, its date, release notes and the upgrade command for the install method; `409` while `update_check_mode` is `off`, `502` when GitHub cannot be reached |
 | GET | `/health` | liveness for Docker/CI (also `sendmock health` CLI for the Docker HEALTHCHECK) |
 | GET | `/tls/ca` | the local CA (path and PEM) to trust for the HTTPS provider port, 404 when SendMock has none (A23, PL-20) |
+| GET | `/tls/trust` | which places on this machine trust the local CA: the system store, each PHP, Java and Python runtime found, and Node (what `sendmock trust --check` prints); `sendmock trust` itself runs in the binary, adding the CA where it is missing (`--undo` removes what it added) (A28, PL-25) |
 
 ## Projects
 
@@ -251,6 +256,8 @@ Retention (2026-11-13, #238): when the retention task deletes traffic past the l
 Delete all (A17, UI-14): every delete-all operation and `DELETE /traffic` publish one `traffic.cleared` with `{ "kinds": ["sms"], "project": "shop", "deleted_count": n }` (`kinds` from `email`, `sms`, `verification`, `push`, `http_request`, `webhook_delivery`, `payment`, `subscription`, `smtp_session`, `api_request`; `project` null when every project was cleared) instead of one event per row, and the UI refetches the lists of those kinds and the stats. Like `traffic.pruned`, webhook rules cannot pick it.
 
 ## Conventions
+
+**PATCH merges a partial body (1.5.0, PL-26.4):** every configuration PATCH (providers, numbers, Messaging Services, Verify services, Twilio subaccounts, inbound routes, payment flows, gateways and methods, webhook variables, HTTP bins) takes only the fields to change and merges them into the stored object, objects key by key and lists replaced; a left-out or masked secret keeps the stored value. The endpoint preview completes a partial endpoint from the saved one or a new endpoint's defaults (PL-26.5). Their request bodies are `Partial<...>` in the registry.
 
 - Errors: `{ "error": { "code": "not_found", "message": "..." } }` with proper HTTP status.
 - Times: RFC 3339 UTC strings in JSON.

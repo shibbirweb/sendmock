@@ -1,4 +1,4 @@
-use sendmock_sms::{SendDecision, describe_error_code};
+use sendmock_sms::{DeliveryStep, SendDecision, describe_error_code};
 use sendmock_store::SmsRecord;
 
 use super::created_message::CreatedMessage;
@@ -9,6 +9,7 @@ use super::request_checks::{ProviderFailure, find_rule_failure};
 use crate::sms::{
     IncomingSms, MediaProblem, accept_media, decide_outbound_send, start_sms_delivery, store_sms,
 };
+use crate::sms_opt_outs::is_send_opted_out;
 use crate::{OperationContext, OperationError};
 
 /// Twilio answers a send through a Messaging Service as `accepted` until it picks a sender.
@@ -21,6 +22,8 @@ const MEDIA_UNFETCHABLE_ERROR_CODE: &str = "11200";
 pub struct ProviderAnswer {
     pub response: ProviderHttpResponse,
     pub created_message: Option<CreatedMessage>,
+    /// Why the provider answered as it did, for the request log.
+    pub note: Option<String>,
 }
 
 impl ProviderAnswer {
@@ -28,9 +31,20 @@ impl ProviderAnswer {
         Self {
             response,
             created_message: None,
+            note: None,
+        }
+    }
+
+    pub fn with_note(self, note: String) -> Self {
+        Self {
+            note: Some(note),
+            ..self
         }
     }
 }
+
+/// Twilio's code for a send to a recipient who opted out.
+const OPTED_OUT_ERROR_CODE: &str = "21610";
 
 /// The message parts a send reads.
 struct SendParts {
@@ -64,11 +78,9 @@ pub async fn answer_send(
         return refuse(failure);
     }
     let delivery_steps =
-        match decide_outbound_send(operation_context, &send_parts.to, &send_parts.from).await? {
-            SendDecision::Accepted(delivery_steps) => delivery_steps,
-            SendDecision::Rejected { error_code, reason } => {
-                return refuse(describe_rejection(provider_call, &error_code, &reason));
-            }
+        match plan_provider_send(operation_context, provider_call, &send_parts).await? {
+            Ok(delivery_steps) => delivery_steps,
+            Err(failure) => return refuse(failure),
         };
     let sms = store_provider_sms(operation_context, provider_call, send_parts).await?;
     let mut answered_message = describe_message(provider_call.provider, &sms);
@@ -83,7 +95,40 @@ pub async fn answer_send(
     Ok(ProviderAnswer {
         response,
         created_message,
+        note: None,
     })
+}
+
+/// The steps a send plays, or the provider's refusal: 21610 for a recipient who texted STOP,
+/// then the magic and custom outcome numbers with the provider's error codes.
+async fn plan_provider_send(
+    operation_context: &OperationContext,
+    provider_call: &ProviderCall<'_>,
+    send_parts: &SendParts,
+) -> Result<Result<Vec<DeliveryStep>, ProviderFailure>, OperationError> {
+    let is_opted_out = is_send_opted_out(
+        operation_context,
+        provider_call.provider,
+        &send_parts.from,
+        send_parts.messaging_service_sid.as_deref(),
+        &send_parts.to,
+    )
+    .await?;
+    if is_opted_out {
+        return Ok(Err(describe_rejection(
+            provider_call,
+            OPTED_OUT_ERROR_CODE,
+            "the recipient texted STOP",
+        )));
+    }
+    Ok(
+        match decide_outbound_send(operation_context, &send_parts.to, &send_parts.from).await? {
+            SendDecision::Accepted(delivery_steps) => Ok(delivery_steps),
+            SendDecision::Rejected { error_code, reason } => {
+                Err(describe_rejection(provider_call, &error_code, &reason))
+            }
+        },
+    )
 }
 
 /// A provider whose requests carry no sender at all (Amazon SNS maps neither `from` nor a

@@ -50,6 +50,10 @@ pub struct ApiRequestLogEntry {
         schema_with = "crate::nullable_schema::<ApiRequestCatcherAnswer>"
     )]
     pub catcher_answer: Option<ApiRequestCatcherAnswer>,
+    /// Why SendMock answered as it did when the answer alone does not say, such as the reason
+    /// for a Twilio 401; null otherwise.
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
+    pub note: Option<String>,
     pub created_at: String,
 }
 
@@ -78,6 +82,7 @@ impl From<ApiRequestRecord> for ApiRequestLogEntry {
                     bin_name: catcher_answer.bin_name,
                     rule_name: catcher_answer.rule_name,
                 }),
+            note: request.note,
             created_at: format_rfc3339(request.created_at_unix_ms),
         }
     }

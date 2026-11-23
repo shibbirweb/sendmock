@@ -50,8 +50,10 @@ export function SmsManualStatus({ smsMessage }: { smsMessage: SmsMessage }) {
         webhookChoice: webhookTargets.webhookChoice,
       },
       {
-        onSuccess: () => {
-          toast(`Status set to ${smsStatusLabels[smsStatus]}`);
+        onSuccess: (statusChange) => {
+          toast(`Status set to ${smsStatusLabels[smsStatus]}`, {
+            description: statusChange.status_callback_timing,
+          });
         },
         onError: () => {
           toast.error("Could not set the status");

@@ -210,6 +210,7 @@ function nameForProvider(eventType: string, providerIndex: number): string {
 
 const templateFilters: Record<string, (filterInput: unknown) => unknown> = {
   json: (filterInput) => JSON.stringify(filterInput, null, 2),
+  tojson: (filterInput) => JSON.stringify(filterInput ?? null),
   urlencode: (filterInput) => encodeURIComponent(String(filterInput)),
   length: (filterInput) =>
     Array.isArray(filterInput) || typeof filterInput === "string"

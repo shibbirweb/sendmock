@@ -12,6 +12,9 @@ import { calculateAppStats } from "@/mocks/stats/calculate-app-stats";
 import { findMockInstallProfile } from "@/mocks/updates/mock-releases";
 
 /** What `/info` reports; Docker binds every interface instead of loopback. */
+const providerPortOffWarning =
+  "The provider port is off, so apps using a provider SDK (Twilio, Mailgun, ...) with SendMock's base URL get no answer. Start SendMock without --provider-addr none, or with --provider-addr <HOST:PORT>.";
+
 export function buildMockAppInfo(): AppInfo {
   const mockConditions = readMockConditions();
   const isRunningInContainer = mockConditions.isRunningInContainer;
@@ -36,6 +39,8 @@ export function buildMockAppInfo(): AppInfo {
     available_operations: apiEndpoints.map((apiEndpoint) =>
       buildOperationId(apiEndpoint.method, apiEndpoint.path),
     ),
+    // The demo has no provider port, so it warns as the server does while that port is off.
+    warnings: [providerPortOffWarning],
   };
 }
 

@@ -29,10 +29,12 @@ mod operation_registry;
 mod outcome_rules;
 mod paddle;
 mod page_of;
+mod partial_changes;
 mod payments;
 mod paypal;
 mod pop3_mailbox;
 mod present_value;
+mod presets;
 mod projects;
 mod provider_bins;
 mod providers;
@@ -46,6 +48,7 @@ mod seed;
 mod settings;
 mod setup;
 mod sms;
+mod sms_opt_outs;
 mod sms_replies;
 mod smtp_chaos;
 mod smtp_delivery;
@@ -110,6 +113,7 @@ pub use outcome_rules::{
     EmailOutcomeRule, OutcomeTestResult, SmsOutcomeRule, load_email_outcome_rules,
 };
 pub use page_of::PageOf;
+pub use partial_changes::PartialChanges;
 pub use payments::{
     PaymentDetail, PaymentFlowDefinition, PaymentFlowStep, PaymentGatewayDefinition,
     PaymentMethodDefinition, PaymentSummary,
@@ -125,7 +129,8 @@ pub use provider_bins::{
 pub use providers::{
     MessageProviderDefinition, ProviderHttpRequest, ProviderHttpResponse, ProviderOutcome,
     ProviderRoute, answer_provider_request, builtin_email_providers, builtin_sms_providers,
-    find_whatsapp_media_download, load_sms_provider_definitions, sign_twilio_request,
+    decode_path_segments, find_whatsapp_media_download, load_sms_provider_definitions,
+    sign_twilio_request,
 };
 pub use push::{PushFilterQuery, PushListQuery, PushNotification, PushReference, PushWaitQuery};
 pub use request_client::{REQUEST_CLIENT_HEADER, RequestClient};
@@ -135,8 +140,8 @@ pub use seed::{
     ApplySeedOperation, EnvironmentReader, ExportSeedOperation, FixedEnvironment,
     GetSeedStatusOperation, ProcessEnvironment, SeedChangedItem, SeedFileRequest, SeedItemChange,
     SeedItemCount, SeedStatus, SeedValidation, SeedValidationError, SetupCheck, SetupImportOptions,
-    ValidateSeedOperation, apply_seed_toml, apply_setup_text, check_setup_text, restore_seed_state,
-    validate_seed_toml, write_setup_text,
+    ValidateSeedOperation, apply_seed_toml, apply_setup_text, check_setup_text,
+    remove_all_configuration, restore_seed_state, validate_seed_toml, write_setup_text,
 };
 pub use settings::{
     AppSettings, AppSettingsStore, AppSettingsUpdate, EmailOutcomeProfile, SmsSimulationProfile,
@@ -170,8 +175,9 @@ pub use sms_replies::{
 pub use smtp_chaos::{SmtpChaos, read_smtp_chaos, take_chaos_rejection};
 pub use smtp_delivery::{SmtpMessage, record_smtp_session, store_smtp_message};
 pub use system::{
-    ActivityBucket, AppInfo, AppStats, CurrencyAmount, GetHealthOperation, GetInfoOperation,
-    GetStatsOperation, GetTlsCaOperation, HealthStatus, TlsCertificateAuthority,
+    ActivityBucket, AppInfo, AppStats, CurrencyAmount, FixedTrustInspector, GetHealthOperation,
+    GetInfoOperation, GetStatsOperation, GetTlsCaOperation, GetTlsTrustOperation, HealthStatus,
+    SharedTrustInspector, TlsCertificateAuthority, TlsTrustPlace, TlsTrustReport, TrustInspector,
 };
 pub use twilio_accounts::{TwilioSubaccount, TwilioSubaccountTokenReveal};
 pub use updates::{
@@ -180,7 +186,7 @@ pub use updates::{
 };
 pub use verify::{Verification, VerificationDetail, VerifyService, find_newest_verification};
 pub use webhooks::{
-    DeliveryOrder, DeliveryTrigger, EndpointPreviewResult, FileTemplateLibrary,
+    DeliveryOrder, DeliveryTrigger, EndpointPreviewResult, EventTemplateData, FileTemplateLibrary,
     LoadedTemplateDirectory, ResolvedVariables, RevealedEndpointSecret, SavedDelivery,
     TemplateRenderResult, TemplateRevision, VariablePreviewResult, WebhookChoiceInput,
     WebhookDelivery, WebhookDeliveryDetail, WebhookEndpoint, WebhookRequestEdit, WebhookRule,
@@ -188,8 +194,8 @@ pub use webhooks::{
     WebhookSender, WebhookTemplateDetail, WebhookTemplateSummary, WebhookVariable,
     build_event_template_context, build_sample_template_context, deliver_recorded_event,
     enqueue_webhook_delivery, fire_matching_rules, load_template_directory,
-    read_environment_variables, resolve_template_variables, run_due_deliveries,
-    run_webhook_dispatcher, run_webhook_rule_subscriber,
+    read_environment_variables, read_event_template_data, resolve_template_variables,
+    run_due_deliveries, run_webhook_dispatcher, run_webhook_rule_subscriber,
 };
 
 /// Every operation this build of SendMock serves.
@@ -198,16 +204,19 @@ pub fn build_operation_registry() -> OperationRegistry {
     operation_registry.register(GetHealthOperation);
     operation_registry.register(GetInfoOperation);
     operation_registry.register(GetTlsCaOperation);
+    operation_registry.register(GetTlsTrustOperation);
     operation_registry.register(GetSeedStatusOperation);
     operation_registry.register(ExportSeedOperation);
     operation_registry.register(ValidateSeedOperation);
     operation_registry.register(ApplySeedOperation);
     setup::register_setup_operations(&mut operation_registry);
+    presets::register_preset_operations(&mut operation_registry);
     operation_registry.register(GetStatsOperation);
     email::register_email_operations(&mut operation_registry);
     events::register_event_operations(&mut operation_registry);
     sms::register_sms_operations(&mut operation_registry);
     sms_replies::register_sms_reply_operations(&mut operation_registry);
+    sms_opt_outs::register_sms_opt_out_operations(&mut operation_registry);
     payments::register_payment_operations(&mut operation_registry);
     outcome_rules::register_outcome_rule_operations(&mut operation_registry);
     message_rules::register_message_rule_operations(&mut operation_registry);

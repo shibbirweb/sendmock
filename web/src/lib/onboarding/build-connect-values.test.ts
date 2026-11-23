@@ -20,6 +20,7 @@ const localAppInfo: AppInfo = {
   database_size_bytes: 0,
   is_container: false,
   available_operations: [],
+  warnings: [],
 };
 
 describe("buildConnectValues", () => {

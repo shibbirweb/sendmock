@@ -23,6 +23,7 @@ mod listener_binding;
 mod logging;
 mod mcp_command;
 mod pop3_startup;
+mod preset_command;
 mod provider_listeners;
 mod provider_tls;
 #[cfg(test)]
@@ -35,10 +36,12 @@ mod server_startup;
 mod shutdown_signal;
 mod smtp_startup;
 mod spamd_client;
+mod startup_banner;
 mod startup_error;
 mod startup_setup;
 mod template_directory_task;
 mod tls_provider;
+mod trust_command;
 mod update_check_task;
 mod version_output;
 mod webhook_dispatch_task;
@@ -60,40 +63,50 @@ fn main() -> ExitCode {
         return sendmail_shim::run_sendmail_shim(&sendmail_arguments);
     }
     let operation_registry = build_operation_registry();
-    let root_command = ci_command::add_ci_flags(ai_install::add_install_flags(
-        CliArguments::command().subcommands(build_operation_commands(&operation_registry)),
+    let root_command = preset_command::add_preset_flags(trust_command::add_trust_flags(
+        ci_command::add_ci_flags(ai_install::add_install_flags(
+            CliArguments::command().subcommands(build_operation_commands(&operation_registry)),
+        )),
     ));
     let root_matches = root_command.clone().get_matches();
     if let Some(matched_operation) = find_matched_operation(&operation_registry, &root_matches) {
-        match matched_operation.operation.definition().operation_id {
-            ai_install::AI_AGENTS_OPERATION_ID => {
-                return ai_install::run_ai_install(&matched_operation);
-            }
-            ci_command::CI_RUN_OPERATION_ID => {
-                return ci_command::run_ci_run_command(&matched_operation);
-            }
-            ci_command::CI_INIT_OPERATION_ID => {
-                return ci_command::run_ci_init_command(&matched_operation);
-            }
-            _ => {}
-        }
-        return client_command::run_client_command(&matched_operation);
+        return run_operation_command(&matched_operation);
     }
     let cli_arguments = CliArguments::from_arg_matches(&root_matches)
         .unwrap_or_else(|parse_error| parse_error.exit());
     match cli_arguments.built_in_command() {
-        BuiltInCommand::Serve(serve_arguments) => match launcher::prepare_launch(serve_arguments) {
-            launcher::LaunchPlan::Start(launched_arguments) => {
-                server_startup::start_server(&launched_arguments)
+        BuiltInCommand::Serve(serve_arguments) => {
+            startup_banner::print_startup_banner(serve_arguments);
+            match launcher::prepare_launch(serve_arguments) {
+                launcher::LaunchPlan::Start(launched_arguments) => {
+                    server_startup::start_server(&launched_arguments)
+                }
+                launcher::LaunchPlan::Stop(exit_code) => exit_code,
             }
-            launcher::LaunchPlan::Stop(exit_code) => exit_code,
-        },
+        }
         BuiltInCommand::LastRun { action, json } => launcher::run_last_run_command(action, json),
         BuiltInCommand::Mcp(mcp_arguments) => mcp_command::run_mcp_command(mcp_arguments),
         BuiltInCommand::Version { json } => version_output::print_version(*json),
         BuiltInCommand::Help { all, json } => {
             help_output::print_help(root_command, &operation_registry, *all, *json)
         }
+    }
+}
+
+/// The operation commands the binary runs itself, with no server or before calling it; every
+/// other one calls the server.
+fn run_operation_command(matched_operation: &sendmock_cli::MatchedOperation) -> ExitCode {
+    match matched_operation.operation.definition().operation_id {
+        ai_install::AI_AGENTS_OPERATION_ID => ai_install::run_ai_install(matched_operation),
+        ci_command::CI_RUN_OPERATION_ID => ci_command::run_ci_run_command(matched_operation),
+        ci_command::CI_INIT_OPERATION_ID => ci_command::run_ci_init_command(matched_operation),
+        trust_command::TLS_TRUST_OPERATION_ID => {
+            trust_command::run_trust_command(matched_operation)
+        }
+        preset_command::PRESET_APPLY_OPERATION_ID => {
+            preset_command::run_preset_command(matched_operation)
+        }
+        _ => client_command::run_client_command(matched_operation),
     }
 }
 

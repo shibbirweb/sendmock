@@ -55,6 +55,13 @@ export type WebhookChoice = {
    * Payloads edited for this action, by endpoint: each body is sent as written instead of the rendered one and signed over those bytes. Leave it out to send the rendered payloads.
    */
   webhook_requests?: WebhookRequestEdit[];
+  /**
+   * User variables for this action's webhooks, such as your app's order id, merged over the
+   * email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is
+   * signed (EM-27.1).
+   * @example {"order_id": "A-1001"}
+   */
+  user_variables?: Record<string, unknown>;
 };
 
 /** A request edited before an action sends it (WH-14.4). */

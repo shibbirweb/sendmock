@@ -14,6 +14,12 @@ export const systemSurfaces: SurfaceCatalogue = {
     mcp: "sendmock_tls_ca",
     ui: "Settings > Connection > Provider APIs over HTTPS > Download the CA",
   },
+  "GET /api/v1/tls/trust": {
+    phase: "A28",
+    cli: "sendmock trust",
+    mcp: "sendmock_tls_trust",
+    ui: "Settings > Connection > Provider APIs over HTTPS > Trusted by",
+  },
   "GET /api/v1/info": {
     phase: "0",
     cli: "sendmock status",
@@ -113,12 +119,25 @@ export const systemSurfaces: SurfaceCatalogue = {
     ui: "Settings > Setup > Import a setup > Preview",
     cliArguments: { file: "setup_text" },
   },
+  "GET /api/v1/presets": {
+    phase: "A28",
+    cli: "sendmock presets",
+    mcp: "sendmock_preset_list",
+    ui: "Settings > Setup > Presets",
+  },
+  "POST /api/v1/presets/{presetName}/apply": {
+    phase: "A28",
+    cli: "sendmock preset <presetName>",
+    mcp: "sendmock_preset_apply",
+    ui: "Settings > Setup > Presets > Apply",
+  },
   "POST /api/v1/setup/import": {
     phase: "A18",
-    cli: "sendmock setup import <file> --yes",
+    cli: "sendmock setup import <file>",
     mcp: "sendmock_setup_import",
     ui: "Settings > Setup > Import a setup",
     cliArguments: { file: "setup_text" },
+    confirmsOnServer: true,
   },
   "POST /api/v1/setup/migrate": {
     phase: "A18",

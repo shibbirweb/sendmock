@@ -1,6 +1,7 @@
 import { automationHandlers } from "@/mocks/handlers/automation-handlers";
 import { definitionLookupHandlers } from "@/mocks/handlers/definition-lookup-handlers";
 import { emailDetailHandlers } from "@/mocks/handlers/email-detail-handlers";
+import { emailTemplateHandlers } from "@/mocks/handlers/email-template-handlers";
 import { emailImportHandlers } from "@/mocks/handlers/email-import-handlers";
 import { messageProviderHandlers } from "@/mocks/handlers/message-provider-handlers";
 import { whatsappCloudHandlers } from "@/mocks/handlers/whatsapp-cloud-handlers";
@@ -30,6 +31,7 @@ import { paymentMethodHandlers } from "@/mocks/handlers/payment-method-handlers"
 import { samplesHandlers } from "@/mocks/handlers/samples-handlers";
 import { savedScenarioHandlers } from "@/mocks/handlers/saved-scenario-handlers";
 import { settingsHandlers } from "@/mocks/handlers/settings-handlers";
+import { presetHandlers } from "@/mocks/handlers/preset-handlers";
 import { setupHandlers } from "@/mocks/handlers/setup-handlers";
 import { simulatedErrorHandler } from "@/mocks/handlers/simulated-error-handler";
 import { smsHandlers } from "@/mocks/handlers/sms-handlers";
@@ -39,6 +41,7 @@ import { systemHandlers } from "@/mocks/handlers/system-handlers";
 import { tlsHandlers } from "@/mocks/handlers/tls-handlers";
 import { ciHandlers } from "@/mocks/handlers/ci-handlers";
 import { providerBinHandlers } from "@/mocks/handlers/provider-bin-handlers";
+import { smsOptOutHandlers } from "@/mocks/handlers/sms-opt-out-handlers";
 import { twilioSubaccountHandlers } from "@/mocks/handlers/twilio-subaccount-handlers";
 import { mailgunComplaintHandlers } from "@/mocks/handlers/mailgun-complaint-handlers";
 import { verifyHandlers } from "@/mocks/handlers/verify-handlers";
@@ -58,6 +61,7 @@ export const mockHandlers = [
   ...systemHandlers,
   ...settingsHandlers,
   ...setupHandlers,
+  ...presetHandlers,
   ...waitHandlers,
   ...automationHandlers,
   ...savedScenarioHandlers,
@@ -71,11 +75,13 @@ export const mockHandlers = [
   ...messageRuleHandlers,
   ...projectHandlers,
   ...pushHandlers,
+  ...emailTemplateHandlers,
   ...emailDetailHandlers,
   ...nativeSendHandlers,
   ...emailHandlers,
   ...emailClickHandlers,
   ...emailResponseHandlers,
+  ...smsOptOutHandlers,
   ...smsSendHandlers,
   // Before the SMS handlers, so `/sms/threads` is not read as an SMS id.
   ...smsThreadHandlers,

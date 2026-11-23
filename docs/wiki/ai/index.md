@@ -211,7 +211,7 @@ Reference:
 | **CLI** with `--json` | any agent with a shell, scripts, CI |
 | **Agent skill** | teaching the agent when and how to use SendMock: workflows and safety rules |
 
-Tool sets keep the agent's tool list small: the default is `core`, `email`, `sms`, `verify`, `extract` and `webhooks`; add `payments`, `templates`, `variables`, `http`, `logs`, `admin` or `scenario` with `sendmock mcp --toolsets ...`, or `--toolsets all`.
+Tool sets keep the agent's tool list small: the default is `core`, `email`, `sms`, `verify`, `extract`, `webhooks`, `numbers` (numbers and Messaging Services), `outcomes` (outcome rules), `setup` and `logs` (the SMTP and HTTP request logs); add `payments`, `templates`, `variables`, `http`, `rules`, `admin` or `scenario` with `sendmock mcp --toolsets ...`, or `--toolsets all`. A call to a tool whose toolset is off answers with the toolset to add.
 
 ## Safety
 

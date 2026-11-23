@@ -1,8 +1,9 @@
 # Installs a published SendMock through each channel, from the real registries, on each
 # operating system the channel serves, and runs test cases 2 to 8 on what it installed
 # (DS-03.6, docs/plan/30-phase-5.md W11). The channels and their install steps come from
-# packaging/channels.json. Run it after a release: `after-publish` right away, every channel
-# once WinGet, Chocolatey, COPR and Nixpkgs have taken the version.
+# packaging/channels.json. Registry publish starts it with `after-publish` once the registries
+# serve a release (#370); run it by hand with every channel once WinGet, Chocolatey, COPR and
+# Nixpkgs have taken the version, or to try a channel again.
 name: Install channels
 
 on:

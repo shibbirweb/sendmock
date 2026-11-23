@@ -2,6 +2,7 @@ import { http, HttpResponse } from "msw";
 
 import type { InboundSmsRequest, NativeSmsRequest } from "@/lib/api/types";
 import { mockDatabase } from "@/mocks/db/mock-database";
+import { applyMockOptOutKeyword } from "@/mocks/handlers/sms-opt-out-handlers";
 import { buildNewSmsMessage } from "@/mocks/fixtures/sms-message-builder";
 import { type ParsedSmsMedia, parseSmsMedia } from "@/mocks/fixtures/sms-media";
 import {
@@ -181,8 +182,14 @@ export const smsSendHandlers = [
       parsedMedia: inboundMediaResult.media,
     });
     storeSmsMediaBytes(inboundMessage.id, inboundMediaResult.media);
+    const receivingNumber = mockDatabase.virtualNumbers.find(
+      (virtualNumber) => virtualNumber.number === inboundMessage.to_number,
+    );
+    inboundMessage.account =
+      receivingNumber?.account_sid ?? inboundMessage.account;
 
     mockDatabase.smsMessages.unshift(inboundMessage);
+    applyMockOptOutKeyword(inboundMessage);
     runWithWebhookChoice(inboundSmsRequest, () => {
       publishMockEvent("sms.inbound", {
         id: inboundMessage.id,

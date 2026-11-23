@@ -15,6 +15,8 @@ export function toProviderInput(
     host: messageProvider.host,
     credentials: messageProvider.credentials,
     check_credentials: messageProvider.check_credentials,
+    opt_out_keywords: messageProvider.opt_out_keywords,
+    opt_out_auto_replies: messageProvider.opt_out_auto_replies,
     operations: messageProvider.operations,
     field_mapping: messageProvider.field_mapping,
     validation_rules: messageProvider.validation_rules,

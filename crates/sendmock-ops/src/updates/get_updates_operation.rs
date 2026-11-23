@@ -28,6 +28,7 @@ impl Operation for GetUpdatesOperation {
         _input: NoInput,
     ) -> Result<UpdateCheckResult, OperationError> {
         operation_context
+            .machine
             .update_checker
             .check(operation_context)
             .await

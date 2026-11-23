@@ -10,8 +10,8 @@ use axum::routing::any;
 use sendmock_ops::{
     CompletedApiRequest, OperationContext, PROJECT_HEADER, ProviderGapOrigin, ProviderHttpRequest,
     ProviderOutcome, ProviderRequestLogEntry, ProviderRoute, answer_provider_gap,
-    answer_provider_request, find_named_project, find_whatsapp_media_download,
-    record_provider_request,
+    answer_provider_request, decode_path_segments, find_named_project,
+    find_whatsapp_media_download, record_provider_request,
 };
 
 use crate::api_error_response::ApiErrorResponse;
@@ -131,7 +131,7 @@ pub async fn answer_provider_http_request(
     let request_headers = read_request_headers(&request_parts.headers);
     let provider_request = ProviderHttpRequest {
         method: request_parts.method.to_string(),
-        path: provider_path,
+        path: decode_path_segments(&provider_path),
         query_string: request_parts.uri.query().map(str::to_owned),
         headers: request_headers.iter().cloned().collect(),
         body: request_bytes,
@@ -279,6 +279,7 @@ async fn record_outcome(
         created_message: provider_outcome.created_message.clone(),
         secret_values: provider_outcome.secret_values.clone(),
         catcher_answer: None,
+        note: provider_outcome.note.clone(),
     };
     if let Err(record_error) =
         record_provider_request(operation_context, log_entry, completed_request).await

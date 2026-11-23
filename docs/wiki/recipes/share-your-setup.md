@@ -44,10 +44,10 @@ To carry your own setup to your other machine, secrets included:
    SENDMOCK_SETUP_PASSPHRASE='correct horse battery' sendmock setup validate sendmock.setup.toml
    ```
 
-4. Import it. **Merge** (the default) adds and updates what the file holds by name and keeps everything else; `--mode replace` also removes what the file does not hold.
+4. Import it. **Merge** (the default) adds and updates what the file holds by name and keeps everything else, so it never asks to confirm; `--mode replace` also removes what the file does not hold, and when it would remove something it names each item and asks you to run it again with `--confirm-removed-count <count>`.
 
    ```bash
-   SENDMOCK_SETUP_PASSPHRASE='correct horse battery' sendmock setup import sendmock.setup.toml --yes
+   SENDMOCK_SETUP_PASSPHRASE='correct horse battery' sendmock setup import sendmock.setup.toml
    ```
 
    In the app: **Settings > Setup > Import a setup**, upload the file, type the passphrase, press **Preview**, then **Import**.
@@ -59,7 +59,7 @@ Without the passphrase, or with a wrong one, the import is refused and nothing c
 A setup can come from an `https://` address, such as a raw file in a repository or a gist:
 
 ```bash
-sendmock setup import --url https://example.com/sendmock.setup.toml --yes
+sendmock setup import --url https://example.com/sendmock.setup.toml
 ```
 
 - Add `--sha256 <digest>` to refuse a file that changed since you checked it.

@@ -4,6 +4,7 @@ import {
   listOf,
   tagEndpoints,
   typeRef,
+  partialOf,
 } from "./endpoint-definition";
 
 const templateEndpoints = tagEndpoints("Webhook templates", [
@@ -154,7 +155,7 @@ const variableEndpoints = tagEndpoints("Webhook variables", [
     method: "PATCH",
     path: "/api/v1/webhooks/variables/{variableId}",
     summary: "Change a variable.",
-    requestBody: typeRef("WebhookVariableInput"),
+    requestBody: partialOf("WebhookVariableInput"),
     response: typeRef("WebhookVariable"),
     errorStatuses: [400, 404],
   },

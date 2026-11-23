@@ -24,6 +24,8 @@ pub struct VirtualNumber {
     /// The Twilio account the number belongs to; null for the main account.
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub account_sid: Option<String>,
+    /// Whether a text of STOP to this number opts the contact out.
+    pub opt_out_keywords: bool,
     pub created_by: String,
 }
 
@@ -42,6 +44,7 @@ impl From<VirtualNumberRecord> for VirtualNumber {
             messaging_service_sid: stored_number.messaging_service_sid,
             phone_number_sid: stored_number.phone_number_sid,
             account_sid: stored_number.account_sid,
+            opt_out_keywords: stored_number.opt_out_keywords,
             created_by: stored_number.created_by,
         }
     }
@@ -57,6 +60,8 @@ pub struct MessagingService {
     pub inbound_url: Option<String>,
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub inbound_fallback_url: Option<String>,
+    /// Whether a text of STOP to one of its numbers opts the contact out of the service.
+    pub opt_out_keywords: bool,
     pub created_by: String,
 }
 
@@ -69,6 +74,7 @@ impl From<MessagingServiceRecord> for MessagingService {
             inbound_mode: stored_service.inbound_mode,
             inbound_url: stored_service.inbound_url,
             inbound_fallback_url: stored_service.inbound_fallback_url,
+            opt_out_keywords: stored_service.opt_out_keywords,
             created_by: stored_service.created_by,
         }
     }

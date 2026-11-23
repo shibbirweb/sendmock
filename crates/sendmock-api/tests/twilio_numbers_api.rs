@@ -9,7 +9,7 @@ use serde_json::{Value, json};
 use support::test_app::{build_test_app, call_api};
 use tower::ServiceExt;
 
-const MAIN_ACCOUNT_SID: &str = "ACtest00000000000000000000000000";
+const MAIN_ACCOUNT_SID: &str = "ACtest0000000000000000000000000000";
 const OTHER_ACCOUNT_SID: &str = "AC22222222222222222222222222222222";
 
 fn numbers_path(account_sid: &str) -> String {

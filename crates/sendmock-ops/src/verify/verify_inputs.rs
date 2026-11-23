@@ -1,3 +1,4 @@
+use crate::PartialChanges;
 use schemars::JsonSchema;
 use serde::Deserialize;
 
@@ -19,8 +20,9 @@ pub struct VerifyServiceInput {
 pub struct VerifyServiceUpdate {
     /// The service SID, `VA...`, from `GET /api/v1/verify/services`.
     pub service_sid: String,
+    /// Only the fields to change; the rest stay.
     #[serde(flatten)]
-    pub changes: VerifyServiceInput,
+    pub changes: PartialChanges<VerifyServiceInput>,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
