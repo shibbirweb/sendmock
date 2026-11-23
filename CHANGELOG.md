@@ -8,6 +8,8 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-11-23
+
 ### Added
 
 - **Mailgun store-and-notify webhooks:** a new built-in `mailgun.store_notify` template sends Mailgun's `store(notify=...)` form, with `attachments` as a JSON list of each file's `url`, `content-type`, `name` and `size`, for apps written for store-and-notify. `mailgun.routes` sends the `forward()` form, with each file as `attachment-N`. A stored message (`GET /v3/domains/{domain}/messages/{key}`) now lists each attachment with the `url` it downloads from. See Mail providers.
