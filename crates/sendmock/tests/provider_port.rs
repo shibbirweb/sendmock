@@ -12,7 +12,7 @@ use support::http_get::send_http_get;
 use support::sendmock_process::{SendmockProcess, sendmock_command};
 
 const TWILIO_SEND_PATH: &str =
-    "/2010-04-01/Accounts/ACtest00000000000000000000000000/Messages.json";
+    "/2010-04-01/Accounts/ACtest0000000000000000000000000000/Messages.json";
 const TWILIO_SEND_FORM: &str = "To=%2B8801700000000&From=%2B15005550006&Body=Hi";
 const VONAGE_SEND_FORM: &str = "from=Acme&to=447700900000&text=Hi";
 

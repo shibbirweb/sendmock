@@ -10,7 +10,7 @@ use support::test_app::{build_test_app, call_api};
 use tower::ServiceExt;
 
 const MESSAGES_PATH: &str =
-    "/providers/twilio/2010-04-01/Accounts/ACtest00000000000000000000000000/Messages.json";
+    "/providers/twilio/2010-04-01/Accounts/ACtest0000000000000000000000000000/Messages.json";
 const SERVICES_PATH: &str = "/providers/twilio/v1/Services";
 
 async fn call_form(

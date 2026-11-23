@@ -11,7 +11,7 @@ use support::project_requests::create_project;
 use support::test_app::{build_test_app, call_api};
 use tower::ServiceExt;
 
-const ACCOUNT_PATH: &str = "2010-04-01/Accounts/ACtest00000000000000000000000000";
+const ACCOUNT_PATH: &str = "2010-04-01/Accounts/ACtest0000000000000000000000000000";
 /// `ACtest...:any-token`, as an SDK configured with any credentials sends it.
 const ANY_BASIC_AUTH: &str = "Basic QUN0ZXN0MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA6YW55LXRva2Vu";
 const TWILIO_SMS_FORM: &str = "To=%2B8801700000000&From=%2B15550001111&Body=Your+code+is+4821";

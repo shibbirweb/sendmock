@@ -486,7 +486,7 @@ async fn prepare_sms_provider_samples(
     vonage_update["provider_key"] = json!("vonage");
     let twilio_send = json!({
         "method": "POST",
-        "path": "/2010-04-01/Accounts/ACtest00000000000000000000000000/Messages.json",
+        "path": "/2010-04-01/Accounts/ACtest0000000000000000000000000000/Messages.json",
         "headers": { "content-type": "application/x-www-form-urlencoded" },
         "body": "To=%2B15551234567&From=%2B15005550006&Body=Hi",
     });

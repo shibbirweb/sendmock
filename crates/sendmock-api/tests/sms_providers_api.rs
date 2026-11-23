@@ -352,7 +352,7 @@ async fn the_preview_answers_the_providers_error_for_a_refused_sample() {
             "provider": twilio_input,
             "sample_request": {
                 "method": "POST",
-                "path": "/2010-04-01/Accounts/ACtest00000000000000000000000000/Messages.json",
+                "path": "/2010-04-01/Accounts/ACtest0000000000000000000000000000/Messages.json",
                 "headers": { "content-type": "application/x-www-form-urlencoded" },
                 "body": "From=%2B15005550006&Body=Hi",
             },
@@ -370,12 +370,12 @@ async fn the_preview_answers_the_providers_error_for_a_refused_sample() {
     );
 }
 
-/// A Twilio send with Basic auth `ACtest00000000000000000000000000:<auth_token>`.
+/// A Twilio send with Basic auth `ACtest0000000000000000000000000000:<auth_token>`.
 async fn send_twilio_with_token(app_router: &axum::Router, auth_token: &str) -> (u16, Value) {
     let basic_credentials =
-        STANDARD.encode(format!("ACtest00000000000000000000000000:{auth_token}"));
+        STANDARD.encode(format!("ACtest0000000000000000000000000000:{auth_token}"));
     let request = Request::post(
-        "/providers/twilio/2010-04-01/Accounts/ACtest00000000000000000000000000/Messages.json",
+        "/providers/twilio/2010-04-01/Accounts/ACtest0000000000000000000000000000/Messages.json",
     )
     .header("content-type", "application/x-www-form-urlencoded")
     .header("authorization", format!("Basic {basic_credentials}"))

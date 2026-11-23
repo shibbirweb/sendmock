@@ -81,8 +81,8 @@ mod tests {
                 .starts_with("Unknown account AC99999999999999999999999999999999")
         );
         assert!(
-            describe("ACtest00000000000000000000000000", SHOP_SID, "shop-token")
-                .starts_with("The path's account ACtest00000000000000000000000000 is not")
+            describe("ACtest0000000000000000000000000000", SHOP_SID, "shop-token")
+                .starts_with("The path's account ACtest0000000000000000000000000000 is not")
         );
         assert!(
             describe_unauthorized_reason(&build_directory(), None, None)

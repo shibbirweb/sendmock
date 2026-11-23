@@ -11,7 +11,7 @@ use serde_json::{Value, json};
 use support::test_app::{build_test_app, call_api};
 use tower::ServiceExt;
 
-const MAIN_ACCOUNT_SID: &str = "ACtest00000000000000000000000000";
+const MAIN_ACCOUNT_SID: &str = "ACtest0000000000000000000000000000";
 const MAIN_AUTH_TOKEN: &str = "twilio-test-token";
 const SHOP_SUBACCOUNT_SID: &str = "AC22222222222222222222222222222222";
 const SHOP_AUTH_TOKEN: &str = "shop-token-1234";

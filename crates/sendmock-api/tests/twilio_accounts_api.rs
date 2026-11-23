@@ -16,7 +16,7 @@ use support::recording_callback_sender::RecordingCallbackSender;
 use support::test_app::{build_test_app, build_test_app_with, call_api, call_api_text};
 use tower::ServiceExt;
 
-const MAIN_ACCOUNT_SID: &str = "ACtest00000000000000000000000000";
+const MAIN_ACCOUNT_SID: &str = "ACtest0000000000000000000000000000";
 const MAIN_AUTH_TOKEN: &str = "twilio-test-token";
 const ACCOUNTS_PATH: &str = "/providers/twilio/2010-04-01/Accounts.json";
 

@@ -19,7 +19,7 @@ use Twilio\Rest\Client;
 use Twilio\Security\RequestValidator;
 
 // The shipped Twilio provider's main account; the Accounts API checks it.
-const MAIN_ACCOUNT_SID = 'ACtest00000000000000000000000000';
+const MAIN_ACCOUNT_SID = 'ACtest0000000000000000000000000000';
 const MAIN_AUTH_TOKEN = 'twilio-test-token';
 const EXPECTED_CALLBACK_COUNT = 3;
 const CALLBACK_TIMEOUT_SECONDS = 60;

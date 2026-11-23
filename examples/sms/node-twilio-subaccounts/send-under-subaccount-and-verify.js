@@ -12,7 +12,7 @@ const providerUrl =
 const sendmockUrl = process.env.SENDMOCK_URL ?? "http://127.0.0.1:8025";
 const subaccountNumber = "+15550007777";
 // The shipped Twilio provider's main account; the Accounts API checks it.
-const mainAccountSid = "ACtest00000000000000000000000000";
+const mainAccountSid = "ACtest0000000000000000000000000000";
 const mainAuthToken = "twilio-test-token";
 const expectedStatuses = ["queued", "sent", "delivered"];
 const callbackTimeoutMs = 60_000;

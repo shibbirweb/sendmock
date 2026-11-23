@@ -56,7 +56,7 @@ final class SendMockCurlClient extends CurlClient
 
 $providerUrl = getenv('SENDMOCK_PROVIDER_URL') ?: 'http://127.0.0.1:8026';
 $client = new Client(
-    'ACtest00000000000000000000000000',
+    'ACtest0000000000000000000000000000',
     'twilio-test-token',
     null,
     null,

@@ -6,7 +6,7 @@ mod support {
 use serde_json::{Value, json};
 use support::test_app::{build_test_app, call_api};
 
-const MAIN_ACCOUNT_SID: &str = "ACtest00000000000000000000000000";
+const MAIN_ACCOUNT_SID: &str = "ACtest0000000000000000000000000000";
 const SHOP_SUBACCOUNT_SID: &str = "AC00000000000000000000000000000a11";
 const CHOSEN_SERVICE_SID: &str = "MG0123456789abcdef0123456789abcdef";
 

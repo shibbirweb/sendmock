@@ -9,7 +9,7 @@ use serde_json::{Value, json};
 use support::email_provider_requests::{ProviderReply, send_json, send_provider_request};
 use support::test_app::{build_test_app, call_api, call_api_text};
 
-const CALLS_PATH: &str = "/2010-04-01/Accounts/ACtest00000000000000000000000000/Calls.json";
+const CALLS_PATH: &str = "/2010-04-01/Accounts/ACtest0000000000000000000000000000/Calls.json";
 const FORM_CONTENT_TYPE: &str = "application/x-www-form-urlencoded";
 const STATUS_CALLBACK_URL: &str = "http://localhost:3999/calls/status";
 
@@ -146,7 +146,7 @@ async fn an_unmatched_twilio_path_is_captured_in_the_bin_and_answered_by_its_rul
 async fn built_in_operations_answer_first_and_catch_urls_and_the_404_keep_working() {
     let (app_router, _) = build_test_app();
     let messages_path =
-        "/providers/twilio/2010-04-01/Accounts/ACtest00000000000000000000000000/Messages.json";
+        "/providers/twilio/2010-04-01/Accounts/ACtest0000000000000000000000000000/Messages.json";
     let unattached_reply = place_call(&app_router, &format!("/providers/twilio{CALLS_PATH}")).await;
     let bin_id = attach_twilio_bin_with_rule(&app_router, Value::Null).await;
 

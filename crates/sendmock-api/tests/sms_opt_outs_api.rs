@@ -13,7 +13,7 @@ const APP_NUMBER: &str = "+15550001111";
 const CONTACT_NUMBER: &str = "+15550002222";
 const OTHER_CONTACT: &str = "+15550003333";
 const TWILIO_MESSAGES_PATH: &str =
-    "/providers/twilio/2010-04-01/Accounts/ACtest00000000000000000000000000/Messages.json";
+    "/providers/twilio/2010-04-01/Accounts/ACtest0000000000000000000000000000/Messages.json";
 
 /// A send through the Twilio API; answers its status and body.
 async fn send_through_twilio(app_router: &axum::Router, form_body: &str) -> (u16, Value) {

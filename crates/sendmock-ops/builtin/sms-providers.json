@@ -7,7 +7,7 @@
     "credentials": [
       {
         "name": "account_sid",
-        "value": "ACtest00000000000000000000000000",
+        "value": "ACtest0000000000000000000000000000",
         "is_secret": false
       },
       {
@@ -186,7 +186,7 @@
     "credentials": [
       {
         "name": "account_sid",
-        "value": "ACtest00000000000000000000000000",
+        "value": "ACtest0000000000000000000000000000",
         "is_secret": false
       },
       {

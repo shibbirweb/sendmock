@@ -11,7 +11,7 @@ const sendmockUrl = process.env.SENDMOCK_URL ?? "http://127.0.0.1:8025";
 const providerUrl =
   process.env.SENDMOCK_PROVIDER_URL ?? "http://127.0.0.1:8026";
 // The shipped Twilio provider's main account, which signs its callbacks.
-const mainAccountSid = "ACtest00000000000000000000000000";
+const mainAccountSid = "ACtest0000000000000000000000000000";
 const mainAuthToken = "twilio-test-token";
 const callbackTimeoutMs = 30_000;
 
@@ -56,7 +56,7 @@ async function attachCallsBin() {
       response: {
         status_code: 201,
         headers: { "content-type": "application/json" },
-        body: '{"sid": "CA{{ random_hex(32) }}", "account_sid": "ACtest00000000000000000000000000", "status": "queued", "to": "{{ request.form.To }}", "from": "{{ request.form.From }}", "direction": "outbound-api"}',
+        body: '{"sid": "CA{{ random_hex(32) }}", "account_sid": "ACtest0000000000000000000000000000", "status": "queued", "to": "{{ request.form.To }}", "from": "{{ request.form.From }}", "direction": "outbound-api"}',
       },
       delay_min_ms: 0,
       delay_max_ms: 0,

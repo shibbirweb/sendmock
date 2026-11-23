@@ -76,7 +76,7 @@ export const presetHandlers = [
           "MAILGUN_ENDPOINT=127.0.0.1:8026",
           "MAILGUN_SCHEME=http",
           "MAILGUN_WEBHOOK_SIGNING_KEY=key-sendmock-demo",
-          "TWILIO_ACCOUNT_SID=ACtest00000000000000000000000000",
+          "TWILIO_ACCOUNT_SID=ACtest0000000000000000000000000000",
           "TWILIO_AUTH_TOKEN=twilio-test-token",
           "TWILIO_FROM=+15005550006",
         ].join("\n"),

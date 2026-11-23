@@ -16,7 +16,7 @@ use support::webhook_send_fixture::{WebhookSendFixture, build_send_fixture, glob
 use tower::ServiceExt;
 
 const TWILIO_MESSAGES_PATH: &str =
-    "/providers/twilio/2010-04-01/Accounts/ACtest00000000000000000000000000/Messages.json";
+    "/providers/twilio/2010-04-01/Accounts/ACtest0000000000000000000000000000/Messages.json";
 /// `ACtest...:any-token`, as an SDK configured with any credentials sends it.
 const ANY_BASIC_AUTH: &str = "Basic QUN0ZXN0MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA6YW55LXRva2Vu";
 

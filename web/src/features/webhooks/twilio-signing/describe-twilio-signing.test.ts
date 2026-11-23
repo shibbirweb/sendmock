@@ -14,7 +14,7 @@ const twilioProvider = {
   credentials: [
     {
       name: "account_sid",
-      value: "ACtest00000000000000000000000000",
+      value: "ACtest0000000000000000000000000000",
       is_secret: false,
     },
   ],
@@ -30,7 +30,7 @@ function tokenVariable(scope: "global" | "endpoint"): WebhookVariable {
 describe("describeTwilioSigning", () => {
   test("SM-19.6 without a variable the Twilio provider's token for the event's account signs", () => {
     expect(describeTwilioSigning([], [twilioProvider])).toContain(
-      "Twilio provider: the token of the event's subaccount, or of account ACtest00000000000000000000000000 for any other.",
+      "Twilio provider: the token of the event's subaccount, or of account ACtest0000000000000000000000000000 for any other.",
     );
   });
 
