@@ -53,7 +53,7 @@ fn find_printed_commands(text: &str) -> Vec<Vec<String>> {
             .next()
             .unwrap_or_default();
         for token in command_line.split(' ') {
-            let word = token.trim_end_matches(['`', '.', ',', ')', ';', ':']);
+            let word = token.trim_end_matches(['`', '.', ',', ')', ';', ':', '"', '\'']);
             let is_command_word = word
                 .chars()
                 .next()
@@ -74,6 +74,24 @@ fn find_printed_commands(text: &str) -> Vec<Vec<String>> {
         }
     }
     printed_commands
+}
+
+/// Every string in a JSON answer, so each text is read on its own and not as JSON.
+fn collect_texts(json_value: &Value, texts: &mut Vec<String>) {
+    match json_value {
+        Value::String(text) => texts.push(text.clone()),
+        Value::Array(json_items) => {
+            for json_item in json_items {
+                collect_texts(json_item, texts);
+            }
+        }
+        Value::Object(json_fields) => {
+            for field_value in json_fields.values() {
+                collect_texts(field_value, texts);
+            }
+        }
+        _ => {}
+    }
 }
 
 fn find_unknown_commands(text: &str, command_words: &[Vec<String>]) -> Vec<String> {
@@ -117,9 +135,13 @@ async fn every_command_the_snippets_and_presets_print_is_a_cli_command() {
     let unknown_commands: Vec<String> = printed_texts
         .iter()
         .flat_map(|(source, printed)| {
-            find_unknown_commands(&printed.to_string().replace("\\n", "\n"), &command_words)
-                .into_iter()
+            let mut texts = Vec::new();
+            collect_texts(printed, &mut texts);
+            texts
+                .iter()
+                .flat_map(|text| find_unknown_commands(text, &command_words))
                 .map(move |command| format!("{source}: {command}"))
+                .collect::<Vec<String>>()
         })
         .collect();
 
@@ -153,7 +175,7 @@ fn a_misspelled_command_is_reported() {
 }
 
 #[test]
-fn a_command_at_the_end_of_a_line_is_read_whole() {
+fn a_command_at_the_end_of_a_line_or_in_quotes_is_read_whole() {
     let command_words = vec![vec![
         "webhook".to_owned(),
         "var".to_owned(),
@@ -162,7 +184,7 @@ fn a_command_at_the_end_of_a_line_is_read_whole() {
 
     assert_eq!(
         find_unknown_commands(
-            "# the signing key (sendmock webhook var list).\nMAILGUN_DOMAIN=mg.test\nsendmock webhook var list\nnext",
+            "# key (sendmock webhook var list).\nsendmock webhook var list\nrun \"sendmock webhook var list\"",
             &command_words
         ),
         Vec::<String>::new()
