@@ -40,6 +40,13 @@
             "null"
           ]
         },
+        "count_views_with_webhook_rules": {
+          "description": "Counts a view as an open even when a webhook rule would send `email.opened`.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
         "email_outcome_bounce_rate_percent": {
           "description": "Used by the `realistic` outcome profile.",
           "format": "uint32",
@@ -930,7 +937,6 @@
           "type": "string"
         },
         "opt_out_keywords": {
-          "default": true,
           "description": "`false` turns opt-out keywords off for the service's numbers.",
           "type": "boolean"
         },
@@ -1260,7 +1266,6 @@
           "type": "string"
         },
         "opt_out_keywords": {
-          "default": true,
           "description": "`false` turns opt-out keywords off for this number.",
           "type": "boolean"
         },
