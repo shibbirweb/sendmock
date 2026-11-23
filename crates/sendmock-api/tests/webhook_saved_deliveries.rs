@@ -175,7 +175,7 @@ async fn saved_deliveries_survive_reset_and_can_still_be_sent() {
     )
     .await;
 
-    assert_eq!(reset_status, 204);
+    assert_eq!(reset_status, 200);
     assert_eq!(delivery_page["total_count"], 0, "{delivery_page}");
     assert_eq!(list_saved(&fixture).await, vec![saved_delivery]);
     assert_eq!(sent_delivery["status"], "pending");
