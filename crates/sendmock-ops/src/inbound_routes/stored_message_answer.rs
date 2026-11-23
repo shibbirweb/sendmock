@@ -49,7 +49,15 @@ pub async fn answer_stored_message(
     }
     Ok(mailgun_json(
         200,
-        &describe_stored_message(&stored_email, &raw_message, provider_send.as_ref()),
+        &describe_stored_message(
+            &stored_email,
+            &raw_message,
+            provider_send.as_ref(),
+            &format!(
+                "http://{}/api/v1/emails/{email_id}/attachments",
+                operation_context.instance_details.http_address
+            ),
+        ),
     ))
 }
 
@@ -83,6 +91,7 @@ fn describe_stored_message(
     stored_email: &EmailRecord,
     raw_message: &[u8],
     provider_send: Option<&EmailProviderSendRecord>,
+    attachments_url: &str,
 ) -> Value {
     let message_headers: Vec<[&str; 2]> = stored_email
         .headers
@@ -93,7 +102,7 @@ fn describe_stored_message(
                 .map(move |header_value| [header_name.as_str(), header_value.as_str()])
         })
         .collect();
-    let (attachments, content_id_map) = describe_attachments(raw_message);
+    let (attachments, content_id_map) = describe_attachments(raw_message, attachments_url);
     let (stripped_text, stripped_signature) =
         split_reply_text(stored_email.text_body.as_deref().unwrap_or_default());
     let to_addresses: Vec<&str> = stored_email
@@ -125,14 +134,24 @@ fn describe_stored_message(
     stored_message
 }
 
-/// Each file's name, type and size, and each inline part's content id with its field.
-fn describe_attachments(raw_message: &[u8]) -> (Vec<Value>, serde_json::Map<String, Value>) {
+/// Each file's download URL, name, type and size, as Mailgun lists a stored message's
+/// attachments, and each inline part's content id with its field.
+fn describe_attachments(
+    raw_message: &[u8],
+    attachments_url: &str,
+) -> (Vec<Value>, serde_json::Map<String, Value>) {
     let parsed_email = parse_email(raw_message);
     let attachments = parsed_email
         .attachments
         .iter()
-        .map(|attachment| {
-            json!({ "filename": attachment.filename, "content-type": attachment.content_type, "size": attachment.content.len() })
+        .enumerate()
+        .map(|(attachment_index, attachment)| {
+            json!({
+                "url": format!("{attachments_url}/{attachment_index}"),
+                "name": attachment.filename,
+                "content-type": attachment.content_type,
+                "size": attachment.content.len(),
+            })
         })
         .collect();
     let content_id_map = parsed_email

@@ -230,7 +230,15 @@ const builtinTemplateSpecs: TemplateSpec[] = [
   ],
   [
     "mailgun.routes",
-    "Mailgun: routes (inbound)",
+    "Mailgun: routes, forward (inbound)",
+    "Mailgun",
+    "email-provider",
+    inboundEmailEvents,
+    ["mailgun_signing_key"],
+  ],
+  [
+    "mailgun.store_notify",
+    "Mailgun: routes, store and notify (inbound)",
     "Mailgun",
     "email-provider",
     inboundEmailEvents,

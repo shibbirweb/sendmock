@@ -23,7 +23,7 @@ The `laravel-mailgun-twilio` preset sets SendMock up for a Laravel app on Mailgu
 
 3. Copy the `.env` lines it prints into your app's `.env`.
 
-Each webhook path has a flag (`--mailgun-events-path`, `--mailgun-inbound-path`, `--twilio-inbound-path`, `--twilio-status-path`, `--twilio-debugger-path`; `sendmock presets` lists the defaults), and `--import-numbers numbers.csv` adds your numbers, one per line as `number,label,subaccount_sid,messaging_service_sid`. Settings > Setup has the same preset under **Presets**.
+Each webhook path has a flag (`--mailgun-events-path`, `--mailgun-inbound-path`, `--twilio-inbound-path`, `--twilio-status-path`, `--twilio-debugger-path`; `sendmock presets` lists the defaults), and `--import-numbers numbers.csv` adds your numbers, one per line as `number,label,subaccount_sid,messaging_service_sid`. A Messaging Service SID that does not exist yet is created with that SID. The whole CSV is checked before anything is set up: if a line has a malformed number or an unknown subaccount, nothing changes and the error names every bad line. Settings > Setup has the same preset under **Presets**.
 
 ## Email
 

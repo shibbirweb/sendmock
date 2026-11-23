@@ -192,6 +192,16 @@ export type WebhookEndpointInput = Pick<
   | "render_mode"
 >;
 
+/**
+ * Body of POST /api/v1/webhooks/endpoints: a name and a URL, and any other fields; the rest
+ * take a new endpoint's defaults, as Preview fills them (PL-26.6).
+ */
+export type WebhookEndpointCreateInput = Pick<
+  WebhookEndpointInput,
+  "name" | "url"
+> &
+  Partial<WebhookEndpointInput>;
+
 /** Body of POST /api/v1/webhooks/endpoints/preview (WH-07.15). */
 export type EndpointPreviewRequest = {
   /**

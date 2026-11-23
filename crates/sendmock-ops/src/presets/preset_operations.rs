@@ -1,9 +1,10 @@
 use super::preset_catalog::{PRESETS, find_preset};
 use super::preset_env_block::{EnvBlockValues, build_env_block};
-use super::preset_setup_text::{read_option, render_preset_setup};
-use super::preset_steps::{
-    ensure_mailgun_signing_key, import_numbers_csv, set_twilio_debugger_url,
+use super::preset_numbers_csv::{
+    NumbersCsvRow, check_numbers_csv, import_numbers_csv, read_numbers_csv,
 };
+use super::preset_setup_text::{read_option, render_preset_setup};
+use super::preset_steps::{ensure_mailgun_signing_key, set_twilio_debugger_url};
 use super::preset_wire::{PresetApplyInput, PresetApplyResult, PresetOptionView, StackPreset};
 use crate::seed::{apply_seed_document, check_setup_text};
 use crate::setup::{SetupFileFormat, SetupImportMode};
@@ -83,11 +84,14 @@ impl Operation for ApplyPresetOperation {
                 message: format!("No preset named {}", input.preset_name),
             })?;
         let setup_text = render_preset_setup(preset, &input.app_url, &input.options)?;
+        let csv_rows = read_numbers_csv(input.numbers_csv.as_deref().unwrap_or_default());
+        check_numbers_csv(operation_context, &csv_rows).await?;
         let setup_check = check_setup_text(&setup_text, SetupFileFormat::Toml);
         let applied = setup_check.into_seed_validation().summary;
         apply_seed_document(operation_context, &setup_text, None, SetupImportMode::Merge).await?;
         let app_url = input.app_url.trim().trim_end_matches('/');
-        let mut steps = run_preset_steps(operation_context, &input, app_url, preset).await?;
+        let mut steps =
+            run_preset_steps(operation_context, &input, app_url, preset, &csv_rows).await?;
         let (signing_key, is_new_key) = ensure_mailgun_signing_key(operation_context).await?;
         steps.insert(
             0,
@@ -106,17 +110,14 @@ async fn run_preset_steps(
     input: &PresetApplyInput,
     app_url: &str,
     preset: &super::preset_catalog::PresetDefinition,
+    csv_rows: &[NumbersCsvRow],
 ) -> Result<Vec<String>, OperationError> {
     let debugger_path = read_option(preset, &input.options, "twilio_debugger_path");
     let mut steps = vec![
         set_twilio_debugger_url(operation_context, &format!("{app_url}{debugger_path}")).await?,
     ];
-    if let Some(numbers_csv) = input
-        .numbers_csv
-        .as_deref()
-        .filter(|csv| !csv.trim().is_empty())
-    {
-        let imported_count = import_numbers_csv(operation_context, numbers_csv).await?;
+    if !csv_rows.is_empty() {
+        let imported_count = import_numbers_csv(operation_context, csv_rows).await?;
         steps.push(format!(
             "Added or updated {imported_count} numbers from the CSV."
         ));

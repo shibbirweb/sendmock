@@ -6,10 +6,12 @@ use std::sync::Arc;
 
 use super::command_runner::CommandRunner;
 use super::php_ini_block::replace_trust_block;
+use super::php_scanned_ini::{describe_settings, find_ca_setting_file};
 use super::trust_target::{LocalCa, TrustCheck, TrustState, TrustTarget};
 
-/// Prints the loaded `php.ini`, `openssl.cafile`, OpenSSL's default CA file and the version.
-const PHP_PROBE: &str = "echo php_ini_loaded_file() ?: '', PHP_EOL, ini_get('openssl.cafile'), PHP_EOL, openssl_get_cert_locations()['default_cert_file'] ?? '', PHP_EOL, PHP_VERSION, PHP_EOL;";
+/// Prints the loaded `php.ini`, `openssl.cafile`, OpenSSL's default CA file, the version and
+/// the ini files read from the scan folder, comma separated.
+const PHP_PROBE: &str = "echo php_ini_loaded_file() ?: '', PHP_EOL, ini_get('openssl.cafile'), PHP_EOL, openssl_get_cert_locations()['default_cert_file'] ?? '', PHP_EOL, PHP_VERSION, PHP_EOL, implode(',', array_map('trim', explode(',', php_ini_scanned_files() ?: ''))), PHP_EOL;";
 
 /// System bundles to combine with when PHP names none it can read.
 const SYSTEM_BUNDLES: [&str; 5] = [
@@ -31,6 +33,7 @@ struct PhpSettings {
     ca_file: String,
     default_ca_file: String,
     version: String,
+    scanned_inis: Vec<String>,
 }
 
 /// Every PHP on this machine: the one on `PATH`, Herd's and Homebrew's, each once.
@@ -78,6 +81,14 @@ impl PhpTarget {
             ca_file: lines.next().unwrap_or_default(),
             default_ca_file: lines.next().unwrap_or_default(),
             version: lines.next().unwrap_or_default(),
+            scanned_inis: lines
+                .next()
+                .unwrap_or_default()
+                .split(',')
+                .map(str::trim)
+                .filter(|ini_path| !ini_path.is_empty())
+                .map(str::to_owned)
+                .collect(),
         })
     }
 
@@ -100,11 +111,40 @@ impl PhpTarget {
         ))
     }
 
+    /// The CA file PHP uses now (or a system bundle) with the local CA added, in SendMock's
+    /// trust folder, so nothing outside it changes.
+    fn write_bundle(&self, local_ca: &LocalCa, settings: &PhpSettings) -> Result<PathBuf, String> {
+        let bundle_path = self.bundle_path(local_ca, settings);
+        let base_pem = read_base_bundle(settings, &bundle_path)
+            .ok_or("no CA bundle to combine with the local CA")?;
+        std::fs::create_dir_all(&local_ca.bundle_folder).map_err(|error| error.to_string())?;
+        std::fs::write(
+            &bundle_path,
+            format!("{}\n{}", base_pem.trim_end(), local_ca.certificate_pem),
+        )
+        .map_err(|error| error.to_string())?;
+        Ok(bundle_path)
+    }
+
     fn place_name(&self, settings: Option<&PhpSettings>) -> String {
         match settings {
             Some(settings) => format!("PHP {} ({})", settings.version, self.php_binary.display()),
             None => format!("PHP ({})", self.php_binary.display()),
         }
+    }
+}
+
+/// What to set by hand for a PHP with no main php.ini: in the scanned file that sets its CA
+/// files (Herd's), or in a php.ini of its own.
+fn describe_manual_step(settings: &PhpSettings, bundle_path: &Path) -> String {
+    let bundle_text = bundle_path.display();
+    match find_ca_setting_file(&settings.scanned_inis) {
+        Some(ca_setting_file) => format!(
+            "It loads no main php.ini; {} sets {}. Set openssl.cafile and curl.cainfo there to {bundle_text}",
+            ca_setting_file.ini_path,
+            describe_settings(&ca_setting_file)
+        ),
+        None => format!("It loads no php.ini; set openssl.cafile and curl.cainfo to {bundle_text}"),
     }
 }
 
@@ -156,10 +196,7 @@ impl TrustTarget for PhpTarget {
             ),
             (false, true) => (
                 TrustState::Manual,
-                format!(
-                    "It loads no php.ini; set openssl.cafile and curl.cainfo to {}",
-                    bundle_path.display()
-                ),
+                describe_manual_step(&settings, &bundle_path),
             ),
             (false, false) => (TrustState::Missing, format!("Its CA file is {ca_file}")),
         };
@@ -179,15 +216,7 @@ impl TrustTarget for PhpTarget {
         if settings.loaded_ini.is_empty() {
             return Err("this PHP loads no php.ini".to_owned());
         }
-        let bundle_path = self.bundle_path(local_ca, &settings);
-        let base_pem = read_base_bundle(&settings, &bundle_path)
-            .ok_or("no CA bundle to combine with the local CA")?;
-        std::fs::create_dir_all(&local_ca.bundle_folder).map_err(|error| error.to_string())?;
-        std::fs::write(
-            &bundle_path,
-            format!("{}\n{}", base_pem.trim_end(), local_ca.certificate_pem),
-        )
-        .map_err(|error| error.to_string())?;
+        let bundle_path = self.write_bundle(local_ca, &settings)?;
         let ini_text =
             std::fs::read_to_string(&settings.loaded_ini).map_err(|error| error.to_string())?;
         let bundle_text = bundle_path.display().to_string();
@@ -197,6 +226,17 @@ impl TrustTarget for PhpTarget {
         )
         .map_err(|error| format!("{}: {error}", settings.loaded_ini))?;
         Ok(format!("Pointed {} at {bundle_text}.", settings.loaded_ini))
+    }
+
+    fn prepare_manual_step(&self, local_ca: &LocalCa) -> Option<Result<String, String>> {
+        let settings = self.read_settings()?;
+        if !settings.loaded_ini.is_empty() || has_local_ca(effective_ca_file(&settings), local_ca) {
+            return None;
+        }
+        Some(
+            self.write_bundle(local_ca, &settings)
+                .map(|bundle_path| describe_manual_step(&settings, &bundle_path)),
+        )
     }
 
     fn remove(&self, local_ca: &LocalCa) -> Result<String, String> {

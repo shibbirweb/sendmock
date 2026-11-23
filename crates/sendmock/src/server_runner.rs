@@ -271,10 +271,27 @@ fn spawn_background_tasks(
     ));
 }
 
+/// The folder of the CA this server's HTTPS provider port uses (beside a `--db <path>`
+/// database), or the data folder's when the port is off.
+fn find_server_ca_folder(listeners: &BoundListeners) -> std::path::PathBuf {
+    listeners
+        .provider_tls_listener
+        .as_ref()
+        .and_then(|tls_listener| tls_listener.details.ca_certificate_path.as_deref())
+        .and_then(|ca_certificate_path| std::path::Path::new(ca_certificate_path).parent())
+        .map_or_else(
+            crate::provider_tls::default_ca_folder,
+            std::path::Path::to_path_buf,
+        )
+}
+
 /// The context every operation runs with, able to send samples through the SMTP listener.
 fn build_operation_context(database: Database, listeners: &BoundListeners) -> OperationContext {
     let clock: Arc<dyn Clock> = Arc::new(SystemClock);
     let started_at_unix_ms = clock.now_unix_ms();
+    let trust_inspector = crate::trust_command::LocalTrustInspector {
+        ca_folder: find_server_ca_folder(listeners),
+    };
     let operation_context = OperationContext::new(
         Arc::new(database),
         clock,
@@ -297,7 +314,7 @@ fn build_operation_context(database: Database, listeners: &BoundListeners) -> Op
     ))))
     .with_update_checker(build_update_checker())
     .with_setup_fetcher(Arc::new(HttpSetupFetcher))
-    .with_trust_inspector(Arc::new(crate::trust_command::LocalTrustInspector));
+    .with_trust_inspector(Arc::new(trust_inspector));
     let operation_context = with_email_network_clients(operation_context);
     let operation_context = match HttpMediaFetcher::new() {
         Some(media_fetcher) => operation_context.with_media_fetcher(Arc::new(media_fetcher)),

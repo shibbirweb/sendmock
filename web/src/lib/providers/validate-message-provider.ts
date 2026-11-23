@@ -137,6 +137,27 @@ export function findRouteClash(
     : `It answers the same path as ${clashingProvider.name}; give each a different host or path`;
 }
 
+/**
+ * The Twilio provider's `account_sid` is the main account's SID, which
+ * webhooks and the Accounts API use, so it must look like one.
+ */
+export function findTwilioAccountProblem(
+  providerInput: Pick<MessageProviderInput, "key" | "credentials">,
+): string | undefined {
+  if (providerInput.key !== "twilio") {
+    return undefined;
+  }
+  const accountSid = providerInput.credentials.find(
+    (credential) => credential.name === "account_sid",
+  );
+  if (accountSid === undefined) {
+    return undefined;
+  }
+  return /^AC[0-9a-zA-Z]{32}$/.test(accountSid.value.trim())
+    ? undefined
+    : "account_sid needs AC and 32 letters or digits, as Twilio's are";
+}
+
 /** Rules for a provider's fields; template problems come from the preview. */
 export function validateMessageProvider(
   providerInput: MessageProviderInput,
@@ -159,6 +180,8 @@ export function validateMessageProvider(
     fieldErrors.credentials = `${badCredentialName || "A credential"} needs a name of letters, digits, _, . or -`;
   } else if (findDuplicate(credentialNames) !== undefined) {
     fieldErrors.credentials = `${findDuplicate(credentialNames)} appears twice`;
+  } else {
+    fieldErrors.credentials = findTwilioAccountProblem(providerInput);
   }
   const pathProblem = providerInput.operations
     .map((operation) => findPathProblem(operation.path))

@@ -245,6 +245,7 @@ Phase 5 (W20), for the next beta (0.1.0-beta.4), added 2026-11-13 (owner request
 - [ ] EM-24.3 A provider send keeps the provider's message id on the stored email; templates read it as `data.provider_message_id`, the email API shows it, and the built-in Mailgun templates use it, so a webhook carries the id the send answered (R-26).
 - [ ] EM-24.4 Every provider route percent-decodes its path parameters before matching, so `DELETE /v3/{domain}/complaints/user%40example.org` removes the complaint as `user@example.org` does (R-28).
 - [ ] EM-24.5 The Mailgun PHP and Node SDKs send with `template` and with `v:` variables in CI, and the webhooks for those emails carry the variables and the id the SDK got back.
+- [ ] EM-24.6 A Mailgun template send fills the template from `h:X-Mailgun-Variables` as well as `t:variables`, and `t:variables` wins a key both give, as on Mailgun (R-36).
 
 ## EM-25 Mailgun webhooks as Mailgun sends them
 
@@ -255,6 +256,7 @@ Phase 5 (W20), for the next beta (0.1.0-beta.4), added 2026-11-13 (owner request
 - [ ] EM-25.3 `mailgun.routes` sends Mailgun's store-and-notify fields (`from`, `To`, `Message-Id`, `In-Reply-To`, `References`, the stripped text, HTML and signature, `body-html`, `message-headers`, `attachment-count`, the attachments, `content-id-map`, `message-url`), matching a fixture from Mailgun's documentation (R-06).
 - [ ] EM-25.4 Each built-in template lists only the events its provider sends: inbound templates list `email.inbound`, event templates do not, and a rule built from the rule tool's inbound example fires for simulated inbound mail and replies (R-04, R-24).
 - [ ] EM-25.5 Simulate warns before sending when a chosen endpoint's template does not list the event (R-24).
+- [ ] EM-25.6 A built-in `mailgun.store_notify` template sends Mailgun's store-and-notify form, with `attachments` as a JSON list of each file's `url`, `content-type`, `name` and `size` and no file parts, and `mailgun.routes` is described as Mailgun's forward form (R-43).
 
 ## EM-26 Stored messages and local email templates
 
@@ -264,6 +266,7 @@ Phase 5 (W20), for the next beta (0.1.0-beta.4), added 2026-11-13 (owner request
 - [ ] EM-26.2 Local email templates are listed, created, updated and deleted on REST, CLI, MCP and Mail > Templates in the UI (R-29).
 - [ ] EM-26.3 `GET /v3/{domain}/templates/{name}` (with `active=yes`) answers from the local email templates in Mailgun's shape, and 404 as Mailgun does for an unknown name (R-10).
 - [ ] EM-26.4 The `[[email.templates]]` keys are documented, and a setup file with an unknown key is refused by validate and import with the key's name (R-18).
+- [ ] EM-26.5 Each attachment of a stored message (`GET /v3/domains/{domain}/messages/{key}`) has the `url` it can be downloaded from (R-43).
 
 ## EM-27 Simulating email events with the app's data
 

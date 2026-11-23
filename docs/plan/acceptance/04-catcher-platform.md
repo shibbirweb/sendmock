@@ -320,6 +320,8 @@ Phase 5. Plan: [30-phase-5.md](../30-phase-5.md) (W8).
 - [ ] PL-25.2 It finds the runtime bundles that ignore the system store (Herd and Homebrew PHP, Python certifi, Java cacerts), writes a combined bundle and points the runtime at it, or appends only where that is safe, and prints the `NODE_EXTRA_CA_CERTS` and `SSL_CERT_FILE` lines for the rest.
 - [ ] PL-25.3 `sendmock trust` can run again safely, `--check` reports what trusts the CA, and `--undo` removes what it added.
 - [ ] PL-25.4 After `sendmock trust`, Laravel's `mailgun` mailer on Herd PHP reaches the HTTPS provider port with no other change, and the docs show using an existing local CA (mkcert) with `--provider-tls-cert`.
+- [ ] PL-25.5 For a PHP with no main php.ini whose scanned ini files set `openssl.cafile` or `curl.cainfo` (Herd), `sendmock trust --check` names that file and the CA files it sets, and `sendmock trust` writes the combined bundle and prints the lines to set there instead of changing the file (R-42).
+- [ ] PL-25.6 `sendmock trust` checks and adds the CA of the running server (also one started with `--db <path>`) when one answers, else the data folder's, and says which CA it used (R-42).
 
 ## PL-26 Setup and configuration that agree
 
@@ -330,6 +332,7 @@ Phase 5. Plan: [30-phase-5.md](../30-phase-5.md) (W8).
 - [ ] PL-26.3 `reset` prints what it cleared and what it kept, and `reset --config` also removes configuration and restores the built-in providers after a confirmation with the counts; its help says what each does (R-12).
 - [ ] PL-26.4 PATCH on providers, numbers and the other configuration merges a partial body into the stored object, and a masked or missing secret keeps the stored value (R-19).
 - [ ] PL-26.5 An endpoint preview fills defaults for every field it is not given (R-20).
+- [ ] PL-26.6 `POST /api/v1/webhooks/endpoints` with only `name`, `url` and `template_id` creates the endpoint with the defaults Preview uses for every other field (R-44).
 
 ## PL-27 Stack presets
 
@@ -339,3 +342,5 @@ Phase 5. Plan: [30-phase-5.md](../30-phase-5.md) (W8).
 - [ ] PL-27.2 It creates the webhook endpoints and rules for opened, bounced, complained and inbound mail at the app's paths, each changeable with a flag, and prints the `.env` block with the generated keys.
 - [ ] PL-27.3 `--import-numbers <csv>` adds numbers with their subaccount, label and Messaging Service.
 - [ ] PL-27.4 A preset is a setup file plus steps, run the same from the CLI, REST, MCP and the UI, and running it twice changes nothing the second time.
+- [ ] PL-27.5 A numbers CSV row that names a Messaging Service SID that does not exist yet creates that service with that SID and adds the number to it (R-37).
+- [ ] PL-27.6 The preset checks the whole CSV before it applies anything: a CSV with a bad row (a malformed number, an unknown subaccount) changes nothing and the error names every bad row (R-38).

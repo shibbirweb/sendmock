@@ -19,6 +19,8 @@ const SENDGRID_EVENT_WEBHOOK: &str =
 const RESEND_WEBHOOK: &str = include_str!("fixtures/provider_webhooks/resend_webhook.json");
 const MAILGUN_ROUTE_FORWARD: &str =
     include_str!("fixtures/provider_webhooks/mailgun_route_forward.json");
+const MAILGUN_ROUTE_STORE_NOTIFY: &str =
+    include_str!("fixtures/provider_webhooks/mailgun_route_store_notify.json");
 const RESEND_SIGNING_SECRET: &str = "whsec_MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw";
 const MAILGUN_SIGNING_KEY: &str = "key-sendmock-test";
 
@@ -287,6 +289,42 @@ async fn render_for_email(
         headers,
         rendered["body"].as_str().unwrap_or_default().to_owned(),
     )
+}
+
+// AC: EM-25.6
+#[tokio::test]
+async fn mailgun_store_and_notify_lists_each_file_as_json_with_its_url_and_sends_no_file_parts() {
+    let (app_router, _) = build_test_app();
+    add_secret_variable(&app_router, "mailgun_signing_key", MAILGUN_SIGNING_KEY).await;
+    let email_id = send_email_with_attachment(&app_router).await;
+
+    let (_, body) = render_for_email(&app_router, "mailgun.store_notify", &email_id).await;
+    let (_, sample_body) = render(&app_router, "mailgun.store_notify").await;
+
+    let form_fields = read_multipart_fields(&body, "MailgunForward");
+    check_against_fixture(MAILGUN_ROUTE_STORE_NOTIFY, &json!(form_fields));
+    let attachments: Value =
+        serde_json::from_str(form_fields.get("attachments").map_or("", String::as_str))
+            .unwrap_or(Value::Null);
+    assert_eq!(attachments[0]["name"], "receipt.txt", "{body}");
+    assert!(
+        attachments[0]["content-type"]
+            .as_str()
+            .is_some_and(|content_type| !content_type.is_empty()),
+        "{attachments}"
+    );
+    assert_eq!(attachments[0]["size"], 5);
+    assert!(
+        attachments[0]["url"]
+            .as_str()
+            .is_some_and(|url| url.ends_with(&format!("/api/v1/emails/{email_id}/attachments/0"))),
+        "{attachments}"
+    );
+    assert!(!body.contains("filename="), "{body}");
+    assert_eq!(
+        read_multipart_fields(&sample_body, "MailgunForward").get("attachments"),
+        Some(&"[]".to_owned())
+    );
 }
 
 // AC: WH-06.3

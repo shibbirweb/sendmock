@@ -1,0 +1,62 @@
+{
+  "doc_url": "https://documentation.mailgun.com/docs/mailgun/user-manual/receive-forward-store/storing-and-retrieving-messages",
+  "verified_on": "2026-11-23",
+  "method": "POST",
+  "content_type": "multipart/form-data",
+  "documented_example": {
+    "recipient": "bob@sandbox.mailgun.org",
+    "sender": "alice@example.com",
+    "from": "Alice <alice@example.com>",
+    "To": "Bob <bob@sandbox.mailgun.org>",
+    "subject": "Re: Sample POST request",
+    "Message-Id": "<517ACC75.5010709@mailgun.net>",
+    "In-Reply-To": "<517AC78B.5060404@mailgun.net>",
+    "References": "<517AC78B.5060404@mailgun.net>",
+    "body-plain": "Hi Bob, I posted it.",
+    "stripped-text": "Hi Bob, I posted it.",
+    "stripped-signature": "",
+    "body-html": "<html><body><p>Hi Bob, I posted it.</p></body></html>",
+    "stripped-html": "<html><body><p>Hi Bob, I posted it.</p></body></html>",
+    "message-headers": "[[\"Received\", \"by luna.mailgun.net\"], [\"Subject\", \"Re: Sample POST request\"]]",
+    "content-id-map": "{}",
+    "message-url": "https://storage.mailgun.net/v3/domains/sandbox.mailgun.org/messages/WyJhOTM4NDk1MjVlIiwgW",
+    "attachments": "[{\"url\": \"https://storage.mailgun.net/v3/domains/sandbox.mailgun.org/messages/WyJhOTM4NDk1MjVlIiwgW/attachments/0\", \"content-type\": \"text/plain\", \"name\": \"notes.txt\", \"size\": 120}]",
+    "timestamp": "1529006854",
+    "token": "a8ce0edb2dd8301dee6c2405235584e45aa91d1e9f979f3de0",
+    "signature": "d2271d12299f6592d9d44cd9d250f0704e4674c30d79d07c47a66f95ce71cf55"
+  },
+  "schema": {
+    "type": "object",
+    "required": [
+      "recipient",
+      "sender",
+      "from",
+      "To",
+      "subject",
+      "Message-Id",
+      "In-Reply-To",
+      "References",
+      "body-plain",
+      "stripped-text",
+      "stripped-signature",
+      "body-html",
+      "stripped-html",
+      "message-headers",
+      "content-id-map",
+      "message-url",
+      "attachments",
+      "timestamp",
+      "token",
+      "signature"
+    ],
+    "not": { "required": ["attachment-count"] },
+    "properties": {
+      "message-headers": { "type": "string", "pattern": "^\\[" },
+      "content-id-map": { "type": "string", "pattern": "^\\{" },
+      "attachments": { "type": "string", "pattern": "^\\[" },
+      "timestamp": { "type": "string", "pattern": "^[0-9]{10}$" },
+      "token": { "type": "string", "pattern": "^[0-9a-f]{50}$" },
+      "signature": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+    }
+  }
+}

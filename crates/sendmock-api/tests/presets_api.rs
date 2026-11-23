@@ -166,3 +166,72 @@ async fn an_unknown_preset_or_a_bad_app_url_is_refused() {
     assert_eq!(missing_status, 404);
     assert_eq!(bad_url_status, 400);
 }
+
+// AC: PL-27.5
+#[tokio::test]
+async fn a_csv_row_naming_a_new_messaging_service_creates_it_with_that_sid() {
+    let (app_router, _) = build_test_app();
+    let service_sid = "MG0123456789abcdef0123456789abcdef";
+
+    apply_preset(
+        &app_router,
+        &json!({
+            "app_url": "http://localhost:8000",
+            "numbers_csv": format!("number,label,subaccount_sid,messaging_service_sid\n+15550007001,Shop line,,{service_sid}\n"),
+        }),
+    )
+    .await;
+    let (_, service) = call_api(
+        &app_router,
+        "GET",
+        &format!("/api/v1/messaging-services/{service_sid}"),
+        None,
+    )
+    .await;
+    let (_, numbers) = call_api(&app_router, "GET", "/api/v1/numbers", None).await;
+    let shop_line = list_items(&numbers)
+        .into_iter()
+        .find(|number| number["number"] == "+15550007001")
+        .unwrap_or(Value::Null);
+
+    assert_eq!(service["sid"], service_sid, "{service}");
+    assert_eq!(shop_line["messaging_service_sid"], service_sid, "{numbers}");
+    assert_eq!(service["number_ids"], json!([shop_line["id"]]), "{service}");
+}
+
+// AC: PL-27.6
+#[tokio::test]
+async fn a_csv_with_bad_rows_changes_nothing_and_names_every_bad_row() {
+    let (app_router, _) = build_test_app();
+    let (_, endpoints_before) =
+        call_api(&app_router, "GET", "/api/v1/webhooks/endpoints", None).await;
+
+    let (status, refusal) = call_api(
+        &app_router,
+        "POST",
+        APPLY_PATH,
+        Some(&json!({
+            "app_url": "http://localhost:8000",
+            "numbers_csv": "number,label,subaccount_sid,messaging_service_sid\n+15550007002,Good line,,\nnot-a-number,Bad number,,\n+15550007003,Unknown account,AC99999999999999999999999999999999,\n",
+        })),
+    )
+    .await;
+    let (_, endpoints_after) =
+        call_api(&app_router, "GET", "/api/v1/webhooks/endpoints", None).await;
+    let (_, numbers_after) = call_api(&app_router, "GET", "/api/v1/numbers", None).await;
+    let message = refusal["error"]["message"].as_str().unwrap_or_default();
+
+    assert_eq!(status, 400, "{refusal}");
+    assert!(
+        message.contains("line 3") && message.contains("line 4"),
+        "{message}"
+    );
+    assert!(!message.contains("line 2"), "{message}");
+    assert_eq!(endpoints_after, endpoints_before);
+    assert!(
+        list_items(&numbers_after)
+            .iter()
+            .all(|number| number["number"] != "+15550007002"),
+        "{numbers_after}"
+    );
+}

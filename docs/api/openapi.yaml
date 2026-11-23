@@ -7044,7 +7044,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/WebhookEndpointInput"
+              $ref: "#/components/schemas/WebhookEndpointCreateInput"
       responses:
         "201":
           description: Created.
@@ -13168,7 +13168,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Ulid"
-          description: The virtual numbers in the sender pool, by ID.
+          description: The virtual numbers in the sender pool, by ID; none when left out, as a new Twilio Messaging Service starts.
           examples:
             - - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
         inbound_mode:
@@ -13200,7 +13200,6 @@ components:
         - inbound_fallback_url
         - inbound_mode
         - inbound_url
-        - number_ids
       description: "Body of POST /api/v1/messaging-services: the service, and the SID to give it."
     MessagingServiceInboundMode:
       type: string
@@ -13221,7 +13220,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Ulid"
-          description: The virtual numbers in the sender pool, by ID.
+          description: The virtual numbers in the sender pool, by ID; none when left out, as a new Twilio Messaging Service starts.
           examples:
             - - 01JB7T9Q2R5W8X3Y6Z1A4B7C9D
         inbound_mode:
@@ -19848,6 +19847,104 @@ components:
         - success_history
         - created_by
         - created_at
+    WebhookEndpointCreateInput:
+      type: object
+      properties:
+        name:
+          type: string
+          description: A name for the endpoint, shown in lists and deliveries.
+          examples:
+            - Orders app
+        url:
+          type: string
+          description: Where deliveries are sent; can use templates.
+          examples:
+            - http://localhost:3000/webhooks/sendmock
+        method:
+          $ref: "#/components/schemas/HttpMethod"
+          description: The HTTP method of each delivery.
+          examples:
+            - POST
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+          description: Extra headers layered on top of the template's.
+          examples:
+            - Authorization: Bearer {{ vars.app_token }}
+        extra_fields:
+          type: object
+          additionalProperties:
+            type: string
+          description: Extra body fields layered on top of the template's.
+          examples:
+            - environment: local
+        template_id:
+          type: string
+          description: The payload template, e.g. `native` (Standard Webhooks JSON) or `slack.incoming_webhook`.
+          examples:
+            - native
+        template_mode:
+          $ref: "#/components/schemas/TemplateMode"
+          description: "`linked` follows template updates, `detached` keeps its own copy."
+          examples:
+            - linked
+        timeout_ms:
+          type: number
+          description: How long to wait for your app's answer, in milliseconds.
+          examples:
+            - 10000
+        retry_policy:
+          $ref: "#/components/schemas/RetryPolicy"
+          description: When and how often failed deliveries are retried.
+        is_enabled:
+          type: boolean
+          description: Off endpoints receive no deliveries.
+          examples:
+            - true
+        query_params:
+          type: array
+          items:
+            $ref: "#/components/schemas/NameValueTemplate"
+          description: Query parameters added to the URL.
+        body_mode:
+          $ref: "#/components/schemas/EndpointBodyMode"
+          description: "How the body is built: `template` (the payload template), `fields` (name and value rows), `raw` (one text template) or `none`."
+          examples:
+            - template
+        body_fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/EndpointBodyField"
+          description: The rows of `fields` mode.
+        fields_encoding:
+          type: string
+          enum:
+            - json
+            - form
+            - multipart
+          description: "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent)."
+          examples:
+            - json
+        raw_content_type:
+          type: string
+          description: The content type of `raw` mode.
+          examples:
+            - application/json
+        raw_body:
+          type: string
+          description: The body template of `raw` mode.
+          examples:
+            - '{"text": "New email: {{ data.subject }}"}'
+        render_mode:
+          $ref: "#/components/schemas/RenderMode"
+          description: "`strict` stops a delivery on an undefined variable, `lenient` renders it empty with a warning."
+          examples:
+            - strict
+      required:
+        - name
+        - url
+      description: "Body of POST /api/v1/webhooks/endpoints: a name and a URL, and any other fields; the rest take a new endpoint's defaults, as Preview fills them."
     WebhookEndpointInput:
       type: object
       properties:

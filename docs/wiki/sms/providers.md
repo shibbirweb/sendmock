@@ -96,6 +96,10 @@ Twilio's Console sends a **Debugger event** to a webhook URL when something goes
 
 The event is a form POST in the `twilio.debugger` template: `Sid` (`NO...`), `AccountSid`, `ParentAccountSid` for a subaccount, `Timestamp`, `Level` (`ERROR`), `PayloadType` (`application/json`) and `Payload`, signed with the account's token. It shows on the message's timeline with its callbacks and is retried like them. The template can also be picked for any webhook endpoint.
 
+## Twilio's main account
+
+The Twilio provider's `account_sid` credential is the main account's SID: inbound webhooks carry it as `AccountSid` and the Accounts API answers with it. It must be `AC` and 32 letters or digits, as Twilio's are (the default is `ACtest0000000000000000000000000000`); saving anything else, an empty value included, is refused with the field named.
+
 ## Twilio signatures
 
 Every Twilio webhook carries `X-Twilio-Signature`, made with the auth token of the account the message belongs to:

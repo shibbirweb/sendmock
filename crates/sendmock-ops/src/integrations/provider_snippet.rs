@@ -9,7 +9,8 @@ pub struct ProviderSnippetTarget<'target> {
     pub provider_tls_port: u16,
 }
 
-const MAILGUN_SIGNING_LINE: &str = "# Webhook signing key: the mailgun_signing_key webhook variable (sendmock webhooks variables list).";
+const MAILGUN_SIGNING_LINE: &str =
+    "# Webhook signing key: the mailgun_signing_key webhook variable (sendmock webhook var list).";
 const TWILIO_SIGNING_LINE: &str = "# Webhooks are signed with the auth token; a subaccount's number signs with the subaccount's token.";
 const TWILIO_RECIPE_LINE: &str = "(see Connect your app, SDKs without a base URL setting)";
 

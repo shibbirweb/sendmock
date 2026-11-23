@@ -54,6 +54,8 @@ Delete asks first and removes the number from its service.
 
 A table: name, SID (copy), sender pool (number chips), inbound handling and actions. **New Messaging Service** and Edit open a sheet with the name, the **Sender pool** (a checkbox per number; picking one from another service moves it, and the list says so) and the inbound handling:
 
+A service can start with no numbers, as on Twilio (leave out `number_ids` in the API, or `--number-id` in `sendmock sms services create`), and get them later. A send through a service with no number for the recipient goes from Twilio's test sender `+15005550006`; with **Strict Twilio test mode** on in Settings it is refused with Twilio's 21704 (no numbers) or 21703 (no number for that channel).
+
 | Choice | Incoming messages to the pool's numbers |
 | --- | --- |
 | **Send a webhook** | go to the service's **Request URL**, with its **Fallback URL** |

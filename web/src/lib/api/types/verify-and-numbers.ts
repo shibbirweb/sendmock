@@ -279,10 +279,10 @@ export type MessagingServiceInput = {
    */
   friendly_name: string;
   /**
-   * The virtual numbers in the sender pool, by ID.
+   * The virtual numbers in the sender pool, by ID; none when left out, as a new Twilio Messaging Service starts.
    * @example ["01JB7T9Q2R5W8X3Y6Z1A4B7C9D"]
    */
-  number_ids: Ulid[];
+  number_ids?: Ulid[];
   /**
    * What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.
    * @example "webhook"

@@ -65,6 +65,46 @@ async fn routes_made_through_the_mailgun_api_are_the_routes_the_ui_lists() {
     assert_eq!(deleted["message"], "Route has been deleted");
 }
 
+// AC: EM-26.5
+#[tokio::test]
+async fn each_stored_attachment_has_the_url_it_downloads_from() {
+    let (app_router, _) = build_test_app();
+    let raw_message = "From: sam@example.test\r\nTo: support@inbound.app.test\r\nSubject: Invoice\r\nMIME-Version: 1.0\r\nContent-Type: multipart/mixed; boundary=b1\r\n\r\n--b1\r\nContent-Type: text/plain\r\n\r\nAttached\r\n--b1\r\nContent-Type: text/plain\r\nContent-Disposition: attachment; filename=invoice.txt\r\n\r\nINVOICE 42\r\n--b1--\r\n";
+    let (_, received) = call_api(
+        &app_router,
+        "POST",
+        "/api/v1/emails/inbound",
+        Some(&json!({ "raw": raw_message })),
+    )
+    .await;
+    let email_id = received["id"].as_str().unwrap_or_default();
+    tokio::time::sleep(Duration::from_millis(10)).await;
+
+    let (status, stored_message) = call_api(
+        &app_router,
+        "GET",
+        &format!("/providers/mailgun/v3/domains/inbound/messages/{email_id}"),
+        None,
+    )
+    .await;
+    let attachment = &stored_message["attachments"][0];
+    let attachment_url = attachment["url"].as_str().unwrap_or_default();
+    let attachment_path = attachment_url
+        .find("/api/v1/")
+        .map(|path_start| &attachment_url[path_start..])
+        .unwrap_or_default();
+    let (download_status, _) = call_api(&app_router, "GET", attachment_path, None).await;
+
+    assert_eq!(status, 200, "{stored_message}");
+    assert_eq!(attachment["name"], "invoice.txt", "{stored_message}");
+    assert_eq!(attachment["content-type"], "text/plain");
+    assert!(
+        attachment_url.ends_with(&format!("/api/v1/emails/{email_id}/attachments/0")),
+        "{attachment_url}"
+    );
+    assert_eq!(download_status, 200);
+}
+
 // AC: WH-12.5
 #[tokio::test]
 async fn the_message_url_answers_the_stored_message_and_its_mime() {

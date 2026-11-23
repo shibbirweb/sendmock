@@ -115,6 +115,7 @@ function buildMailgunProvider(): MessageProviderRecord {
       { part: "headers", source: "h:*" },
       { part: "template_id", source: "template" },
       { part: "template_data", source: "t:variables" },
+      { part: "template_data", source: "h:X-Mailgun-Variables" },
       { part: "user_variables", source: "h:X-Mailgun-Variables" },
       { part: "user_variables", source: "v:*" },
       { part: "raw", source: "message.content" },

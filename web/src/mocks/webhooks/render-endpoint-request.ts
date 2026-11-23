@@ -16,7 +16,7 @@ import {
   type TemplateContext,
 } from "@/mocks/webhooks/render-template-text";
 
-const newEndpointDefaults: WebhookEndpointInput = {
+export const newEndpointDefaults: WebhookEndpointInput = {
   name: "",
   url: "",
   method: "POST",

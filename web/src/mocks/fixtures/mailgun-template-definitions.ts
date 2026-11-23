@@ -3,6 +3,7 @@ import type { TemplateDefinition } from "@/mocks/fixtures/template-definitions";
 const jsonType = "application/json";
 const verifiedOn = "2026-09-30";
 const forwardVerifiedOn = "2026-11-22";
+const storeNotifyVerifiedOn = "2026-11-23";
 const forwardBoundary = "MailgunForward";
 
 /** One multipart form field of Mailgun's forward, as lines joined with CRLF. */
@@ -15,8 +16,66 @@ function forwardField(fieldName: string, valueTemplate: string): string[] {
   ];
 }
 
+/** The parsed message's fields, which both route actions send. */
+const messageFormFields: string[] = [
+  ...forwardField("recipient", "{{ data.to[0].address }}"),
+  ...forwardField("sender", "{{ data.from.address }}"),
+  ...forwardField("from", "{{ data.from.address }}"),
+  ...forwardField("To", "{{ data.to[0].address }}"),
+  ...forwardField("subject", "{{ data.subject }}"),
+  ...forwardField(
+    "Message-Id",
+    "{% if data.message_id %}{{ data.message_id }}{% endif %}",
+  ),
+  ...forwardField("In-Reply-To", '{{ data.in_reply_to | default("") }}'),
+  ...forwardField("References", '{{ data.references | default("") }}'),
+  ...forwardField(
+    "body-plain",
+    "{% if data.text_body %}{{ data.text_body }}{% endif %}",
+  ),
+  ...forwardField("stripped-text", '{{ data.stripped_text | default("") }}'),
+  ...forwardField(
+    "stripped-signature",
+    '{{ data.stripped_signature | default("") }}',
+  ),
+  ...forwardField(
+    "body-html",
+    "{% if data.html_body %}{{ data.html_body }}{% endif %}",
+  ),
+  ...forwardField(
+    "stripped-html",
+    "{% if data.html_body %}{{ data.html_body }}{% endif %}",
+  ),
+  ...forwardField(
+    "message-headers",
+    "{% if data.header_pairs %}{{ data.header_pairs | tojson }}{% else %}[]{% endif %}",
+  ),
+  ...forwardField(
+    "content-id-map",
+    "{% if data.content_id_map %}{{ data.content_id_map | tojson }}{% else %}{}{% endif %}",
+  ),
+  ...forwardField("message-url", '{{ data.message_url | default("") }}'),
+];
+
+/** The token and signature Mailgun signs every route request with. */
+const signatureFormFields: string[] = [
+  ...forwardField("timestamp", "{{ mailgun_timestamp }}"),
+  ...forwardField("token", "{{ mailgun_token }}"),
+  ...forwardField(
+    "signature",
+    "{{ mailgun_signature(vars.mailgun_signing_key, mailgun_timestamp, mailgun_token) }}",
+  ),
+];
+
+const signingSetup =
+  "{% set mailgun_timestamp = event.created_at | unix %}{% set mailgun_token = random_hex(50) %}";
+
+/** store(notify=...) lists the files as JSON, each with the URL to fetch it from. */
+const storedAttachmentsJson =
+  '[{% for attachment in data.attachments %}{% if loop.index > 1 %}, {% endif %}{"url": {{ attachment.url | tojson }}, "content-type": {{ attachment.content_type | tojson }}, "name": {{ attachment.filename | tojson }}, "size": {{ attachment.size_bytes }}}{% endfor %}]';
+
 /**
- * Mailgun's inbound route forward and event webhooks. Both the binary's template engine and
+ * Mailgun's inbound route actions (forward and store-and-notify) and event webhooks. Both the binary's template engine and
  * the demo's Jinja subset render them, so conditions are single comparisons in nested ifs.
  */
 export const mailgunTemplateDefinitions: Record<string, TemplateDefinition> = {
@@ -24,57 +83,13 @@ export const mailgunTemplateDefinitions: Record<string, TemplateDefinition> = {
     method: "POST",
     content_type: `multipart/form-data; boundary=${forwardBoundary}`,
     header_templates: {},
-    // Mailgun's store-and-notify forward: the parsed message, every header, the stripped
-    // reply and signature, and each file as attachment-N, fetched from its URL when sent.
+    // Mailgun's forward() action: the parsed message, every header, the stripped reply and
+    // signature, and each file as attachment-N, fetched from its URL when sent.
     body_template: [
-      "{% set mailgun_timestamp = event.created_at | unix %}{% set mailgun_token = random_hex(50) %}",
-      ...forwardField("recipient", "{{ data.to[0].address }}"),
-      ...forwardField("sender", "{{ data.from.address }}"),
-      ...forwardField("from", "{{ data.from.address }}"),
-      ...forwardField("To", "{{ data.to[0].address }}"),
-      ...forwardField("subject", "{{ data.subject }}"),
-      ...forwardField(
-        "Message-Id",
-        "{% if data.message_id %}{{ data.message_id }}{% endif %}",
-      ),
-      ...forwardField("In-Reply-To", '{{ data.in_reply_to | default("") }}'),
-      ...forwardField("References", '{{ data.references | default("") }}'),
-      ...forwardField(
-        "body-plain",
-        "{% if data.text_body %}{{ data.text_body }}{% endif %}",
-      ),
-      ...forwardField(
-        "stripped-text",
-        '{{ data.stripped_text | default("") }}',
-      ),
-      ...forwardField(
-        "stripped-signature",
-        '{{ data.stripped_signature | default("") }}',
-      ),
-      ...forwardField(
-        "body-html",
-        "{% if data.html_body %}{{ data.html_body }}{% endif %}",
-      ),
-      ...forwardField(
-        "stripped-html",
-        "{% if data.html_body %}{{ data.html_body }}{% endif %}",
-      ),
-      ...forwardField(
-        "message-headers",
-        "{% if data.header_pairs %}{{ data.header_pairs | tojson }}{% else %}[]{% endif %}",
-      ),
-      ...forwardField(
-        "content-id-map",
-        "{% if data.content_id_map %}{{ data.content_id_map | tojson }}{% else %}{}{% endif %}",
-      ),
-      ...forwardField("message-url", '{{ data.message_url | default("") }}'),
+      signingSetup,
+      ...messageFormFields,
       ...forwardField("attachment-count", "{{ data.attachments | length }}"),
-      ...forwardField("timestamp", "{{ mailgun_timestamp }}"),
-      ...forwardField("token", "{{ mailgun_token }}"),
-      ...forwardField(
-        "signature",
-        "{{ mailgun_signature(vars.mailgun_signing_key, mailgun_timestamp, mailgun_token) }}",
-      ),
+      ...signatureFormFields,
       `{% for attachment in data.attachments %}--${forwardBoundary}`,
       'Content-Disposition: form-data; name="attachment-{{ loop.index }}"; filename="{{ attachment.filename }}"',
       "X-Sendmock-File-Url: {{ attachment.url }}",
@@ -85,6 +100,24 @@ export const mailgunTemplateDefinitions: Record<string, TemplateDefinition> = {
     doc_url:
       "https://documentation.mailgun.com/docs/mailgun/user-manual/receive-forward-store/",
     verified_on: forwardVerifiedOn,
+  },
+  "mailgun.store_notify": {
+    method: "POST",
+    content_type: `multipart/form-data; boundary=${forwardBoundary}`,
+    header_templates: {},
+    // Mailgun's store(notify=...) action: the same parsed message, and the files as a JSON
+    // list in attachments instead of file parts.
+    body_template: [
+      signingSetup,
+      ...messageFormFields,
+      ...forwardField("attachments", storedAttachmentsJson),
+      ...signatureFormFields,
+      `--${forwardBoundary}--`,
+      "",
+    ].join("\r\n"),
+    doc_url:
+      "https://documentation.mailgun.com/docs/mailgun/user-manual/receive-forward-store/storing-and-retrieving-messages",
+    verified_on: storeNotifyVerifiedOn,
   },
   "mailgun.events": {
     method: "POST",

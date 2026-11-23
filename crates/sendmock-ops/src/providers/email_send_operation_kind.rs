@@ -11,6 +11,7 @@ use super::provider_call::ProviderCall;
 use super::raw_message_part::decode_raw_part;
 use super::request_checks::{ProviderFailure, find_rule_failure};
 use super::send_operation_kind::ProviderAnswer;
+use super::template_data::merge_template_data;
 use super::user_variables::read_user_variables;
 use crate::email::{NativeSendRequest, complete_email_intake, read_bare_address};
 use crate::{OperationContext, OperationError, read_ingest_options};
@@ -189,9 +190,10 @@ async fn apply_local_template(
     else {
         return Ok(());
     };
-    let template_data = read_first("template_data")
-        .and_then(|template_data_json| serde_json::from_str::<Value>(template_data_json).ok())
-        .unwrap_or_else(|| json!({}));
+    let template_data = part_values
+        .get("template_data")
+        .and_then(|data_values| merge_template_data(data_values))
+        .map_or_else(|| json!({}), Value::Object);
     let render = |template_text: &str| {
         render_template(
             template_text,
@@ -242,7 +244,10 @@ async fn save_provider_send(
             provider_key: provider_call.provider.key.clone(),
             provider_message_id: provider_message_id.to_owned(),
             template_id: read_first("template_id"),
-            template_data_json: read_first("template_data"),
+            template_data_json: part_values
+                .get("template_data")
+                .and_then(|data_values| merge_template_data(data_values))
+                .map(|template_data| Value::Object(template_data).to_string()),
             sending_domain: provider_call.path_params.get("domain").cloned(),
             user_variables_json: part_values
                 .get("user_variables")

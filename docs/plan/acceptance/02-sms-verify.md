@@ -263,6 +263,8 @@ UI in U1, backend Phase 2.
 - [ ] SM-22.4 A 401 keeps Twilio's 20003 body, and the HTTP request log says why: a wrong token, an unknown account, or an account that is not the provider's (R-21).
 - [ ] SM-22.5 Numbers take an account on add and update (REST, CLI `--account-sid`, MCP, UI), the setup file exports and imports it, `inbound_method` defaults to POST, and `sms services create` takes `--sid` (R-11, R-15).
 - [ ] SM-22.6 The Twilio PHP and Node SDKs in CI fetch a subaccount's message through the main account and get 20404, and validate an inbound webhook signed with the subaccount's token.
+- [ ] SM-22.7 A Messaging Service can be made with no numbers (`number_ids` left out, from the API, CLI and MCP); a send through a service with no usable sender goes from Twilio's test sender, and in strict Twilio test mode is refused with Twilio's 21704 (no numbers) or 21703 (no number for the recipient's channel) (R-45).
+- [ ] SM-22.8 Saving the Twilio provider with an `account_sid` that is not `AC` and 32 letters or digits, an empty one included, is refused with the field named (R-47).
 
 ## SM-23 Opt-out keywords
 

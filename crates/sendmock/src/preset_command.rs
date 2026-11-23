@@ -92,13 +92,17 @@ fn build_apply_input(matched_operation: &MatchedOperation) -> Result<Value, Stri
 
 pub fn run_preset_command(matched_operation: &MatchedOperation) -> ExitCode {
     let as_json = read_switch(matched_operation, "json");
+    let server_url = resolve_server_url(
+        read_text(matched_operation, "server").as_deref(),
+        std::env::var("SENDMOCK_HTTP_ADDR").ok().as_deref(),
+    );
     if !read_switch(matched_operation, "no_trust") {
         let trust_action = TrustAction {
             is_check: false,
             is_undo: false,
             is_confirmed: false,
         };
-        let _ = run_trust(trust_action, false);
+        let _ = run_trust(trust_action, false, &server_url);
     }
     let input = match build_apply_input(matched_operation) {
         Ok(input) => input,
@@ -114,10 +118,6 @@ pub fn run_preset_command(matched_operation: &MatchedOperation) -> ExitCode {
         eprintln!("Could not start the client runtime");
         return CliExitCode::Error.into();
     };
-    let server_url = resolve_server_url(
-        read_text(matched_operation, "server").as_deref(),
-        std::env::var("SENDMOCK_HTTP_ADDR").ok().as_deref(),
-    );
     let api_client = ApiClient::new(server_url, read_text(matched_operation, "token"));
     let definition = matched_operation.operation.definition();
     match runtime.block_on(api_client.call_operation(definition, &input)) {

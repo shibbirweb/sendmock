@@ -7,6 +7,8 @@ use super::command_runner::{CommandOutcome, CommandRunner};
 #[derive(Default)]
 pub struct FakeCommandRunner {
     pub succeeding_programs: Vec<String>,
+    /// What a program prints, by program; nothing for the others.
+    pub program_outputs: Vec<(String, String)>,
     pub calls: Mutex<Vec<String>>,
 }
 
@@ -17,8 +19,16 @@ impl FakeCommandRunner {
                 .iter()
                 .map(|program| (*program).to_owned())
                 .collect(),
+            program_outputs: Vec::new(),
             calls: Mutex::new(Vec::new()),
         }
+    }
+
+    /// The same runner, with `program` printing `output_text`.
+    pub fn with_output(mut self, program: &str, output_text: &str) -> Self {
+        self.program_outputs
+            .push((program.to_owned(), output_text.to_owned()));
+        self
     }
 
     pub fn recorded_calls(&self) -> Vec<String> {
@@ -39,7 +49,12 @@ impl CommandRunner for FakeCommandRunner {
                 .succeeding_programs
                 .iter()
                 .any(|succeeding| succeeding == program),
-            output_text: String::new(),
+            output_text: self
+                .program_outputs
+                .iter()
+                .find(|(output_program, _)| output_program == program)
+                .map(|(_, output_text)| output_text.clone())
+                .unwrap_or_default(),
         }
     }
 

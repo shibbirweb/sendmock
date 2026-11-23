@@ -46,4 +46,10 @@ pub trait TrustTarget {
 
     /// Removes what `add` added; what changed, or why it could not.
     fn remove(&self, local_ca: &LocalCa) -> Result<String, String>;
+
+    /// For a place SendMock does not change: prepares what the user sets by hand (such as a
+    /// combined CA bundle) and says what to set; `None` when there is nothing to do.
+    fn prepare_manual_step(&self, _local_ca: &LocalCa) -> Option<Result<String, String>> {
+        None
+    }
 }

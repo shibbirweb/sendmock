@@ -17,7 +17,8 @@ Pick one on a webhook endpoint to send events in that service's format, signed a
 
 | Template | Name | Events | Required variables |
 | --- | --- | --- | --- |
-| `mailgun.routes` | Mailgun: routes (inbound) | `email.inbound` | `mailgun_signing_key` |
+| `mailgun.routes` | Mailgun: routes, forward (inbound) | `email.inbound` | `mailgun_signing_key` |
+| `mailgun.store_notify` | Mailgun: routes, store and notify (inbound) | `email.inbound` | `mailgun_signing_key` |
 | `mailgun.events` | Mailgun: event webhooks | `email.opened`, `email.clicked`, `email.delivered`, `email.bounced`, `email.complained` | `mailgun_signing_key` |
 | `postmark.webhooks` | Postmark: delivery, bounce, spam and open webhooks | `email.opened`, `email.clicked`, `email.delivered`, `email.bounced`, `email.complained` |  |
 | `brevo.events` | Brevo: transactional webhooks | `email.received`, `email.opened`, `email.clicked`, `email.delivered`, `email.bounced`, `email.complained` |  |

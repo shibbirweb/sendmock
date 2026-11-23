@@ -7,6 +7,8 @@ use sendmock_core::{
 use serde_json::json;
 
 use crate::providers::MessageProviderDefinition;
+
+const TWILIO_PROVIDER_KEY: &str = "twilio";
 use crate::{OperationContext, OperationError};
 
 /// Paths SendMock answers itself, never a provider's.
@@ -52,7 +54,9 @@ fn find_field_problem(
     if !is_hex_colour(&provider.accent) {
         return Some(("accent", "Use a colour like #1e5bb8".to_owned()));
     }
-    if let Some(problem) = find_credential_problem(provider) {
+    if let Some(problem) =
+        find_credential_problem(provider).or_else(|| find_twilio_account_problem(provider))
+    {
         return Some(("credentials", problem));
     }
     if let Some(problem) = find_operations_problem(provider, area_providers) {
@@ -92,6 +96,25 @@ fn find_credential_problem(provider: &MessageProviderDefinition) -> Option<Strin
         }
     }
     None
+}
+
+/// The Twilio provider's `account_sid` is the main account's SID, which webhooks and the
+/// Accounts API use, so it must look like one: `AC` and 32 letters or digits.
+fn find_twilio_account_problem(provider: &MessageProviderDefinition) -> Option<String> {
+    if provider.key != TWILIO_PROVIDER_KEY {
+        return None;
+    }
+    let account_sid = provider.find_credential("account_sid")?.trim();
+    let is_account_sid_shape = account_sid
+        .strip_prefix("AC")
+        .is_some_and(|sid_characters| {
+            sid_characters.len() == 32
+                && sid_characters
+                    .chars()
+                    .all(|character| character.is_ascii_alphanumeric())
+        });
+    (!is_account_sid_shape)
+        .then(|| "account_sid needs AC and 32 letters or digits, as Twilio's are".to_owned())
 }
 
 fn find_operations_problem(
@@ -307,6 +330,39 @@ mod tests {
                 provider.key
             );
         }
+    }
+
+    // AC: SM-22.8
+    #[test]
+    fn the_twilio_account_sid_must_be_ac_and_32_letters_or_digits() {
+        let shipped_providers = builtin_sms_providers();
+        let mut twilio = find_builtin("twilio");
+        let set_account_sid = |provider: &mut MessageProviderDefinition, account_sid: &str| {
+            if let Some(credential) = provider
+                .credentials
+                .iter_mut()
+                .find(|credential| credential.name == "account_sid")
+            {
+                credential.value = account_sid.to_owned();
+            }
+        };
+
+        assert_eq!(find_twilio_account_problem(&twilio), None);
+        for wrong_account_sid in [
+            "",
+            "AC123",
+            "ACtest00000000000000000000000000",
+            "MG0000000000000000000000000000000",
+        ] {
+            set_account_sid(&mut twilio, wrong_account_sid);
+            assert_eq!(
+                find_field_problem(&twilio, &shipped_providers).map(|(field_name, _)| field_name),
+                Some("credentials"),
+                "{wrong_account_sid:?}"
+            );
+        }
+        set_account_sid(&mut twilio, "AC0123456789abcdef0123456789ABCDEF");
+        assert_eq!(find_twilio_account_problem(&twilio), None);
     }
 
     // AC: EM-24.2

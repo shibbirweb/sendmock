@@ -63,6 +63,48 @@ async fn a_template_send_without_a_body_is_accepted_and_keeps_its_template_id() 
     );
 }
 
+// AC: EM-24.6
+#[tokio::test]
+async fn a_template_send_takes_its_values_from_the_variables_header_and_t_variables_wins() {
+    let (app_router, _) = build_test_app();
+    let (template_status, template) = call_api(
+        &app_router,
+        "POST",
+        "/api/v1/emails/templates",
+        Some(&json!({
+            "id": "welcome-email", "subject": "Welcome",
+            "text": "Hi {{ first_name }}, plan {{ plan }}", "html": null,
+        })),
+    )
+    .await;
+    let mut header_only = ADDRESS_FIELDS.to_vec();
+    header_only.extend([
+        ("template", "welcome-email"),
+        (
+            "h:X-Mailgun-Variables",
+            r#"{"first_name": "Pat", "plan": "pro"}"#,
+        ),
+    ]);
+    let mut both_sources = header_only.clone();
+    both_sources.push(("t:variables", r#"{"first_name": "Sam"}"#));
+
+    send_form(&app_router, MESSAGES_PATH, &header_only).await;
+    let header_email = read_newest_email(&app_router).await;
+    send_form(&app_router, MESSAGES_PATH, &both_sources).await;
+    let both_email = read_newest_email(&app_router).await;
+
+    assert_eq!(template_status, 201, "{template}");
+    assert_eq!(
+        header_email["text_body"], "Hi Pat, plan pro",
+        "{header_email}"
+    );
+    assert_eq!(both_email["text_body"], "Hi Sam, plan pro", "{both_email}");
+    assert_eq!(
+        both_email["template"]["template_data"],
+        json!({ "first_name": "Sam", "plan": "pro" })
+    );
+}
+
 // AC: EM-24.2
 #[tokio::test]
 async fn v_fields_and_the_variables_header_are_kept_as_user_variables() {

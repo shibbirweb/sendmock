@@ -8,7 +8,7 @@ export type ProviderSnippetTarget = {
 };
 
 const mailgunSigningLine =
-  "# Webhook signing key: the mailgun_signing_key webhook variable (sendmock webhooks variables list).";
+  "# Webhook signing key: the mailgun_signing_key webhook variable (sendmock webhook var list).";
 const twilioSigningLine =
   "# Webhooks are signed with the auth token; a subaccount's number signs with the subaccount's token.";
 const twilioRecipeLine =

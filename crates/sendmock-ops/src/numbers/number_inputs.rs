@@ -114,7 +114,9 @@ pub struct VirtualNumberReference {
 pub struct MessagingServiceInput {
     /// A name for the service.
     pub friendly_name: String,
-    /// The virtual numbers in the sender pool, by ID.
+    /// The virtual numbers in the sender pool, by ID; none when left out, as a new Twilio
+    /// Messaging Service starts.
+    #[serde(default)]
     pub number_ids: Vec<String>,
     /// `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.
     pub inbound_mode: MessagingServiceInboundMode,

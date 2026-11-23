@@ -18192,11 +18192,11 @@
           },
           "type": "string[]",
           "value_label": "<number-id>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": true,
           "takes_json": false,
           "allowed_values": null,
-          "description": "The virtual numbers in the sender pool, by ID.",
+          "description": "The virtual numbers in the sender pool, by ID; none when left out, as a new Twilio Messaging Service starts.",
           "example": [
             "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
           ]
@@ -18266,7 +18266,7 @@
           "example": true
         }
       ],
-      "example": "sendmock sms services create --friendly-name Notifications --number-id 01JB7T9Q2R5W8X3Y6Z1A4B7C9D --inbound-mode webhook --sid MG00000000000000000000000000000001 --inbound-url http://localhost:3000/sms/inbound",
+      "example": "sendmock sms services create --friendly-name Notifications --inbound-mode webhook --sid MG00000000000000000000000000000001 --number-id 01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
       "output": "MessagingService",
       "exit_codes": [
         0,
@@ -18434,7 +18434,7 @@
           "is_repeatable": true,
           "takes_json": false,
           "allowed_values": null,
-          "description": "The virtual numbers in the sender pool, by ID.",
+          "description": "The virtual numbers in the sender pool, by ID; none when left out, as a new Twilio Messaging Service starts.",
           "example": [
             "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
           ]
@@ -21101,7 +21101,7 @@
           },
           "type": "string",
           "value_label": "<method>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": [
@@ -21122,7 +21122,7 @@
           },
           "type": "object",
           "value_label": "<headers>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -21139,7 +21139,7 @@
           },
           "type": "object",
           "value_label": "<extra-fields>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -21156,7 +21156,7 @@
           },
           "type": "string",
           "value_label": "<template-id>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -21171,7 +21171,7 @@
           },
           "type": "string",
           "value_label": "<template-mode>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": [
@@ -21189,7 +21189,7 @@
           },
           "type": "number",
           "value_label": "<timeout-ms>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -21204,7 +21204,7 @@
           },
           "type": "RetryPolicy",
           "value_label": "<retry-policy>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -21229,7 +21229,7 @@
           },
           "type": "boolean",
           "value_label": null,
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -21244,7 +21244,7 @@
           },
           "type": "NameValueTemplate[]",
           "value_label": "<query-params>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -21264,7 +21264,7 @@
           },
           "type": "string",
           "value_label": "<body-mode>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": [
@@ -21284,7 +21284,7 @@
           },
           "type": "EndpointBodyField[]",
           "value_label": "<body-fields>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": true,
           "allowed_values": null,
@@ -21305,7 +21305,7 @@
           },
           "type": "string",
           "value_label": "<fields-encoding>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": [
@@ -21324,7 +21324,7 @@
           },
           "type": "string",
           "value_label": "<raw-content-type>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -21339,7 +21339,7 @@
           },
           "type": "string",
           "value_label": "<raw-body>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": null,
@@ -21354,7 +21354,7 @@
           },
           "type": "string",
           "value_label": "<render-mode>",
-          "is_required": true,
+          "is_required": false,
           "is_repeatable": false,
           "takes_json": false,
           "allowed_values": [
@@ -21365,7 +21365,7 @@
           "example": "strict"
         }
       ],
-      "example": "sendmock webhook endpoint create --name 'Orders app' --url http://localhost:3000/webhooks/sendmock --method POST --headers '{\"Authorization\":\"Bearer {{ vars.app_token }}\"}' --extra-fields '{\"environment\":\"local\"}' --template-id native --template-mode linked --timeout-ms 10000 --retry-policy '{\"max_attempts\":5,\"backoff_seconds\":[1,5,30,120,600],\"retry_on_client_errors\":false}' --enabled --query-params '[{\"name\":\"X-Source\",\"value\":\"sendmock-{{ event.type }}\"}]' --body-mode template --body-fields '[{\"name\":\"user.email\",\"value_type\":\"text\",\"value\":\"{{ data.to[0].address }}\"}]' --fields-encoding json --raw-content-type application/json --raw-body '{\"text\": \"New email: {{ data.subject }}\"}' --render-mode strict",
+      "example": "sendmock webhook endpoint create --name 'Orders app' --url http://localhost:3000/webhooks/sendmock --method POST --template-mode linked",
       "output": "WebhookEndpoint",
       "exit_codes": [
         0,

@@ -226,6 +226,10 @@
         "source": "t:variables"
       },
       {
+        "part": "template_data",
+        "source": "h:X-Mailgun-Variables"
+      },
+      {
         "part": "user_variables",
         "source": "h:X-Mailgun-Variables"
       },

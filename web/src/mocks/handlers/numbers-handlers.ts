@@ -241,7 +241,7 @@ export const numbersHandlers = [
       created_by: "ui",
     };
     mockDatabase.messagingServices.push(messagingService);
-    setServicePool(messagingService, serviceInput.number_ids);
+    setServicePool(messagingService, serviceInput.number_ids ?? []);
 
     return HttpResponse.json(messagingService, { status: 201 });
   }),
@@ -267,7 +267,10 @@ export const numbersHandlers = [
         friendly_name: serviceInput.friendly_name.trim(),
         number_ids: messagingService.number_ids,
       });
-      setServicePool(messagingService, serviceInput.number_ids);
+      setServicePool(
+        messagingService,
+        serviceInput.number_ids ?? messagingService.number_ids,
+      );
 
       return HttpResponse.json(messagingService);
     },

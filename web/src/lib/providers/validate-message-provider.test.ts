@@ -3,6 +3,7 @@ import { describe, expect, test } from "vitest";
 import {
   findFieldMappingDuplicate,
   findPathProblem,
+  findTwilioAccountProblem,
   validateNewProvider,
 } from "@/lib/providers/validate-message-provider";
 
@@ -38,6 +39,28 @@ describe("provider rules", () => {
         { part: "user_variables", source: " v:* " },
       ]),
     ).toBe("user_variables is mapped from v:* twice");
+  });
+
+  test("SM-22.8 the Twilio account_sid must be AC and 32 letters or digits", () => {
+    const twilioWith = (accountSid: string) => ({
+      key: "twilio",
+      credentials: [
+        { name: "account_sid", value: accountSid, is_secret: false },
+      ],
+    });
+
+    expect(
+      findTwilioAccountProblem(
+        twilioWith("ACtest0000000000000000000000000000"),
+      ),
+    ).toBeUndefined();
+    expect(findTwilioAccountProblem(twilioWith(""))).toContain("AC and 32");
+    expect(findTwilioAccountProblem(twilioWith("AC123"))).toContain(
+      "AC and 32",
+    );
+    expect(
+      findTwilioAccountProblem({ ...twilioWith(""), key: "vonage" }),
+    ).toBeUndefined();
   });
 
   test("SM-16.4 a path must start with / and stay out of SendMock's own paths", () => {

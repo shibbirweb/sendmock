@@ -11541,9 +11541,9 @@
             "location": "body"
           },
           "type": "string[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
-          "description": "The virtual numbers in the sender pool, by ID.",
+          "description": "The virtual numbers in the sender pool, by ID; none when left out, as a new Twilio Messaging Service starts.",
           "example": [
             "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
           ]
@@ -11626,7 +11626,7 @@
             "items": {
               "$ref": "#/$defs/Ulid"
             },
-            "description": "The virtual numbers in the sender pool, by ID.",
+            "description": "The virtual numbers in the sender pool, by ID; none when left out, as a new Twilio Messaging Service starts.",
             "examples": [
               [
                 "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
@@ -11670,7 +11670,6 @@
         },
         "required": [
           "friendly_name",
-          "number_ids",
           "inbound_mode"
         ],
         "$defs": {
@@ -11691,12 +11690,11 @@
       },
       "example_arguments": {
         "friendly_name": "Notifications",
-        "number_ids": [
-          "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
-        ],
         "inbound_mode": "webhook",
         "sid": "MG00000000000000000000000000000001",
-        "inbound_url": "http://localhost:3000/sms/inbound"
+        "number_ids": [
+          "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
+        ]
       },
       "output": "MessagingService",
       "cli": [
@@ -11860,7 +11858,7 @@
           "type": "string[]",
           "is_required": false,
           "allowed_values": null,
-          "description": "The virtual numbers in the sender pool, by ID.",
+          "description": "The virtual numbers in the sender pool, by ID; none when left out, as a new Twilio Messaging Service starts.",
           "example": [
             "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
           ]
@@ -11940,7 +11938,7 @@
             "items": {
               "$ref": "#/$defs/Ulid"
             },
-            "description": "The virtual numbers in the sender pool, by ID.",
+            "description": "The virtual numbers in the sender pool, by ID; none when left out, as a new Twilio Messaging Service starts.",
             "examples": [
               [
                 "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
@@ -30646,7 +30644,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": [
             "GET",
             "POST",
@@ -30664,7 +30662,7 @@
             "location": "body"
           },
           "type": "object",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Extra headers layered on top of the template's.",
           "example": {
@@ -30678,7 +30676,7 @@
             "location": "body"
           },
           "type": "object",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Extra body fields layered on top of the template's.",
           "example": {
@@ -30692,7 +30690,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The payload template, e.g. `native` (Standard Webhooks JSON) or `slack.incoming_webhook`.",
           "example": "native"
@@ -30704,7 +30702,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": [
             "linked",
             "detached"
@@ -30719,7 +30717,7 @@
             "location": "body"
           },
           "type": "number",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "How long to wait for your app's answer, in milliseconds.",
           "example": 10000
@@ -30731,7 +30729,7 @@
             "location": "body"
           },
           "type": "RetryPolicy",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "When and how often failed deliveries are retried.",
           "example": {
@@ -30753,7 +30751,7 @@
             "location": "body"
           },
           "type": "boolean",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Off endpoints receive no deliveries.",
           "example": true
@@ -30765,7 +30763,7 @@
             "location": "body"
           },
           "type": "NameValueTemplate[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Query parameters added to the URL.",
           "example": [
@@ -30782,7 +30780,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": [
             "template",
             "fields",
@@ -30799,7 +30797,7 @@
             "location": "body"
           },
           "type": "EndpointBodyField[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The rows of `fields` mode.",
           "example": [
@@ -30817,7 +30815,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": [
             "json",
             "form",
@@ -30833,7 +30831,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The content type of `raw` mode.",
           "example": "application/json"
@@ -30845,7 +30843,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The body template of `raw` mode.",
           "example": "{\"text\": \"New email: {{ data.subject }}\"}"
@@ -30857,7 +30855,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": [
             "strict",
             "lenient"
@@ -31033,22 +31031,7 @@
         },
         "required": [
           "name",
-          "url",
-          "method",
-          "headers",
-          "extra_fields",
-          "template_id",
-          "template_mode",
-          "timeout_ms",
-          "retry_policy",
-          "is_enabled",
-          "query_params",
-          "body_mode",
-          "body_fields",
-          "fields_encoding",
-          "raw_content_type",
-          "raw_body",
-          "render_mode"
+          "url"
         ],
         "$defs": {
           "BodyFieldType": {
@@ -31197,45 +31180,7 @@
         "name": "Orders app",
         "url": "http://localhost:3000/webhooks/sendmock",
         "method": "POST",
-        "headers": {
-          "Authorization": "Bearer {{ vars.app_token }}"
-        },
-        "extra_fields": {
-          "environment": "local"
-        },
-        "template_id": "native",
-        "template_mode": "linked",
-        "timeout_ms": 10000,
-        "retry_policy": {
-          "max_attempts": 5,
-          "backoff_seconds": [
-            1,
-            5,
-            30,
-            120,
-            600
-          ],
-          "retry_on_client_errors": false
-        },
-        "is_enabled": true,
-        "query_params": [
-          {
-            "name": "X-Source",
-            "value": "sendmock-{{ event.type }}"
-          }
-        ],
-        "body_mode": "template",
-        "body_fields": [
-          {
-            "name": "user.email",
-            "value_type": "text",
-            "value": "{{ data.to[0].address }}"
-          }
-        ],
-        "fields_encoding": "json",
-        "raw_content_type": "application/json",
-        "raw_body": "{\"text\": \"New email: {{ data.subject }}\"}",
-        "render_mode": "strict"
+        "template_mode": "linked"
       },
       "output": "WebhookEndpoint",
       "cli": [

@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 use super::fake_command_runner::FakeCommandRunner;
 use super::java_target::JavaTarget;
+use super::php_target::PhpTarget;
 use super::system_store_target::{LinuxCaFolderTarget, MacKeychainTarget};
 use super::trust_target::{LocalCa, TrustState, TrustTarget};
 
@@ -117,5 +118,88 @@ fn an_alias_the_system_bundle_rebuild_already_removed_counts_as_removed() {
     assert!(
         calls[0].contains("-list -alias sendmock-local-ca"),
         "{calls:?}"
+    );
+}
+
+/// A Herd-like PHP: no main php.ini, and a scanned ini that points both CA settings at
+/// Herd's own bundle. Answers the PHP and that ini's path.
+fn build_herd_php(folder: &std::path::Path) -> (PhpTarget, PathBuf) {
+    let herd_bundle = folder.join("herd-cacert.pem");
+    let herd_ini = folder.join("herd-php.ini");
+    let _ = std::fs::write(
+        &herd_bundle,
+        "-----BEGIN CERTIFICATE-----\nHERD\n-----END CERTIFICATE-----\n",
+    );
+    let _ = std::fs::write(
+        &herd_ini,
+        format!(
+            "openssl.cafile={0}\ncurl.cainfo={0}\n",
+            herd_bundle.display()
+        ),
+    );
+    let php_binary = "/Herd/bin/php85";
+    let probe_output = format!(
+        "\n{}\n\n8.5.0\n{}\n",
+        herd_bundle.display(),
+        herd_ini.display()
+    );
+    let php = PhpTarget {
+        runner: Arc::new(
+            FakeCommandRunner::succeeding(&[php_binary]).with_output(php_binary, &probe_output),
+        ),
+        php_binary: PathBuf::from(php_binary),
+    };
+    (php, herd_ini)
+}
+
+// AC: PL-25.5
+#[test]
+fn a_php_whose_ca_files_come_from_a_scanned_ini_names_that_file_and_its_settings() {
+    let folder = tempfile::tempdir().unwrap_or_else(|error| panic!("{error}"));
+    let local_ca = build_local_ca(folder.path());
+    let (php, herd_ini) = build_herd_php(folder.path());
+
+    let check = php.check(&local_ca);
+
+    assert_eq!(check.state, TrustState::Manual);
+    assert!(
+        check.detail.contains(&herd_ini.display().to_string())
+            && check.detail.contains("openssl.cafile=")
+            && check.detail.contains("curl.cainfo="),
+        "{}",
+        check.detail
+    );
+}
+
+// AC: PL-25.5
+#[test]
+fn trust_writes_a_combined_bundle_for_that_php_and_leaves_its_ini_as_it_was() {
+    let folder = tempfile::tempdir().unwrap_or_else(|error| panic!("{error}"));
+    let local_ca = build_local_ca(folder.path());
+    let (php, herd_ini) = build_herd_php(folder.path());
+    let ini_before = std::fs::read_to_string(&herd_ini).unwrap_or_default();
+
+    let manual_step = php.prepare_manual_step(&local_ca);
+
+    let manual_text = match manual_step {
+        Some(Ok(manual_text)) => manual_text,
+        other => panic!("a manual step: {other:?}"),
+    };
+    let bundle_text = std::fs::read_dir(&local_ca.bundle_folder)
+        .unwrap_or_else(|error| panic!("{error}"))
+        .flatten()
+        .map(|bundle_entry| std::fs::read_to_string(bundle_entry.path()).unwrap_or_default())
+        .collect::<String>();
+    assert!(
+        bundle_text.contains("HERD") && bundle_text.contains("AAAA"),
+        "{bundle_text}"
+    );
+    assert!(
+        manual_text.contains("Set openssl.cafile and curl.cainfo there"),
+        "{manual_text}"
+    );
+    assert_eq!(
+        std::fs::read_to_string(&herd_ini).unwrap_or_default(),
+        ini_before
     );
 }

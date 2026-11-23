@@ -6,8 +6,10 @@ mod command_runner;
 #[cfg(test)]
 mod fake_command_runner;
 mod java_target;
+mod local_ca_source;
 mod node_target;
 mod php_ini_block;
+mod php_scanned_ini;
 mod php_target;
 mod python_target;
 mod system_store_target;
@@ -20,14 +22,14 @@ use std::process::ExitCode;
 use std::sync::Arc;
 
 use clap::{Arg, ArgAction, Command};
-use sendmock_cli::{CliExitCode, MatchedOperation};
+use sendmock_cli::{CliExitCode, MatchedOperation, resolve_server_url};
 use sendmock_ops::{TlsTrustPlace, TlsTrustReport, TrustInspector};
 use serde_json::json;
 
 pub use command_runner::{CommandRunner, SystemCommandRunner};
 pub use trust_target::{LocalCa, TrustCheck, TrustState, TrustTarget};
 
-use crate::provider_tls::{default_ca_folder, load_local_ca_certificate};
+use local_ca_source::{choose_local_ca, read_existing_folder_ca};
 
 /// The operation whose command `sendmock trust` is.
 pub const TLS_TRUST_OPERATION_ID: &str = "getTlsTrust";
@@ -52,37 +54,15 @@ fn flag(name: &'static str, help: &'static str) -> Arg {
         .help(help)
 }
 
-/// The CA every server on this machine uses, made when there is none.
-pub fn load_local_ca() -> Result<LocalCa, String> {
-    let ca_folder = default_ca_folder();
-    let (certificate_path, certificate_pem) =
-        load_local_ca_certificate(&ca_folder, &[]).map_err(|error| error.to_string())?;
-    Ok(LocalCa {
-        certificate_path,
-        certificate_pem,
-        bundle_folder: ca_folder.join("trust"),
-    })
+/// The server's view of `sendmock trust --check`, for `GET /api/v1/tls/trust`, on the CA in
+/// the server's own folder (beside its database, or the data folder).
+pub struct LocalTrustInspector {
+    pub ca_folder: std::path::PathBuf,
 }
-
-/// The CA when it already exists, for reports that must not make one.
-fn read_existing_local_ca() -> Result<LocalCa, String> {
-    let ca_folder = default_ca_folder();
-    let certificate_path = ca_folder.join("provider-ca-certificate.pem");
-    let certificate_pem = std::fs::read_to_string(&certificate_path)
-        .map_err(|_| "No local CA yet: run sendmock trust".to_owned())?;
-    Ok(LocalCa {
-        certificate_path,
-        certificate_pem,
-        bundle_folder: ca_folder.join("trust"),
-    })
-}
-
-/// The server's view of `sendmock trust --check`, for `GET /api/v1/tls/trust`.
-pub struct LocalTrustInspector;
 
 impl TrustInspector for LocalTrustInspector {
     fn inspect_trust(&self) -> Result<TlsTrustReport, String> {
-        let local_ca = read_existing_local_ca()?;
+        let local_ca = read_existing_folder_ca(&self.ca_folder)?;
         let places = inspect_trust(&local_ca)
             .into_iter()
             .map(|check| TlsTrustPlace {
@@ -134,6 +114,15 @@ fn read_flag(matched_operation: &MatchedOperation, name: &str) -> bool {
 }
 
 pub fn run_trust_command(matched_operation: &MatchedOperation) -> ExitCode {
+    let server_url = resolve_server_url(
+        matched_operation
+            .command_matches
+            .try_get_one::<String>("server")
+            .ok()
+            .flatten()
+            .map(String::as_str),
+        std::env::var("SENDMOCK_HTTP_ADDR").ok().as_deref(),
+    );
     run_trust(
         TrustAction {
             is_check: read_flag(matched_operation, "check"),
@@ -141,6 +130,7 @@ pub fn run_trust_command(matched_operation: &MatchedOperation) -> ExitCode {
             is_confirmed: read_flag(matched_operation, "yes"),
         },
         read_flag(matched_operation, "json"),
+        &server_url,
     )
 }
 
@@ -152,21 +142,22 @@ pub struct TrustAction {
 }
 
 /// Checks, adds or removes the local CA, as `sendmock trust` and `sendmock preset` run it.
-pub fn run_trust(trust_action: TrustAction, as_json: bool) -> ExitCode {
-    let local_ca = match load_local_ca() {
-        Ok(local_ca) => local_ca,
+pub fn run_trust(trust_action: TrustAction, as_json: bool, server_url: &str) -> ExitCode {
+    let chosen_ca = match choose_local_ca(server_url) {
+        Ok(chosen_ca) => chosen_ca,
         Err(reason) => {
             eprintln!("Could not read the local CA: {reason}");
             return CliExitCode::Error.into();
         }
     };
+    let local_ca = chosen_ca.local_ca;
     let trust_targets = list_trust_targets(Arc::new(SystemCommandRunner));
     let checks: Vec<TrustCheck> = trust_targets
         .iter()
         .map(|target| target.check(&local_ca))
         .collect();
     if trust_action.is_check {
-        print_checks(&local_ca, &checks, as_json);
+        print_checks(&local_ca, &chosen_ca.source, &checks, as_json);
         return CliExitCode::Success.into();
     }
     let is_undo = trust_action.is_undo;
@@ -178,7 +169,10 @@ pub fn run_trust(trust_action: TrustAction, as_json: bool) -> ExitCode {
     let planned: Vec<usize> = (0..checks.len())
         .filter(|&index| checks[index].state == wanted_state)
         .collect();
-    print_plan(&local_ca, &checks, &planned, is_undo);
+    print_plan(&local_ca, &chosen_ca.source, &checks, &planned, is_undo);
+    if !is_undo {
+        print_manual_steps(&trust_targets, &local_ca);
+    }
     if planned.is_empty() {
         return CliExitCode::Success.into();
     }
@@ -189,21 +183,27 @@ pub fn run_trust(trust_action: TrustAction, as_json: bool) -> ExitCode {
     apply_plan(&trust_targets, &local_ca, &checks, &planned, is_undo)
 }
 
-fn print_checks(local_ca: &LocalCa, checks: &[TrustCheck], as_json: bool) {
+fn print_checks(local_ca: &LocalCa, ca_source: &str, checks: &[TrustCheck], as_json: bool) {
     if as_json {
         let places: Vec<_> = checks
             .iter()
             .map(|check| json!({ "place": check.place, "state": check.state.as_str(), "detail": check.detail }))
             .collect();
-        let report =
-            json!({ "ca_path": local_ca.certificate_path.display().to_string(), "places": places });
+        let report = json!({
+            "ca_path": local_ca.certificate_path.display().to_string(),
+            "ca_source": ca_source,
+            "places": places,
+        });
         println!(
             "{}",
             serde_json::to_string_pretty(&report).unwrap_or_default()
         );
         return;
     }
-    println!("The local CA: {}", local_ca.certificate_path.display());
+    println!(
+        "The local CA ({ca_source}): {}",
+        local_ca.certificate_path.display()
+    );
     for check in checks {
         println!(
             "  {:<8} {}: {}",
@@ -214,8 +214,17 @@ fn print_checks(local_ca: &LocalCa, checks: &[TrustCheck], as_json: bool) {
     }
 }
 
-fn print_plan(local_ca: &LocalCa, checks: &[TrustCheck], planned: &[usize], is_undo: bool) {
-    println!("The local CA: {}", local_ca.certificate_path.display());
+fn print_plan(
+    local_ca: &LocalCa,
+    ca_source: &str,
+    checks: &[TrustCheck],
+    planned: &[usize],
+    is_undo: bool,
+) {
+    println!(
+        "The local CA ({ca_source}): {}",
+        local_ca.certificate_path.display()
+    );
     for (index, check) in checks.iter().enumerate() {
         let action = match (planned.contains(&index), is_undo) {
             (true, false) => "add to",
@@ -226,6 +235,18 @@ fn print_plan(local_ca: &LocalCa, checks: &[TrustCheck], planned: &[usize], is_u
     }
     if planned.is_empty() {
         println!("Nothing to change.");
+    }
+}
+
+/// Prepares and prints what to set by hand where SendMock changes nothing, such as the combined
+/// bundle for a PHP whose CA files come from Herd's own ini file.
+fn print_manual_steps(trust_targets: &[Box<dyn TrustTarget>], local_ca: &LocalCa) {
+    for trust_target in trust_targets {
+        match trust_target.prepare_manual_step(local_ca) {
+            Some(Ok(manual_step)) => println!("  set by hand: {manual_step}"),
+            Some(Err(reason)) => eprintln!("  could not prepare a manual step: {reason}"),
+            None => {}
+        }
     }
 }
 

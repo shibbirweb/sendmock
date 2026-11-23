@@ -117,7 +117,7 @@ async fn read_previewed_endpoint(
 
 /// What a partial endpoint is completed with: the saved endpoint's fields, or a new endpoint's
 /// (no name or URL yet, on, and the default request settings).
-fn build_merge_base(stored_fields: Option<serde_json::Value>) -> serde_json::Value {
+pub(super) fn build_merge_base(stored_fields: Option<serde_json::Value>) -> serde_json::Value {
     let (name, url, is_enabled, settings) = match stored_fields {
         Some(stored_fields) => (
             stored_fields["name"].clone(),

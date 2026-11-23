@@ -121,3 +121,36 @@ async fn an_unsaved_endpoint_preview_with_only_a_url_fills_every_other_field() {
         "{preview}"
     );
 }
+
+// AC: PL-26.6
+#[tokio::test]
+async fn an_endpoint_made_from_a_name_url_and_template_takes_the_defaults_for_the_rest() {
+    let (app_router, _) = build_test_app();
+
+    let (create_status, created_endpoint) = call_api(
+        &app_router,
+        "POST",
+        "/api/v1/webhooks/endpoints",
+        Some(&json!({
+            "name": "Laravel inbound mail",
+            "url": "http://localhost:8000/mailgun/inbound",
+            "template_id": "mailgun.routes",
+        })),
+    )
+    .await;
+    let (missing_url_status, missing_url_error) = call_api(
+        &app_router,
+        "POST",
+        "/api/v1/webhooks/endpoints",
+        Some(&json!({ "name": "No URL" })),
+    )
+    .await;
+
+    assert_eq!(create_status, 201, "{created_endpoint}");
+    assert_eq!(created_endpoint["template_id"], "mailgun.routes");
+    assert_eq!(created_endpoint["method"], "POST");
+    assert_eq!(created_endpoint["is_enabled"], true);
+    assert_eq!(created_endpoint["headers"], json!({}));
+    assert_eq!(created_endpoint["timeout_ms"], 10_000);
+    assert_eq!(missing_url_status, 400, "{missing_url_error}");
+}
