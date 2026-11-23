@@ -30,6 +30,7 @@ export function useEmailOpenTracking(
   ).isAvailable;
   const openEmail = useOpenEmail();
   const updateEmail = useUpdateEmail();
+  const readEmailIdRef = React.useRef<string | null>(null);
   const trackedEmailIdRef = React.useRef<string | null>(null);
   const { mutate: sendOpen } = openEmail;
   const { mutate: sendUpdate } = updateEmail;
@@ -46,6 +47,20 @@ export function useEmailOpenTracking(
     isRuleCheckNeeded && (ruleMatchQuery.data?.webhook_rules.length ?? 0) > 0;
   const isRuleCheckPending = isRuleCheckNeeded && ruleMatchQuery.isPending;
 
+  // Marking read does not depend on the rule check, so it is not held back by it.
+  React.useEffect(() => {
+    if (email === undefined || appSettings === undefined) {
+      return;
+    }
+    if (readEmailIdRef.current === email.id) {
+      return;
+    }
+    readEmailIdRef.current = email.id;
+    if (!email.is_read) {
+      sendUpdate({ emailId: email.id, emailUpdate: { is_read: true } });
+    }
+  }, [email, appSettings, sendUpdate]);
+
   React.useEffect(() => {
     if (
       email === undefined ||
@@ -58,10 +73,6 @@ export function useEmailOpenTracking(
       return;
     }
     trackedEmailIdRef.current = email.id;
-
-    if (!email.is_read) {
-      sendUpdate({ emailId: email.id, emailUpdate: { is_read: true } });
-    }
 
     const isFirstOpen = email.open_count === 0;
     const shouldFireOpen =
@@ -79,7 +90,6 @@ export function useEmailOpenTracking(
     isRuleCheckPending,
     wouldRuleReportView,
     sendOpen,
-    sendUpdate,
   ]);
 
   return {
