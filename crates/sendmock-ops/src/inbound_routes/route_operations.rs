@@ -114,18 +114,21 @@ impl Operation for UpdateInboundRouteOperation {
         input: InboundRouteUpdate,
     ) -> Result<InboundRoute, OperationError> {
         let stored_route = find_route_or_not_found(operation_context, &input.route_id).await?;
+        let changes: InboundRouteInput = input
+            .changes
+            .merge_onto(&present_inbound_route(&stored_route)?)?;
         check_inbound_route(
-            input.priority,
-            &input.description,
-            &input.filter,
-            &input.actions,
+            changes.priority,
+            &changes.description,
+            &changes.filter,
+            &changes.actions,
         )?;
         let route_record = build_route_record(
             stored_route.route_id,
-            input.priority,
-            &input.description,
-            &input.filter,
-            &input.actions,
+            changes.priority,
+            &changes.description,
+            &changes.filter,
+            &changes.actions,
             stored_route.created_at_unix_ms,
         )?;
         operation_context

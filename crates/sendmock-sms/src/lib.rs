@@ -2,6 +2,8 @@
 //! the TwiML an app answers a reply webhook with.
 
 mod encoding;
+mod number_country;
+mod opt_out_keyword;
 mod phone_number;
 mod simulation;
 mod sms_thread;
@@ -9,6 +11,8 @@ mod twiml;
 mod verify;
 
 pub use encoding::{SegmentCount, SmsEncoding, count_segments};
+pub use number_country::find_number_country;
+pub use opt_out_keyword::OptOutKeyword;
 pub use phone_number::{PhoneNumber, split_channel_prefix};
 pub use simulation::{
     CustomOutcomeRule, DeliveryChange, DeliveryStep, MagicNumber, MagicNumberGroup, MatchField,

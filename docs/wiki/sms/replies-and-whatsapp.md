@@ -29,7 +29,7 @@ Like a real provider, SendMock looks at the number the contact wrote to (set up 
 In Twilio's format (the default), the same "A message comes in" request Twilio sends, so the handler you run in production works unchanged:
 
 - `POST` as `application/x-www-form-urlencoded`, or `GET` with the fields in the query string when the number's method is `GET`. A Messaging Service always uses `POST`.
-- Fields: `MessageSid`, `SmsSid`, `SmsMessageSid`, `AccountSid`, `MessagingServiceSid` (when the number is in a service), `From`, `To`, `Body`, `NumMedia`, `NumSegments`, `SmsStatus`, `ApiVersion`, plus `MediaUrl{N}` and `MediaContentType{N}` for each file (links to SendMock's copy) and `ProfileName` and `WaId` on WhatsApp.
+- Fields: `MessageSid`, `SmsSid`, `SmsMessageSid`, `AccountSid` (the Twilio account that owns the number: the main account, or the subaccount set on the number), `MessagingServiceSid` (when the number is in a service), `From`, `To`, `Body`, `NumMedia`, `NumSegments`, `SmsStatus`, `ApiVersion`, the location fields `FromCity`, `FromState`, `FromZip`, `FromCountry`, `ToCity`, `ToState`, `ToZip` and `ToCountry` (the countries from each number's calling code, the rest empty), plus `MediaUrl{N}` and `MediaContentType{N}` for each file (links to SendMock's copy) and `ProfileName` and `WaId` on WhatsApp.
 - Headers: `X-Twilio-Signature` (signed with the auth token in **Settings > SMS providers > Twilio**), `I-Twilio-Idempotency-Token` and `User-Agent: TwilioProxy/1.1`.
 
 ## What your app can answer

@@ -17,6 +17,11 @@ pub struct MessageProviderDefinition {
     pub host: Option<String>,
     pub credentials: Vec<ProviderCredential>,
     pub check_credentials: bool,
+    /// Twilio's Advanced Opt-Out: STOP blocks later sends to the contact with 21610 until
+    /// START. `None`, as in definitions saved before it existed, is on for Twilio only.
+    pub opt_out_keywords: Option<bool>,
+    /// Answers STOP, START and HELP with Twilio's default replies.
+    pub opt_out_auto_replies: bool,
     pub operations: Vec<ProviderOperation>,
     pub field_mapping: Vec<ProviderFieldMapping>,
     pub validation_rules: Vec<ProviderValidationRule>,
@@ -105,6 +110,11 @@ impl ProviderErrorResponse {
 }
 
 impl MessageProviderDefinition {
+    /// Whether opt-out keywords are emulated: as set, or on for Twilio when never set.
+    pub fn has_opt_out_keywords(&self) -> bool {
+        self.opt_out_keywords.unwrap_or(self.key == "twilio")
+    }
+
     /// Whether requests reach it: enabled and not removed.
     pub fn is_routable(&self) -> bool {
         self.is_enabled && !self.is_removed

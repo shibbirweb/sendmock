@@ -27,6 +27,11 @@ Pick your language:
 - [Ruby](./ruby.md)
 - [.NET](./dotnet.md)
 
+Provider SDKs:
+
+- [HTTPS for provider SDKs](./https.md)
+- [SDKs without a base URL setting](./sdks-without-a-base-url.md)
+
 Running in containers:
 
 - [Docker](./docker.md)

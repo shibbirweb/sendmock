@@ -85,7 +85,23 @@ async fn play_in_background(
     Ok(())
 }
 
-/// A status change that needs a callback, or `None` for a read receipt, which has none.
+/// Statuses that end a message's lifecycle; once one is set, by the simulation or by hand,
+/// no later simulated step changes it.
+const FINAL_STATUSES: [&str; 3] = ["delivered", "undelivered", "failed"];
+
+async fn has_final_status(
+    operation_context: &OperationContext,
+    sms_id: &str,
+) -> Result<bool, OperationError> {
+    Ok(operation_context
+        .sms_repository
+        .find_message(sms_id)
+        .await?
+        .is_some_and(|stored_sms| FINAL_STATUSES.contains(&stored_sms.status.as_str())))
+}
+
+/// A status change that needs a callback, or `None` for a read receipt, which has none, or
+/// for a step after the message already reached a final status.
 async fn apply_delivery_change(
     operation_context: &OperationContext,
     sms_id: &str,
@@ -94,6 +110,9 @@ async fn apply_delivery_change(
     let now_unix_ms = operation_context.clock.now_unix_ms();
     match delivery_change {
         DeliveryChange::Status { status, error_code } => {
+            if has_final_status(operation_context, sms_id).await? {
+                return Ok(None);
+            }
             let status_change = SmsStatusChangeRecord {
                 status: status.to_owned(),
                 error_code,

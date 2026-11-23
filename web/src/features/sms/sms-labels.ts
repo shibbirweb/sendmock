@@ -1,4 +1,8 @@
-import type { SmsApi, SmsStatus } from "@/lib/api/types";
+import type {
+  SmsApi,
+  SmsCallbackReportedStatus,
+  SmsStatus,
+} from "@/lib/api/types";
 
 /** Short names for the APIs SendMock ships; a custom provider shows its key. */
 export const smsApiLabels: Record<SmsApi, string> = {
@@ -22,6 +26,12 @@ export const smsStatusLabels: Record<SmsStatus | "read", string> = {
   undelivered: "Undelivered",
   failed: "Failed",
   received: "Received",
+};
+
+/** A callback attempt's label: the status it reported, or the Debugger event. */
+export const smsCallbackLabels: Record<SmsCallbackReportedStatus, string> = {
+  ...smsStatusLabels,
+  debugger: "Twilio Debugger",
 };
 
 /** Twilio's descriptions for the delivery error codes SendMock simulates. */

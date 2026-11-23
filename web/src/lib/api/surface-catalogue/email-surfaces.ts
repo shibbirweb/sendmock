@@ -213,4 +213,28 @@ export const emailSurfaces: SurfaceCatalogue = {
     mcp: "sendmock_inbound_route_match",
     ui: "Mail > Reply, Reply all, Forward > Delivers to",
   },
+  "GET /api/v1/emails/templates": {
+    phase: "A28",
+    cli: "sendmock email templates list",
+    mcp: "sendmock_email_template_list",
+    ui: "Mail > Templates",
+  },
+  "POST /api/v1/emails/templates": {
+    phase: "A28",
+    cli: "sendmock email templates create",
+    mcp: "sendmock_email_template_create",
+    ui: "Mail > Templates > New template",
+  },
+  "PATCH /api/v1/emails/templates/{templateId}": {
+    phase: "A28",
+    cli: "sendmock email templates update <templateId>",
+    mcp: "sendmock_email_template_update",
+    ui: "Mail > Templates > a template > Save",
+  },
+  "DELETE /api/v1/emails/templates/{templateId}": {
+    phase: "A28",
+    cli: "sendmock email templates delete <templateId>",
+    mcp: "sendmock_email_template_delete",
+    ui: "Mail > Templates > a template > Delete",
+  },
 };

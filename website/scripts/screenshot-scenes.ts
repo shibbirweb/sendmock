@@ -152,6 +152,7 @@ const docsScenes: Scene[] = [
     },
   },
   listScene("mail-providers", "/mail/providers", "Providers · Mail · SendMock"),
+  listScene("mail-templates", "/mail/templates", "Templates · Mail · SendMock"),
   listScene("sms-providers", "/sms/providers", "Providers · SMS · SendMock"),
   listScene(
     "payment-gateways",

@@ -207,7 +207,7 @@ async fn reset_restores_the_seeded_webhooks_and_deletes_the_others() {
 
     let (status, _) = call_api(&app_router, "POST", "/api/v1/reset", None).await;
 
-    assert_eq!(status, 204);
+    assert_eq!(status, 200);
     assert_eq!(export_seed(&app_router).await, seeded_export);
     assert_eq!(reveal_endpoint_secret(&app_router).await, SEEDED_SECRET);
     assert_eq!(

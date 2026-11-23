@@ -1,4 +1,8 @@
 import {
+  buildMailgunSnippet,
+  buildTwilioSnippet,
+} from "@/lib/settings/build-provider-snippets";
+import {
   buildHttpPostSnippet,
   type SnippetHeader,
 } from "@/lib/settings/build-http-post-snippet";
@@ -38,7 +42,7 @@ export const appLocationHosts: Record<AppLocation, string> = {
 };
 
 export type ConnectionSnippet = {
-  area: "smtp" | "email-api" | "sms" | "catcher";
+  area: "smtp" | "email-api" | "sms" | "catcher" | "mailgun" | "twilio";
   title: string;
   code: string;
 };
@@ -47,6 +51,9 @@ type SnippetTarget = {
   host: string;
   smtpPort: number;
   httpPort: number;
+  /** The provider ports; 8026 and 8027 when left out. */
+  providerPort?: number;
+  providerTlsPort?: number;
 };
 
 /** The body the email snippet starts with; the editor can change it. */
@@ -104,6 +111,11 @@ export function buildConnectionSnippets(
   requestCustomization: RequestCustomization = defaultRequestCustomization,
 ): ConnectionSnippet[] {
   const apiBaseUrl = `http://${snippetTarget.host}:${snippetTarget.httpPort}`;
+  const providerTarget = {
+    host: snippetTarget.host,
+    providerPort: snippetTarget.providerPort ?? 8026,
+    providerTlsPort: snippetTarget.providerTlsPort ?? 8027,
+  };
   const { requestHeaders, emailRequestBody, smsRequestBody } =
     requestCustomization;
 
@@ -135,6 +147,16 @@ export function buildConnectionSnippets(
       area: "catcher",
       title: "HTTP Catcher (point Slack, push or other webhooks here)",
       code: `${apiBaseUrl}/catch/slack/services/T000/B000/XXXX`,
+    },
+    {
+      area: "mailgun",
+      title: "Mailgun SDK",
+      code: buildMailgunSnippet(language, providerTarget),
+    },
+    {
+      area: "twilio",
+      title: "Twilio SDK",
+      code: buildTwilioSnippet(language, providerTarget),
     },
   ];
 }

@@ -42,6 +42,9 @@ pub async fn store_sms(
     let now_unix_ms = operation_context.clock.now_unix_ms();
     let is_inbound = incoming_sms.is_inbound;
     let (mut sms, media_contents) = build_sms_record(incoming_sms, sms_id, now_unix_ms, otp_codes);
+    if is_inbound && sms.account.is_none() {
+        sms.account = find_number_account(operation_context, &sms.app_number).await?;
+    }
     operation_context
         .request
         .project_key
@@ -64,6 +67,19 @@ pub async fn store_sms(
         serde_json::to_value(SmsMessage::from(&sms)).unwrap_or_default(),
     );
     Ok(sms)
+}
+
+/// The Twilio subaccount that owns your app's number, as Twilio stores a message to it
+/// under the number's account; none for the main account or a number not registered.
+async fn find_number_account(
+    operation_context: &OperationContext,
+    app_number: &str,
+) -> Result<Option<String>, OperationError> {
+    Ok(operation_context
+        .virtual_number_repository
+        .find_by_number(app_number)
+        .await?
+        .and_then(|registered_number| registered_number.account_sid))
 }
 
 /// Both numbers parsed, which one is your app's, and whether it is WhatsApp.

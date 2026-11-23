@@ -6,7 +6,7 @@ use crate::{OperationContext, OperationError};
 
 /// The Twilio provider's key; its credentials are the main account.
 pub const TWILIO_PROVIDER_KEY: &str = "twilio";
-const DEFAULT_MAIN_ACCOUNT_SID: &str = "ACtest00000000000000000000000000";
+const DEFAULT_MAIN_ACCOUNT_SID: &str = "ACtest0000000000000000000000000000";
 
 /// One Twilio account, main or sub, with what signing and the Accounts API need.
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -142,3 +142,31 @@ if ($verificationCheck->status !== 'approved') {
     throw new RuntimeException("Verify login ended {$verificationCheck->status}");
 }
 echo "Verify login {$verification->sid} approved with {$verifyCode}\n";
+
+/** The recipient texts the app's number, as a reply would arrive (SM-23.4). */
+function textAppNumber(string $sendmockUrl, string $body): void
+{
+    $inboundAnswer = file_get_contents("{$sendmockUrl}/api/v1/sms/inbound", false, stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: application/json\r\n",
+            'content' => json_encode(['from' => RECIPIENT_NUMBER, 'to' => '+15005550006', 'body' => $body]),
+        ],
+    ]));
+    if ($inboundAnswer === false) {
+        throw new RuntimeException("The {$body} text was refused");
+    }
+}
+
+textAppNumber($sendmockUrl, 'STOP');
+try {
+    $client->messages->create(RECIPIENT_NUMBER, ['from' => '+15005550006', 'body' => 'Sent after STOP']);
+    throw new RuntimeException('A send after STOP was accepted');
+} catch (Twilio\Exceptions\RestException $sendError) {
+    if ($sendError->getCode() !== 21610) {
+        throw $sendError;
+    }
+}
+textAppNumber($sendmockUrl, 'START');
+$resumedMessage = $client->messages->create(RECIPIENT_NUMBER, ['from' => '+15005550006', 'body' => 'Sent after START']);
+echo "STOP gave 21610, and after START {$resumedMessage->sid} was sent\n";

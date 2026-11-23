@@ -33,6 +33,25 @@ function findDuplicate(names: string[]): string | undefined {
   );
 }
 
+/**
+ * A part may be read from several sources (Mailgun's user variables come from
+ * `v:*` and `X-Mailgun-Variables`); only the same part from the same source
+ * twice is refused.
+ */
+export function findFieldMappingDuplicate(
+  fieldMappings: { part: string; source: string }[],
+): string | undefined {
+  const mappingKeys = fieldMappings.map(
+    (fieldMapping) => `${fieldMapping.part}\u0000${fieldMapping.source.trim()}`,
+  );
+  const duplicateKey = findDuplicate(mappingKeys);
+  if (duplicateKey === undefined) {
+    return undefined;
+  }
+  const [part, source] = duplicateKey.split("\u0000");
+  return `${part} is mapped from ${source} twice`;
+}
+
 /** `/v3/{domain}/messages` and `/v3/{name}/messages` are the same route. */
 function normalizeRoute(method: string, path: string): string {
   return `${method} ${path.replace(/\{[^}]*\}/g, "{}")}`;
@@ -118,6 +137,27 @@ export function findRouteClash(
     : `It answers the same path as ${clashingProvider.name}; give each a different host or path`;
 }
 
+/**
+ * The Twilio provider's `account_sid` is the main account's SID, which
+ * webhooks and the Accounts API use, so it must look like one.
+ */
+export function findTwilioAccountProblem(
+  providerInput: Pick<MessageProviderInput, "key" | "credentials">,
+): string | undefined {
+  if (providerInput.key !== "twilio") {
+    return undefined;
+  }
+  const accountSid = providerInput.credentials.find(
+    (credential) => credential.name === "account_sid",
+  );
+  if (accountSid === undefined) {
+    return undefined;
+  }
+  return /^AC[0-9a-zA-Z]{32}$/.test(accountSid.value.trim())
+    ? undefined
+    : "account_sid needs AC and 32 letters or digits, as Twilio's are";
+}
+
 /** Rules for a provider's fields; template problems come from the preview. */
 export function validateMessageProvider(
   providerInput: MessageProviderInput,
@@ -140,6 +180,8 @@ export function validateMessageProvider(
     fieldErrors.credentials = `${badCredentialName || "A credential"} needs a name of letters, digits, _, . or -`;
   } else if (findDuplicate(credentialNames) !== undefined) {
     fieldErrors.credentials = `${findDuplicate(credentialNames)} appears twice`;
+  } else {
+    fieldErrors.credentials = findTwilioAccountProblem(providerInput);
   }
   const pathProblem = providerInput.operations
     .map((operation) => findPathProblem(operation.path))
@@ -151,12 +193,9 @@ export function validateMessageProvider(
   } else {
     fieldErrors.operations = findRouteClash(providerInput, areaProviders);
   }
-  const duplicatePart = findDuplicate(
-    providerInput.field_mapping.map((fieldMapping) => fieldMapping.part),
+  fieldErrors.field_mapping = findFieldMappingDuplicate(
+    providerInput.field_mapping,
   );
-  if (duplicatePart !== undefined) {
-    fieldErrors.field_mapping = `${duplicatePart} is mapped twice`;
-  }
   if (
     providerInput.field_mapping.some(
       (fieldMapping) => fieldMapping.source.trim() === "",

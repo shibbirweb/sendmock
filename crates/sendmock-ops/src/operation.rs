@@ -144,6 +144,9 @@ pub struct OperationDefinition {
     /// An answer field that holds a secret in plain text: the operation has no MCP tool, since
     /// agents never read secrets back, and the CLI masks the field unless `--reveal` is given.
     pub revealed_secret_field: Option<&'static str>,
+    /// A destructive operation that confirms on the server through this input, refusing only
+    /// a call that would remove something and naming what; the CLI then needs no `--yes`.
+    pub server_confirmation_input: Option<&'static str>,
 }
 
 impl OperationDefinition {
@@ -171,6 +174,7 @@ impl OperationDefinition {
         request_log: None,
         get_alias_path: None,
         revealed_secret_field: None,
+        server_confirmation_input: None,
     };
 
     /// Whether MCP serves it: not when it reveals a secret.

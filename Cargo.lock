@@ -3091,6 +3091,7 @@ dependencies = [
  "clap",
  "dialoguer",
  "dirs 7.0.0",
+ "insta",
  "rcgen",
  "reqwest",
  "rusqlite",

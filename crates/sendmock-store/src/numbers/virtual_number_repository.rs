@@ -5,7 +5,7 @@ use rusqlite::{OptionalExtension, Row, params};
 use super::VirtualNumberRecord;
 use crate::{Database, StoreError};
 
-const NUMBER_COLUMNS: &str = "id, number, label, channels, inbound_url, inbound_method, inbound_fallback_url, inbound_template_id, status_callback_url, messaging_service_sid, created_by, created_at, phone_number_sid, account_sid";
+const NUMBER_COLUMNS: &str = "id, number, label, channels, inbound_url, inbound_method, inbound_fallback_url, inbound_template_id, status_callback_url, messaging_service_sid, created_by, created_at, phone_number_sid, account_sid, opt_out_keywords";
 const CHANNEL_SEPARATOR: &str = ",";
 
 #[derive(Clone)]
@@ -79,7 +79,7 @@ impl VirtualNumberRepository {
         self.database
             .write(move |connection| {
                 connection.execute(
-                    &format!("INSERT INTO virtual_numbers ({NUMBER_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)"),
+                    &format!("INSERT INTO virtual_numbers ({NUMBER_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15)"),
                     params![
                         new_number.number_id,
                         new_number.number,
@@ -95,6 +95,7 @@ impl VirtualNumberRepository {
                         new_number.created_at_unix_ms,
                         new_number.phone_number_sid,
                         new_number.account_sid,
+                        new_number.opt_out_keywords,
                     ],
                 )?;
                 Ok(())
@@ -110,7 +111,7 @@ impl VirtualNumberRepository {
         self.database
             .write(move |connection| {
                 let changed_count = connection.execute(
-                    "UPDATE virtual_numbers SET number = ?2, label = ?3, channels = ?4, inbound_url = ?5, inbound_method = ?6, inbound_fallback_url = ?7, inbound_template_id = ?8, status_callback_url = ?9, messaging_service_sid = ?10 WHERE id = ?1",
+                    "UPDATE virtual_numbers SET number = ?2, label = ?3, channels = ?4, inbound_url = ?5, inbound_method = ?6, inbound_fallback_url = ?7, inbound_template_id = ?8, status_callback_url = ?9, messaging_service_sid = ?10, account_sid = ?11, opt_out_keywords = ?12 WHERE id = ?1",
                     params![
                         changed_number.number_id,
                         changed_number.number,
@@ -122,6 +123,8 @@ impl VirtualNumberRepository {
                         changed_number.inbound_template_id,
                         changed_number.status_callback_url,
                         changed_number.messaging_service_sid,
+                        changed_number.account_sid,
+                        changed_number.opt_out_keywords,
                     ],
                 )?;
                 Ok(changed_count > 0)
@@ -163,5 +166,6 @@ fn read_number_row(row: &Row<'_>) -> rusqlite::Result<VirtualNumberRecord> {
         created_at_unix_ms: row.get(11)?,
         phone_number_sid: row.get::<_, Option<String>>(12)?.unwrap_or_default(),
         account_sid: row.get(13)?,
+        opt_out_keywords: row.get(14)?,
     })
 }

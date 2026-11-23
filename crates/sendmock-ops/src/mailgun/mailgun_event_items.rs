@@ -1,9 +1,11 @@
+use sendmock_mail::EmailDeliveryEvent;
 use sendmock_store::{
     EmailClickRecord, EmailProviderSendRecord, EmailRecord, MessageOpenRecord, TimelineRecord,
 };
 use serde_json::{Value, json};
 
 use super::mailgun_complaint_recording::SUPPRESS_COMPLAINT_REASON;
+use crate::email::{build_bounce_data, read_stored_user_variables};
 
 /// One Mailgun event, with what its filters and its order read.
 #[derive(Debug, Clone, PartialEq)]
@@ -17,6 +19,8 @@ pub struct MailgunEvent {
 
 /// Everything SendMock keeps about one email sent through Mailgun.
 pub struct MailgunEmailRecords {
+    /// Where the stored-message API reads the email back, as the events' `storage.url`.
+    pub message_url: String,
     pub email: EmailRecord,
     pub provider_send: EmailProviderSendRecord,
     pub timeline: Vec<TimelineRecord>,
@@ -42,12 +46,7 @@ fn shape_report(timeline_kind: &str, detail: &str) -> Option<ReportShape> {
     };
     match timeline_kind {
         "delivered" => Some(shape("delivered", None, None, Some(250))),
-        "bounced" => Some(shape(
-            "failed",
-            Some("permanent"),
-            Some("bounce"),
-            Some(550),
-        )),
+        "bounced" => Some(shape_bounce(detail)),
         "deferred" => Some(shape(
             "failed",
             Some("temporary"),
@@ -63,6 +62,33 @@ fn shape_report(timeline_kind: &str, detail: &str) -> Option<ReportShape> {
             Some(605),
         )),
         _ => None,
+    }
+}
+
+/// A soft bounce is Mailgun's temporary failure with its code (452), a hard one permanent.
+fn shape_bounce(detail: &str) -> ReportShape {
+    let bounce = EmailDeliveryEvent::read_described_bounce(detail);
+    let bounce_data = bounce.as_ref().and_then(build_bounce_data);
+    let is_temporary = bounce_data
+        .as_ref()
+        .is_some_and(|bounce_fields| bounce_fields["severity"] == "temporary");
+    let status_code = bounce_data
+        .as_ref()
+        .and_then(|bounce_fields| bounce_fields["code"].as_u64())
+        .and_then(|code| u16::try_from(code).ok());
+    match is_temporary {
+        true => ReportShape {
+            event_name: "failed",
+            severity: Some("temporary"),
+            reason: Some("generic"),
+            status_code: status_code.or(Some(452)),
+        },
+        false => ReportShape {
+            event_name: "failed",
+            severity: Some("permanent"),
+            reason: Some("bounce"),
+            status_code: status_code.or(Some(550)),
+        },
     }
 }
 
@@ -204,6 +230,8 @@ fn describe_event(
         "recipient": recipient,
         "recipient-domain": recipient.split_once('@').map(|(_, domain)| domain).unwrap_or_default(),
         "tags": email.tags,
+        "user-variables": read_stored_user_variables(&records.provider_send),
+        "storage": { "url": records.message_url, "key": email.email_id },
         "message": {
             "headers": {
                 "message-id": message_id,
@@ -236,6 +264,21 @@ mod tests {
         assert_eq!(
             read_report_recipient("delivered", "x@example.test"),
             "x@example.test"
+        );
+    }
+
+    // AC: EM-25.2
+    #[test]
+    fn a_soft_bounce_is_a_temporary_failure_with_its_code() {
+        let soft_bounce = shape_report(
+            "bounced",
+            "sam@example.test: soft bounce, 452 4.2.2 mailbox full (simulated)",
+        );
+
+        assert!(
+            soft_bounce.is_some_and(|shape| shape.severity == Some("temporary")
+                && shape.reason == Some("generic")
+                && shape.status_code == Some(452))
         );
     }
 

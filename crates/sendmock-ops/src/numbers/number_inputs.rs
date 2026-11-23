@@ -1,6 +1,8 @@
 use schemars::JsonSchema;
 use serde::Deserialize;
 
+use crate::PartialChanges;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum NumberChannel {
@@ -17,8 +19,9 @@ impl NumberChannel {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Deserialize, JsonSchema)]
 pub enum InboundWebhookMethod {
+    #[default]
     #[serde(rename = "POST")]
     Post,
     #[serde(rename = "GET")]
@@ -34,11 +37,13 @@ impl InboundWebhookMethod {
     }
 }
 
-/// What happens to inbound messages to a service's numbers.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, JsonSchema)]
+/// What happens to inbound messages to a service's numbers; a new service defers to each
+/// number's own webhook, as the services SendMock makes for an unknown SID do.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum MessagingServiceInboundMode {
     Webhook,
+    #[default]
     DeferToSender,
     Drop,
 }
@@ -65,7 +70,8 @@ pub struct VirtualNumberInput {
     /// Reply webhook (Twilio "A message comes in"); null means rules only.
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub inbound_url: Option<String>,
-    /// The HTTP method of the reply webhook.
+    /// The HTTP method of the reply webhook; POST when left out, as on Twilio.
+    #[serde(default)]
     pub inbound_method: InboundWebhookMethod,
     /// Called when the reply webhook fails, with `ErrorCode` and `ErrorUrl` added.
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
@@ -79,14 +85,24 @@ pub struct VirtualNumberInput {
     /// The Messaging Service this number belongs to, `MG...`; null for none.
     #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
     pub messaging_service_sid: Option<String>,
+    /// The Twilio account that owns the number: the main account or a subaccount, `AC...`;
+    /// left out or null, the main account. Inbound messages to it carry this account.
+    #[serde(default)]
+    #[schemars(schema_with = "crate::nullable_schema::<String>")]
+    pub account_sid: Option<String>,
+    /// Whether a text of STOP to this number opts the contact out (Twilio's Advanced
+    /// Opt-Out, with the provider's switch on); on when left out.
+    #[serde(default = "crate::numbers::number_inputs::default_opt_out_keywords")]
+    pub opt_out_keywords: bool,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
 pub struct VirtualNumberUpdate {
     /// The number's ID, from `GET /api/v1/numbers`.
     pub number_id: String,
+    /// Only the fields to change; the rest stay.
     #[serde(flatten)]
-    pub changes: VirtualNumberInput,
+    pub changes: PartialChanges<VirtualNumberInput>,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
@@ -100,24 +116,51 @@ pub struct VirtualNumberReference {
 pub struct MessagingServiceInput {
     /// A name for the service.
     pub friendly_name: String,
-    /// The virtual numbers in the sender pool, by ID.
+    /// The virtual numbers in the sender pool, by ID; none when left out, as a new Twilio
+    /// Messaging Service starts.
+    #[serde(default)]
     pub number_ids: Vec<String>,
-    /// `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.
+    /// `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook, the
+    /// default) or `drop`.
+    #[serde(default)]
     pub inbound_mode: MessagingServiceInboundMode,
-    /// Used when `inbound_mode` is `webhook`.
-    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
+    /// Used when `inbound_mode` is `webhook`; none when left out.
+    #[serde(default)]
+    #[schemars(schema_with = "crate::nullable_schema::<String>")]
     pub inbound_url: Option<String>,
-    /// Called when `inbound_url` fails.
-    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
+    /// Called when `inbound_url` fails; none when left out.
+    #[serde(default)]
+    #[schemars(schema_with = "crate::nullable_schema::<String>")]
     pub inbound_fallback_url: Option<String>,
+    /// Whether a text of STOP to one of its numbers opts the contact out of the whole
+    /// service (Twilio's Advanced Opt-Out, with the provider's switch on); on when left out.
+    #[serde(default = "crate::numbers::number_inputs::default_opt_out_keywords")]
+    pub opt_out_keywords: bool,
+}
+
+pub(crate) fn default_opt_out_keywords() -> bool {
+    true
+}
+
+/// Body of `POST /api/v1/messaging-services`: the service, and the SID to give it.
+#[derive(Debug, Clone, Deserialize, JsonSchema)]
+pub struct MessagingServiceCreateInput {
+    /// The SID to give the service, `MG` and 32 hex digits, so an app's configured SID
+    /// works unchanged; left out, a new one is generated.
+    #[serde(default)]
+    #[schemars(schema_with = "crate::nullable_schema::<String>")]
+    pub sid: Option<String>,
+    #[serde(flatten)]
+    pub service: MessagingServiceInput,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]
 pub struct MessagingServiceUpdate {
     /// The service SID, `MG...`, from `GET /api/v1/messaging-services`.
     pub service_sid: String,
+    /// Only the fields to change; the rest stay.
     #[serde(flatten)]
-    pub changes: MessagingServiceInput,
+    pub changes: PartialChanges<MessagingServiceInput>,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]

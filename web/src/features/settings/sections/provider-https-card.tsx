@@ -3,6 +3,7 @@ import { toast } from "sonner";
 
 import { CopyButton } from "@/components/common/copy-button";
 import { Button } from "@/components/ui/button";
+import { TlsTrustList } from "@/features/settings/sections/tls-trust-list";
 import { SettingsSectionCard } from "@/features/settings/settings-section-card";
 import {
   useAppInfo,
@@ -65,6 +66,7 @@ export function ProviderHttpsCard() {
             <DownloadIcon />
             Download the CA
           </Button>
+          <TlsTrustList />
         </div>
       )}
     </SettingsSectionCard>

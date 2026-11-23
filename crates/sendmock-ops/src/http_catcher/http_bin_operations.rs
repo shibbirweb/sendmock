@@ -141,10 +141,11 @@ impl Operation for UpdateHttpBinOperation {
     ) -> Result<HttpBin, OperationError> {
         let http_bins = &operation_context.http_catcher_stores.bins;
         let stored_bin = find_bin_or_not_found(operation_context, &input.bin_id).await?;
+        let changes = input.changes.merge_onto(&present_http_bin(&stored_bin))?;
         http_bins
             .update_bin_answers(
                 &input.bin_id,
-                write_json(&input.default_response)?,
+                write_json(&changes.default_response)?,
                 stored_bin.rules_json,
             )
             .await?;

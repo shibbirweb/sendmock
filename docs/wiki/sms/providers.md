@@ -53,6 +53,17 @@ Built-ins you removed are listed here. Requests to their paths get a 404 until y
 
 
 Every control and text, one by one: [SMS providers in depth](../deeper/sms/providers.md).
+## Opt-out keywords
+
+SendMock emulates Twilio's Advanced Opt-Out, on by default for the Twilio provider as on Twilio:
+
+- A contact who texts STOP, STOPALL, UNSUBSCRIBE, CANCEL, END or QUIT (the whole text, in any case) to one of your numbers is opted out of that number, or of the Messaging Service the number is in.
+- A later send through the Twilio API from that number or Messaging Service to the contact answers Twilio's error `21610`, and nothing is stored.
+- START, YES or UNSTOP lifts it; HELP and INFO are left as they are.
+- The inbound message still reaches your app's webhook, as on Twilio.
+
+**Opt-out keywords** in the provider's General tab turns it off (`opt_out_keywords`); the same switch on a number or a Messaging Service (Numbers) turns it off for just that one. **Opt-out auto-replies** (`opt_out_auto_replies`, off by default) answers STOP, START and HELP with Twilio's default replies, stored as outbound messages. The list of opt-outs is on the Numbers screen's **Opt-outs** tab; see [Numbers](../numbers.md#opt-outs).
+
 ## Twilio subaccounts
 
 Apps that give each customer a Twilio subaccount send under `/2010-04-01/Accounts/{AccountSid}/Messages.json` with that subaccount's SID and token, and check every webhook with the subaccount's own token. SendMock does the same:
@@ -84,6 +95,10 @@ Twilio's Console sends a **Debugger event** to a webhook URL when something goes
 3. Or let a status callback or the inbound URL fail: one event with error `11200` and the `webhook` request and answer.
 
 The event is a form POST in the `twilio.debugger` template: `Sid` (`NO...`), `AccountSid`, `ParentAccountSid` for a subaccount, `Timestamp`, `Level` (`ERROR`), `PayloadType` (`application/json`) and `Payload`, signed with the account's token. It shows on the message's timeline with its callbacks and is retried like them. The template can also be picked for any webhook endpoint.
+
+## Twilio's main account
+
+The Twilio provider's `account_sid` credential is the main account's SID: inbound webhooks carry it as `AccountSid` and the Accounts API answers with it. It must be `AC` and 32 letters or digits, as Twilio's are (the default is `ACtest0000000000000000000000000000`); saving anything else, an empty value included, is refused with the field named.
 
 ## Twilio signatures
 

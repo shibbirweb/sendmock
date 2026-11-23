@@ -19,6 +19,7 @@ export type MessagingServiceFormValues = {
   inboundMode: MessagingServiceInboundMode;
   inboundUrl: string;
   inboundFallbackUrl: string;
+  hasOptOutKeywords: boolean;
 };
 
 function toFormValues(
@@ -30,6 +31,7 @@ function toFormValues(
     inboundMode: messagingService?.inbound_mode ?? "defer_to_sender",
     inboundUrl: messagingService?.inbound_url ?? "",
     inboundFallbackUrl: messagingService?.inbound_fallback_url ?? "",
+    hasOptOutKeywords: messagingService?.opt_out_keywords ?? true,
   };
 }
 
@@ -53,6 +55,7 @@ function toServiceInput(
     inbound_fallback_url: isWebhookMode
       ? toNullableText(formValues.inboundFallbackUrl)
       : null,
+    opt_out_keywords: formValues.hasOptOutKeywords,
   };
 }
 

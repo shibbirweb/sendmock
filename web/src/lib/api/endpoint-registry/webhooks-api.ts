@@ -17,7 +17,7 @@ const endpointEndpoints = tagEndpoints("Webhook endpoints", [
     method: "POST",
     path: "/api/v1/webhooks/endpoints",
     summary: "Add an endpoint; its signing secret is generated.",
-    requestBody: typeRef("WebhookEndpointInput"),
+    requestBody: typeRef("WebhookEndpointCreateInput"),
     response: typeRef("WebhookEndpoint"),
     successStatus: 201,
     errorStatuses: [400],

@@ -53,8 +53,9 @@ use webhook_variable_seed_adapter::WebhookVariableSeedAdapter;
 
 use super::seed_section_adapter::SeedSectionAdapter;
 
-/// Every section SendMock can apply and export, in apply order: a Messaging Service exists
-/// before the numbers that join it, and a template before the endpoints that render it, which
+/// Every section SendMock can apply and export, in apply order: the Twilio provider and its
+/// subaccounts exist before the numbers they own, a Messaging Service before the numbers that
+/// join it, and a template before the endpoints that render it, which
 /// exist before their variables, rules and saved deliveries; a payment flow exists before the
 /// methods that run it, which exist before the gateways that offer them, after the endpoints
 /// gateways notify. HTTP bins, email tag, forward and inbound rules and saved scenarios refer to
@@ -64,13 +65,13 @@ pub fn seed_section_adapters() -> Vec<Box<dyn SeedSectionAdapter>> {
         Box::new(SettingsSeedAdapter),
         Box::new(ProjectSeedAdapter),
         Box::new(VerifyServiceSeedAdapter),
+        Box::new(SmsProviderSeedAdapter),
+        Box::new(TwilioSubaccountSeedAdapter),
         Box::new(MessagingServiceSeedAdapter),
         Box::new(VirtualNumberSeedAdapter),
         Box::new(SmsOutcomeRuleSeedAdapter),
         Box::new(EmailOutcomeRuleSeedAdapter),
         Box::new(EmailTemplateSeedAdapter),
-        Box::new(SmsProviderSeedAdapter),
-        Box::new(TwilioSubaccountSeedAdapter),
         Box::new(EmailProviderSeedAdapter),
         Box::new(WebhookTemplateSeedAdapter),
         Box::new(WebhookEndpointSeedAdapter),

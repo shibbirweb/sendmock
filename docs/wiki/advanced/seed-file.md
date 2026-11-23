@@ -27,12 +27,24 @@ In **Settings > Setup**, **Import a setup**: upload or paste it, press **Preview
 
 ## Reset before every test run
 
-**Reset to seed** deletes all traffic (emails, SMS, deliveries, payments), puts the settings back to their defaults and restores the seed applied last: items you edited get the file's values again, and items the file does not hold are deleted (saved deliveries are kept, as they are without a seed). Without a seed, reset keeps your configuration.
+**Reset to seed** deletes all traffic (emails, SMS, deliveries, payments), puts the settings back to their defaults and restores the seed applied last: items you edited get the file's values again, and items the file does not hold are deleted (saved deliveries are kept, as they are without a seed). Without a seed, reset keeps your configuration. It answers what it cleared and what it kept, by kind.
 
 ```bash
 sendmock reset --yes
-# or
+```
+
+```bash
 curl -X POST http://127.0.0.1:8025/api/v1/reset
+```
+
+To start from nothing, `--config` also removes every configured item (numbers, endpoints, rules, templates and the rest), puts the settings and providers back to what SendMock ships with, and forgets the seed. It first answers how many items of each kind it would remove; run it again with that count to go ahead:
+
+```bash
+sendmock reset --yes --config
+```
+
+```bash
+sendmock reset --yes --config --confirm-removed-count 5
 ```
 
 ## Secrets
@@ -113,7 +125,7 @@ text = "Hi {{ first_name }}, your {{ plan }} plan is ready."
 html = "<p>Hi {{ first_name }}, your <b>{{ plan }}</b> plan is ready.</p>"
 ```
 
-A template send whose id matches is stored with this subject (unless the send names its own) and these bodies, rendered from the send's template data with the same template language as webhook templates. A template needs a `text` or an `html` body.
+A template send whose id matches is stored with this subject (unless the send names its own) and these bodies, rendered from the send's template data with the same template language as webhook templates. The keys are `id` (required), `subject`, `text` and `html`; a template needs a `text` or an `html` body, and any other key (such as `template_id`) is refused by validate and import with its name. **Mail > Templates** manages the same templates; see [Templates](../mail/templates.md).
 
 ## Payment flows, methods and gateways
 

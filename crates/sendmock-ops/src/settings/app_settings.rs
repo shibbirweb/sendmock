@@ -43,6 +43,10 @@ pub struct AppSettings {
     pub is_magic_addresses_enabled: bool,
     /// Fires `email.opened` and `sms.opened` when you open a message in the UI.
     pub fire_opened_events_on_view: bool,
+    /// On: a view counts as an open even when a webhook rule would send `email.opened` to your
+    /// app. Off (the default): such a view is not counted, so browsing the inbox never tells
+    /// your app a customer read the email.
+    pub count_views_with_webhook_rules: bool,
     pub opened_event_mode: OpenedEventMode,
     /// Rejects the next N SMTP messages, to test your app's retries.
     pub chaos_smtp_reject_next_count: u32,
@@ -95,6 +99,7 @@ impl Default for AppSettings {
             is_magic_numbers_enabled: true,
             is_magic_addresses_enabled: true,
             fire_opened_events_on_view: true,
+            count_views_with_webhook_rules: false,
             opened_event_mode: OpenedEventMode::FirstOpen,
             chaos_smtp_reject_next_count: 0,
             chaos_smtp_reject_code: 550,

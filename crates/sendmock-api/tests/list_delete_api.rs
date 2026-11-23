@@ -316,7 +316,7 @@ async fn every_delete_answers_204_for_a_missing_item_and_an_empty_list() {
 async fn a_logged_api_request_is_deleted_by_its_id() {
     let fixture = build_send_fixture(&[]);
     let twilio_request = Request::post(
-        "/providers/twilio/2010-04-01/Accounts/ACtest00000000000000000000000000/Messages.json",
+        "/providers/twilio/2010-04-01/Accounts/ACtest0000000000000000000000000000/Messages.json",
     )
     .header("content-type", "application/x-www-form-urlencoded")
     // `ACtest...:any-token`, as an SDK configured with any credentials sends it.

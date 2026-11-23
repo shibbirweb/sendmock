@@ -28,6 +28,7 @@ import {
   EmailTextTab,
 } from "@/features/mail/detail/tabs/email-source-tabs";
 import { useEmailOpenTracking } from "@/features/mail/detail/use-email-open-tracking";
+import { ViewNotCountedNotice } from "@/features/mail/detail/view-not-counted-notice";
 import { useEmail, useEmailTimeline } from "@/lib/api/hooks/use-email-queries";
 import { useOperationAvailability } from "@/lib/api/hooks/use-operation-availability";
 
@@ -39,7 +40,7 @@ export function MailDetail({ emailId }: { emailId: string }) {
   // The route keys this component by email, so a composer never outlives it.
   const [composerMode, setComposerMode] =
     React.useState<EmailComposerMode | null>(null);
-  useEmailOpenTracking(email);
+  const openTracking = useEmailOpenTracking(email);
   useEmailResponseShortcuts(email, setComposerMode);
   const checksAvailability = useOperationAvailability(
     "GET /api/v1/emails/{emailId}/html-check",
@@ -85,6 +86,9 @@ export function MailDetail({ emailId }: { emailId: string }) {
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       <MailDetailHeader email={email} onStartResponse={setComposerMode} />
+      {openTracking.isViewNotCounted && (
+        <ViewNotCountedNotice onCountAsOpen={openTracking.countAsOpen} />
+      )}
       {composerMode !== null && (
         <EmailResponseComposer
           key={composerMode}

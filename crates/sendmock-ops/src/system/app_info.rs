@@ -29,4 +29,6 @@ pub struct AppInfo {
     pub is_container: bool,
     /// The `operationId`s this binary serves; the UI shows Not available yet for the rest.
     pub available_operations: Vec<String>,
+    /// Setup worth fixing, such as the provider port being off; empty when there is nothing.
+    pub warnings: Vec<String>,
 }

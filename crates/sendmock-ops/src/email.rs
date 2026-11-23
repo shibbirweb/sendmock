@@ -1,3 +1,4 @@
+mod bounce_data;
 mod change_email_operations;
 mod delivery_event_recording;
 mod delivery_outcome_runner;
@@ -22,6 +23,8 @@ mod inbound_email_store;
 mod link_check_operation;
 mod link_checker;
 mod list_unsubscribe_report;
+mod local_template_operations;
+mod local_template_wire;
 mod lookup_operations;
 mod lookups;
 pub mod mailpit;
@@ -37,6 +40,7 @@ mod simulate_outcome_operation;
 mod spam_check_operation;
 mod spam_checker;
 
+pub(crate) use bounce_data::build_bounce_data;
 pub use change_email_operations::{
     DeleteAllEmailsOperation, DeleteEmailOperation, UpdateEmailOperation,
 };
@@ -59,8 +63,13 @@ pub use email_summary::{EmailAddress, EmailSummary};
 pub use inbound_email_operation::ReceiveInboundEmailOperation;
 pub use link_check_operation::CheckEmailLinksOperation;
 pub use link_checker::{LinkChecker, LinkProbe};
+pub use local_template_operations::{
+    CreateEmailTemplateOperation, DeleteEmailTemplateOperation, ListEmailTemplatesOperation,
+    UpdateEmailTemplateOperation,
+};
 pub use lookup_operations::{GetLinksOperation, GetOtpOperation, WaitForEmailOperation};
 pub(crate) use native_send_request::{NativeSendAttachment, NativeSendRequest, read_bare_address};
+pub(crate) use read_email_operations::read_stored_user_variables;
 pub use read_email_operations::{
     CheckListUnsubscribeOperation, GetEmailMimeOperation, GetEmailOperation,
     GetEmailTimelineOperation, GetLatestEmailOperation, ListEmailsOperation,
@@ -95,6 +104,10 @@ pub fn register_email_operations(operation_registry: &mut OperationRegistry) {
     operation_registry.register(ReleaseEmailOperation);
     operation_registry.register(ReplyToEmailOperation);
     operation_registry.register(ForwardEmailOperation);
+    operation_registry.register(ListEmailTemplatesOperation);
+    operation_registry.register(CreateEmailTemplateOperation);
+    operation_registry.register(UpdateEmailTemplateOperation);
+    operation_registry.register(DeleteEmailTemplateOperation);
     operation_registry.register(ReceiveInboundEmailOperation);
     operation_registry.register(GetEmailMimeOperation);
     operation_registry.register(DownloadRawEmailOperation);

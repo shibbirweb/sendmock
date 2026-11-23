@@ -928,6 +928,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -990,6 +1004,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -1566,6 +1590,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -1649,6 +1687,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -1913,6 +1961,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -1994,6 +2056,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -2715,6 +2787,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -2770,6 +2856,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -3234,6 +3330,8 @@
               }
             ],
             "check_credentials": false,
+            "opt_out_keywords": true,
+            "opt_out_auto_replies": false,
             "operations": [
               {
                 "kind": "send",
@@ -3341,6 +3439,8 @@
                   }
                 ],
                 "check_credentials": false,
+                "opt_out_keywords": true,
+                "opt_out_auto_replies": false,
                 "operations": [
                   {
                     "kind": "send",
@@ -3486,6 +3586,23 @@
                   false
                 ]
               },
+              "opt_out_keywords": {
+                "type": [
+                  "boolean",
+                  "null"
+                ],
+                "description": "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others.",
+                "examples": [
+                  true
+                ]
+              },
+              "opt_out_auto_replies": {
+                "type": "boolean",
+                "description": "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages.",
+                "examples": [
+                  false
+                ]
+              },
               "operations": {
                 "type": "array",
                 "items": {
@@ -3571,6 +3688,8 @@
               "host",
               "credentials",
               "check_credentials",
+              "opt_out_keywords",
+              "opt_out_auto_replies",
               "operations",
               "field_mapping",
               "validation_rules",
@@ -3730,6 +3849,7 @@
               "tags",
               "template_id",
               "template_data",
+              "user_variables",
               "raw",
               "body",
               "media_urls",
@@ -3965,6 +4085,8 @@
             }
           ],
           "check_credentials": false,
+          "opt_out_keywords": true,
+          "opt_out_auto_replies": false,
           "operations": [
             {
               "kind": "send",
@@ -4197,7 +4319,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The `/providers/<key>/...` path and the `provider` value stored on each message; lowercase, fixed after creation.",
           "example": "sendgrid"
@@ -4209,7 +4331,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The provider's name, shown on messages and in pickers.",
           "example": "SendGrid"
@@ -4221,7 +4343,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "`#rrggbb`, used on its badge.",
           "example": "#1a82e2"
@@ -4233,7 +4355,7 @@
             "location": "body"
           },
           "type": "boolean",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Off providers answer nothing; their paths get SendMock's native 404.",
           "example": true
@@ -4257,7 +4379,7 @@
             "location": "body"
           },
           "type": "ProviderCredential[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The credentials your app is configured with.",
           "example": [
@@ -4275,9 +4397,33 @@
             "location": "body"
           },
           "type": "boolean",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer.",
+          "example": false
+        },
+        {
+          "name": "opt_out_keywords",
+          "input": {
+            "name": "opt_out_keywords",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others.",
+          "example": true
+        },
+        {
+          "name": "opt_out_auto_replies",
+          "input": {
+            "name": "opt_out_auto_replies",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages.",
           "example": false
         },
         {
@@ -4287,7 +4433,7 @@
             "location": "body"
           },
           "type": "ProviderOperation[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The requests it answers.",
           "example": [
@@ -4306,7 +4452,7 @@
             "location": "body"
           },
           "type": "ProviderFieldMapping[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Where each part of a sent message is read from; anything else is kept as metadata.",
           "example": [
@@ -4323,7 +4469,7 @@
             "location": "body"
           },
           "type": "ProviderValidationRule[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The checks run on each send, in order.",
           "example": [
@@ -4342,7 +4488,7 @@
             "location": "body"
           },
           "type": "ProviderResponseTemplate",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The answer to a request that passes every check.",
           "example": {
@@ -4363,7 +4509,7 @@
             "location": "body"
           },
           "type": "ProviderErrorResponse[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The answer for each kind of error.",
           "example": [
@@ -4387,7 +4533,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The provider's id for each message, a template.",
           "example": "<{{ uuid() }}@sendmock.local>"
@@ -4411,7 +4557,7 @@
             "location": "body"
           },
           "type": "object",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The provider's name for each SendMock status.",
           "example": {
@@ -4427,7 +4573,7 @@
             "location": "body"
           },
           "type": "object",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "SMS only: the provider's error code for each delivery outcome, so test numbers fail with its own codes.",
           "example": {
@@ -4503,6 +4649,23 @@
           "check_credentials": {
             "type": "boolean",
             "description": "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer.",
+            "examples": [
+              false
+            ]
+          },
+          "opt_out_keywords": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others.",
+            "examples": [
+              true
+            ]
+          },
+          "opt_out_auto_replies": {
+            "type": "boolean",
+            "description": "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages.",
             "examples": [
               false
             ]
@@ -4640,21 +4803,7 @@
           }
         },
         "required": [
-          "provider_key",
-          "key",
-          "name",
-          "accent",
-          "is_enabled",
-          "credentials",
-          "check_credentials",
-          "operations",
-          "field_mapping",
-          "validation_rules",
-          "success_response",
-          "error_responses",
-          "message_id_template",
-          "status_names",
-          "outcome_error_codes"
+          "provider_key"
         ],
         "$defs": {
           "EmailProviderOperationKind": {
@@ -4814,6 +4963,7 @@
               "tags",
               "template_id",
               "template_data",
+              "user_variables",
               "raw",
               "body",
               "media_urls",
@@ -4983,74 +5133,7 @@
       "example_arguments": {
         "provider_key": "twilio",
         "key": "sendgrid",
-        "name": "SendGrid",
-        "accent": "#1a82e2",
-        "is_enabled": true,
-        "credentials": [
-          {
-            "name": "api_key",
-            "value": "SG.test_key_123",
-            "is_secret": true
-          }
-        ],
-        "check_credentials": false,
-        "operations": [
-          {
-            "kind": "send",
-            "method": "POST",
-            "path": "/v3/{domain}/messages",
-            "request_format": "multipart"
-          }
-        ],
-        "field_mapping": [
-          {
-            "part": "to",
-            "source": "personalizations[0].to[*].email"
-          }
-        ],
-        "validation_rules": [
-          {
-            "part": "to",
-            "check": "required",
-            "max_length": null,
-            "error_kind": "missing_field"
-          }
-        ],
-        "success_response": {
-          "status": 202,
-          "headers": [
-            {
-              "name": "X-Message-Id",
-              "template": "{{ message.provider_id }}"
-            }
-          ],
-          "body": "{\"id\": \"{{ message.provider_id }}\"}"
-        },
-        "error_responses": [
-          {
-            "kind": "missing_field",
-            "status": 202,
-            "headers": [
-              {
-                "name": "X-Message-Id",
-                "template": "{{ message.provider_id }}"
-              }
-            ],
-            "body": "{\"id\": \"{{ message.provider_id }}\"}"
-          }
-        ],
-        "message_id_template": "<{{ uuid() }}@sendmock.local>",
-        "status_names": {
-          "delivered": "delivered",
-          "bounced": "bounce",
-          "complained": "spamreport"
-        },
-        "outcome_error_codes": {
-          "invalid_number": "21211",
-          "unreachable": "30003"
-        },
-        "host": "api.sendgrid.com",
-        "callback_template_key": "sendgrid-event"
+        "name": "SendGrid"
       },
       "output": "MessageProviderDefinition",
       "cli": [
@@ -5280,6 +5363,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -5356,6 +5453,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -5926,6 +6033,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -5985,6 +6106,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -6067,6 +6198,360 @@
       ],
       "ui": [
         "Mail > open email > Simulate"
+      ]
+    },
+    {
+      "name": "sendmock_email_template_create",
+      "toolset": "email",
+      "summary": "Add a local email template under a provider's template id or name.",
+      "area": "Email templates",
+      "area_slug": "email-templates",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/emails/templates",
+          "operation_id": "postEmailsTemplates",
+          "summary": "Add a local email template under a provider's template id or name.",
+          "area_slug": "email-templates",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "id",
+          "input": {
+            "name": "id",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The provider's template id or name: SendGrid's `d-...`, Postmark's number or alias, Mailgun's template name.",
+          "example": "welcome-email"
+        },
+        {
+          "name": "subject",
+          "input": {
+            "name": "subject",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The subject, used when the send gives none; can use the template data.",
+          "example": "Welcome, {{ first_name }}"
+        },
+        {
+          "name": "text",
+          "input": {
+            "name": "text",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The plain-text body; at least one of `text` and `html`.",
+          "example": "Hi {{ first_name }}, thanks for joining."
+        },
+        {
+          "name": "html",
+          "input": {
+            "name": "html",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The HTML body.",
+          "example": "<p>Hi {{ first_name }}, thanks for joining.</p>"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The provider's template id or name: SendGrid's `d-...`, Postmark's number or alias, Mailgun's template name.",
+            "examples": [
+              "welcome-email"
+            ]
+          },
+          "subject": {
+            "type": "string",
+            "description": "The subject, used when the send gives none; can use the template data.",
+            "examples": [
+              "Welcome, {{ first_name }}"
+            ]
+          },
+          "text": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The plain-text body; at least one of `text` and `html`.",
+            "examples": [
+              "Hi {{ first_name }}, thanks for joining."
+            ]
+          },
+          "html": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The HTML body.",
+            "examples": [
+              "<p>Hi {{ first_name }}, thanks for joining.</p>"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "subject"
+        ]
+      },
+      "example_arguments": {
+        "id": "welcome-email",
+        "subject": "Welcome, {{ first_name }}",
+        "text": "Hi {{ first_name }}, thanks for joining.",
+        "html": "<p>Hi {{ first_name }}, thanks for joining.</p>"
+      },
+      "output": "EmailTemplate",
+      "cli": [
+        "sendmock email templates create"
+      ],
+      "ui": [
+        "Mail > Templates > New template"
+      ]
+    },
+    {
+      "name": "sendmock_email_template_delete",
+      "toolset": "email",
+      "summary": "Remove a local email template; sends naming it keep their own bodies.",
+      "area": "Email templates",
+      "area_slug": "email-templates",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/emails/templates/{templateId}",
+          "operation_id": "deleteEmailsTemplatesByTemplateId",
+          "summary": "Remove a local email template; sends naming it keep their own bodies.",
+          "area_slug": "email-templates",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "template_id",
+          "input": {
+            "name": "templateId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The webhook template's ID, e.g. `slack.incoming_webhook` or `custom.ops_alert`.",
+          "example": "slack.incoming_webhook"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "template_id": {
+            "type": "string",
+            "description": "The webhook template's ID, e.g. `slack.incoming_webhook` or `custom.ops_alert`.",
+            "examples": [
+              "slack.incoming_webhook"
+            ]
+          }
+        },
+        "required": [
+          "template_id"
+        ]
+      },
+      "example_arguments": {
+        "template_id": "slack.incoming_webhook"
+      },
+      "output": null,
+      "cli": [
+        "sendmock email templates delete <templateId>"
+      ],
+      "ui": [
+        "Mail > Templates > a template > Delete"
+      ]
+    },
+    {
+      "name": "sendmock_email_template_list",
+      "toolset": "email",
+      "summary": "Local email templates: a provider send naming one gets its subject and bodies.",
+      "area": "Email templates",
+      "area_slug": "email-templates",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/emails/templates",
+          "operation_id": "getEmailsTemplates",
+          "summary": "Local email templates: a provider send naming one gets its subject and bodies.",
+          "area_slug": "email-templates",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [],
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "example_arguments": {},
+      "output": "EmailTemplate[]",
+      "cli": [
+        "sendmock email templates list"
+      ],
+      "ui": [
+        "Mail > Templates"
+      ]
+    },
+    {
+      "name": "sendmock_email_template_update",
+      "toolset": "email",
+      "summary": "Change a local email template's subject or bodies.",
+      "area": "Email templates",
+      "area_slug": "email-templates",
+      "operations": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/emails/templates/{templateId}",
+          "operation_id": "patchEmailsTemplatesByTemplateId",
+          "summary": "Change a local email template's subject or bodies.",
+          "area_slug": "email-templates",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "template_id",
+          "input": {
+            "name": "templateId",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The webhook template's ID, e.g. `slack.incoming_webhook` or `custom.ops_alert`.",
+          "example": "slack.incoming_webhook"
+        },
+        {
+          "name": "subject",
+          "input": {
+            "name": "subject",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The subject, used when the send gives none; can use the template data.",
+          "example": "Welcome, {{ first_name }}"
+        },
+        {
+          "name": "text",
+          "input": {
+            "name": "text",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The plain-text body; at least one of `text` and `html`.",
+          "example": "Hi {{ first_name }}, thanks for joining."
+        },
+        {
+          "name": "html",
+          "input": {
+            "name": "html",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The HTML body.",
+          "example": "<p>Hi {{ first_name }}, thanks for joining.</p>"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "template_id": {
+            "type": "string",
+            "description": "The webhook template's ID, e.g. `slack.incoming_webhook` or `custom.ops_alert`.",
+            "examples": [
+              "slack.incoming_webhook"
+            ]
+          },
+          "subject": {
+            "type": "string",
+            "description": "The subject, used when the send gives none; can use the template data.",
+            "examples": [
+              "Welcome, {{ first_name }}"
+            ]
+          },
+          "text": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The plain-text body; at least one of `text` and `html`.",
+            "examples": [
+              "Hi {{ first_name }}, thanks for joining."
+            ]
+          },
+          "html": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The HTML body.",
+            "examples": [
+              "<p>Hi {{ first_name }}, thanks for joining.</p>"
+            ]
+          }
+        },
+        "required": [
+          "template_id"
+        ]
+      },
+      "example_arguments": {
+        "template_id": "slack.incoming_webhook",
+        "subject": "Welcome, {{ first_name }}",
+        "text": "Hi {{ first_name }}, thanks for joining."
+      },
+      "output": "EmailTemplate",
+      "cli": [
+        "sendmock email templates update <templateId>"
+      ],
+      "ui": [
+        "Mail > Templates > a template > Save"
       ]
     },
     {
@@ -7451,7 +7936,7 @@
             "location": "body"
           },
           "type": "HttpMockResponse",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The reply sent when no rule matches.",
           "example": {
@@ -7488,8 +7973,7 @@
           }
         },
         "required": [
-          "bin_id",
-          "default_response"
+          "bin_id"
         ],
         "$defs": {
           "HttpMockResponse": {
@@ -7532,14 +8016,7 @@
         }
       },
       "example_arguments": {
-        "bin_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
-        "default_response": {
-          "status_code": 200,
-          "headers": {
-            "Content-Type": "application/json"
-          },
-          "body": "{\"ok\": true}"
-        }
+        "bin_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
       },
       "output": "HttpBin",
       "cli": [
@@ -9829,7 +10306,7 @@
             "location": "body"
           },
           "type": "number",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Lower runs first.",
           "example": 10
@@ -9841,7 +10318,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "A name for the route, shown in the list.",
           "example": "Ticket replies to the helpdesk"
@@ -9853,7 +10330,7 @@
             "location": "body"
           },
           "type": "InboundRouteFilter",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Which incoming emails the route takes.",
           "example": {
@@ -9868,7 +10345,7 @@
             "location": "body"
           },
           "type": "InboundRouteAction[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "What the route does with a matching email, in order.",
           "example": [
@@ -9930,11 +10407,7 @@
           }
         },
         "required": [
-          "route_id",
-          "priority",
-          "description",
-          "filter",
-          "actions"
+          "route_id"
         ],
         "$defs": {
           "InboundRouteAction": {
@@ -10094,17 +10567,7 @@
       "example_arguments": {
         "route_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
         "priority": 10,
-        "description": "Ticket replies to the helpdesk",
-        "filter": {
-          "kind": "match_recipient",
-          "pattern": "reply\\+(?P<token>.+)@reply.app.test"
-        },
-        "actions": [
-          {
-            "kind": "forward_url",
-            "url": "http://localhost:8000/webhooks/mail"
-          }
-        ]
+        "description": "Ticket replies to the helpdesk"
       },
       "output": "InboundRoute",
       "cli": [
@@ -10158,7 +10621,7 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "email, sms or http (default email).",
+          "description": "email, sms, http, mailgun or twilio (default email).",
           "example": "email"
         },
         {
@@ -10186,7 +10649,7 @@
           },
           "channel": {
             "type": "string",
-            "description": "email, sms or http (default email).",
+            "description": "email, sms, http, mailgun or twilio (default email).",
             "examples": [
               "email"
             ]
@@ -11048,6 +11511,18 @@
       },
       "properties": [
         {
+          "name": "sid",
+          "input": {
+            "name": "sid",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The SID to give the service, `MG` and 32 hex digits, so an app's configured SID works unchanged; left out, a new one is generated.",
+          "example": "MG00000000000000000000000000000001"
+        },
+        {
           "name": "friendly_name",
           "input": {
             "name": "friendly_name",
@@ -11066,9 +11541,9 @@
             "location": "body"
           },
           "type": "string[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
-          "description": "The virtual numbers in the sender pool, by ID.",
+          "description": "The virtual numbers in the sender pool, by ID; none when left out, as a new Twilio Messaging Service starts.",
           "example": [
             "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
           ]
@@ -11080,13 +11555,13 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": [
             "webhook",
             "defer_to_sender",
             "drop"
           ],
-          "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.",
+          "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook, the default) or `drop`.",
           "example": "webhook"
         },
         {
@@ -11098,7 +11573,7 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "Used when `inbound_mode` is `webhook`.",
+          "description": "Used when `inbound_mode` is `webhook`; none when left out.",
           "example": "http://localhost:3000/sms/inbound"
         },
         {
@@ -11110,13 +11585,35 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "Called when `inbound_url` fails.",
+          "description": "Called when `inbound_url` fails; none when left out.",
           "example": "http://localhost:3000/sms/inbound-fallback"
+        },
+        {
+          "name": "opt_out_keywords",
+          "input": {
+            "name": "opt_out_keywords",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.",
+          "example": true
         }
       ],
       "input_schema": {
         "type": "object",
         "properties": {
+          "sid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The SID to give the service, `MG` and 32 hex digits, so an app's configured SID works unchanged; left out, a new one is generated.",
+            "examples": [
+              "MG00000000000000000000000000000001"
+            ]
+          },
           "friendly_name": {
             "type": "string",
             "description": "A name for the service.",
@@ -11129,7 +11626,7 @@
             "items": {
               "$ref": "#/$defs/Ulid"
             },
-            "description": "The virtual numbers in the sender pool, by ID.",
+            "description": "The virtual numbers in the sender pool, by ID; none when left out, as a new Twilio Messaging Service starts.",
             "examples": [
               [
                 "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
@@ -11138,7 +11635,7 @@
           },
           "inbound_mode": {
             "$ref": "#/$defs/MessagingServiceInboundMode",
-            "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.",
+            "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook, the default) or `drop`.",
             "examples": [
               "webhook"
             ]
@@ -11148,7 +11645,7 @@
               "string",
               "null"
             ],
-            "description": "Used when `inbound_mode` is `webhook`.",
+            "description": "Used when `inbound_mode` is `webhook`; none when left out.",
             "examples": [
               "http://localhost:3000/sms/inbound"
             ]
@@ -11158,16 +11655,21 @@
               "string",
               "null"
             ],
-            "description": "Called when `inbound_url` fails.",
+            "description": "Called when `inbound_url` fails; none when left out.",
             "examples": [
               "http://localhost:3000/sms/inbound-fallback"
+            ]
+          },
+          "opt_out_keywords": {
+            "type": "boolean",
+            "description": "Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.",
+            "examples": [
+              true
             ]
           }
         },
         "required": [
-          "friendly_name",
-          "number_ids",
-          "inbound_mode"
+          "friendly_name"
         ],
         "$defs": {
           "MessagingServiceInboundMode": {
@@ -11187,12 +11689,10 @@
       },
       "example_arguments": {
         "friendly_name": "Notifications",
+        "sid": "MG00000000000000000000000000000001",
         "number_ids": [
           "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
-        ],
-        "inbound_mode": "webhook",
-        "inbound_url": "http://localhost:3000/sms/inbound",
-        "inbound_fallback_url": "http://localhost:3000/sms/inbound-fallback"
+        ]
       },
       "output": "MessagingService",
       "cli": [
@@ -11342,7 +11842,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "A name for the service.",
           "example": "Notifications"
@@ -11354,9 +11854,9 @@
             "location": "body"
           },
           "type": "string[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
-          "description": "The virtual numbers in the sender pool, by ID.",
+          "description": "The virtual numbers in the sender pool, by ID; none when left out, as a new Twilio Messaging Service starts.",
           "example": [
             "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
           ]
@@ -11368,13 +11868,13 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": [
             "webhook",
             "defer_to_sender",
             "drop"
           ],
-          "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.",
+          "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook, the default) or `drop`.",
           "example": "webhook"
         },
         {
@@ -11386,7 +11886,7 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "Used when `inbound_mode` is `webhook`.",
+          "description": "Used when `inbound_mode` is `webhook`; none when left out.",
           "example": "http://localhost:3000/sms/inbound"
         },
         {
@@ -11398,8 +11898,20 @@
           "type": "string",
           "is_required": false,
           "allowed_values": null,
-          "description": "Called when `inbound_url` fails.",
+          "description": "Called when `inbound_url` fails; none when left out.",
           "example": "http://localhost:3000/sms/inbound-fallback"
+        },
+        {
+          "name": "opt_out_keywords",
+          "input": {
+            "name": "opt_out_keywords",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.",
+          "example": true
         }
       ],
       "input_schema": {
@@ -11424,7 +11936,7 @@
             "items": {
               "$ref": "#/$defs/Ulid"
             },
-            "description": "The virtual numbers in the sender pool, by ID.",
+            "description": "The virtual numbers in the sender pool, by ID; none when left out, as a new Twilio Messaging Service starts.",
             "examples": [
               [
                 "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
@@ -11433,7 +11945,7 @@
           },
           "inbound_mode": {
             "$ref": "#/$defs/MessagingServiceInboundMode",
-            "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook) or `drop`.",
+            "description": "What happens to inbound messages: `webhook` (call `inbound_url`), `defer_to_sender` (each number's own webhook, the default) or `drop`.",
             "examples": [
               "webhook"
             ]
@@ -11443,7 +11955,7 @@
               "string",
               "null"
             ],
-            "description": "Used when `inbound_mode` is `webhook`.",
+            "description": "Used when `inbound_mode` is `webhook`; none when left out.",
             "examples": [
               "http://localhost:3000/sms/inbound"
             ]
@@ -11453,17 +11965,21 @@
               "string",
               "null"
             ],
-            "description": "Called when `inbound_url` fails.",
+            "description": "Called when `inbound_url` fails; none when left out.",
             "examples": [
               "http://localhost:3000/sms/inbound-fallback"
+            ]
+          },
+          "opt_out_keywords": {
+            "type": "boolean",
+            "description": "Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.",
+            "examples": [
+              true
             ]
           }
         },
         "required": [
-          "service_sid",
-          "friendly_name",
-          "number_ids",
-          "inbound_mode"
+          "service_sid"
         ],
         "$defs": {
           "MessagingServiceInboundMode": {
@@ -11486,10 +12002,7 @@
         "friendly_name": "Notifications",
         "number_ids": [
           "01JB7T9Q2R5W8X3Y6Z1A4B7C9D"
-        ],
-        "inbound_mode": "webhook",
-        "inbound_url": "http://localhost:3000/sms/inbound",
-        "inbound_fallback_url": "http://localhost:3000/sms/inbound-fallback"
+        ]
       },
       "output": "MessagingService",
       "cli": [
@@ -11641,7 +12154,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "E.164, without a channel prefix; `channels` says whether WhatsApp works.",
           "example": "+15550001111"
@@ -11653,7 +12166,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "A name for the number, e.g. the app or feature that uses it.",
           "example": "Support line"
@@ -11665,7 +12178,7 @@
             "location": "body"
           },
           "type": "string[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": [
             "sms",
             "whatsapp"
@@ -11686,21 +12199,6 @@
           "allowed_values": null,
           "description": "Reply webhook (Twilio \"A message comes in\"); null means rules only.",
           "example": "http://localhost:3000/sms/inbound"
-        },
-        {
-          "name": "inbound_method",
-          "input": {
-            "name": "inbound_method",
-            "location": "body"
-          },
-          "type": "string",
-          "is_required": true,
-          "allowed_values": [
-            "POST",
-            "GET"
-          ],
-          "description": "The HTTP method of the reply webhook.",
-          "example": "POST"
         },
         {
           "name": "inbound_fallback_url",
@@ -11749,6 +12247,45 @@
           "allowed_values": null,
           "description": "The Messaging Service this number belongs to, `MG...`; null for none.",
           "example": "MG00000000000000000000000000000001"
+        },
+        {
+          "name": "inbound_method",
+          "input": {
+            "name": "inbound_method",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": [
+            "POST",
+            "GET"
+          ],
+          "description": "The HTTP method of the reply webhook; POST when left out, as on Twilio.",
+          "example": "POST"
+        },
+        {
+          "name": "account_sid",
+          "input": {
+            "name": "account_sid",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.",
+          "example": null
+        },
+        {
+          "name": "opt_out_keywords",
+          "input": {
+            "name": "opt_out_keywords",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Whether a text of STOP to this number opts the contact out; on when left out.",
+          "example": true
         },
         {
           "name": "number_id",
@@ -11802,13 +12339,6 @@
               "http://localhost:3000/sms/inbound"
             ]
           },
-          "inbound_method": {
-            "$ref": "#/$defs/InboundWebhookMethod",
-            "description": "The HTTP method of the reply webhook.",
-            "examples": [
-              "POST"
-            ]
-          },
           "inbound_fallback_url": {
             "type": [
               "string",
@@ -11849,6 +12379,30 @@
               "MG00000000000000000000000000000001"
             ]
           },
+          "inbound_method": {
+            "$ref": "#/$defs/InboundWebhookMethod",
+            "description": "The HTTP method of the reply webhook; POST when left out, as on Twilio.",
+            "examples": [
+              "POST"
+            ]
+          },
+          "account_sid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The Twilio account that owns the number, the main account or a subaccount (`AC...`); left out or null, the main account. Inbound messages to it carry this account.",
+            "examples": [
+              null
+            ]
+          },
+          "opt_out_keywords": {
+            "type": "boolean",
+            "description": "Whether a text of STOP to this number opts the contact out; on when left out.",
+            "examples": [
+              true
+            ]
+          },
           "number_id": {
             "type": "string",
             "description": "The virtual number's ID, from `GET /api/v1/numbers`.",
@@ -11857,12 +12411,6 @@
             ]
           }
         },
-        "required": [
-          "number",
-          "label",
-          "channels",
-          "inbound_method"
-        ],
         "$defs": {
           "InboundWebhookMethod": {
             "type": "string",
@@ -11886,7 +12434,6 @@
         "channels": [
           "sms"
         ],
-        "inbound_method": "POST",
         "inbound_url": "http://localhost:3000/sms/inbound",
         "inbound_fallback_url": "http://localhost:3000/sms/inbound-fallback"
       },
@@ -12023,7 +12570,7 @@
     },
     {
       "name": "sendmock_outcome_rule_create",
-      "toolset": "rules",
+      "toolset": "outcomes",
       "summary": "Add an email outcome rule. Add an SMS outcome rule.",
       "area": "Outcome rules",
       "area_slug": "outcome-rules",
@@ -12326,7 +12873,7 @@
     },
     {
       "name": "sendmock_outcome_rule_delete",
-      "toolset": "rules",
+      "toolset": "outcomes",
       "summary": "Delete an email outcome rule. Delete an SMS outcome rule.",
       "area": "Outcome rules",
       "area_slug": "outcome-rules",
@@ -12429,7 +12976,7 @@
     },
     {
       "name": "sendmock_outcome_rule_list",
-      "toolset": "rules",
+      "toolset": "outcomes",
       "summary": "Email outcome rules, checked from top to bottom. SMS outcome rules, checked from top to bottom.",
       "area": "Outcome rules",
       "area_slug": "outcome-rules",
@@ -12511,7 +13058,7 @@
     },
     {
       "name": "sendmock_outcome_rule_move",
-      "toolset": "rules",
+      "toolset": "outcomes",
       "summary": "Move an email outcome rule up or down. Move an SMS outcome rule up or down.",
       "area": "Outcome rules",
       "area_slug": "outcome-rules",
@@ -12642,7 +13189,7 @@
     },
     {
       "name": "sendmock_outcome_rule_test",
-      "toolset": "rules",
+      "toolset": "outcomes",
       "summary": "Which custom rule, magic address or profile decides an address's outcome. Which custom rule, magic number or profile decides a number's outcome.",
       "area": "Outcome rules",
       "area_slug": "outcome-rules",
@@ -12789,7 +13336,7 @@
     },
     {
       "name": "sendmock_outcome_rule_update",
-      "toolset": "rules",
+      "toolset": "outcomes",
       "summary": "Change an email outcome rule; send only the changed keys. Change an SMS outcome rule; send only the changed keys.",
       "area": "Outcome rules",
       "area_slug": "outcome-rules",
@@ -14626,7 +15173,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The flow's key; fixed after creation.",
           "example": "wallet_otp"
@@ -14638,7 +15185,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The flow's name.",
           "example": "Wallet with OTP"
@@ -14650,7 +15197,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The checkout picker tab its methods show under, e.g. \"Mobile banking\".",
           "example": "Mobile banking"
@@ -14662,7 +15209,7 @@
             "location": "body"
           },
           "type": "PaymentFlowStep[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The steps in order.",
           "example": [
@@ -14727,11 +15274,7 @@
           }
         },
         "required": [
-          "flow_key",
-          "key",
-          "name",
-          "picker_tab",
-          "steps"
+          "flow_key"
         ],
         "$defs": {
           "PaymentFlowStep": {
@@ -14802,17 +15345,7 @@
       "example_arguments": {
         "flow_key": "card",
         "key": "wallet_otp",
-        "name": "Wallet with OTP",
-        "picker_tab": "Mobile banking",
-        "steps": [
-          {
-            "type": "otp",
-            "title": "Enter the code sent to your phone",
-            "field_label": "Verification code",
-            "hint": "We sent a 6 digit code to your {method} number.",
-            "button_label": "Verify"
-          }
-        ]
+        "name": "Wallet with OTP"
       },
       "output": "PaymentFlowDefinition",
       "cli": [
@@ -15820,7 +16353,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The `provider` value in the API and in `/providers/<key>/...` paths.",
           "example": "upay"
@@ -15832,7 +16365,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The gateway's name, shown on checkout pages.",
           "example": "Upay"
@@ -15844,7 +16377,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "`#rrggbb`, used on its checkout pages.",
           "example": "#e2136e"
@@ -15856,7 +16389,7 @@
             "location": "body"
           },
           "type": "boolean",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Off gateways reject new checkouts.",
           "example": true
@@ -15868,7 +16401,7 @@
             "location": "body"
           },
           "type": "string[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The methods its checkout offers, in order.",
           "example": [
@@ -15883,7 +16416,7 @@
             "location": "body"
           },
           "type": "GatewayCredential[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The merchant credentials your app is configured with.",
           "example": [
@@ -15913,7 +16446,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": [
             "GET",
             "POST"
@@ -15928,7 +16461,7 @@
             "location": "body"
           },
           "type": "GatewayRedirectField[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The parameters sent to your app on redirect.",
           "example": [
@@ -15946,7 +16479,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": [
             "json",
             "form"
@@ -15961,7 +16494,7 @@
             "location": "body"
           },
           "type": "object",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The gateway's name for each native event; blank sends nothing.",
           "example": {
@@ -15979,7 +16512,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The notification body, a template over the payment and the event.",
           "example": "{\"status\": \"{{ event.name }}\", \"txn_id\": \"{{ payment.reference }}\"}"
@@ -15991,7 +16524,7 @@
             "location": "body"
           },
           "type": "GatewayHeaderTemplate[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Headers sent with each notification.",
           "example": [
@@ -16210,19 +16743,7 @@
           }
         },
         "required": [
-          "gateway_key",
-          "key",
-          "name",
-          "accent",
-          "is_enabled",
-          "method_keys",
-          "credentials",
-          "redirect_method",
-          "redirect_fields",
-          "notification_content_type",
-          "event_names",
-          "notification_body",
-          "notification_headers"
+          "gateway_key"
         ],
         "$defs": {
           "GatewayCredential": {
@@ -16325,43 +16846,7 @@
       "example_arguments": {
         "gateway_key": "stripe",
         "key": "upay",
-        "name": "Upay",
-        "accent": "#e2136e",
-        "is_enabled": true,
-        "method_keys": [
-          "upay_wallet",
-          "card"
-        ],
-        "credentials": [
-          {
-            "name": "webhook_secret",
-            "value": "whsec_test_123",
-            "is_secret": true
-          }
-        ],
-        "redirect_method": "POST",
-        "redirect_fields": [
-          {
-            "name": "session_id",
-            "template": "{{ payment.reference }}",
-            "send_on": "always"
-          }
-        ],
-        "notification_content_type": "json",
-        "event_names": {
-          "payment.succeeded": "PAYMENT_SUCCESS",
-          "payment.failed": "PAYMENT_FAILED",
-          "payment.refunded": "",
-          "checkout.completed": "",
-          "checkout.expired": ""
-        },
-        "notification_body": "{\"status\": \"{{ event.name }}\", \"txn_id\": \"{{ payment.reference }}\"}",
-        "notification_headers": [
-          {
-            "name": "stripe-signature",
-            "template": "{{ stripe_signature(merchant.webhook_secret) }}"
-          }
-        ]
+        "name": "Upay"
       },
       "output": "PaymentGatewayDefinition",
       "cli": [
@@ -17262,7 +17747,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The method's key; fixed after creation.",
           "example": "upay_wallet"
@@ -17274,7 +17759,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The method's name on checkout pages.",
           "example": "Upay wallet"
@@ -17286,7 +17771,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The key of the flow its checkout runs.",
           "example": "wallet"
@@ -17298,7 +17783,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "`#rrggbb`, used on checkout pages.",
           "example": "#e2136e"
@@ -17310,7 +17795,7 @@
             "location": "body"
           },
           "type": "boolean",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Off methods are hidden on checkout pages.",
           "example": true
@@ -17322,7 +17807,7 @@
             "location": "body"
           },
           "type": "TestCardValue[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Read by a card form step.",
           "example": [
@@ -17340,7 +17825,7 @@
             "location": "body"
           },
           "type": "TestNumberValue[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Read by an account number or voucher code step.",
           "example": [
@@ -17358,7 +17843,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Read by an OTP step.",
           "example": "123456"
@@ -17370,7 +17855,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Read by a PIN step.",
           "example": "12121"
@@ -17382,7 +17867,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": [
             "succeed",
             "decline"
@@ -17397,7 +17882,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Read by a signed-in account step.",
           "example": "sb-buyer@personal.example.com"
@@ -17514,18 +17999,7 @@
           }
         },
         "required": [
-          "method_key",
-          "key",
-          "name",
-          "flow",
-          "accent",
-          "is_enabled",
-          "test_cards",
-          "test_numbers",
-          "otp",
-          "pin",
-          "default_outcome",
-          "test_account"
+          "method_key"
         ],
         "$defs": {
           "CardTestOutcome": {
@@ -17639,28 +18113,7 @@
       "example_arguments": {
         "method_key": "bkash",
         "key": "upay_wallet",
-        "name": "Upay wallet",
-        "flow": "wallet",
-        "accent": "#e2136e",
-        "is_enabled": true,
-        "test_cards": [
-          {
-            "number": "4242424242424242",
-            "outcome": "succeed",
-            "decline_reason": "insufficient_funds"
-          }
-        ],
-        "test_numbers": [
-          {
-            "number": "01770000001",
-            "outcome": "succeed",
-            "decline_reason": "insufficient_funds"
-          }
-        ],
-        "otp": "123456",
-        "pin": "12121",
-        "default_outcome": "succeed",
-        "test_account": "sb-buyer@personal.example.com"
+        "name": "Upay wallet"
       },
       "output": "PaymentMethodDefinition",
       "cli": [
@@ -17881,6 +18334,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -17961,6 +18428,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -18244,6 +18721,174 @@
       ],
       "ui": [
         "Payments (new and changed payments appear live)"
+      ]
+    },
+    {
+      "name": "sendmock_preset_apply",
+      "toolset": "core",
+      "summary": "Set SendMock up for a stack in one step; a second run changes nothing.",
+      "area": "Setup",
+      "area_slug": "setup",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/api/v1/presets/{presetName}/apply",
+          "operation_id": "postPresetsByPresetNameApply",
+          "summary": "Set SendMock up for a stack in one step; a second run changes nothing.",
+          "area_slug": "setup",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [
+        {
+          "name": "preset_name",
+          "input": {
+            "name": "presetName",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The preset's name, from `GET /api/v1/presets`.",
+          "example": "laravel-mailgun-twilio"
+        },
+        {
+          "name": "app_url",
+          "input": {
+            "name": "app_url",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "Where SendMock reaches your app.",
+          "example": "http://localhost:8000"
+        },
+        {
+          "name": "options",
+          "input": {
+            "name": "options",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The preset's options by name (its webhook paths); left out, their defaults.",
+          "example": {
+            "mailgun_events_path": "/webhooks/mailgun/events"
+          }
+        },
+        {
+          "name": "numbers_csv",
+          "input": {
+            "name": "numbers_csv",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Numbers to add, one per line: `number,label,subaccount_sid,messaging_service_sid` (a first line starting with `number` is a header).",
+          "example": "+15550001111,Clinic line,AC22222222222222222222222222222222,"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "preset_name": {
+            "type": "string",
+            "description": "The preset's name, from `GET /api/v1/presets`.",
+            "examples": [
+              "laravel-mailgun-twilio"
+            ]
+          },
+          "app_url": {
+            "type": "string",
+            "description": "Where SendMock reaches your app.",
+            "examples": [
+              "http://localhost:8000"
+            ]
+          },
+          "options": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "The preset's options by name (its webhook paths); left out, their defaults.",
+            "examples": [
+              {
+                "mailgun_events_path": "/webhooks/mailgun/events"
+              }
+            ]
+          },
+          "numbers_csv": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Numbers to add, one per line: `number,label,subaccount_sid,messaging_service_sid` (a first line starting with `number` is a header).",
+            "examples": [
+              "+15550001111,Clinic line,AC22222222222222222222222222222222,"
+            ]
+          }
+        },
+        "required": [
+          "preset_name",
+          "app_url"
+        ]
+      },
+      "example_arguments": {
+        "preset_name": "laravel-mailgun-twilio",
+        "app_url": "http://localhost:8000",
+        "numbers_csv": "+15550001111,Clinic line,AC22222222222222222222222222222222,"
+      },
+      "output": "PresetApplyResult",
+      "cli": [
+        "sendmock preset <presetName>"
+      ],
+      "ui": [
+        "Settings > Setup > Presets > Apply"
+      ]
+    },
+    {
+      "name": "sendmock_preset_list",
+      "toolset": "core",
+      "summary": "The stack presets: what each sets up and its options.",
+      "area": "Setup",
+      "area_slug": "setup",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/presets",
+          "operation_id": "getPresets",
+          "summary": "The stack presets: what each sets up and its options.",
+          "area_slug": "setup",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [],
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "example_arguments": {},
+      "output": "StackPreset[]",
+      "cli": [
+        "sendmock presets"
+      ],
+      "ui": [
+        "Settings > Setup > Presets"
       ]
     },
     {
@@ -19157,7 +19802,7 @@
     {
       "name": "sendmock_reset",
       "toolset": "admin",
-      "summary": "Delete all traffic and restore the seed configuration.",
+      "summary": "Delete all traffic and apply the seed applied last again, keeping the rest of the configuration; with config, also remove every configured item and restore the built-in providers. Answers what it cleared, removed and kept.",
       "area": "System",
       "area_slug": "system",
       "operations": [
@@ -19165,7 +19810,7 @@
           "method": "POST",
           "path": "/api/v1/reset",
           "operation_id": "postReset",
-          "summary": "Delete all traffic and restore the seed configuration.",
+          "summary": "Delete all traffic and apply the seed applied last again, keeping the rest of the configuration; with config, also remove every configured item and restore the built-in providers. Answers what it cleared, removed and kept.",
           "area_slug": "system",
           "selector": null
         }
@@ -19176,13 +19821,59 @@
         "destructive_hint": true,
         "idempotent_hint": false
       },
-      "properties": [],
+      "properties": [
+        {
+          "name": "config",
+          "input": {
+            "name": "config",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Also remove every configured item, put the settings and providers back to what SendMock ships with, and forget the seed.",
+          "example": false
+        },
+        {
+          "name": "confirm_removed_count",
+          "input": {
+            "name": "confirm_removed_count",
+            "location": "body"
+          },
+          "type": "number",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "With `config`: how many configured items the reset said it would remove.",
+          "example": 12
+        }
+      ],
       "input_schema": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "config": {
+            "type": "boolean",
+            "description": "Also remove every configured item, put the settings and providers back to what SendMock ships with, and forget the seed.",
+            "examples": [
+              false
+            ]
+          },
+          "confirm_removed_count": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "With `config`: how many configured items the reset said it would remove.",
+            "examples": [
+              12
+            ]
+          }
+        }
       },
-      "example_arguments": {},
-      "output": null,
+      "example_arguments": {
+        "config": false,
+        "confirm_removed_count": 12
+      },
+      "output": "ResetSummary",
       "cli": [
         "sendmock reset --yes"
       ],
@@ -19297,6 +19988,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -19359,6 +20064,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -20428,6 +21143,18 @@
           "example": true
         },
         {
+          "name": "count_views_with_webhook_rules",
+          "input": {
+            "name": "count_views_with_webhook_rules",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "On: a view counts as an open even when a webhook rule would send `email.opened` to your app. Off (the default): such a view is not counted.",
+          "example": false
+        },
+        {
           "name": "opened_event_mode",
           "input": {
             "name": "opened_event_mode",
@@ -20770,6 +21497,13 @@
               true
             ]
           },
+          "count_views_with_webhook_rules": {
+            "type": "boolean",
+            "description": "On: a view counts as an open even when a webhook rule would send `email.opened` to your app. Off (the default): such a view is not counted.",
+            "examples": [
+              false
+            ]
+          },
           "opened_event_mode": {
             "type": "string",
             "enum": [
@@ -20965,7 +21699,7 @@
     },
     {
       "name": "sendmock_setup_export",
-      "toolset": "admin",
+      "toolset": "setup",
       "summary": "The configuration as a versioned setup file in TOML, JSON or YAML.",
       "area": "Setup",
       "area_slug": "setup",
@@ -21141,7 +21875,7 @@
     },
     {
       "name": "sendmock_setup_import",
-      "toolset": "admin",
+      "toolset": "setup",
       "summary": "Apply a setup from its text or a URL, merging or replacing; 422 with the errors and nothing applied when it is invalid.",
       "area": "Setup",
       "area_slug": "setup",
@@ -21377,7 +22111,7 @@
       },
       "output": "SetupValidation",
       "cli": [
-        "sendmock setup import <file> --yes"
+        "sendmock setup import <file>"
       ],
       "ui": [
         "Settings > Setup > Import a setup"
@@ -21385,7 +22119,7 @@
     },
     {
       "name": "sendmock_setup_migrate",
-      "toolset": "admin",
+      "toolset": "setup",
       "summary": "A setup file upgraded to this build's format version, without applying it.",
       "area": "Setup",
       "area_slug": "setup",
@@ -21520,7 +22254,7 @@
     },
     {
       "name": "sendmock_setup_validate",
-      "toolset": "admin",
+      "toolset": "setup",
       "summary": "Check a setup without applying it, with what an import would add, change and remove.",
       "area": "Setup",
       "area_slug": "setup",
@@ -22284,6 +23018,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -22339,6 +23087,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -22476,6 +23234,161 @@
       ],
       "ui": [
         "SMS > message ticks (read)"
+      ]
+    },
+    {
+      "name": "sendmock_sms_opt_out_clear",
+      "toolset": "sms",
+      "summary": "Lift every opt-out.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/sms/opt-outs",
+          "operation_id": "deleteSmsOptOuts",
+          "summary": "Lift every opt-out.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [],
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "example_arguments": {},
+      "output": null,
+      "cli": [
+        "sendmock sms opt-outs clear --yes"
+      ],
+      "ui": [
+        "Numbers > Opt-outs > Lift all"
+      ]
+    },
+    {
+      "name": "sendmock_sms_opt_out_delete",
+      "toolset": "sms",
+      "summary": "Lift one opt-out, as if the contact texted START.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/sms/opt-outs/{sender}/{contactNumber}",
+          "operation_id": "deleteSmsOptOutsBySenderByContactNumber",
+          "summary": "Lift one opt-out, as if the contact texted START.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true
+      },
+      "properties": [
+        {
+          "name": "sender",
+          "input": {
+            "name": "sender",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "Your number (E.164) or the Messaging Service SID an opt-out is kept under, from `GET /api/v1/sms/opt-outs`.",
+          "example": "+15550001111"
+        },
+        {
+          "name": "contact_number",
+          "input": {
+            "name": "contactNumber",
+            "location": "path"
+          },
+          "type": "string",
+          "is_required": true,
+          "allowed_values": null,
+          "description": "The contact's number, E.164.",
+          "example": "+15550002222"
+        }
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "sender": {
+            "type": "string",
+            "description": "Your number (E.164) or the Messaging Service SID an opt-out is kept under, from `GET /api/v1/sms/opt-outs`.",
+            "examples": [
+              "+15550001111"
+            ]
+          },
+          "contact_number": {
+            "type": "string",
+            "description": "The contact's number, E.164.",
+            "examples": [
+              "+15550002222"
+            ]
+          }
+        },
+        "required": [
+          "sender",
+          "contact_number"
+        ]
+      },
+      "example_arguments": {
+        "sender": "+15550001111",
+        "contact_number": "+15550002222"
+      },
+      "output": null,
+      "cli": [
+        "sendmock sms opt-outs delete <sender> <contactNumber>"
+      ],
+      "ui": [
+        "Numbers > Opt-outs > Lift"
+      ]
+    },
+    {
+      "name": "sendmock_sms_opt_out_list",
+      "toolset": "sms",
+      "summary": "Contacts who texted STOP, newest first.",
+      "area": "SMS",
+      "area_slug": "sms",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/sms/opt-outs",
+          "operation_id": "getSmsOptOuts",
+          "summary": "Contacts who texted STOP, newest first.",
+          "area_slug": "sms",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [],
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "example_arguments": {},
+      "output": "SmsOptOut[]",
+      "cli": [
+        "sendmock sms opt-outs list"
+      ],
+      "ui": [
+        "Numbers > Opt-outs"
       ]
     },
     {
@@ -22803,6 +23716,8 @@
               }
             ],
             "check_credentials": false,
+            "opt_out_keywords": true,
+            "opt_out_auto_replies": false,
             "operations": [
               {
                 "kind": "send",
@@ -22910,6 +23825,8 @@
                   }
                 ],
                 "check_credentials": false,
+                "opt_out_keywords": true,
+                "opt_out_auto_replies": false,
                 "operations": [
                   {
                     "kind": "send",
@@ -23055,6 +23972,23 @@
                   false
                 ]
               },
+              "opt_out_keywords": {
+                "type": [
+                  "boolean",
+                  "null"
+                ],
+                "description": "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others.",
+                "examples": [
+                  true
+                ]
+              },
+              "opt_out_auto_replies": {
+                "type": "boolean",
+                "description": "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages.",
+                "examples": [
+                  false
+                ]
+              },
               "operations": {
                 "type": "array",
                 "items": {
@@ -23140,6 +24074,8 @@
               "host",
               "credentials",
               "check_credentials",
+              "opt_out_keywords",
+              "opt_out_auto_replies",
               "operations",
               "field_mapping",
               "validation_rules",
@@ -23299,6 +24235,7 @@
               "tags",
               "template_id",
               "template_data",
+              "user_variables",
               "raw",
               "body",
               "media_urls",
@@ -23534,6 +24471,8 @@
             }
           ],
           "check_credentials": false,
+          "opt_out_keywords": true,
+          "opt_out_auto_replies": false,
           "operations": [
             {
               "kind": "send",
@@ -23766,7 +24705,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The `/providers/<key>/...` path and the `provider` value stored on each message; lowercase, fixed after creation.",
           "example": "sendgrid"
@@ -23778,7 +24717,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The provider's name, shown on messages and in pickers.",
           "example": "SendGrid"
@@ -23790,7 +24729,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "`#rrggbb`, used on its badge.",
           "example": "#1a82e2"
@@ -23802,7 +24741,7 @@
             "location": "body"
           },
           "type": "boolean",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Off providers answer nothing; their paths get SendMock's native 404.",
           "example": true
@@ -23826,7 +24765,7 @@
             "location": "body"
           },
           "type": "ProviderCredential[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The credentials your app is configured with.",
           "example": [
@@ -23844,9 +24783,33 @@
             "location": "body"
           },
           "type": "boolean",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer.",
+          "example": false
+        },
+        {
+          "name": "opt_out_keywords",
+          "input": {
+            "name": "opt_out_keywords",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others.",
+          "example": true
+        },
+        {
+          "name": "opt_out_auto_replies",
+          "input": {
+            "name": "opt_out_auto_replies",
+            "location": "body"
+          },
+          "type": "boolean",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages.",
           "example": false
         },
         {
@@ -23856,7 +24819,7 @@
             "location": "body"
           },
           "type": "ProviderOperation[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The requests it answers.",
           "example": [
@@ -23875,7 +24838,7 @@
             "location": "body"
           },
           "type": "ProviderFieldMapping[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Where each part of a sent message is read from; anything else is kept as metadata.",
           "example": [
@@ -23892,7 +24855,7 @@
             "location": "body"
           },
           "type": "ProviderValidationRule[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The checks run on each send, in order.",
           "example": [
@@ -23911,7 +24874,7 @@
             "location": "body"
           },
           "type": "ProviderResponseTemplate",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The answer to a request that passes every check.",
           "example": {
@@ -23932,7 +24895,7 @@
             "location": "body"
           },
           "type": "ProviderErrorResponse[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The answer for each kind of error.",
           "example": [
@@ -23956,7 +24919,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The provider's id for each message, a template.",
           "example": "<{{ uuid() }}@sendmock.local>"
@@ -23980,7 +24943,7 @@
             "location": "body"
           },
           "type": "object",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The provider's name for each SendMock status.",
           "example": {
@@ -23996,7 +24959,7 @@
             "location": "body"
           },
           "type": "object",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "SMS only: the provider's error code for each delivery outcome, so test numbers fail with its own codes.",
           "example": {
@@ -24072,6 +25035,23 @@
           "check_credentials": {
             "type": "boolean",
             "description": "Off by default: any credentials are accepted. On: wrong ones get the provider's `unauthorized` answer.",
+            "examples": [
+              false
+            ]
+          },
+          "opt_out_keywords": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others.",
+            "examples": [
+              true
+            ]
+          },
+          "opt_out_auto_replies": {
+            "type": "boolean",
+            "description": "SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages.",
             "examples": [
               false
             ]
@@ -24209,21 +25189,7 @@
           }
         },
         "required": [
-          "provider_key",
-          "key",
-          "name",
-          "accent",
-          "is_enabled",
-          "credentials",
-          "check_credentials",
-          "operations",
-          "field_mapping",
-          "validation_rules",
-          "success_response",
-          "error_responses",
-          "message_id_template",
-          "status_names",
-          "outcome_error_codes"
+          "provider_key"
         ],
         "$defs": {
           "EmailProviderOperationKind": {
@@ -24383,6 +25349,7 @@
               "tags",
               "template_id",
               "template_data",
+              "user_variables",
               "raw",
               "body",
               "media_urls",
@@ -24552,74 +25519,7 @@
       "example_arguments": {
         "provider_key": "twilio",
         "key": "sendgrid",
-        "name": "SendGrid",
-        "accent": "#1a82e2",
-        "is_enabled": true,
-        "credentials": [
-          {
-            "name": "api_key",
-            "value": "SG.test_key_123",
-            "is_secret": true
-          }
-        ],
-        "check_credentials": false,
-        "operations": [
-          {
-            "kind": "send",
-            "method": "POST",
-            "path": "/v3/{domain}/messages",
-            "request_format": "multipart"
-          }
-        ],
-        "field_mapping": [
-          {
-            "part": "to",
-            "source": "personalizations[0].to[*].email"
-          }
-        ],
-        "validation_rules": [
-          {
-            "part": "to",
-            "check": "required",
-            "max_length": null,
-            "error_kind": "missing_field"
-          }
-        ],
-        "success_response": {
-          "status": 202,
-          "headers": [
-            {
-              "name": "X-Message-Id",
-              "template": "{{ message.provider_id }}"
-            }
-          ],
-          "body": "{\"id\": \"{{ message.provider_id }}\"}"
-        },
-        "error_responses": [
-          {
-            "kind": "missing_field",
-            "status": 202,
-            "headers": [
-              {
-                "name": "X-Message-Id",
-                "template": "{{ message.provider_id }}"
-              }
-            ],
-            "body": "{\"id\": \"{{ message.provider_id }}\"}"
-          }
-        ],
-        "message_id_template": "<{{ uuid() }}@sendmock.local>",
-        "status_names": {
-          "delivered": "delivered",
-          "bounced": "bounce",
-          "complained": "spamreport"
-        },
-        "outcome_error_codes": {
-          "invalid_number": "21211",
-          "unreachable": "30003"
-        },
-        "host": "api.sendgrid.com",
-        "callback_template_key": "sendgrid-event"
+        "name": "SendGrid"
       },
       "output": "MessageProviderDefinition",
       "cli": [
@@ -25035,6 +25935,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -25093,6 +26007,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -25169,7 +26093,7 @@
           "01JB7T9Q2RENDPOINT00000000"
         ]
       },
-      "output": "SmsMessageDetail",
+      "output": "SmsStatusChangeAnswer",
       "cli": [
         "sendmock sms status <smsId> <status>"
       ],
@@ -25315,6 +26239,20 @@
               }
             }
           ]
+        },
+        {
+          "name": "user_variables",
+          "input": {
+            "name": "user_variables",
+            "location": "body"
+          },
+          "type": "object",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+          "example": {
+            "order_id": "A-1001"
+          }
         }
       ],
       "input_schema": {
@@ -25400,6 +26338,16 @@
                   }
                 }
               ]
+            ]
+          },
+          "user_variables": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "User variables for this action's webhooks, such as your app's order id, merged over the email's own (`data.user_variables`, Mailgun's `user-variables`) before each payload is signed.",
+            "examples": [
+              {
+                "order_id": "A-1001"
+              }
             ]
           }
         },
@@ -27304,6 +28252,42 @@
       ]
     },
     {
+      "name": "sendmock_tls_trust",
+      "toolset": "core",
+      "summary": "What trusts the local CA on this machine: the system store and each runtime.",
+      "area": "System",
+      "area_slug": "system",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/api/v1/tls/trust",
+          "operation_id": "getTlsTrust",
+          "summary": "What trusts the local CA on this machine: the system store and each runtime.",
+          "area_slug": "system",
+          "selector": null
+        }
+      ],
+      "aliases": [],
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": false
+      },
+      "properties": [],
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "example_arguments": {},
+      "output": "TlsTrustReport",
+      "cli": [
+        "sendmock trust"
+      ],
+      "ui": [
+        "Settings > Connection > Provider APIs over HTTPS > Trusted by"
+      ]
+    },
+    {
       "name": "sendmock_traffic_delete_all",
       "toolset": "admin",
       "summary": "Delete every captured item in every project and keep every setting and configuration list.",
@@ -27643,7 +28627,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "A name for the subaccount.",
           "example": "Acme Clinic"
@@ -27735,8 +28719,7 @@
           }
         },
         "required": [
-          "account_sid",
-          "friendly_name"
+          "account_sid"
         ],
         "$defs": {
           "TwilioAccountStatus": {
@@ -27753,8 +28736,7 @@
       "example_arguments": {
         "account_sid": "AC33333333333333333333333333333333",
         "friendly_name": "Acme Clinic",
-        "status": "active",
-        "auth_token": null
+        "status": "active"
       },
       "output": "TwilioSubaccount",
       "cli": [
@@ -28594,7 +29576,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The name shown in the code message, e.g. \"Your Shop verification code is ...\".",
           "example": "Shop"
@@ -28606,7 +29588,7 @@
             "location": "body"
           },
           "type": "number",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Digits in each code, 4 to 10.",
           "example": 6
@@ -28630,7 +29612,7 @@
             "location": "body"
           },
           "type": "number",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "How long a code stays valid, in seconds.",
           "example": 600
@@ -28679,18 +29661,13 @@
           }
         },
         "required": [
-          "service_sid",
-          "friendly_name",
-          "code_length",
-          "ttl_seconds"
+          "service_sid"
         ]
       },
       "example_arguments": {
         "service_sid": "MG00000000000000000000000000000001",
         "friendly_name": "Shop",
-        "code_length": 6,
-        "ttl_seconds": 600,
-        "fixed_code": "123456"
+        "code_length": 6
       },
       "output": "VerifyService",
       "cli": [
@@ -29665,7 +30642,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": [
             "GET",
             "POST",
@@ -29683,7 +30660,7 @@
             "location": "body"
           },
           "type": "object",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Extra headers layered on top of the template's.",
           "example": {
@@ -29697,7 +30674,7 @@
             "location": "body"
           },
           "type": "object",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Extra body fields layered on top of the template's.",
           "example": {
@@ -29711,7 +30688,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The payload template, e.g. `native` (Standard Webhooks JSON) or `slack.incoming_webhook`.",
           "example": "native"
@@ -29723,7 +30700,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": [
             "linked",
             "detached"
@@ -29738,7 +30715,7 @@
             "location": "body"
           },
           "type": "number",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "How long to wait for your app's answer, in milliseconds.",
           "example": 10000
@@ -29750,7 +30727,7 @@
             "location": "body"
           },
           "type": "RetryPolicy",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "When and how often failed deliveries are retried.",
           "example": {
@@ -29772,7 +30749,7 @@
             "location": "body"
           },
           "type": "boolean",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Off endpoints receive no deliveries.",
           "example": true
@@ -29784,7 +30761,7 @@
             "location": "body"
           },
           "type": "NameValueTemplate[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Query parameters added to the URL.",
           "example": [
@@ -29801,7 +30778,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": [
             "template",
             "fields",
@@ -29818,7 +30795,7 @@
             "location": "body"
           },
           "type": "EndpointBodyField[]",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The rows of `fields` mode.",
           "example": [
@@ -29836,7 +30813,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": [
             "json",
             "form",
@@ -29852,7 +30829,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The content type of `raw` mode.",
           "example": "application/json"
@@ -29864,7 +30841,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The body template of `raw` mode.",
           "example": "{\"text\": \"New email: {{ data.subject }}\"}"
@@ -29876,7 +30853,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": [
             "strict",
             "lenient"
@@ -30052,22 +31029,7 @@
         },
         "required": [
           "name",
-          "url",
-          "method",
-          "headers",
-          "extra_fields",
-          "template_id",
-          "template_mode",
-          "timeout_ms",
-          "retry_policy",
-          "is_enabled",
-          "query_params",
-          "body_mode",
-          "body_fields",
-          "fields_encoding",
-          "raw_content_type",
-          "raw_body",
-          "render_mode"
+          "url"
         ],
         "$defs": {
           "BodyFieldType": {
@@ -30216,45 +31178,7 @@
         "name": "Orders app",
         "url": "http://localhost:3000/webhooks/sendmock",
         "method": "POST",
-        "headers": {
-          "Authorization": "Bearer {{ vars.app_token }}"
-        },
-        "extra_fields": {
-          "environment": "local"
-        },
-        "template_id": "native",
-        "template_mode": "linked",
-        "timeout_ms": 10000,
-        "retry_policy": {
-          "max_attempts": 5,
-          "backoff_seconds": [
-            1,
-            5,
-            30,
-            120,
-            600
-          ],
-          "retry_on_client_errors": false
-        },
-        "is_enabled": true,
-        "query_params": [
-          {
-            "name": "X-Source",
-            "value": "sendmock-{{ event.type }}"
-          }
-        ],
-        "body_mode": "template",
-        "body_fields": [
-          {
-            "name": "user.email",
-            "value_type": "text",
-            "value": "{{ data.to[0].address }}"
-          }
-        ],
-        "fields_encoding": "json",
-        "raw_content_type": "application/json",
-        "raw_body": "{\"text\": \"New email: {{ data.subject }}\"}",
-        "render_mode": "strict"
+        "template_mode": "linked"
       },
       "output": "WebhookEndpoint",
       "cli": [
@@ -31391,10 +32315,10 @@
             "name": "endpoint",
             "location": "body"
           },
-          "type": "WebhookEndpointInput",
+          "type": "object",
           "is_required": false,
           "allowed_values": null,
-          "description": "The endpoint settings to render, saved or not; left out, the saved endpoint `endpoint_id` names is rendered as stored.",
+          "description": "The endpoint settings to render, saved or not, as many fields as you like: the rest come from the saved endpoint `endpoint_id` names, or a new endpoint's defaults. Left out, the saved endpoint is rendered as stored.",
           "example": {
             "name": "Orders app",
             "url": "http://localhost:3000/webhooks/sendmock",
@@ -31507,8 +32431,141 @@
         "type": "object",
         "properties": {
           "endpoint": {
-            "$ref": "#/$defs/WebhookEndpointInput",
-            "description": "The endpoint settings to render, saved or not; left out, the saved endpoint `endpoint_id` names is rendered as stored.",
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "A name for the endpoint, shown in lists and deliveries.",
+                "examples": [
+                  "Orders app"
+                ]
+              },
+              "url": {
+                "type": "string",
+                "description": "Where deliveries are sent; can use templates.",
+                "examples": [
+                  "http://localhost:3000/webhooks/sendmock"
+                ]
+              },
+              "method": {
+                "$ref": "#/$defs/HttpMethod",
+                "description": "The HTTP method of each delivery.",
+                "examples": [
+                  "POST"
+                ]
+              },
+              "headers": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "Extra headers layered on top of the template's.",
+                "examples": [
+                  {
+                    "Authorization": "Bearer {{ vars.app_token }}"
+                  }
+                ]
+              },
+              "extra_fields": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "Extra body fields layered on top of the template's.",
+                "examples": [
+                  {
+                    "environment": "local"
+                  }
+                ]
+              },
+              "template_id": {
+                "type": "string",
+                "description": "The payload template, e.g. `native` (Standard Webhooks JSON) or `slack.incoming_webhook`.",
+                "examples": [
+                  "native"
+                ]
+              },
+              "template_mode": {
+                "$ref": "#/$defs/TemplateMode",
+                "description": "`linked` follows template updates, `detached` keeps its own copy.",
+                "examples": [
+                  "linked"
+                ]
+              },
+              "timeout_ms": {
+                "type": "number",
+                "description": "How long to wait for your app's answer, in milliseconds.",
+                "examples": [
+                  10000
+                ]
+              },
+              "retry_policy": {
+                "$ref": "#/$defs/RetryPolicy",
+                "description": "When and how often failed deliveries are retried."
+              },
+              "is_enabled": {
+                "type": "boolean",
+                "description": "Off endpoints receive no deliveries.",
+                "examples": [
+                  true
+                ]
+              },
+              "query_params": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/NameValueTemplate"
+                },
+                "description": "Query parameters added to the URL."
+              },
+              "body_mode": {
+                "$ref": "#/$defs/EndpointBodyMode",
+                "description": "How the body is built: `template` (the payload template), `fields` (name and value rows), `raw` (one text template) or `none`.",
+                "examples": [
+                  "template"
+                ]
+              },
+              "body_fields": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/EndpointBodyField"
+                },
+                "description": "The rows of `fields` mode."
+              },
+              "fields_encoding": {
+                "type": "string",
+                "enum": [
+                  "json",
+                  "form",
+                  "multipart"
+                ],
+                "description": "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent).",
+                "examples": [
+                  "json"
+                ]
+              },
+              "raw_content_type": {
+                "type": "string",
+                "description": "The content type of `raw` mode.",
+                "examples": [
+                  "application/json"
+                ]
+              },
+              "raw_body": {
+                "type": "string",
+                "description": "The body template of `raw` mode.",
+                "examples": [
+                  "{\"text\": \"New email: {{ data.subject }}\"}"
+                ]
+              },
+              "render_mode": {
+                "$ref": "#/$defs/RenderMode",
+                "description": "`strict` stops a delivery on an undefined variable, `lenient` renders it empty with a warning.",
+                "examples": [
+                  "strict"
+                ]
+              }
+            },
+            "description": "The endpoint settings to render, saved or not, as many fields as you like: the rest come from the saved endpoint `endpoint_id` names, or a new endpoint's defaults. Left out, the saved endpoint is rendered as stored.",
             "examples": [
               {
                 "name": "Orders app",
@@ -31741,162 +32798,6 @@
           "Ulid": {
             "type": "string",
             "description": "Sortable unique ID (ULID), e.g. \"01JB6Z3K8Q2W5X7Y9A1B3C5D7E\"."
-          },
-          "WebhookEndpointInput": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string",
-                "description": "A name for the endpoint, shown in lists and deliveries.",
-                "examples": [
-                  "Orders app"
-                ]
-              },
-              "url": {
-                "type": "string",
-                "description": "Where deliveries are sent; can use templates.",
-                "examples": [
-                  "http://localhost:3000/webhooks/sendmock"
-                ]
-              },
-              "method": {
-                "$ref": "#/$defs/HttpMethod",
-                "description": "The HTTP method of each delivery.",
-                "examples": [
-                  "POST"
-                ]
-              },
-              "headers": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "string"
-                },
-                "description": "Extra headers layered on top of the template's.",
-                "examples": [
-                  {
-                    "Authorization": "Bearer {{ vars.app_token }}"
-                  }
-                ]
-              },
-              "extra_fields": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "string"
-                },
-                "description": "Extra body fields layered on top of the template's.",
-                "examples": [
-                  {
-                    "environment": "local"
-                  }
-                ]
-              },
-              "template_id": {
-                "type": "string",
-                "description": "The payload template, e.g. `native` (Standard Webhooks JSON) or `slack.incoming_webhook`.",
-                "examples": [
-                  "native"
-                ]
-              },
-              "template_mode": {
-                "$ref": "#/$defs/TemplateMode",
-                "description": "`linked` follows template updates, `detached` keeps its own copy.",
-                "examples": [
-                  "linked"
-                ]
-              },
-              "timeout_ms": {
-                "type": "number",
-                "description": "How long to wait for your app's answer, in milliseconds.",
-                "examples": [
-                  10000
-                ]
-              },
-              "retry_policy": {
-                "$ref": "#/$defs/RetryPolicy",
-                "description": "When and how often failed deliveries are retried."
-              },
-              "is_enabled": {
-                "type": "boolean",
-                "description": "Off endpoints receive no deliveries.",
-                "examples": [
-                  true
-                ]
-              },
-              "query_params": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/NameValueTemplate"
-                },
-                "description": "Query parameters added to the URL."
-              },
-              "body_mode": {
-                "$ref": "#/$defs/EndpointBodyMode",
-                "description": "How the body is built: `template` (the payload template), `fields` (name and value rows), `raw` (one text template) or `none`.",
-                "examples": [
-                  "template"
-                ]
-              },
-              "body_fields": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/EndpointBodyField"
-                },
-                "description": "The rows of `fields` mode."
-              },
-              "fields_encoding": {
-                "type": "string",
-                "enum": [
-                  "json",
-                  "form",
-                  "multipart"
-                ],
-                "description": "How `fields` mode is sent: `json`, `form` (`x-www-form-urlencoded`) or `multipart` (`multipart/form-data`, where `file` fields are fetched from their URL when sent).",
-                "examples": [
-                  "json"
-                ]
-              },
-              "raw_content_type": {
-                "type": "string",
-                "description": "The content type of `raw` mode.",
-                "examples": [
-                  "application/json"
-                ]
-              },
-              "raw_body": {
-                "type": "string",
-                "description": "The body template of `raw` mode.",
-                "examples": [
-                  "{\"text\": \"New email: {{ data.subject }}\"}"
-                ]
-              },
-              "render_mode": {
-                "$ref": "#/$defs/RenderMode",
-                "description": "`strict` stops a delivery on an undefined variable, `lenient` renders it empty with a warning.",
-                "examples": [
-                  "strict"
-                ]
-              }
-            },
-            "required": [
-              "name",
-              "url",
-              "method",
-              "headers",
-              "extra_fields",
-              "template_id",
-              "template_mode",
-              "timeout_ms",
-              "retry_policy",
-              "is_enabled",
-              "query_params",
-              "body_mode",
-              "body_fields",
-              "fields_encoding",
-              "raw_content_type",
-              "raw_body",
-              "render_mode"
-            ],
-            "description": "Body of POST and PATCH /api/v1/webhooks/endpoints."
           }
         }
       },
@@ -36686,7 +37587,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "The name templates read it by, as `{{ vars.<name> }}`.",
           "example": "tenant_id"
@@ -36698,7 +37599,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": [
             "text",
             "number",
@@ -36720,7 +37621,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": [
             "global",
             "endpoint"
@@ -36747,7 +37648,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "Static value, expression, generator or default; secrets are masked.",
           "example": "acme"
@@ -36774,7 +37675,7 @@
             "location": "body"
           },
           "type": "string",
-          "is_required": true,
+          "is_required": false,
           "allowed_values": null,
           "description": "What the variable is for.",
           "example": "Tenant every webhook is sent for"
@@ -36860,12 +37761,7 @@
           }
         },
         "required": [
-          "variable_id",
-          "name",
-          "kind",
-          "scope",
-          "value",
-          "description"
+          "variable_id"
         ],
         "$defs": {
           "Ulid": {
@@ -36891,11 +37787,7 @@
       "example_arguments": {
         "variable_id": "01JB7T9Q2R5W8X3Y6Z1A4B7C9D",
         "name": "tenant_id",
-        "kind": "text",
-        "scope": "global",
-        "value": "acme",
-        "description": "Tenant every webhook is sent for",
-        "random_mode": "per_send"
+        "kind": "text"
       },
       "output": "WebhookVariable",
       "cli": [

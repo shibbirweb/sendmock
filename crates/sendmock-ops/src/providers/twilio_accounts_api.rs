@@ -8,6 +8,7 @@ use super::provider_http::{ProviderHttpRequest, ProviderHttpResponse};
 use super::request_reader::read_request_fields;
 use super::twilio_account_shape::{ACCOUNT_PATH_PREFIX, describe_account};
 use super::twilio_answers::{answer_json, answer_twilio_error, read_form_field};
+use super::twilio_unauthorized_reason::describe_unauthorized_reason;
 use crate::twilio_accounts::{
     TwilioAccount, TwilioAccountDirectory, TwilioAccountStatus, TwilioSubaccountChanges,
     build_subaccount, generate_account_sid,
@@ -20,6 +21,8 @@ const ACCOUNTS_LIST_PATH: &str = "/2010-04-01/Accounts.json";
 pub struct TwilioAccountsAnswer {
     pub response: ProviderHttpResponse,
     pub secret_values: Vec<String>,
+    /// Why a request was refused, for the request log.
+    pub note: Option<String>,
 }
 
 /// Who called: the main account sees every account, a subaccount only itself.
@@ -49,10 +52,14 @@ pub async fn answer_twilio_accounts_request(
         .map(|account| account.auth_token.clone())
         .filter(|auth_token| !auth_token.is_empty())
         .collect();
-    let Some(caller) = identify_caller(&directory, request) else {
+    let basic_credentials = read_basic_credentials(request);
+    let Some(caller) = identify_caller(&directory, basic_credentials.as_ref()) else {
+        let reason =
+            describe_unauthorized_reason(&directory, account_target, basic_credentials.as_ref());
         return Ok(Some(TwilioAccountsAnswer {
             response: answer_twilio_error(401, 20003, "Authenticate"),
             secret_values,
+            note: Some(reason),
         }));
     };
     let fields = read_request_fields(request, "form").unwrap_or_default();
@@ -73,6 +80,7 @@ pub async fn answer_twilio_accounts_request(
     Ok(Some(TwilioAccountsAnswer {
         response,
         secret_values,
+        note: None,
     }))
 }
 
@@ -88,11 +96,9 @@ fn read_account_target(request_path: &str) -> Option<Option<&str>> {
     is_one_segment.then_some(Some(account_sid))
 }
 
-fn identify_caller<'directory>(
-    directory: &'directory TwilioAccountDirectory,
-    request: &ProviderHttpRequest,
-) -> Option<Caller<'directory>> {
-    let (user_name, password) = request
+/// The SID and token of the request's Basic auth, as Twilio's SDKs send them.
+fn read_basic_credentials(request: &ProviderHttpRequest) -> Option<(String, String)> {
+    request
         .header("authorization")
         .and_then(|authorization| authorization.strip_prefix("Basic "))
         .and_then(|encoded| STANDARD.decode(encoded.trim()).ok())
@@ -101,15 +107,24 @@ fn identify_caller<'directory>(
             credentials
                 .split_once(':')
                 .map(|(user_name, password)| (user_name.to_owned(), password.to_owned()))
-        })?;
+        })
+}
+
+fn identify_caller<'directory>(
+    directory: &'directory TwilioAccountDirectory,
+    basic_credentials: Option<&(String, String)>,
+) -> Option<Caller<'directory>> {
+    let (user_name, password) = basic_credentials?;
     let main_account = &directory.main_account;
-    if user_name == main_account.account_sid && password == main_account.auth_token {
+    if user_name == &main_account.account_sid && password == &main_account.auth_token {
         return Some(Caller::Main);
     }
     directory
         .subaccounts
         .iter()
-        .find(|subaccount| subaccount.account_sid == user_name && subaccount.auth_token == password)
+        .find(|subaccount| {
+            &subaccount.account_sid == user_name && &subaccount.auth_token == password
+        })
         .map(Caller::Subaccount)
 }
 

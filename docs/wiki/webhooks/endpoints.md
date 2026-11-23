@@ -71,6 +71,8 @@ Every control and text, one by one: [Endpoints in depth](../deeper/webhooks/endp
 
 Agents can set secrets but never read them back.
 
+Creating an endpoint needs only `name` and `url` (and usually `template_id`); every other field takes the default a new endpoint has in the UI, such as `POST`, no headers, a 10 second timeout and the default retries.
+
 ## Related
 
 - [Rules](./rules.md)

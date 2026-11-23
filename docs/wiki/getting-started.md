@@ -100,6 +100,8 @@ SendMock listens on `127.0.0.1` only:
 | `8025` | Web UI, REST API, WebSocket, native send APIs and `/catch/*` |
 | `8026` | Provider emulation at the real provider paths (Twilio, SendGrid, ...) |
 
+The provider port starts by default. `--provider-addr none` (`SENDMOCK_PROVIDER_ADDR=none`, or `provider_addr = "none"` in `sendmock.toml`) turns it off; if port `8026` is busy, SendMock says so and starts without it, and `sendmock status` warns while it is off. The Docker image and the Helm chart keep it off until you set its address.
+
 ## 2. Look around with samples
 
 Open `http://127.0.0.1:8025`. A fresh install is empty, and every empty screen offers a sample button:

@@ -4,6 +4,7 @@ import {
   pageOf,
   pageQueryParameters,
   tagEndpoints,
+  listOf,
   typeRef,
 } from "./endpoint-definition";
 
@@ -25,6 +26,14 @@ const systemEndpoints = tagEndpoints("System", [
     path: "/api/v1/tls/ca",
     summary: "The local CA to trust for the HTTPS provider port.",
     response: typeRef("TlsCertificateAuthority"),
+    errorStatuses: [404],
+  },
+  {
+    method: "GET",
+    path: "/api/v1/tls/trust",
+    summary:
+      "What trusts the local CA on this machine: the system store and each runtime.",
+    response: typeRef("TlsTrustReport"),
     errorStatuses: [404],
   },
   {
@@ -58,9 +67,11 @@ const systemEndpoints = tagEndpoints("System", [
   {
     method: "POST",
     path: "/api/v1/reset",
-    summary: "Delete all traffic and restore the seed configuration.",
-    response: null,
-    successStatus: 204,
+    summary:
+      "Delete all traffic and apply the seed applied last again, keeping the rest of the configuration; with config, also remove every configured item and restore the built-in providers. Answers what it cleared, removed and kept.",
+    requestBody: typeRef("ResetRequest"),
+    response: typeRef("ResetSummary"),
+    errorStatuses: [422],
   },
   {
     method: "DELETE",
@@ -131,6 +142,21 @@ const setupEndpoints = tagEndpoints("Setup", [
     requestBody: typeRef("SetupImportRequest"),
     response: typeRef("SetupValidation"),
     errorStatuses: [400, 422],
+  },
+  {
+    method: "GET",
+    path: "/api/v1/presets",
+    summary: "The stack presets: what each sets up and its options.",
+    response: listOf("StackPreset"),
+  },
+  {
+    method: "POST",
+    path: "/api/v1/presets/{presetName}/apply",
+    summary:
+      "Set SendMock up for a stack in one step; a second run changes nothing.",
+    requestBody: typeRef("PresetApplyInput"),
+    response: typeRef("PresetApplyResult"),
+    errorStatuses: [400, 404],
   },
   {
     method: "POST",

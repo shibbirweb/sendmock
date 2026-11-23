@@ -29,6 +29,7 @@ mod seed_state;
 mod settings;
 mod sms;
 mod sms_callback_attempt;
+mod sms_opt_out;
 mod sms_reply_webhook;
 mod smtp_session;
 mod store_error;
@@ -93,13 +94,14 @@ pub use saved_webhook_delivery::{SavedWebhookDeliveryRecord, SavedWebhookDeliver
 pub use seed_state::{SeedStateRecord, SeedStateRepository};
 pub use settings::SettingsRepository;
 pub use sms::{
-    NewSmsRecord, SmsListFilter, SmsMediaContent, SmsMediaRecord, SmsPage, SmsRecord,
-    SmsRepository, SmsStatusChangeRecord, SmsThreadRecord, WhatsappMediaRecord,
+    NewSmsRecord, SmsListFilter, SmsMediaContent, SmsMediaRecord, SmsOwnerAccount, SmsPage,
+    SmsRecord, SmsRepository, SmsStatusChangeRecord, SmsThreadRecord, WhatsappMediaRecord,
     WhatsappMediaRepository,
 };
 pub use sms_callback_attempt::{
     CallbackAttemptResult, SmsCallbackAttemptRecord, SmsCallbackAttemptRepository,
 };
+pub use sms_opt_out::{SmsOptOutRecord, SmsOptOutRepository};
 pub use sms_reply_webhook::{SmsReplyWebhookAttemptRecord, SmsReplyWebhookRepository};
 pub use smtp_session::{
     SmtpSessionFilter, SmtpSessionPage, SmtpSessionRecord, SmtpSessionRepository,

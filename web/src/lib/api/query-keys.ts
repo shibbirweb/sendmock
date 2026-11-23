@@ -71,6 +71,7 @@ export const queryKeys = {
     all: ["numbers"] as const,
     virtualNumbers: ["numbers", "virtual-numbers"] as const,
     messagingServices: ["numbers", "messaging-services"] as const,
+    optOuts: ["numbers", "opt-outs"] as const,
   },
   twilio: {
     subaccounts: ["twilio", "subaccounts"] as const,
@@ -78,6 +79,7 @@ export const queryKeys = {
   mailgun: {
     complaints: ["mailgun", "complaints"] as const,
   },
+  emailTemplates: ["email-templates"] as const,
   webhooks: {
     all: ["webhooks"] as const,
     endpoints: ["webhooks", "endpoints"] as const,

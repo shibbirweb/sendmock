@@ -62,6 +62,7 @@ pub async fn record_api_request(
             linked_message,
             secret_values: Vec::new(),
             catcher_answer: None,
+            note: None,
         },
         completed_request,
     )
@@ -77,6 +78,8 @@ pub struct ProviderRequestLogEntry {
     pub secret_values: Vec<String>,
     /// The attached bin and rule that answered, when no built-in operation did.
     pub catcher_answer: Option<CatcherAnswerRecord>,
+    /// Why SendMock answered as it did, when the answer alone does not say.
+    pub note: Option<String>,
 }
 
 pub async fn record_provider_request(
@@ -96,6 +99,7 @@ pub async fn record_provider_request(
             }),
             secret_values: log_entry.secret_values,
             catcher_answer: log_entry.catcher_answer,
+            note: log_entry.note,
         },
         completed_request,
     )
@@ -107,6 +111,7 @@ struct LoggedRequest {
     linked_message: Option<(String, String)>,
     secret_values: Vec<String>,
     catcher_answer: Option<CatcherAnswerRecord>,
+    note: Option<String>,
 }
 
 /// Masks each secret wherever it shows, in what was sent and in what was answered (a token
@@ -145,6 +150,7 @@ async fn insert_logged_request(
         duration_ms: completed_request.duration_ms,
         linked_message: logged_request.linked_message,
         catcher_answer: logged_request.catcher_answer,
+        note: logged_request.note,
         created_at_unix_ms: operation_context.clock.now_unix_ms(),
     };
     Ok(operation_context

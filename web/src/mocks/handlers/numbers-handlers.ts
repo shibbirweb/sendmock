@@ -2,6 +2,7 @@ import { http, HttpResponse } from "msw";
 
 import type {
   MessagingService,
+  MessagingServiceCreateInput,
   MessagingServiceInput,
   VirtualNumber,
   VirtualNumberInput,
@@ -63,6 +64,35 @@ function readFirstError(fieldErrors: Record<string, string | undefined>) {
   );
 }
 
+function readMainAccountSid(): string {
+  const twilioProvider = mockDatabase.messageProviders.find(
+    (messageProvider) =>
+      messageProvider.area === "sms" && messageProvider.key === "twilio",
+  );
+
+  return (
+    twilioProvider?.credentials.find(
+      (credential) => credential.name === "account_sid",
+    )?.value ?? ""
+  );
+}
+
+/** The stored owner: a known subaccount's SID, null for the main account, undefined if unknown. */
+function readKnownAccountSid(
+  accountSid: string | null | undefined,
+): string | null | undefined {
+  const trimmedSid = accountSid?.trim() ?? "";
+  if (trimmedSid === "" || trimmedSid === readMainAccountSid()) {
+    return null;
+  }
+
+  return mockDatabase.twilioSubaccounts.some(
+    (subaccount) => subaccount.account_sid === trimmedSid,
+  )
+    ? trimmedSid
+    : undefined;
+}
+
 function findMessagingService(serviceSid: unknown) {
   return mockDatabase.messagingServices.find(
     (messagingService) => messagingService.sid === serviceSid,
@@ -87,12 +117,23 @@ export const numbersHandlers = [
       return createErrorResponse(400, "validation_failed", firstError);
     }
 
+    const accountSid = readKnownAccountSid(numberInput.account_sid);
+    if (accountSid === undefined) {
+      return createErrorResponse(
+        400,
+        "validation_failed",
+        "No Twilio account or subaccount with this SID",
+      );
+    }
+
     const virtualNumber: VirtualNumber = {
       ...numberInput,
+      inbound_method: numberInput.inbound_method ?? "POST",
+      opt_out_keywords: numberInput.opt_out_keywords ?? true,
       label: numberInput.label.trim(),
       messaging_service_sid: null,
       phone_number_sid: createProviderId("PN"),
-      account_sid: null,
+      account_sid: accountSid,
       id: createMockUlid(),
       created_by: "ui",
     };
@@ -122,8 +163,22 @@ export const numbersHandlers = [
       return createErrorResponse(400, "validation_failed", firstError);
     }
 
+    const accountSid = readKnownAccountSid(
+      numberInput.account_sid ?? virtualNumber.account_sid,
+    );
+    if (accountSid === undefined) {
+      return createErrorResponse(
+        400,
+        "validation_failed",
+        "No Twilio account or subaccount with this SID",
+      );
+    }
+
     Object.assign(virtualNumber, numberInput, {
+      inbound_method:
+        numberInput.inbound_method ?? virtualNumber.inbound_method,
       label: numberInput.label.trim(),
+      account_sid: accountSid,
     });
     assignNumberToService(virtualNumber, numberInput.messaging_service_sid);
 
@@ -153,23 +208,43 @@ export const numbersHandlers = [
 
   http.post("*/api/v1/messaging-services", async ({ request }) => {
     await applyMockConditions();
-    const serviceInput = (await request.json()) as MessagingServiceInput;
+    const { sid: chosenSid, ...serviceInput } =
+      (await request.json()) as MessagingServiceCreateInput;
     const firstError = readFirstError(
       validateMessagingServiceInput(serviceInput),
     );
     if (firstError !== undefined) {
       return createErrorResponse(400, "validation_failed", firstError);
     }
+    const trimmedSid = chosenSid?.trim() ?? "";
+    if (trimmedSid !== "" && !/^MG[0-9a-fA-F]{32}$/.test(trimmedSid)) {
+      return createErrorResponse(
+        400,
+        "validation_failed",
+        "sid must be MG and 32 hex digits",
+      );
+    }
+    if (findMessagingService(trimmedSid) !== undefined) {
+      return createErrorResponse(
+        409,
+        "messaging_service_exists",
+        `A Messaging Service with SID ${trimmedSid} already exists`,
+      );
+    }
 
     const messagingService: MessagingService = {
       ...serviceInput,
+      inbound_mode: serviceInput.inbound_mode ?? "defer_to_sender",
+      inbound_url: serviceInput.inbound_url ?? null,
+      inbound_fallback_url: serviceInput.inbound_fallback_url ?? null,
+      opt_out_keywords: serviceInput.opt_out_keywords ?? true,
       friendly_name: serviceInput.friendly_name.trim(),
       number_ids: [],
-      sid: createProviderId("MG"),
+      sid: trimmedSid === "" ? createProviderId("MG") : trimmedSid,
       created_by: "ui",
     };
     mockDatabase.messagingServices.push(messagingService);
-    setServicePool(messagingService, serviceInput.number_ids);
+    setServicePool(messagingService, serviceInput.number_ids ?? []);
 
     return HttpResponse.json(messagingService, { status: 201 });
   }),
@@ -195,7 +270,10 @@ export const numbersHandlers = [
         friendly_name: serviceInput.friendly_name.trim(),
         number_ids: messagingService.number_ids,
       });
-      setServicePool(messagingService, serviceInput.number_ids);
+      setServicePool(
+        messagingService,
+        serviceInput.number_ids ?? messagingService.number_ids,
+      );
 
       return HttpResponse.json(messagingService);
     },

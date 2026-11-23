@@ -104,6 +104,7 @@ pub async fn answer_vonage_verify(
             .map(|credential| credential.value.clone())
             .collect(),
         is_unknown_path: false,
+        note: None,
     }))
 }
 

@@ -147,6 +147,11 @@ async fn collect_domain_events(
             continue;
         };
         let records = MailgunEmailRecords {
+            message_url: crate::webhooks::build_message_url(
+                &operation_context.instance_details,
+                domain,
+                &email.email_id,
+            ),
             timeline: email_repository.list_timeline(&email.email_id).await?,
             opens: email_repository.list_opens(&email.email_id).await?,
             clicks: email_repository.list_clicks(&email.email_id).await?,

@@ -1,5 +1,8 @@
-/// The toolsets a harness gets unless it asks for others (docs/plan/14-ai-integration.md).
-pub const DEFAULT_TOOLSETS: [&str; 6] = ["core", "email", "sms", "verify", "extract", "webhooks"];
+/// The toolsets a harness gets unless it asks for others (docs/plan/14-ai-integration.md):
+/// enough to set up and test an email and SMS app, the request log included.
+pub const DEFAULT_TOOLSETS: [&str; 10] = [
+    "core", "email", "sms", "verify", "extract", "webhooks", "numbers", "outcomes", "setup", "logs",
+];
 
 /// The toolset of each tool, by name prefix, as `mcp-toolsets.ts` gives them; the first
 /// matching prefix wins, so longer prefixes come first.
@@ -12,7 +15,7 @@ const TOOLSET_PREFIXES: [(&str, &str); 30] = [
     ("sendmock_inbound_route_", "rules"),
     ("sendmock_tag_rule_", "rules"),
     ("sendmock_forward_rule_", "rules"),
-    ("sendmock_outcome_rule_", "rules"),
+    ("sendmock_outcome_rule_", "outcomes"),
     ("sendmock_email_", "email"),
     ("sendmock_sms_", "sms"),
     ("sendmock_twilio_", "sms"),
@@ -31,7 +34,7 @@ const TOOLSET_PREFIXES: [(&str, &str); 30] = [
     ("sendmock_reset", "admin"),
     ("sendmock_traffic_", "admin"),
     ("sendmock_seed_", "admin"),
-    ("sendmock_setup_", "admin"),
+    ("sendmock_setup_", "setup"),
     ("sendmock_sample_", "admin"),
     ("sendmock_update_", "admin"),
     ("sendmock_", "core"),
@@ -106,6 +109,25 @@ mod tests {
         assert_eq!(find_toolset("sendmock_webhook_send"), "webhooks");
         assert_eq!(find_toolset("sendmock_otp_get"), "extract");
         assert_eq!(find_toolset("sendmock_status"), "core");
+    }
+
+    // AC: AI-08.4
+    #[test]
+    fn the_default_toolsets_hold_numbers_outcome_rules_setup_and_the_request_log() {
+        let default_filter = ToolFilter::default();
+
+        for tool_name in [
+            "sendmock_number_upsert",
+            "sendmock_messaging_service_create",
+            "sendmock_outcome_rule_create",
+            "sendmock_setup_import",
+            "sendmock_logs_http",
+        ] {
+            assert!(
+                default_filter.allows(find_toolset(tool_name), false),
+                "{tool_name}"
+            );
+        }
     }
 
     #[test]

@@ -1,4 +1,5 @@
 use sendmock_core::format_rfc3339;
+use sendmock_sms::find_number_country;
 use sendmock_store::{MessagingServiceRecord, VirtualNumberRecord};
 use serde_json::{Value, json};
 
@@ -12,22 +13,6 @@ use crate::{OperationContext, OperationError};
 
 const SERVICES_PREFIX: &str = "/v1/Services/";
 const SERVICES_URL: &str = "https://messaging.twilio.com/v1/Services";
-/// Country calling codes to ISO country codes, longest first, for the numbers SendMock's
-/// examples and test numbers use.
-const COUNTRY_CALLING_CODES: [(&str, &str); 12] = [
-    ("+880", "BD"),
-    ("+234", "NG"),
-    ("+254", "KE"),
-    ("+971", "AE"),
-    ("+44", "GB"),
-    ("+49", "DE"),
-    ("+33", "FR"),
-    ("+34", "ES"),
-    ("+61", "AU"),
-    ("+91", "IN"),
-    ("+55", "BR"),
-    ("+1", "US"),
-];
 
 struct ServiceNumbersTarget<'path> {
     service_sid: &'path str,
@@ -214,10 +199,7 @@ async fn add_number(
 }
 
 fn find_country_code(e164_number: &str) -> &'static str {
-    COUNTRY_CALLING_CODES
-        .iter()
-        .find(|(calling_code, _)| e164_number.starts_with(calling_code))
-        .map_or("US", |(_, country_code)| country_code)
+    find_number_country(e164_number).unwrap_or("US")
 }
 
 /// Twilio's Messaging Service PhoneNumber resource.

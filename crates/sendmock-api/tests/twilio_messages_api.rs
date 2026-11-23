@@ -15,7 +15,7 @@ use support::test_app::{build_test_app, build_test_app_with, call_api};
 use tower::ServiceExt;
 
 const MESSAGES_PATH: &str =
-    "/providers/twilio/2010-04-01/Accounts/ACtest00000000000000000000000000/Messages";
+    "/providers/twilio/2010-04-01/Accounts/ACtest0000000000000000000000000000/Messages";
 /// `ACtest...:any-token`, as an SDK configured with any credentials sends it.
 const ANY_BASIC_AUTH: &str = "Basic QUN0ZXN0MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA6YW55LXRva2Vu";
 
@@ -107,7 +107,7 @@ async fn create_fetch_and_list_answer_twilio_shaped_messages() {
     assert_eq!(created_message["status"], "queued");
     assert_eq!(
         created_message["account_sid"],
-        "ACtest00000000000000000000000000"
+        "ACtest0000000000000000000000000000"
     );
     assert_eq!(created_message["to"], "+8801700000000");
     assert_eq!(created_message["num_segments"], "1");

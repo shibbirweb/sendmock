@@ -20,6 +20,7 @@ export function buildDefaultSettings(): AppSettings {
     is_magic_numbers_enabled: true,
     is_magic_addresses_enabled: true,
     fire_opened_events_on_view: true,
+    count_views_with_webhook_rules: false,
     opened_event_mode: "first_open",
     chaos_smtp_reject_next_count: 0,
     chaos_smtp_reject_code: 550,

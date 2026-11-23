@@ -355,3 +355,45 @@ jobs:
         run: |
           dotnet pack SendMock.Testcontainers --configuration Release --output out
           dotnet nuget push "out/*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+  # Install channels with `after-publish` once every registry it installs from serves the release
+  # (#370). It waits rather than starting at once: the APT and YUM repository comes from the
+  # website deploy that runs beside this workflow, and a stable's crates from the hand-started
+  # run. The full run, once WinGet, Chocolatey, COPR and Nixpkgs take the version, stays by hand.
+  install-channels:
+    name: Start Install channels
+    needs: [plan, npm, mcp-registry, testcontainers-node, testcontainers-python, testcontainers-dotnet]
+    if: ${{ !cancelled() && github.event_name == 'workflow_run' && needs.plan.outputs.should_publish == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: refs/tags/${{ needs.plan.outputs.tag_name }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Wait until npm, the APT and YUM repository and a stable's crates serve the release
+        env:
+          VERSION: ${{ needs.plan.outputs.version }}
+          RELEASE_CHANNEL: ${{ needs.plan.outputs.channel }}
+          CRATES_PUBLISHING: ${{ vars.CRATES_PUBLISHING }}
+        run: |
+          crates_arguments=()
+          if [ "$CRATES_PUBLISHING" = "true" ]; then
+            crates_arguments=(--with-crates)
+          fi
+          bun scripts/release/published-channels.ts "$VERSION" "$RELEASE_CHANNEL" "${crates_arguments[@]}"
+
+      - name: Start Install channels for the channels that serve a release right away
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          VERSION: ${{ needs.plan.outputs.version }}
+          RELEASE_CHANNEL: ${{ needs.plan.outputs.channel }}
+        run: |
+          gh workflow run install-channels.yml --repo "$GITHUB_REPOSITORY" --ref "$DEFAULT_BRANCH" \
+            -f version="$VERSION" -f channel="$RELEASE_CHANNEL" -f channels=after-publish

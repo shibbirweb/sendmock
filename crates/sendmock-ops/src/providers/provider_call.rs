@@ -38,18 +38,18 @@ impl ProviderCall<'_> {
 
     /// The parts read from one message's fields, such as one item of a batch.
     pub fn read_part_values_from(&self, message_fields: &Value) -> BTreeMap<String, Vec<String>> {
-        let mut part_values: BTreeMap<String, Vec<String>> = self
-            .provider
-            .field_mapping
-            .iter()
-            .map(|field_mapping| {
-                (
-                    field_mapping.part.clone(),
-                    read_source_values(message_fields, &field_mapping.source),
-                )
-            })
-            .filter(|(_, values)| !values.is_empty())
-            .collect();
+        // A part mapped from several sources, such as Mailgun's user variables from `v:*` and
+        // `X-Mailgun-Variables`, gathers the values of each in mapping order.
+        let mut part_values: BTreeMap<String, Vec<String>> = BTreeMap::new();
+        for field_mapping in &self.provider.field_mapping {
+            let source_values = read_source_values(message_fields, &field_mapping.source);
+            if !source_values.is_empty() {
+                part_values
+                    .entry(field_mapping.part.clone())
+                    .or_default()
+                    .extend(source_values);
+            }
+        }
         fill_parts_from_raw_message(&mut part_values);
         part_values
     }

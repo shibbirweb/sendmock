@@ -8,6 +8,7 @@ import {
   type QueryParameter,
   tagEndpoints,
   typeRef,
+  partialOf,
 } from "./endpoint-definition";
 
 /** The filters the email list takes; a delete with the same filters removes what it lists. */
@@ -308,7 +309,7 @@ const inboundRouteEndpoints = tagEndpoints("Inbound routes", [
     method: "PATCH",
     path: "/api/v1/inbound-routes/{routeId}",
     summary: "Change a route.",
-    requestBody: typeRef("InboundRouteInput"),
+    requestBody: partialOf("InboundRouteInput"),
     response: typeRef("InboundRoute"),
     errorStatuses: [400, 404],
   },
@@ -337,7 +338,46 @@ const inboundRouteEndpoints = tagEndpoints("Inbound routes", [
   },
 ]);
 
+/** Local stand-ins for providers' email templates (EM-26.2). */
+const emailTemplateEndpoints = tagEndpoints("Email templates", [
+  {
+    method: "GET",
+    path: "/api/v1/emails/templates",
+    summary:
+      "Local email templates: a provider send naming one gets its subject and bodies.",
+    response: listOf("EmailTemplate"),
+  },
+  {
+    method: "POST",
+    path: "/api/v1/emails/templates",
+    summary:
+      "Add a local email template under a provider's template id or name.",
+    requestBody: typeRef("EmailTemplate"),
+    response: typeRef("EmailTemplate"),
+    successStatus: 201,
+    errorStatuses: [400, 409],
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/emails/templates/{templateId}",
+    summary: "Change a local email template's subject or bodies.",
+    requestBody: partialOf("EmailTemplateChanges"),
+    response: typeRef("EmailTemplate"),
+    errorStatuses: [400, 404],
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/emails/templates/{templateId}",
+    summary:
+      "Remove a local email template; sends naming it keep their own bodies.",
+    response: null,
+    successStatus: 204,
+    errorStatuses: [404],
+  },
+]);
+
 export const emailApi: ApiEndpoint[] = [
   ...emailEndpoints,
+  ...emailTemplateEndpoints,
   ...inboundRouteEndpoints,
 ];

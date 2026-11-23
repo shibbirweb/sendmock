@@ -1,0 +1,80 @@
+{
+  "doc_url": "https://documentation.mailgun.com/docs/mailgun/user-manual/events/webhooks/",
+  "verified_on": "2026-11-22",
+  "method": "POST",
+  "content_type": "application/json",
+  "documented_example": {
+    "signature": {
+      "timestamp": "1529006854",
+      "token": "a8ce0edb2dd8301dee6c2405235584e45aa91d1e9f979f3de0",
+      "signature": "d2271d12299f6592d9d44cd9d250f0704e4674c30d79d07c47a66f95ce71cf55"
+    },
+    "event-data": {
+      "id": "Fs7-5t81S2ms-Y8vPIi9mA",
+      "timestamp": 1521472262.908181,
+      "log-level": "warn",
+      "event": "failed",
+      "severity": "temporary",
+      "reason": "generic",
+      "delivery-status": {
+        "attempt-no": 1,
+        "message": "4.2.2 The email account that you tried to reach is over quota.",
+        "code": 452,
+        "enhanced-code": "4.2.2",
+        "description": "",
+        "session-seconds": 0.0
+      },
+      "recipient": "alice@example.com",
+      "recipient-domain": "example.com",
+      "tags": ["my_tag_1"],
+      "user-variables": {
+        "my_var_1": "Mailgun Variable #1",
+        "my-var-2": "awesome"
+      },
+      "message": {
+        "headers": {
+          "to": "Alice <alice@example.com>",
+          "message-id": "20130503192659.13651.20287@sandbox.mailgun.org",
+          "from": "Bob <bob@sandbox.mailgun.org>",
+          "subject": "Test temporary failure webhook"
+        },
+        "size": 111
+      }
+    }
+  },
+  "schema": {
+    "type": "object",
+    "required": ["signature", "event-data"],
+    "properties": {
+      "event-data": {
+        "type": "object",
+        "required": ["id", "timestamp", "log-level", "event", "severity", "reason", "delivery-status", "recipient", "recipient-domain", "user-variables", "message"],
+        "properties": {
+          "event": { "const": "failed" },
+          "severity": { "enum": ["temporary", "permanent"] },
+          "log-level": { "enum": ["warn", "error"] },
+          "delivery-status": {
+            "type": "object",
+            "required": ["attempt-no", "message", "code"],
+            "properties": {
+              "code": { "type": "integer" },
+              "attempt-no": { "type": "integer" },
+              "message": { "type": "string" }
+            }
+          },
+          "user-variables": { "type": "object" },
+          "message": {
+            "type": "object",
+            "required": ["headers"],
+            "properties": {
+              "headers": {
+                "type": "object",
+                "required": ["message-id", "from", "to", "subject"]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -143,10 +143,23 @@ export type SmsReplyWebhookAttempt = {
   created_at: IsoTimestamp;
 };
 
+/**
+ * What a callback attempt reported: the message's status, or `debugger` for a
+ * Twilio Debugger event sent for the message.
+ */
+export type SmsCallbackReportedStatus =
+  | "queued"
+  | "sent"
+  | "delivered"
+  | "undelivered"
+  | "failed"
+  | "received"
+  | "debugger";
+
 /** One call to the message's status callback URL, in the provider's format. */
 export type SmsCallbackAttempt = {
   id: Ulid;
-  reported_status: SmsStatus;
+  reported_status: SmsCallbackReportedStatus;
   attempt: number;
   request: RecordedHttpRequest;
   response: RecordedHttpResponse | null;
@@ -162,6 +175,15 @@ export type SmsMessageDetail = SmsMessage & {
   callback_attempts: SmsCallbackAttempt[];
   /** Inbound only, oldest first; every Resend adds attempts. */
   reply_webhook_attempts: SmsReplyWebhookAttempt[];
+};
+
+/** Answer of POST /api/v1/sms/{smsId}/status: the message, and when its status callback is sent. */
+export type SmsStatusChangeAnswer = SmsMessageDetail & {
+  /**
+   * When the status callback for this change is sent, in words.
+   * @example "No status callback: the message has no status callback URL."
+   */
+  status_callback_timing: string;
 };
 
 /** Body of PATCH /api/v1/sms/threads/{threadId}. */
@@ -278,4 +300,24 @@ export type SmsStatusUpdate = WebhookChoice & {
    * @example "30003"
    */
   error_code?: string | null;
+};
+
+/** A contact who texted STOP to one of your numbers or Messaging Services (SM-23). */
+export type SmsOptOut = {
+  /**
+   * Your app's number, or the SID of the Messaging Service it was in, `MG...`.
+   * @example "+15550001111"
+   */
+  sender: string;
+  /**
+   * The contact's number, E.164.
+   * @example "+15550002222"
+   */
+  contact_number: string;
+  /**
+   * The keyword the contact texted, as they wrote it.
+   * @example "STOP"
+   */
+  keyword: string;
+  created_at: IsoTimestamp;
 };

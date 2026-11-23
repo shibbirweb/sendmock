@@ -11,6 +11,8 @@ use crate::{OperationContext, OperationError};
 pub struct TwilioApiAnswer {
     pub response: ProviderHttpResponse,
     pub secret_values: Vec<String>,
+    /// Why the API answered as it did, for the request log.
+    pub note: Option<String>,
 }
 
 /// Twilio's APIs served in code beside the Messages definition: Accounts, IncomingPhoneNumbers,
@@ -27,6 +29,7 @@ pub async fn answer_twilio_api_request(
         return Ok(Some(TwilioApiAnswer {
             response: accounts_answer.response,
             secret_values: accounts_answer.secret_values,
+            note: accounts_answer.note,
         }));
     }
     let stored_subaccounts = operation_context
@@ -38,6 +41,7 @@ pub async fn answer_twilio_api_request(
         Some(TwilioApiAnswer {
             response,
             secret_values: provider_secret_values.clone(),
+            note: None,
         })
     };
     if let Some(numbers_response) =

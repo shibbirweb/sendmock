@@ -29,7 +29,7 @@ test.beforeAll(async ({ request }) => {
 /** Reset deletes every message, log and verification but keeps configuration. */
 test.beforeEach(async ({ request }) => {
   const resetResponse = await request.post("/api/v1/reset");
-  expect(resetResponse.status()).toBe(204);
+  expect(resetResponse.status()).toBe(200);
 });
 
 // A sample verification makes a service when there is none, and later specs expect
@@ -47,13 +47,22 @@ async function readLiveConnection(request: APIRequestContext) {
   const appInfo = (await (await request.get("/api/v1/info")).json()) as {
     smtp_address: string;
     http_address: string;
+    provider_address: string | null;
     is_container: boolean;
   };
+  const defaultHost = appInfo.is_container ? "sendmock" : "127.0.0.1";
+  const httpPort = appInfo.http_address.split(":").pop() ?? "";
+  const providerPort = appInfo.provider_address?.split(":").pop() ?? null;
 
   return {
-    defaultHost: appInfo.is_container ? "sendmock" : "127.0.0.1",
+    defaultHost,
     smtpPort: appInfo.smtp_address.split(":").pop() ?? "",
-    httpPort: appInfo.http_address.split(":").pop() ?? "",
+    httpPort,
+    // The provider port is on by default (PL-24); without it, SDKs use /providers/<name>.
+    twilioBaseUrl:
+      providerPort === null
+        ? `http://${defaultHost}:${httpPort}/providers/twilio`
+        : `http://${defaultHost}:${providerPort}`,
   };
 }
 
@@ -80,7 +89,8 @@ test("UI-04.1 every empty live list shows how to connect with the binary's host 
   request,
 }) => {
   const failedApiCalls = watchFailedApiCalls(page);
-  const { defaultHost, smtpPort, httpPort } = await readLiveConnection(request);
+  const { defaultHost, smtpPort, httpPort, twilioBaseUrl } =
+    await readLiveConnection(request);
   await page.goto("/mail");
 
   await expect(page.getByText("No emails yet")).toBeVisible();
@@ -99,9 +109,7 @@ test("UI-04.1 every empty live list shows how to connect with the binary's host 
 
   await navigateInApp(page, "/sms/verify");
   await expect(page.getByText("No verifications yet")).toBeVisible();
-  await expect(
-    page.getByText(`http://${defaultHost}:${httpPort}/providers/twilio`),
-  ).toBeVisible();
+  await expect(page.getByText(twilioBaseUrl, { exact: true })).toBeVisible();
 
   await navigateInApp(page, "/logs");
   await expect(page.getByText("No SMTP sessions yet")).toBeVisible();

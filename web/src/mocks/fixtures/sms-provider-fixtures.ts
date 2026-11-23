@@ -37,12 +37,13 @@ function buildTwilioProvider(): MessageProviderRecord {
     key: "twilio",
     name: "Twilio",
     area: "sms",
+    opt_out_keywords: true,
     accent: "#f22f46",
     host: "api.twilio.com",
     credentials: [
       {
         name: "account_sid",
-        value: "ACtest00000000000000000000000000",
+        value: "ACtest0000000000000000000000000000",
         is_secret: false,
       },
       { name: "auth_token", value: "twilio-test-token", is_secret: true },
@@ -148,7 +149,7 @@ function buildTwilioVerifyProvider(): MessageProviderRecord {
     credentials: [
       {
         name: "account_sid",
-        value: "ACtest00000000000000000000000000",
+        value: "ACtest0000000000000000000000000000",
         is_secret: false,
       },
       { name: "auth_token", value: "twilio-test-token", is_secret: true },

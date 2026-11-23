@@ -106,6 +106,11 @@ export function ConnectionSection() {
         appInfoQuery.data?.http_address ?? null,
         defaultHttpPort,
       ),
+      providerPort: readPort(appInfoQuery.data?.provider_address ?? null, 8026),
+      providerTlsPort: readPort(
+        appInfoQuery.data?.provider_tls_address ?? null,
+        8027,
+      ),
     },
     requestEditor.requestCustomization,
   );

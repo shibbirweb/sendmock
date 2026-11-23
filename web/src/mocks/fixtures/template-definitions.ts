@@ -1,5 +1,6 @@
 import type { HttpMethod } from "@/lib/api/types";
 import { inboundEmailTemplateDefinitions } from "@/mocks/fixtures/inbound-email-template-definitions";
+import { mailgunTemplateDefinitions } from "@/mocks/fixtures/mailgun-template-definitions";
 import { paymentTemplateDefinitions } from "@/mocks/fixtures/payment-template-definitions";
 import { twilioDebuggerTemplateDefinitions } from "@/mocks/fixtures/twilio-debugger-template-definitions";
 import { whatsappTemplateDefinitions } from "@/mocks/fixtures/whatsapp-template-definitions";
@@ -56,7 +57,7 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
       "I-Twilio-Idempotency-Token": "{{ uuid() }}",
       "User-Agent": "TwilioProxy/1.1",
     },
-    body_template: `${twilioWhatsAppProfile}SmsMessageSid={{ data.provider_id }}&NumMedia={{ data.media | length }}${twilioMediaFields}&SmsSid={{ data.provider_id }}&SmsStatus=received&Body={{ data.body | urlencode }}&To=${twilioWhatsAppPrefix}{{ data.to_number | urlencode }}${twilioMessagingService}&NumSegments={{ data.segments | default("1") }}&MessageSid={{ data.provider_id }}&AccountSid=${twilioAccountSid}&From=${twilioWhatsAppPrefix}{{ data.from_number | urlencode }}&ApiVersion=2010-04-01`,
+    body_template: `${twilioWhatsAppProfile}SmsMessageSid={{ data.provider_id }}&NumMedia={{ data.media | length }}${twilioMediaFields}&SmsSid={{ data.provider_id }}&SmsStatus=received&Body={{ data.body | urlencode }}&FromCity=&FromState=&FromZip=&FromCountry={{ data.from_country | default("") }}&ToCity=&ToState=&ToZip=&ToCountry={{ data.to_country | default("") }}&To=${twilioWhatsAppPrefix}{{ data.to_number | urlencode }}${twilioMessagingService}&NumSegments={{ data.segments | default("1") }}&MessageSid={{ data.provider_id }}&AccountSid=${twilioAccountSid}&From=${twilioWhatsAppPrefix}{{ data.from_number | urlencode }}&ApiVersion=2010-04-01`,
     doc_url: "https://www.twilio.com/docs/messaging/guides/webhook-request",
     verified_on: smsFormatsVerifiedOn,
   },
@@ -200,46 +201,7 @@ export const templateDefinitions: Record<string, TemplateDefinition> = {
       "https://developers.telnyx.com/docs/messaging/messages/receiving-webhooks",
     verified_on: verifiedOn,
   },
-  "mailgun.routes": {
-    method: "POST",
-    content_type: formType,
-    header_templates: {},
-    body_template:
-      "{% set mailgun_timestamp = event.created_at | unix %}{% set mailgun_token = random_hex(50) %}sender={{ data.from.address | urlencode }}&recipient={{ data.to[0].address | urlencode }}&subject={{ data.subject | urlencode }}&body-plain={{ data.text_body | urlencode }}&timestamp={{ mailgun_timestamp }}&token={{ mailgun_token }}&signature={{ mailgun_signature(vars.mailgun_signing_key, mailgun_timestamp, mailgun_token) }}",
-    doc_url:
-      "https://documentation.mailgun.com/docs/mailgun/user-manual/receive-forward-store/",
-    verified_on: verifiedOn,
-  },
-  "mailgun.events": {
-    method: "POST",
-    content_type: jsonType,
-    header_templates: {},
-    body_template: `{% set mailgun_timestamp = event.created_at | unix %}{% set mailgun_token = random_hex(50) %}{
-  "signature": {
-    "timestamp": "{{ mailgun_timestamp }}",
-    "token": "{{ mailgun_token }}",
-    "signature": "{{ mailgun_signature(vars.mailgun_signing_key, mailgun_timestamp, mailgun_token) }}"
-  },
-  "event-data": {
-    "id": "{{ event.id }}",
-    "timestamp": {{ mailgun_timestamp }},
-    "event": "{{ event.type | mailgun_event }}",
-    "recipient": "{{ data.to[0].address }}",{% if event.type == "email.clicked" %}
-    "url": "{{ data.url }}",{% endif %}
-    "message": {
-      "headers": {
-        "message-id": "{{ data.message_id | default(data.id) }}",
-        "from": "{{ data.from.address }}",
-        "to": "{{ data.to[0].address }}",
-        "subject": "{{ data.subject }}"
-      }
-    }
-  }
-}`,
-    doc_url:
-      "https://documentation.mailgun.com/docs/mailgun/user-manual/events/webhooks/",
-    verified_on: verifiedOn,
-  },
+  ...mailgunTemplateDefinitions,
   "postmark.webhooks": {
     method: "POST",
     content_type: jsonType,

@@ -8,7 +8,7 @@ use crate::providers::{
     ProviderWebhookTarget, build_callback_template_functions, collect_provider_credential_vars,
     find_builtin_webhook_template, load_sms_provider_definitions, render_provider_webhook_request,
 };
-use crate::sms::{RecordedHttpRequest, SmsMessage};
+use crate::sms::{RecordedHttpRequest, SmsMessage, add_number_countries};
 use crate::twilio_accounts::{apply_twilio_account_vars, find_conversation_account};
 use crate::{OperationContext, OperationError};
 
@@ -39,6 +39,7 @@ impl ReplyWebhookRequestBuilder {
         let mut message_data = serde_json::to_value(SmsMessage::from(inbound_sms))
             .map_err(|write_error| OperationError::Internal(write_error.to_string()))?;
         message_data["messaging_service_sid"] = json!(target.messaging_service_sid);
+        add_number_countries(&mut message_data);
         let mut template_vars = collect_provider_credential_vars(&providers);
         let conversation_account =
             find_conversation_account(operation_context, inbound_sms).await?;

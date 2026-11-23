@@ -12,8 +12,8 @@ import { readSmsThreadId } from "@/mocks/fixtures/sms-thread-id";
 
 type ApiRequestSpec = Omit<
   ApiRequestLogEntry,
-  "id" | "created_at" | "linked_message" | "catcher_answer"
-> & { minutesAgo: number };
+  "id" | "created_at" | "linked_message" | "catcher_answer" | "note"
+> & { minutesAgo: number; note?: string };
 
 const twilioMessagesPath =
   "/2010-04-01/Accounts/AC00000000000000000000000000000000/Messages.json";
@@ -102,6 +102,7 @@ const apiRequestSpecs: ApiRequestSpec[] = [
     response_body:
       '{"code":20003,"message":"Authenticate","more_info":"https://www.twilio.com/docs/errors/20003","status":401}',
     duration_ms: 1,
+    note: "Wrong auth token for AC00000000000000000000000000000000",
   },
 ];
 
@@ -122,11 +123,12 @@ export function buildApiRequestLogFixtures(
   );
 
   return [...apiRequestSpecs, ...fillerSpecs].map(
-    ({ minutesAgo: requestMinutesAgo, ...requestFields }) => ({
+    ({ minutesAgo: requestMinutesAgo, note, ...requestFields }) => ({
       ...requestFields,
       id: createMockUlid(minutesAgoInMs(requestMinutesAgo)),
       linked_message: null,
       catcher_answer: null,
+      note: note ?? null,
       created_at: minutesAgo(requestMinutesAgo),
     }),
   );

@@ -20,6 +20,7 @@ export function buildVirtualNumberFixtures(): VirtualNumber[] {
       messaging_service_sid: notificationsServiceSid,
       phone_number_sid: "PN00000000000000000000000000000001",
       account_sid: null,
+      opt_out_keywords: true,
       created_by: "seed",
     },
     {
@@ -35,6 +36,7 @@ export function buildVirtualNumberFixtures(): VirtualNumber[] {
       messaging_service_sid: notificationsServiceSid,
       phone_number_sid: "PN00000000000000000000000000000002",
       account_sid: null,
+      opt_out_keywords: true,
       created_by: "ui",
     },
     {
@@ -50,6 +52,7 @@ export function buildVirtualNumberFixtures(): VirtualNumber[] {
       messaging_service_sid: whatsappServiceSid,
       phone_number_sid: "PN00000000000000000000000000000003",
       account_sid: null,
+      opt_out_keywords: true,
       created_by: "mcp",
     },
   ];
@@ -73,6 +76,7 @@ export function buildMessagingServiceFixtures(
       inbound_mode: "defer_to_sender",
       inbound_url: null,
       inbound_fallback_url: null,
+      opt_out_keywords: true,
       created_by: "seed",
     },
     {
@@ -83,6 +87,7 @@ export function buildMessagingServiceFixtures(
       // Unreachable on purpose: the demo shows the fallback answering (SM-09.7).
       inbound_url: "http://app.internal:8000/whatsapp/inbound",
       inbound_fallback_url: "http://localhost:8000/whatsapp/fallback",
+      opt_out_keywords: true,
       created_by: "ui",
     },
   ];

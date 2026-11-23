@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { ProviderCredentialsEditor } from "@/features/providers/provider-credentials-editor";
+import { ProviderOptOutSwitches } from "@/features/providers/provider-opt-out-switches";
 import type { MessageProviderForm } from "@/features/providers/use-message-provider-form";
 import type { ProviderCredential } from "@/lib/api/types";
 
@@ -12,9 +13,11 @@ import type { ProviderCredential } from "@/lib/api/types";
 export function ProviderGeneralTab({
   providerForm,
   savedCredentials,
+  providerArea,
 }: {
   providerForm: MessageProviderForm;
   savedCredentials: ProviderCredential[];
+  providerArea: string;
 }) {
   const fieldIdPrefix = React.useId();
   const { providerInput, fieldErrors, updateInput } = providerForm;
@@ -120,6 +123,12 @@ export function ProviderGeneralTab({
           </p>
         </div>
       </div>
+      {providerArea === "sms" && (
+        <ProviderOptOutSwitches
+          providerForm={providerForm}
+          fieldIdPrefix={fieldIdPrefix}
+        />
+      )}
     </div>
   );
 }

@@ -45,6 +45,7 @@ pub(crate) use setup_header::{HEADER_KEY, build_setup_header, check_setup_header
 pub use setup_import_operations::{ImportSetupOperation, ValidateSetupOperation};
 pub use setup_json_schema::{build_setup_json_schema, setup_json_schema_url};
 pub(crate) use setup_preparation::prepare_setup_document;
+pub(crate) use setup_preview::preview_setup_changes;
 pub use setup_problem::SetupProblem;
 pub(crate) use setup_problem::join_location;
 pub use setup_secret_cipher::{ENCRYPTED_SECRET_PREFIX, EncryptedSecret};

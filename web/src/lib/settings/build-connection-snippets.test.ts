@@ -10,7 +10,7 @@ import {
 const localTarget = { host: "127.0.0.1", smtpPort: 1025, httpPort: 8025 };
 
 describe("buildConnectionSnippets", () => {
-  test("PL-05.5 every language gets SMTP, email, SMS and catcher snippets", () => {
+  test("PL-05.5 every language gets SMTP, email, SMS, catcher, Mailgun and Twilio snippets", () => {
     for (const language of snippetLanguages) {
       const connectionSnippets = buildConnectionSnippets(language, localTarget);
 
@@ -19,6 +19,8 @@ describe("buildConnectionSnippets", () => {
         "email-api",
         "sms",
         "catcher",
+        "mailgun",
+        "twilio",
       ]);
       for (const snippet of connectionSnippets) {
         expect(snippet.code).toContain("127.0.0.1");

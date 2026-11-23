@@ -99,6 +99,13 @@ export type EmailDetail = EmailSummary & {
   smtp_session_id: Ulid | null;
   smtp_auth_user: string | null;
   template: EmailTemplateData | null;
+  /**
+   * The id the provider's send answered, such as Mailgun's `<...@domain>`; null for mail
+   * that did not come through a provider's API (EM-24.3).
+   */
+  provider_message_id: string | null;
+  /** The send's user variables, such as Mailgun's `v:` fields; empty when it had none (EM-24.2). */
+  user_variables: Record<string, unknown>;
   /** On a reply or forward: the original email it answers. */
   response_to: EmailResponseLink | null;
   /** On an original: the replies and forwards made from it, oldest first. */

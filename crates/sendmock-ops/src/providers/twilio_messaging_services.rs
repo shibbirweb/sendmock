@@ -85,6 +85,7 @@ async fn create_service(
             inbound_mode: "defer_to_sender".to_owned(),
             inbound_url: None,
             inbound_fallback_url: None,
+            opt_out_keywords: true,
             created_by: "api".to_owned(),
             created_at_unix_ms: operation_context.clock.now_unix_ms(),
         },

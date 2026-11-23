@@ -3,8 +3,10 @@ use sendmock_webhooks::WebhookSecret;
 
 use super::endpoint_delivery_health::{add_delivery_health, add_endpoint_delivery_health};
 use super::endpoint_inputs::{
-    WebhookEndpointInput, WebhookEndpointReference, WebhookEndpointUpdate,
+    WebhookEndpointCreateInput, WebhookEndpointInput, WebhookEndpointReference,
+    WebhookEndpointUpdate,
 };
+use super::endpoint_preview_operation::build_merge_base;
 use super::endpoint_template::{choose_detached_template, write_detached_template};
 use super::endpoint_validation::validate_endpoint_input;
 use super::endpoint_view::{
@@ -87,10 +89,20 @@ impl Operation for ListWebhookEndpointsOperation {
     }
 }
 
+/// The created endpoint's fields: the given ones over a new endpoint's defaults.
+fn complete_endpoint_input(
+    create_input: WebhookEndpointCreateInput,
+) -> Result<WebhookEndpointInput, OperationError> {
+    let mut merge_base = build_merge_base(None);
+    merge_base["name"] = serde_json::Value::String(create_input.name);
+    merge_base["url"] = serde_json::Value::String(create_input.url);
+    create_input.other_fields.merge_onto(&merge_base)
+}
+
 pub struct CreateWebhookEndpointOperation;
 
 impl Operation for CreateWebhookEndpointOperation {
-    type Input = WebhookEndpointInput;
+    type Input = WebhookEndpointCreateInput;
     type Output = WebhookEndpoint;
 
     fn definition(&self) -> OperationDefinition {
@@ -109,8 +121,9 @@ impl Operation for CreateWebhookEndpointOperation {
     async fn execute(
         &self,
         operation_context: &OperationContext,
-        input: WebhookEndpointInput,
+        create_input: WebhookEndpointCreateInput,
     ) -> Result<WebhookEndpoint, OperationError> {
+        let input = complete_endpoint_input(create_input)?;
         validate_endpoint_input(&input)?;
         let detached_template =
             choose_detached_template(operation_context, &input.request_settings, None).await?;

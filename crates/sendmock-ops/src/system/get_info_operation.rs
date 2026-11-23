@@ -6,6 +6,17 @@ use crate::{
 
 const MILLISECONDS_PER_SECOND: i64 = 1000;
 
+/// Said while the provider port is off, since provider SDKs then have nothing to reach.
+pub const PROVIDER_PORT_OFF_WARNING: &str = "The provider port is off, so apps using a provider SDK (Twilio, Mailgun, ...) with SendMock's base URL get no answer. Start SendMock without --provider-addr none, or with --provider-addr <HOST:PORT>.";
+
+fn collect_warnings(instance_details: &crate::InstanceDetails) -> Vec<String> {
+    let mut warnings = Vec::new();
+    if instance_details.provider_address.is_none() {
+        warnings.push(PROVIDER_PORT_OFF_WARNING.to_owned());
+    }
+    warnings
+}
+
 pub struct GetInfoOperation;
 
 impl Operation for GetInfoOperation {
@@ -54,6 +65,7 @@ impl Operation for GetInfoOperation {
                 .iter()
                 .map(|operation| operation.definition().operation_id.to_owned())
                 .collect(),
+            warnings: collect_warnings(instance_details),
         })
     }
 }
@@ -132,6 +144,27 @@ mod tests {
             .map(|operation| operation.definition().operation_id.to_owned())
             .collect();
         assert_eq!(app_info.available_operations, served_operation_ids);
+        Ok(())
+    }
+
+    // AC: PL-24.3
+    #[tokio::test]
+    async fn warns_while_the_provider_port_is_off_and_not_once_it_is_on()
+    -> Result<(), OperationError> {
+        let operation_context = build_operation_context(1_767_225_600_000)?;
+        let mut provider_on_context = build_operation_context(1_767_225_600_000)?;
+        Arc::make_mut(&mut provider_on_context.instance_details).provider_address =
+            Some("127.0.0.1:8026".to_owned());
+
+        let provider_off_info = GetInfoOperation
+            .execute(&operation_context, NoInput {})
+            .await?;
+        let provider_on_info = GetInfoOperation
+            .execute(&provider_on_context, NoInput {})
+            .await?;
+
+        assert_eq!(provider_off_info.warnings, vec![PROVIDER_PORT_OFF_WARNING]);
+        assert!(provider_on_info.warnings.is_empty());
         Ok(())
     }
 

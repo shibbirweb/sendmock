@@ -122,6 +122,10 @@ pub(crate) async fn load_email_detail(
         .sends
         .find_send(&email.email_id)
         .await?;
+    if let Some(provider_send) = &provider_send {
+        email_detail.provider_message_id = Some(provider_send.provider_message_id.clone());
+        email_detail.user_variables = read_stored_user_variables(provider_send);
+    }
     email_detail.template = provider_send.and_then(|provider_send| {
         let template_id = provider_send.template_id?;
         let template_data = provider_send
@@ -132,6 +136,17 @@ pub(crate) async fn load_email_detail(
     });
     attach_response_links(operation_context, &mut email_detail).await?;
     Ok(email_detail)
+}
+
+/// A provider send's user variables as stored, or none.
+pub(crate) fn read_stored_user_variables(
+    provider_send: &sendmock_store::EmailProviderSendRecord,
+) -> serde_json::Map<String, serde_json::Value> {
+    provider_send
+        .user_variables_json
+        .as_deref()
+        .and_then(|user_variables_json| serde_json::from_str(user_variables_json).ok())
+        .unwrap_or_default()
 }
 
 pub struct GetLatestEmailOperation;

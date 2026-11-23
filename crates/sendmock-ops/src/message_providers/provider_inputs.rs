@@ -3,6 +3,8 @@ use std::collections::BTreeMap;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+use crate::PartialChanges;
+
 use crate::providers::{
     MessageProviderDefinition, ProviderCredential, ProviderErrorResponse, ProviderFieldMapping,
     ProviderOperation, ProviderResponseTemplate, ProviderValidationRule,
@@ -28,6 +30,14 @@ pub struct MessageProviderInput {
     pub credentials: Vec<ProviderCredential>,
     /// Off: any credentials are accepted. On: wrong ones get the `unauthorized` answer.
     pub check_credentials: bool,
+    /// SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END,
+    /// QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null
+    /// keeps the default: on for Twilio, off for others.
+    #[schemars(required, schema_with = "crate::nullable_schema::<bool>")]
+    pub opt_out_keywords: Option<bool>,
+    /// SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound
+    /// messages.
+    pub opt_out_auto_replies: bool,
     /// The requests it answers.
     pub operations: Vec<ProviderOperation>,
     /// Where each part of a sent message is read from.
@@ -51,6 +61,7 @@ pub struct MessageProviderInput {
 
 impl From<MessageProviderDefinition> for MessageProviderInput {
     fn from(provider: MessageProviderDefinition) -> Self {
+        let has_opt_out_keywords = provider.has_opt_out_keywords();
         Self {
             key: provider.key,
             name: provider.name,
@@ -59,6 +70,8 @@ impl From<MessageProviderDefinition> for MessageProviderInput {
             host: provider.host,
             credentials: provider.credentials,
             check_credentials: provider.check_credentials,
+            opt_out_keywords: Some(has_opt_out_keywords),
+            opt_out_auto_replies: provider.opt_out_auto_replies,
             operations: provider.operations,
             field_mapping: provider.field_mapping,
             validation_rules: provider.validation_rules,
@@ -89,6 +102,8 @@ impl MessageProviderInput {
             host: self.host,
             credentials: self.credentials,
             check_credentials: self.check_credentials,
+            opt_out_keywords: self.opt_out_keywords.or(stored_provider.opt_out_keywords),
+            opt_out_auto_replies: self.opt_out_auto_replies,
             operations: self.operations,
             field_mapping: self.field_mapping,
             validation_rules: self.validation_rules,
@@ -124,8 +139,9 @@ pub struct ProviderReference {
 pub struct ProviderUpdate {
     /// The provider's key, e.g. `twilio`, from its providers list.
     pub provider_key: String,
+    /// Only the fields to change; the rest, a left-out or masked secret included, stay.
     #[serde(flatten)]
-    pub changes: MessageProviderInput,
+    pub changes: PartialChanges<MessageProviderInput>,
 }
 
 #[derive(Debug, Clone, Deserialize, JsonSchema)]

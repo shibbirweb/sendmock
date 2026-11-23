@@ -16,6 +16,47 @@ Ports, database path, auth, relay SMTP and retention. Precedence, highest first:
 
 Every flag, with its variable, key and default, is in [Configuration flags](./reference/configuration-flags.md).
 
+## The startup banner
+
+When you start SendMock in a terminal (`sendmock`, `sendmock serve`, `sendmock --last` or `sendmock --services ...`), it first prints its wordmark in braille dots with the version under it, in mint fading to teal, then the launcher's questions and the startup lines. In an 80-column terminal it looks like this:
+
+```text
+⢀⣴⣿⠿⢿⣷⣦                       ⢸⣿⡇  ⣿⣿⡇    ⢰⣿⣿                  ⢸⣿⣿
+⣿⣿⠁  ⢹⣿⡇                      ⢸⣿⡇  ⣿⣿⣷    ⣾⣿⣿                  ⢸⣿⣿
+⢻⣿⣆⡀  ⠉   ⣤⣶⣶⣶⣤  ⢰⣶⣆⣠⣶⣶⣦  ⢀⣴⣶⣦⣼⣿⡇  ⣿⡿⣿⡆  ⢠⣿⢹⣿   ⣠⣶⣶⣶⣤   ⣠⣶⣶⣶⣦⡀ ⢸⣿⣿  ⣰⣶⡖
+ ⠻⢿⣿⣦⡀   ⢸⣿⡏ ⢸⣿⡇ ⢸⣿⡏⠁⠈⣿⣿  ⣾⣿⠁ ⢹⣿⡇  ⣿⡇⢹⣧  ⣼⡟⢸⣿  ⢸⣿⡏ ⢸⣿⣇ ⢰⣿⡏ ⠈⣿⣧ ⢸⣿⣿ ⣴⣿⠏
+   ⠙⢿⣿⣦⡀ ⣾⣿⣧⣤⣼⣿⡇ ⢸⣿⡇  ⣿⣿  ⣿⣿  ⢸⣿⡇  ⣿⡇⠈⣿⡀⢀⣿⠃⢸⣿  ⢸⣿⡇ ⢸⣿⣿ ⢸⣿⡇  ⠉⠉ ⢸⣿⣿⣾⣿⡏
+⣠⣤   ⠹⣿⣧ ⣿⣿⡏⠉⠉⠉⠁ ⢸⣿⡇  ⣿⣿  ⣿⣿  ⢸⣿⡇  ⣿⡇ ⢻⣇⢸⡟ ⢸⣿  ⢸⣿⡇ ⢸⣿⣿ ⢸⣿⡇  ⣀⣀ ⢸⣿⣿⠃⢿⣿⡀
+⢻⣿⣆  ⢀⣿⡿ ⢸⣿⡇ ⢸⣿⡇ ⢸⣿⡇  ⣿⣿  ⣿⣿⡀ ⢸⣿⡇  ⣿⡇ ⠘⣿⣿⠃ ⢸⣿  ⢸⣿⡇ ⢸⣿⡏ ⢸⣿⡇  ⣿⡿ ⢸⣿⣿ ⠘⣿⣧
+ ⠻⢿⣿⣾⡿⠟⠁ ⠈⠻⣿⣶⣿⠿⠁ ⢸⣿⡇  ⣿⣿  ⠘⢿⣷⡶⢿⣿⡇  ⣿⡇  ⢻⡿  ⢸⣿  ⠈⠻⣿⣶⣿⠿⠁  ⠻⢿⣶⣾⠿⠃ ⢸⣿⣿  ⠹⣿⣇
+                                                                 v1.5.0
+```
+
+- **Size:** the wordmark is the tallest that fits the terminal's width, from 5 lines (about 46 columns) to 12 lines (about 108 columns).
+- **One line instead:** a narrower terminal, one whose width cannot be read, or one that cannot show braille prints `SendMock v1.5.0` instead. On Linux and macOS braille needs a UTF-8 locale (`LANG`, `LC_CTYPE` or `LC_ALL` ending in `UTF-8`); on Windows it shows in Windows Terminal and in terminals such as VS Code's, since the classic console's fonts have no braille.
+- **Colour:** 24-bit colour when `COLORTERM` is `truecolor` or `24bit`, 256 colours otherwise, and no colour with `NO_COLOR` set or `TERM=dumb`.
+- **Never printed** when stdout is not a terminal (a pipe, a file, systemd, the tray app, Docker without `-t`, CI logs), with `--ready-json` or `--log-format json`, for `sendmock mcp`, for client commands and for `sendmock --version` and `sendmock version`. Scripts and log collectors see the same output as before.
+
+Turn it off with any of these:
+
+- the flag:
+
+```bash
+sendmock serve --no-banner
+```
+
+- the environment variable:
+
+```bash
+SENDMOCK_NO_BANNER=1 sendmock serve
+```
+
+- the key in `sendmock.toml`:
+
+```toml
+banner = false
+```
+
 ## Choose what starts: the launcher
 
 Run `sendmock` alone in a terminal and it asks which services to start: the web UI, REST API and MCP (always on), SMTP (always on), SMTPS, the provider APIs over HTTP and HTTPS, the HTTP Catcher's catch-all port and POP3, each with its address.

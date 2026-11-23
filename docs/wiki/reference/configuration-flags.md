@@ -13,7 +13,7 @@ Each setting can come from a flag, a `SENDMOCK_*` environment variable or a key 
 | `--http-addr <HOST:PORT>` | `SENDMOCK_HTTP_ADDR` | `http_addr` | `127.0.0.1:8025` | Address for the web UI, REST API and MCP. |
 | `--smtp-addr <HOST:PORT>` | `SENDMOCK_SMTP_ADDR` | `smtp_addr` | `127.0.0.1:1025` | Address for the SMTP listener. |
 | `--smtps-addr <HOST:PORT>` | `SENDMOCK_SMTPS_ADDR` | `smtps_addr` |  | Address for the SMTPS listener (TLS from the first byte); off unless set. |
-| `--provider-addr <HOST:PORT>` | `SENDMOCK_PROVIDER_ADDR` | `provider_addr` |  | Address that serves the provider APIs at their real paths, for SDKs with a swapped base URL; off unless set. |
+| `--provider-addr <HOST:PORT\|none>` | `SENDMOCK_PROVIDER_ADDR` | `provider_addr` | `127.0.0.1:8026` | Address that serves the provider APIs at their real paths, for SDKs with a swapped base URL; `none` turns it off. |
 | `--provider-tls-addr <HOST:PORT>` | `SENDMOCK_PROVIDER_TLS_ADDR` | `provider_tls_addr` |  | Address that serves the provider APIs over HTTPS, next to --provider-addr; off unless set. |
 | `--provider-tls-cert <FILE>` | `SENDMOCK_PROVIDER_TLS_CERT` | `provider_tls_cert` | one from SendMock's local CA | Certificate (PEM) for --provider-tls-addr. |
 | `--provider-tls-key <FILE>` | `SENDMOCK_PROVIDER_TLS_KEY` | `provider_tls_key` |  | Private key (PEM) for `--provider-tls-cert`. |
@@ -52,3 +52,4 @@ Each setting can come from a flag, a `SENDMOCK_*` environment variable or a key 
 | `--last` |  |  |  | Start the services the launcher saved last, without asking; flags given with it win. |
 | `--services <LIST>` | `SENDMOCK_SERVICES` |  |  | Start these services on their saved or default addresses, without asking: smtp, smtps, provider, provider-tls, catcher, pop3 (comma-separated). |
 | `--no-input` | `SENDMOCK_NO_INPUT` |  |  | Never ask questions, even at a terminal. |
+| `--no-banner` | `SENDMOCK_NO_BANNER` |  |  | Start without the SendMock wordmark a terminal shows first; `banner = false` in sendmock.toml does the same. |

@@ -5,13 +5,14 @@ use super::integration_snippet::{
     IntegrationSnippet, SnippetTarget, build_catcher_snippet, build_smtp_snippet, find_app_host,
     find_snippet_language,
 };
+use super::provider_snippet::{ProviderSnippetTarget, build_mailgun_snippet, build_twilio_snippet};
 use crate::{HttpMethod, Operation, OperationContext, OperationDefinition, OperationError};
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct IntegrationRequest {
     /// Your app's stack: a language (`laravel`, `node`, `python`, `go`, `java`, `ruby`, `dotnet`, `curl`) or a framework (`php`, `express`, `nestjs`, `django`, `flask`, `fastapi`, `spring`, `rails`, `aspnet`).
     pub stack: String,
-    /// email, sms or http (default email).
+    /// email, http, mailgun or twilio (default email).
     pub channel: Option<String>,
     /// Where the app runs: local, docker-host or compose.
     pub host: Option<String>,
@@ -56,6 +57,9 @@ impl Operation for GetIntegrationOperation {
         let code = match channel.as_str() {
             "email" => build_smtp_snippet(language, &target),
             "http" => build_catcher_snippet(&target),
+            "mailgun" | "twilio" => {
+                build_provider_channel_snippet(operation_context, &channel, language, &target)
+            }
             other_channel => {
                 return Err(OperationError::NotFound {
                     message: format!("No {other_channel} snippets in this version yet"),
@@ -69,6 +73,39 @@ impl Operation for GetIntegrationOperation {
             language: language.to_owned(),
             code,
         })
+    }
+}
+
+/// Mailgun's or Twilio's settings, on the provider ports this instance uses (or the defaults).
+fn build_provider_channel_snippet(
+    operation_context: &OperationContext,
+    channel: &str,
+    language: &str,
+    target: &SnippetTarget,
+) -> String {
+    let instance_details = &operation_context.instance_details;
+    let provider_target = ProviderSnippetTarget {
+        host: &target.host,
+        provider_port: read_port(
+            instance_details
+                .provider_address
+                .as_deref()
+                .unwrap_or_default(),
+            8026,
+        ),
+        provider_tls_port: read_port(
+            instance_details
+                .provider_tls
+                .as_ref()
+                .map(|provider_tls| provider_tls.address.as_str())
+                .unwrap_or_default(),
+            8027,
+        ),
+    };
+    if channel == "mailgun" {
+        build_mailgun_snippet(language, &provider_target)
+    } else {
+        build_twilio_snippet(language, &provider_target)
     }
 }
 

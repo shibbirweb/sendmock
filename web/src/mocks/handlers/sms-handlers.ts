@@ -107,7 +107,13 @@ export const smsHandlers = [
       );
     });
 
-    return HttpResponse.json(smsMessage);
+    return HttpResponse.json({
+      ...smsMessage,
+      status_callback_timing:
+        smsMessage.status_callback_url === null
+          ? "No status callback: the message has no status callback URL."
+          : `The status callback is sent to ${smsMessage.status_callback_url} now, in the background, and retried if your app does not answer with a 2xx. Later simulated steps no longer change a final status.`,
+    });
   }),
 
   http.post("*/api/v1/sms/:smsId/reply-webhook/resend", async ({ params }) => {

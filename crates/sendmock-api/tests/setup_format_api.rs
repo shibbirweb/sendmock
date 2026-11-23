@@ -187,7 +187,7 @@ async fn reset_restores_exactly_the_new_sections_of_the_seed() {
 
     let (status, _) = call_api(&app_router, "POST", "/api/v1/reset", None).await;
 
-    assert_eq!(status, 204);
+    assert_eq!(status, 200);
     assert_eq!(export_setup(&app_router).await, seeded_export);
 }
 

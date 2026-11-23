@@ -5,6 +5,7 @@ import type {
   ManualSendRequest,
   RevealedEndpointSecret,
   RotateSecretRequest,
+  WebhookEndpointCreateInput,
   WebhookEndpointInput,
 } from "@/lib/api/types";
 import { validateWebhookEndpointInput } from "@/lib/webhooks/validate-webhook-endpoint";
@@ -20,7 +21,10 @@ import { routeDeliveryToCatcher } from "@/mocks/http/route-delivery-to-catcher";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 import { buildManualDelivery } from "@/mocks/webhooks/build-manual-delivery";
 import { buildTestDelivery } from "@/mocks/webhooks/build-test-delivery";
-import { renderEndpointRequest } from "@/mocks/webhooks/render-endpoint-request";
+import {
+  newEndpointDefaults,
+  renderEndpointRequest,
+} from "@/mocks/webhooks/render-endpoint-request";
 import {
   generateEndpointSecret,
   maskEndpointSecret,
@@ -78,7 +82,10 @@ export const webhookEndpointHandlers = [
 
   http.post("*/api/v1/webhooks/endpoints", async ({ request }) => {
     await applyMockConditions();
-    const endpointInput = (await request.json()) as WebhookEndpointInput;
+    const endpointInput: WebhookEndpointInput = {
+      ...newEndpointDefaults,
+      ...((await request.json()) as WebhookEndpointCreateInput),
+    };
     const validationError = readValidationError(endpointInput);
     if (validationError !== undefined) {
       return createErrorResponse(400, "validation_failed", validationError);

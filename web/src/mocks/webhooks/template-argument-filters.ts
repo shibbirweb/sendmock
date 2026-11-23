@@ -57,6 +57,8 @@ export const argumentFilters: Record<string, ArgumentFilter> = {
     String(filterInput).split(searchText).join(replacementText),
   regex_extract: (filterInput, [patternText = ""]) =>
     new RegExp(patternText).exec(String(filterInput))?.[0] ?? "",
+  regex_replace: (filterInput, [patternText = "", replacementText = ""]) =>
+    String(filterInput).replace(new RegExp(patternText, "g"), replacementText),
   date: (filterInput, [formatText = "%Y-%m-%dT%H:%M:%SZ"]) =>
     formatUtcDate(filterInput, formatText),
   payment_event: (filterInput, [provider = ""]) =>

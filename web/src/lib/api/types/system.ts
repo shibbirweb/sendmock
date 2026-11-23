@@ -39,6 +39,11 @@ export type ApiRequestLogEntry = {
   linked_message: ApiRequestLinkedMessage | null;
   /** The attached bin and rule that answered; null when SendMock answered itself. */
   catcher_answer: ApiRequestCatcherAnswer | null;
+  /**
+   * Why SendMock answered as it did when the answer alone does not say, such as the reason for a Twilio 401; null otherwise.
+   * @example "Wrong auth token for AC22222222222222222222222222222222"
+   */
+  note: string | null;
   created_at: IsoTimestamp;
 };
 
@@ -195,6 +200,11 @@ export type AppInfo = {
    * rest (UI-12).
    */
   available_operations: string[];
+  /**
+   * Setup worth fixing, such as the provider port being off; empty when there is
+   * nothing (PL-24.3).
+   */
+  warnings: string[];
 };
 
 /** What `POST /api/v1/samples/{kind}` can create (UI-04.2). */
@@ -295,6 +305,11 @@ export type AppSettings = {
    * @example true
    */
   fire_opened_events_on_view: boolean;
+  /**
+   * On: a view counts as an open even when a webhook rule would send `email.opened` to your app. Off (the default): such a view is not counted (EM-27.2).
+   * @example false
+   */
+  count_views_with_webhook_rules: boolean;
   /**
    * `first_open` fires on the first view only, `every_open` on each view.
    * @example "first_open"
@@ -465,23 +480,4 @@ export type UpdateCheckResult = {
 /** Answer of `GET /health`. */
 export type HealthStatus = {
   status: "ok";
-};
-
-/** SendMock's local CA, to trust for the HTTPS provider port (PL-20). */
-export type TlsCertificateAuthority = {
-  /**
-   * Where the CA certificate is on the machine SendMock runs on.
-   * @example "/home/sam/.local/share/sendmock/provider-ca-certificate.pem"
-   */
-  path: string;
-  /**
-   * The CA certificate (PEM), to add to a trust store or `NODE_EXTRA_CA_CERTS`.
-   * @example "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----\n"
-   */
-  pem: string;
-  /**
-   * The provider APIs over HTTPS.
-   * @example "127.0.0.1:8027"
-   */
-  provider_tls_address: string;
 };

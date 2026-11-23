@@ -15,6 +15,7 @@ pub async fn run_operation_command(matched_operation: &MatchedOperation) -> Resu
     let command_matches = &matched_operation.command_matches;
     let definition = matched_operation.operation.definition();
     if definition.is_destructive
+        && definition.server_confirmation_input.is_none()
         && !command_matches
             .try_get_one::<bool>("yes")
             .ok()

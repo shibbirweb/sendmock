@@ -5,6 +5,7 @@ use super::provider_call::ProviderCall;
 use super::request_checks::has_valid_credentials;
 use super::send_operation_kind::ProviderAnswer;
 use super::twilio_answers::answer_twilio_error;
+use super::twilio_unauthorized_reason::describe_unauthorized_reason;
 use crate::twilio_accounts::{TwilioAccountDirectory, TwilioAccountStatus};
 use crate::{OperationContext, OperationError};
 
@@ -15,8 +16,8 @@ const ACCOUNT_SID_PATH_PARAM: &str = "AccountSid";
 pub enum TwilioAccountCheck {
     /// Not a Twilio request, or one the account may make.
     Allowed,
-    /// The credentials match no account.
-    Unauthorized,
+    /// The credentials match no account, with why, for the request log.
+    Unauthorized(String),
     /// Twilio's answer for a suspended or closed subaccount; nothing is stored.
     Refused(ProviderAnswer),
 }
@@ -33,7 +34,7 @@ pub async fn check_twilio_account(
         return Ok(if has_provider_credentials {
             TwilioAccountCheck::Allowed
         } else {
-            TwilioAccountCheck::Unauthorized
+            TwilioAccountCheck::Unauthorized("The credentials do not match".to_owned())
         });
     }
     let directory = TwilioAccountDirectory::load(operation_context).await?;
@@ -46,12 +47,23 @@ pub async fn check_twilio_account(
                 .iter()
                 .find(|subaccount| &subaccount.account_sid == account_sid)
         });
+    let basic_credentials = read_basic_credentials(provider_call);
     let has_subaccount_credentials = path_account.is_some_and(|subaccount| {
         !subaccount.auth_token.is_empty()
-            && read_basic_password(provider_call).as_deref() == Some(subaccount.auth_token.as_str())
+            && basic_credentials
+                .as_ref()
+                .is_some_and(|(_, password)| password == &subaccount.auth_token)
     });
     if !has_provider_credentials && !has_subaccount_credentials {
-        return Ok(TwilioAccountCheck::Unauthorized);
+        let reason = describe_unauthorized_reason(
+            &directory,
+            provider_call
+                .path_params
+                .get(ACCOUNT_SID_PATH_PARAM)
+                .map(String::as_str),
+            basic_credentials.as_ref(),
+        );
+        return Ok(TwilioAccountCheck::Unauthorized(reason));
     }
     let is_inactive =
         path_account.is_some_and(|subaccount| subaccount.status != TwilioAccountStatus::Active);
@@ -63,8 +75,8 @@ pub async fn check_twilio_account(
     Ok(TwilioAccountCheck::Allowed)
 }
 
-/// The password of the request's Basic auth, which Twilio's SDKs send as SID and token.
-fn read_basic_password(provider_call: &ProviderCall<'_>) -> Option<String> {
+/// The SID and token of the request's Basic auth, as Twilio's SDKs send them.
+fn read_basic_credentials(provider_call: &ProviderCall<'_>) -> Option<(String, String)> {
     provider_call
         .request
         .header("authorization")
@@ -74,6 +86,6 @@ fn read_basic_password(provider_call: &ProviderCall<'_>) -> Option<String> {
         .and_then(|credentials| {
             credentials
                 .split_once(':')
-                .map(|(_, password)| password.to_owned())
+                .map(|(account_sid, password)| (account_sid.to_owned(), password.to_owned()))
         })
 }

@@ -78,6 +78,55 @@ impl EmailDeliveryEvent {
             other_event => other_event.delivery_status().to_owned(),
         }
     }
+
+    /// The bounce a timeline entry describes, read back from `describe`'s words wherever they
+    /// sit in the entry (after the recipient, before ` (simulated)`), so a stored bounce keeps
+    /// its type, code and reason without a column of its own.
+    pub fn read_described_bounce(timeline_detail: &str) -> Option<Self> {
+        let (before_marker, after_marker) = timeline_detail.split_once(BOUNCE_MARKER)?;
+        let bounce_type = match before_marker.rsplit(' ').next()? {
+            "hard" => BounceType::Hard,
+            "soft" => BounceType::Soft,
+            _ => return None,
+        };
+        let described = after_marker
+            .strip_suffix(SIMULATED_SUFFIX)
+            .unwrap_or(after_marker);
+        let mut words = described.splitn(3, ' ');
+        let basic_code = words.next()?.to_owned();
+        let (smtp_code, diagnostic) = match (words.next(), words.next()) {
+            (Some(enhanced_code), rest) if is_enhanced_code(enhanced_code) => (
+                format!("{basic_code} {enhanced_code}"),
+                rest.unwrap_or_default().to_owned(),
+            ),
+            (Some(first_word), rest) => (
+                basic_code,
+                [Some(first_word), rest]
+                    .into_iter()
+                    .flatten()
+                    .collect::<Vec<_>>()
+                    .join(" "),
+            ),
+            (None, _) => (basic_code, String::new()),
+        };
+        Some(Self::Bounced {
+            bounce_type,
+            smtp_code,
+            diagnostic,
+        })
+    }
+}
+
+const BOUNCE_MARKER: &str = " bounce, ";
+const SIMULATED_SUFFIX: &str = " (simulated)";
+
+/// `5.1.1`: the enhanced status code that follows the basic one.
+fn is_enhanced_code(word: &str) -> bool {
+    let parts: Vec<&str> = word.split('.').collect();
+    parts.len() == 3
+        && parts.iter().all(|part| {
+            !part.is_empty() && part.chars().all(|character| character.is_ascii_digit())
+        })
 }
 
 #[cfg(test)]
@@ -90,6 +139,30 @@ mod tests {
 
         assert_eq!(bounce.delivery_status(), "bounced");
         assert_eq!(bounce.describe(), "hard bounce, 550 5.1.1 user unknown");
+    }
+
+    #[test]
+    fn a_described_bounce_reads_back_as_it_was() {
+        for bounce in [
+            EmailDeliveryEvent::bounce_of_type(BounceType::Hard),
+            EmailDeliveryEvent::soft_bounce(),
+            EmailDeliveryEvent::hard_bounce("rejected"),
+        ] {
+            let timeline_detail = format!("sam@shop.test: {} (simulated)", bounce.describe());
+
+            assert_eq!(
+                EmailDeliveryEvent::read_described_bounce(&timeline_detail),
+                Some(bounce.clone())
+            );
+            assert_eq!(
+                EmailDeliveryEvent::read_described_bounce(&bounce.describe()),
+                Some(bounce.clone())
+            );
+        }
+        assert_eq!(
+            EmailDeliveryEvent::read_described_bounce("sam@shop.test: delivered"),
+            None
+        );
     }
 
     #[test]

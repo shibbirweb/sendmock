@@ -22,6 +22,7 @@ pub fn prepare_setup_document(
     let instance_details = &operation_context.instance_details;
     let update_version = setup_header.exported_by.as_deref().unwrap_or("latest");
     let upgrade_command = operation_context
+        .machine
         .update_checker
         .build_upgrade_command_to(instance_details.channel, update_version);
     if let Some(refusal) = version_policy.describe_refusal(

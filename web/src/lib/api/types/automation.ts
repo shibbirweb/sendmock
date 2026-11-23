@@ -37,7 +37,8 @@ export type SampleOptions = WebhookChoice & {
   html?: string;
 };
 
-export type IntegrationChannel = "email" | "sms" | "http";
+export type IntegrationChannel =
+  "email" | "sms" | "http" | "mailgun" | "twilio";
 
 /** Answer of GET /api/v1/integrations/{stack}: copy-ready settings, as Settings > Connection shows. */
 export type IntegrationSnippet = {

@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 
+use crate::PartialChanges;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -55,6 +56,14 @@ pub struct HttpBinInput {
 pub struct HttpBinUpdate {
     /// The bin's ID, from `GET /api/v1/http/bins`.
     pub bin_id: String,
+    /// Only the fields to change; the rest of the answer stays.
+    #[serde(flatten)]
+    pub changes: PartialChanges<HttpBinChanges>,
+}
+
+/// What a bin's PATCH can change.
+#[derive(Debug, Clone, Deserialize, JsonSchema)]
+pub struct HttpBinChanges {
     pub default_response: HttpMockResponse,
 }
 

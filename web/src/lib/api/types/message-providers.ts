@@ -56,6 +56,16 @@ export type MessageProviderDefinition = {
    */
   check_credentials: boolean;
   /**
+   * SMS: Twilio's Advanced Opt-Out. An inbound STOP (STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT) blocks later sends to the contact with 21610 until START, YES or UNSTOP. Null keeps the default: on for Twilio, off for others.
+   * @example true
+   */
+  opt_out_keywords: boolean | null;
+  /**
+   * SMS: answer STOP, START and HELP with Twilio's default replies, stored as outbound messages.
+   * @example false
+   */
+  opt_out_auto_replies: boolean;
+  /**
    * The requests it answers.
    */
   operations: ProviderOperation[];

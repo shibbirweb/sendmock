@@ -104,6 +104,7 @@ export function WebhookTargetsRow({
                   webhookTargets.chosenEndpointIds ??
                   webhookTargets.matchedEndpointIds,
                 initialRequestEdits: webhookTargets.requestEdits,
+                initialUserVariables: webhookTargets.userVariables,
                 confirmLabel: "Use these",
                 onConfirm: webhookTargets.applyChoice,
               });

@@ -6,7 +6,7 @@ use super::{ApiRequestFilter, ApiRequestPage, ApiRequestRecord, CatcherAnswerRec
 use crate::{Database, StoreError};
 
 const REQUEST_COLUMNS: &str = "id, api, method, path, request_headers, request_body, response_status, response_body, \
-     duration_ms, linked_message_kind, linked_message_id, created_at, catcher_bin_name, catcher_rule_name";
+     duration_ms, linked_message_kind, linked_message_id, created_at, catcher_bin_name, catcher_rule_name, note";
 
 /// Filters shared by the count and the page; `?1` to `?3` are the filter values.
 const FILTER_CONDITIONS: &str = "(?1 IS NULL OR api = ?1) \
@@ -33,7 +33,7 @@ impl ApiRequestRepository {
                     .map(|catcher_answer| (catcher_answer.bin_name, catcher_answer.rule_name))
                     .unzip();
                 connection.execute(
-                    &format!("INSERT INTO api_requests ({REQUEST_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)"),
+                    &format!("INSERT INTO api_requests ({REQUEST_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15)"),
                     params![
                         request.request_id,
                         request.api,
@@ -49,6 +49,7 @@ impl ApiRequestRepository {
                         request.created_at_unix_ms,
                         catcher_bin_name,
                         catcher_rule_name.flatten(),
+                        request.note,
                     ],
                 )?;
                 Ok(())
@@ -167,6 +168,7 @@ fn read_request_row(row: &Row<'_>) -> rusqlite::Result<ApiRequestRecord> {
                 })
             })
             .transpose()?,
+        note: row.get(14)?,
         created_at_unix_ms: row.get(11)?,
     })
 }
@@ -201,6 +203,7 @@ mod tests {
             linked_message: (response_status < 300)
                 .then(|| ("email".to_owned(), format!("email-{request_id}"))),
             catcher_answer: None,
+            note: None,
             created_at_unix_ms: 1,
         }
     }

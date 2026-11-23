@@ -19,6 +19,9 @@ pub struct McpToolCatalog {
     tools: Vec<(McpToolDefinition, Vec<Arc<dyn ErasedOperation>>)>,
     /// Every operation, for the resources, whichever toolsets are on.
     all_operations: Vec<Arc<dyn ErasedOperation>>,
+    /// The tools this server leaves out, so a call to one says how to turn it on.
+    hidden_tools: Vec<McpToolDefinition>,
+    tool_filter: ToolFilter,
     operation_runner: Arc<dyn OperationRunner>,
 }
 
@@ -28,14 +31,17 @@ impl McpToolCatalog {
         tool_filter: &ToolFilter,
         operation_runner: Arc<dyn OperationRunner>,
     ) -> Self {
-        let tools = build_tool_definitions(operation_registry)
+        let (exposed_definitions, hidden_tools): (Vec<_>, Vec<_>) =
+            build_tool_definitions(operation_registry)
+                .into_iter()
+                .partition(|tool_definition| {
+                    tool_filter.allows(
+                        &tool_definition.toolset,
+                        tool_definition.annotations.read_only_hint,
+                    )
+                });
+        let tools = exposed_definitions
             .into_iter()
-            .filter(|tool_definition| {
-                tool_filter.allows(
-                    &tool_definition.toolset,
-                    tool_definition.annotations.read_only_hint,
-                )
-            })
             .map(|tool_definition| {
                 let tool_operations = operation_registry
                     .operations()
@@ -54,6 +60,8 @@ impl McpToolCatalog {
         Self {
             tools,
             all_operations: operation_registry.operations().to_vec(),
+            hidden_tools,
+            tool_filter: tool_filter.clone(),
             operation_runner,
         }
     }
@@ -111,7 +119,7 @@ impl McpToolCatalog {
                     .iter()
                     .any(|alias| alias == tool_name)
         }) else {
-            return ToolOutcome::Failure(format!("No tool named {tool_name}"));
+            return ToolOutcome::Failure(self.describe_missing_tool(tool_name));
         };
         let (selected_operation, input) = match select_operation(tool_operations, arguments) {
             Ok(selection) => selection,
@@ -125,6 +133,34 @@ impl McpToolCatalog {
             Ok(operation_answer) => ToolOutcome::Answer(operation_answer),
             Err(failure_message) => ToolOutcome::Failure(failure_message),
         }
+    }
+}
+
+impl McpToolCatalog {
+    /// Why a tool is not here: its toolset is off, `--read-only` hides it, or there is none.
+    fn describe_missing_tool(&self, tool_name: &str) -> String {
+        let Some(hidden_tool) = self.hidden_tools.iter().find(|tool_definition| {
+            tool_definition.name == tool_name
+                || tool_definition
+                    .aliases
+                    .iter()
+                    .any(|alias| alias == tool_name)
+        }) else {
+            return format!("No tool named {tool_name}");
+        };
+        let toolset = &hidden_tool.toolset;
+        let is_toolset_on = self.tool_filter.allows(toolset, true);
+        if is_toolset_on {
+            return format!(
+                "{tool_name} changes data, and this MCP server runs with --read-only; start it without --read-only to use it"
+            );
+        }
+        let mut wanted_toolsets = self.tool_filter.toolsets.clone().unwrap_or_default();
+        wanted_toolsets.push(toolset.clone());
+        format!(
+            "{tool_name} is in the `{toolset}` toolset, which this MCP server does not expose; start it with `sendmock mcp --toolsets {}` (or `--toolsets all`)",
+            wanted_toolsets.join(",")
+        )
     }
 }
 
@@ -213,6 +249,27 @@ mod tests {
             let operation_id = operation.definition().operation_id;
             Box::pin(async move { Ok(OperationAnswer::Json(json!(operation_id))) })
         }
+    }
+
+    // AC: AI-08.4
+    #[tokio::test]
+    async fn a_call_to_a_tool_whose_toolset_is_off_names_the_toolset_to_turn_on() {
+        let tool_catalog = McpToolCatalog::new(
+            &sendmock_ops::build_operation_registry(),
+            &ToolFilter::from_settings(Some("email"), false),
+            Arc::new(NamingRunner),
+        );
+
+        let outcome = tool_catalog.call_tool("sendmock_reset", Map::new()).await;
+
+        let ToolOutcome::Failure(failure_message) = outcome else {
+            panic!("a hidden tool must not run");
+        };
+        assert!(
+            failure_message.contains("`admin` toolset")
+                && failure_message.contains("--toolsets email,admin"),
+            "{failure_message}"
+        );
     }
 
     #[tokio::test]

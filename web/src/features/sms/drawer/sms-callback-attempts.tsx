@@ -1,7 +1,7 @@
 import { ChevronRightIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { smsStatusLabels } from "@/features/sms/sms-labels";
+import { smsCallbackLabels } from "@/features/sms/sms-labels";
 import { RecordedExchange } from "@/features/sms/drawer/recorded-exchange";
 import type {
   RecordedHttpResponse,
@@ -32,7 +32,7 @@ function SmsCallbackAttemptRow({
         <summary className="flex list-none flex-wrap items-center gap-2 px-3 py-2 text-sm [&::-webkit-details-marker]:hidden">
           <ChevronRightIcon className="size-4 shrink-0 text-muted-foreground transition-transform group-open/callback:rotate-90 motion-reduce:transition-none" />
           <span className="font-medium">
-            {smsStatusLabels[callbackAttempt.reported_status]}
+            {smsCallbackLabels[callbackAttempt.reported_status]}
           </span>
           <span className="text-xs text-muted-foreground">
             Attempt {callbackAttempt.attempt}

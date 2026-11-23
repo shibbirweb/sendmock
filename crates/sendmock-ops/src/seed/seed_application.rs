@@ -98,17 +98,18 @@ pub async fn apply_setup_text(
 }
 
 /// Applies the seed applied last again and deletes the configuration it does not hold, as
-/// reset restores exactly the seed state; nothing happens when no seed was ever applied.
+/// reset restores exactly the seed state; answers false, changing nothing, when no seed was
+/// ever applied.
 pub async fn restore_seed_state(
     operation_context: &OperationContext,
-) -> Result<(), OperationError> {
+) -> Result<bool, OperationError> {
     let Some(seed_state) = operation_context
         .setup_stores
         .seed_state
         .find_state()
         .await?
     else {
-        return Ok(());
+        return Ok(false);
     };
     apply_seed_document(
         operation_context,
@@ -122,7 +123,22 @@ pub async fn restore_seed_state(
         seed_state.seed_toml,
         seed_state.source_path,
     )
-    .await
+    .await?;
+    Ok(true)
+}
+
+/// Removes every configured item and puts the settings and providers back to what SendMock
+/// ships with, as replacing with an empty setup does, and forgets the seed applied last.
+pub async fn remove_all_configuration(
+    operation_context: &OperationContext,
+) -> Result<(), OperationError> {
+    apply_seed_document(operation_context, "", None, SetupImportMode::Replace).await?;
+    operation_context
+        .setup_stores
+        .seed_state
+        .delete_state()
+        .await?;
+    Ok(())
 }
 
 /// The configuration as seed items, section by section in apply order.
@@ -160,7 +176,7 @@ fn describe_invalid_setup(setup_check: &SetupCheck) -> OperationError {
 
 /// Applies every section in order. Replace first puts the settings back to their defaults and
 /// afterwards removes the items the file does not hold, as reset does.
-async fn apply_seed_document(
+pub(crate) async fn apply_seed_document(
     operation_context: &OperationContext,
     seed_toml: &str,
     passphrase: Option<&str>,

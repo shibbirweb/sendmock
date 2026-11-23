@@ -3,7 +3,7 @@ use sendmock_store::MessagingServiceRecord;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-use crate::numbers::{MessagingServiceInput, build_messaging_service};
+use crate::numbers::{MessagingServiceInput, build_messaging_service, is_messaging_service_sid};
 use crate::seed::seed_section_adapter::{
     CREATED_BY_SEED, SeedItem, impl_seed_section_adapter, read_seed_table, to_api_input,
     write_seed_table,
@@ -24,19 +24,21 @@ struct SeedMessagingService {
     inbound_url: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     inbound_fallback_url: Option<String>,
+    /// `false` turns opt-out keywords off for the service's numbers.
+    #[serde(default = "is_on", skip_serializing_if = "is_on_value")]
+    opt_out_keywords: bool,
+}
+
+fn is_on() -> bool {
+    true
+}
+
+fn is_on_value(opt_out_keywords: &bool) -> bool {
+    *opt_out_keywords
 }
 
 fn default_inbound_mode() -> String {
     "defer_to_sender".to_owned()
-}
-
-/// `MG` and 32 hex digits, as Twilio writes Messaging Service SIDs.
-fn is_messaging_service_sid(service_sid: &str) -> bool {
-    service_sid.len() == 34
-        && service_sid.starts_with("MG")
-        && service_sid[2..]
-            .chars()
-            .all(|character| character.is_ascii_hexdigit())
 }
 
 pub struct MessagingServiceSeedAdapter;
@@ -64,6 +66,7 @@ impl MessagingServiceSeedAdapter {
                 inbound_mode: default_inbound_mode(),
                 inbound_url: None,
                 inbound_fallback_url: None,
+                opt_out_keywords: true,
                 created_by: CREATED_BY_SEED.to_owned(),
                 created_at_unix_ms: operation_context.clock.now_unix_ms(),
             });
@@ -73,6 +76,7 @@ impl MessagingServiceSeedAdapter {
             "inbound_mode": seed_service.inbound_mode,
             "inbound_url": seed_service.inbound_url,
             "inbound_fallback_url": seed_service.inbound_fallback_url,
+            "opt_out_keywords": seed_service.opt_out_keywords,
         }))?;
         let mut seeded_service =
             build_messaging_service(operation_context, service_input, Some(existing_service))
@@ -102,6 +106,7 @@ impl MessagingServiceSeedAdapter {
                         inbound_mode: stored_service.inbound_mode,
                         inbound_url: stored_service.inbound_url,
                         inbound_fallback_url: stored_service.inbound_fallback_url,
+                        opt_out_keywords: stored_service.opt_out_keywords,
                     })?,
                 })
             })

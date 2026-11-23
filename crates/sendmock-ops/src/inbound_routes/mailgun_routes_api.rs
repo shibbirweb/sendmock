@@ -21,7 +21,7 @@ use crate::providers::{
 };
 use crate::{OperationContext, OperationError};
 
-const MAILGUN_PROVIDER_KEY: &str = "mailgun";
+pub(super) const MAILGUN_PROVIDER_KEY: &str = "mailgun";
 const ROUTES_PATH: &str = "/v3/routes";
 
 pub(super) fn mailgun_json(status: u16, body: &Value) -> ProviderHttpResponse {
@@ -72,6 +72,7 @@ pub async fn answer_mailgun_routes_request(
         created_message: None,
         secret_values: read_api_key(request).into_iter().collect(),
         is_unknown_path: false,
+        note: None,
     }))
 }
 

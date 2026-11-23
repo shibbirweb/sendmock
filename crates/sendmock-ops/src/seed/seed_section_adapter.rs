@@ -59,6 +59,22 @@ pub trait SeedSectionAdapter: Send + Sync {
     /// The item as an export would write it, with the defaults a file may leave out filled
     /// in, so an import preview compares like with like.
     fn normalize_item(&self, item_table: &toml::Table) -> toml::Table;
+
+    /// Reads the item into the section's type, as the apply does first, so validate refuses an
+    /// unknown key or a wrong type exactly where import would, without writing anything.
+    fn check_item(&self, item_table: &toml::Table) -> Result<(), OperationError>;
+}
+
+/// The check of a section whose items have a type: reading the item into it.
+pub fn check_seed_table<SeedFields: DeserializeOwned>(
+    item_table: &toml::Table,
+) -> Result<(), OperationError> {
+    read_seed_table::<SeedFields>(item_table.clone()).map(|_| ())
+}
+
+/// The check of a section read without a type, whose apply names its own problems.
+pub fn accept_untyped_item(_item_table: &toml::Table) -> Result<(), OperationError> {
+    Ok(())
 }
 
 /// Reads a file item into the section's type and writes it back; an item the type cannot
@@ -137,6 +153,7 @@ macro_rules! impl_seed_section_adapter {
             $section,
             $describe_item_schema,
             |item_table: &toml::Table| item_table.clone(),
+            $crate::seed::seed_section_adapter::accept_untyped_item,
             |operation_context, _secret_writer| Self::export(operation_context)
         );
     };
@@ -148,6 +165,7 @@ macro_rules! impl_seed_section_adapter {
                 schema_generator.subschema_for::<$item_type>()
             },
             $crate::seed::seed_section_adapter::normalize_seed_table::<$item_type>,
+            $crate::seed::seed_section_adapter::check_seed_table::<$item_type>,
             |operation_context, secret_writer| Self::export(operation_context, secret_writer)
         );
     };
@@ -159,6 +177,7 @@ macro_rules! impl_seed_section_adapter {
                 schema_generator.subschema_for::<$item_type>()
             },
             |item_table: &toml::Table| item_table.clone(),
+            $crate::seed::seed_section_adapter::check_seed_table::<$item_type>,
             |operation_context, _secret_writer| Self::export(operation_context)
         );
     };
@@ -170,6 +189,7 @@ macro_rules! impl_seed_section_adapter {
                 schema_generator.subschema_for::<$item_type>()
             },
             $crate::seed::seed_section_adapter::normalize_seed_table::<$item_type>,
+            $crate::seed::seed_section_adapter::check_seed_table::<$item_type>,
             |operation_context, _secret_writer| Self::export(operation_context)
         );
     };
@@ -178,6 +198,7 @@ macro_rules! impl_seed_section_adapter {
         $section:expr,
         $describe_item_schema:expr,
         $normalize_item:expr,
+        $check_item:expr,
         |$export_context:ident, $secret_writer:ident| $export_call:expr
     ) => {
         impl $crate::seed::seed_section_adapter::SeedSectionAdapter for $adapter {
@@ -221,6 +242,13 @@ macro_rules! impl_seed_section_adapter {
 
             fn normalize_item(&self, item_table: &toml::Table) -> toml::Table {
                 ($normalize_item)(item_table)
+            }
+
+            fn check_item(
+                &self,
+                item_table: &toml::Table,
+            ) -> Result<(), $crate::OperationError> {
+                ($check_item)(item_table)
             }
         }
     };

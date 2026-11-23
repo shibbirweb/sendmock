@@ -43,7 +43,7 @@ The drawer: the session facts, the failure reason, and the **transcript**, one l
 
 A table: time, API (Native, Twilio, Vonage, SendGrid, ...), method, path, status and duration. Rejected requests (4xx and 5xx) are highlighted. Chips by status class (All, 2xx, 4xx, 5xx), an API picker and a path search.
 
-The drawer: method, full path, status, duration and time; request headers (credentials masked); the request body (JSON formatted, forms as a field table) and the response body; **Open message** for what the request created.
+The drawer: method, full path, status, duration and time; request headers (credentials masked); the request body (JSON formatted, forms as a field table) and the response body; **Open message** for what the request created. When the answer alone does not say why SendMock answered as it did, the drawer adds a **Why** line (the `note` field in the API): a Twilio 401 keeps Twilio's `20003` body, and the line tells a wrong token from an unknown account or a subaccount's token used under another account.
 
 
 Every control and text, one by one: [Logs in depth](./deeper/logs.md).

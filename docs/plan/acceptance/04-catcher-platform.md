@@ -296,46 +296,52 @@ Phase 5. Plan: [30-phase-5.md](../30-phase-5.md) (W8).
 
 1.5.0 (A27), planned 2026-11-22 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a27-startup-banner-pl-23) (A27).
 
-- [ ] PL-23.1 A server command (`sendmock`, `sendmock serve`, `--last`, `--services`) with stdout on a terminal prints the banner first, before the launcher's questions, the database, the listeners and the first log line: the website footer's SendMock wordmark drawn in braille dots, with `v` and the version right-aligned under it.
-- [ ] PL-23.2 The wordmark is the tallest that fits the terminal's width, from 5 to 12 lines (8 lines and 71 columns in an 80-column terminal); a terminal too narrow for 5 lines, one whose width cannot be read, or one that cannot show braille (no UTF-8 locale on Unix; a console code page other than 65001 outside Windows Terminal) gets one line, `SendMock v<version>`, instead.
-- [ ] PL-23.3 The wordmark is mint at the top and fades toward its foot, in 24-bit colour when `COLORTERM` is `truecolor` or `24bit`, in 256 colours otherwise, and without colour with `NO_COLOR` or `TERM=dumb`.
-- [ ] PL-23.4 Nothing is printed when stdout is not a terminal, with `--ready-json` or `--log-format json`, for `sendmock mcp` and `sendmock mcp --embedded`, for client commands and for `--version`, so their output is unchanged.
-- [ ] PL-23.5 `--no-banner`, `SENDMOCK_NO_BANNER=1` and `banner = false` in `sendmock.toml` turn the banner off.
-- [ ] PL-23.6 The outline in the binary is exported from `website/components/footer-wordmark/sendmock-wordmark-path.ts` by a script, a test fails when the two differ, and the banner adds no dependency and keeps the binary size and startup time budgets.
-- [ ] PL-23.7 The Configuration guide shows the banner and how to turn it off, the CLI reference lists `--no-banner`, and the changelog says where to see it.
+- [x] PL-23.1 A server command (`sendmock`, `sendmock serve`, `--last`, `--services`) with stdout on a terminal prints the banner first, before the launcher's questions, the database, the listeners and the first log line: the website footer's SendMock wordmark drawn in braille dots, with `v` and the version right-aligned under it.
+- [x] PL-23.2 The wordmark is the tallest that fits the terminal's width, from 5 to 12 lines (8 lines and 71 columns in an 80-column terminal); a terminal too narrow for 5 lines, one whose width cannot be read, or one that cannot show braille (no UTF-8 locale on Unix; on Windows, a console that is neither Windows Terminal nor a terminal that sets `TERM_PROGRAM`, such as VS Code's) gets one line, `SendMock v<version>`, instead. (Changed 2026-11-22 while building, from "a console code page other than 65001 outside Windows Terminal": Rust writes to the Windows console in UTF-16 whatever its code page, so the code page decides nothing; what decides is the font, and the classic console's fonts have no braille. Reading the code page would also need unsafe code, which the workspace forbids.)
+- [x] PL-23.3 The wordmark is mint at the top and fades toward its foot, in 24-bit colour when `COLORTERM` is `truecolor` or `24bit`, in 256 colours otherwise, and without colour with `NO_COLOR` or `TERM=dumb`.
+- [x] PL-23.4 Nothing is printed when stdout is not a terminal, with `--ready-json` or `--log-format json`, for `sendmock mcp` and `sendmock mcp --embedded`, for client commands and for `--version`, so their output is unchanged.
+- [x] PL-23.5 `--no-banner`, `SENDMOCK_NO_BANNER=1` and `banner = false` in `sendmock.toml` turn the banner off.
+- [x] PL-23.6 The outline in the binary is exported from `website/components/footer-wordmark/sendmock-wordmark-path.ts` by a script, a test fails when the two differ, and the banner adds no dependency and keeps the binary size and startup time budgets.
+- [x] PL-23.7 The Configuration guide shows the banner and how to turn it off, the CLI reference lists `--no-banner`, and the changelog says where to see it.
 
 ## PL-24 Provider ports on by default
 
 1.5.0 (A28), planned 2026-11-22 from a user's report on 1.4.0 (owner request). Plan: [32-after-1-0.md](../32-after-1-0.md#a28-plug-and-play-for-mailgun-and-twilio-apps-em-24-to-em-27-sm-22-to-sm-24-pl-24-to-pl-27-ai-08) (A28).
 
-- [ ] PL-24.1 `sendmock serve` starts the provider port on `127.0.0.1:8026` by default, `--provider-addr none` (and the variable and config key) turns it off, and the Docker image and Helm chart keep their own settings (R-01).
-- [ ] PL-24.2 When port 8026 is busy, SendMock says so and starts without the provider port instead of failing.
-- [ ] PL-24.3 `sendmock status`, `GET /api/v1/info` and the MCP status tool warn when the provider port is off.
+- [x] PL-24.1 `sendmock serve` starts the provider port on `127.0.0.1:8026` by default, `--provider-addr none` (and the variable and config key) turns it off, and the Docker image and Helm chart keep their own settings (R-01).
+- [x] PL-24.2 When port 8026 is busy, SendMock says so and starts without the provider port instead of failing.
+- [x] PL-24.3 `sendmock status`, `GET /api/v1/info` and the MCP status tool warn when the provider port is off.
 
 ## PL-25 Trust the local CA everywhere
 
 1.5.0 (A28), planned 2026-11-22 from a user's report on 1.4.0 (owner request). Plan: [32-after-1-0.md](../32-after-1-0.md#a28-plug-and-play-for-mailgun-and-twilio-apps-em-24-to-em-27-sm-22-to-sm-24-pl-24-to-pl-27-ai-08) (A28).
 
-- [ ] PL-25.1 `sendmock trust` adds the local CA to the system store on macOS, Windows and Linux (R-05).
-- [ ] PL-25.2 It finds the runtime bundles that ignore the system store (Herd and Homebrew PHP, Python certifi, Java cacerts), writes a combined bundle and points the runtime at it, or appends only where that is safe, and prints the `NODE_EXTRA_CA_CERTS` and `SSL_CERT_FILE` lines for the rest.
-- [ ] PL-25.3 `sendmock trust` can run again safely, `--check` reports what trusts the CA, and `--undo` removes what it added.
-- [ ] PL-25.4 After `sendmock trust`, Laravel's `mailgun` mailer on Herd PHP reaches the HTTPS provider port with no other change, and the docs show using an existing local CA (mkcert) with `--provider-tls-cert`.
+- [x] PL-25.1 `sendmock trust` adds the local CA to the system store on macOS, Windows and Linux (R-05).
+- [x] PL-25.2 It finds the runtime bundles that ignore the system store (Herd and Homebrew PHP, Python certifi, Java cacerts), writes a combined bundle and points the runtime at it, or appends only where that is safe, and prints the `NODE_EXTRA_CA_CERTS` and `SSL_CERT_FILE` lines for the rest.
+- [x] PL-25.3 `sendmock trust` can run again safely, `--check` reports what trusts the CA, and `--undo` removes what it added.
+- [x] PL-25.4 After `sendmock trust`, Laravel's `mailgun` mailer on Herd PHP reaches the HTTPS provider port with no other change, and the docs show using an existing local CA (mkcert) with `--provider-tls-cert`.
+- [x] PL-25.5 For a PHP with no main php.ini whose scanned ini files set `openssl.cafile` or `curl.cainfo` (Herd), `sendmock trust --check` names that file and the CA files it sets, and `sendmock trust` writes the combined bundle and prints the lines to set there instead of changing the file (R-42).
+- [x] PL-25.6 `sendmock trust` checks and adds the CA of the running server (also one started with `--db <path>`) when one answers, else the data folder's, and says which CA it used (R-42).
+- [x] PL-25.7 `sendmock trust --bundle-only` writes the combined PHP and Python bundles and prints their paths without changing the system store, Java or any ini file, and a PHP bundle's name has no empty part (`php-8.5.12.pem`) (R-49).
 
 ## PL-26 Setup and configuration that agree
 
 1.5.0 (A28), planned 2026-11-22 from a user's report on 1.4.0 (owner request). Plan: [32-after-1-0.md](../32-after-1-0.md#a28-plug-and-play-for-mailgun-and-twilio-apps-em-24-to-em-27-sm-22-to-sm-24-pl-24-to-pl-27-ai-08) (A28).
 
-- [ ] PL-26.1 `setup validate` runs the same checks as `setup import`, so a file validate passes always imports (R-13).
-- [ ] PL-26.2 A merge import never says it deletes data and asks to confirm only when something is removed, naming what (R-16).
-- [ ] PL-26.3 `reset` prints what it cleared and what it kept, and `reset --config` also removes configuration and restores the built-in providers after a confirmation with the counts; its help says what each does (R-12).
-- [ ] PL-26.4 PATCH on providers, numbers and the other configuration merges a partial body into the stored object, and a masked or missing secret keeps the stored value (R-19).
-- [ ] PL-26.5 An endpoint preview fills defaults for every field it is not given (R-20).
+- [x] PL-26.1 `setup validate` runs every check `setup import` runs before it writes anything (the text, the format version, the secrets and each item read into its section's type), so an unknown key or a wrong type is refused by both, with its place (R-13). (Narrowed 2026-11-22 while building, from "runs the same checks as `setup import`, so a file validate passes always imports": a refusal the API makes while applying, such as a rule naming an endpoint that does not exist, needs the items written, and a dry run would need a copy of the live configuration with its secrets, which SendMock never copies; import names such an item with its section and number and applies nothing after it.)
+- [x] PL-26.2 A merge import never says it deletes data and asks to confirm only when something is removed, naming what (R-16).
+- [x] PL-26.3 `reset` prints what it cleared and what it kept, and `reset --config` also removes configuration and restores the built-in providers after a confirmation with the counts; its help says what each does (R-12).
+- [x] PL-26.4 PATCH on providers, numbers and the other configuration merges a partial body into the stored object, and a masked or missing secret keeps the stored value (R-19).
+- [x] PL-26.5 An endpoint preview fills defaults for every field it is not given (R-20).
+- [x] PL-26.6 `POST /api/v1/webhooks/endpoints` with only `name`, `url` and `template_id` creates the endpoint with the defaults Preview uses for every other field (R-44).
 
 ## PL-27 Stack presets
 
 1.5.0 (A28), planned 2026-11-22 from a user's report on 1.4.0 (owner request). Plan: [32-after-1-0.md](../32-after-1-0.md#a28-plug-and-play-for-mailgun-and-twilio-apps-em-24-to-em-27-sm-22-to-sm-24-pl-24-to-pl-27-ai-08) (A28).
 
-- [ ] PL-27.1 `sendmock preset laravel-mailgun-twilio --app-url <url>` starts or confirms the SMTP and provider ports, runs `sendmock trust`, and configures Mailgun (the mappings, template lookup, a signing key) and Twilio (account SID and token, a Debugger URL, the test numbers).
-- [ ] PL-27.2 It creates the webhook endpoints and rules for opened, bounced, complained and inbound mail at the app's paths, each changeable with a flag, and prints the `.env` block with the generated keys.
-- [ ] PL-27.3 `--import-numbers <csv>` adds numbers with their subaccount, label and Messaging Service.
-- [ ] PL-27.4 A preset is a setup file plus steps, run the same from the CLI, REST, MCP and the UI, and running it twice changes nothing the second time.
+- [x] PL-27.1 `sendmock preset laravel-mailgun-twilio --app-url <url>` starts or confirms the SMTP and provider ports, runs `sendmock trust`, and configures Mailgun (the mappings, template lookup, a signing key) and Twilio (account SID and token, a Debugger URL, the test numbers).
+- [x] PL-27.2 It creates the webhook endpoints and rules for opened, bounced, complained and inbound mail at the app's paths, each changeable with a flag, and prints the `.env` block with the generated keys.
+- [x] PL-27.3 `--import-numbers <csv>` adds numbers with their subaccount, label and Messaging Service.
+- [x] PL-27.4 A preset is a setup file plus steps, run the same from the CLI, REST, MCP and the UI, and running it twice changes nothing the second time.
+- [x] PL-27.5 A numbers CSV row that names a Messaging Service SID that does not exist yet creates that service with that SID and adds the number to it (R-37).
+- [x] PL-27.6 The preset checks the whole CSV before it applies anything: a CSV with a bad row (a malformed number, an unknown subaccount) changes nothing and the error names every bad row (R-38).

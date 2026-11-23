@@ -14,6 +14,8 @@ const snippetSections = [
   "Email API",
   "SMS API",
   "HTTP Catcher (point Slack, push or other webhooks here)",
+  "Mailgun SDK",
+  "Twilio SDK",
 ];
 
 /** Settings > Notifications, Opened events, Chaos and OTP patterns. */
@@ -27,6 +29,8 @@ export const settingsBehaviourEntries: DeeperEntry[] = [
   { control: "paragraph: email.opened and sms.opened stand in for the recipient reading the message.", does: "Explains opened events." },
   { control: "paragraph: Opening an email or scrolling an SMS into view counts as the recipient reading it.", does: "Explains what counts as an open." },
   { control: "switch: Fire opened events when I view messages", does: "Fires `email.opened` and `sms.opened` when you look at a message in SendMock.", operationIds: ["patchSettings"] },
+  { control: "paragraph: Off: viewing an email a rule would send email.opened for is not counted, so browsing never tells your app a customer read it. The viewer offers Count as an open.", does: "Explains Count views your webhook rules would report." },
+  { control: "switch: Count views your webhook rules would report", does: "On: viewing an email counts as an open even when a webhook rule would send `email.opened` to your app. Off by default.", operationIds: ["patchSettings"] },
   { control: "radio: First open only One event per message, like most providers report.", does: "One opened event per message." },
   { control: "radio: Every open An event each time, for testing open counters.", does: "An opened event each time." },
   { control: "heading: Chaos", does: "SMTP failures on purpose." },
