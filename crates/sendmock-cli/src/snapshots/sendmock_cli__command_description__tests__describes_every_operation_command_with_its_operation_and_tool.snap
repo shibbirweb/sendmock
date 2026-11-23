@@ -6655,6 +6655,7 @@ expression: command_descriptions
       "--chaos-smtp-reject-code",
       "--chaos-smtp-reject-next-count",
       "--chaos-smtp-reject-recipient-pattern",
+      "--count-views-with-webhook-rules",
       "--email-outcome-bounce-rate-percent",
       "--email-outcome-complaint-rate-percent",
       "--email-outcome-profile",
