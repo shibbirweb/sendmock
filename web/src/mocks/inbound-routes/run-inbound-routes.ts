@@ -12,6 +12,7 @@ import type { InboundRouteRecord } from "@/mocks/fixtures/inbound-route-fixtures
 import { toRoutableEmail } from "@/mocks/inbound-routes/inbound-route-record";
 import { selectMatchingRoutes } from "@/mocks/inbound-routes/select-matching-routes";
 import { answerMockAppPost } from "@/mocks/sms-replies/mock-app-responses";
+import { findReceivingDomain } from "@/mocks/webhooks/email-forward-fields";
 
 type RouteDatabase = Pick<
   MockDatabase,
@@ -188,7 +189,7 @@ export function runInboundRoutes(
           filterMatch.matchedValue,
           routeAction.kind === "store"
             ? {
-                "message-url": `http://127.0.0.1:8025/v3/domains/inbound/messages/${email.id}`,
+                "message-url": `http://127.0.0.1:8025/v3/domains/${findReceivingDomain(email)}/messages/${email.id}`,
               }
             : {},
         ),

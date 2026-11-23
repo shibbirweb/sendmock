@@ -40,6 +40,21 @@ function splitReplyText(textBody: string): [string, string] {
 }
 
 /**
+ * The domain that received an email, as Mailgun names it in an inbound message's
+ * `message-url`: the first envelope recipient's (else the first `To`), or `inbound`.
+ */
+export function findReceivingDomain(email: EmailDetail): string {
+  const recipientAddresses = [
+    ...email.envelope_to,
+    ...email.to.map((recipient) => recipient.address),
+  ];
+  const receivingDomain = recipientAddresses
+    .map((address) => address.split("@").slice(1).join("@").trim())
+    .find((domain) => domain !== "");
+  return receivingDomain ?? "inbound";
+}
+
+/**
  * The fields inbound formats such as Mailgun's forward read beyond the stored email, as the
  * binary's template data has them.
  */
@@ -72,7 +87,7 @@ export function buildEmailForwardFields(
           fieldName,
         ]),
     ),
-    message_url: `http://127.0.0.1:8026/v3/domains/inbound/messages/${email.id}`,
+    message_url: `http://127.0.0.1:8026/v3/domains/${findReceivingDomain(email)}/messages/${email.id}`,
     provider_message_id: email.provider_message_id,
     user_variables: email.user_variables,
   };

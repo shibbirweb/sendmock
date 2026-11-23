@@ -274,7 +274,8 @@ async fn forward_to_an_address_needs_the_allowlist_and_store_notifies_with_a_mes
     );
     let form_fields = read_form_fields(&fixture.webhook_sender.received_requests()[0]);
     assert!(
-        form_fields["message-url"].ends_with(&format!("/v3/domains/inbound/messages/{email_id}")),
+        form_fields["message-url"]
+            .ends_with(&format!("/v3/domains/inbound.app.test/messages/{email_id}")),
         "{form_fields:?}"
     );
 }
