@@ -220,7 +220,7 @@ Phase 5, screen by screen as each live mode lands in Stage B (owner feedback F17
 
 ## WS-11 Docs traffic analytics
 
-1.6.0 (planned as After 1.0; moved from 1.5.0 by owner decision 2026-11-23 so 1.5.0 ships A27 and A28), planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a15-docs-traffic-analytics-with-google-analytics-ws-11) (A15).
+1.7.0 (planned as After 1.0; moved from 1.5.0 by owner decision 2026-11-23 so 1.5.0 ships A27 and A28, then from 1.6.0 by owner decision 2026-11-24, so 1.6.0 ships only the fixes from the report on 1.5.0), planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a15-docs-traffic-analytics-with-google-analytics-ws-11) (A15).
 
 - [ ] WS-11.1 The website loads Google Analytics 4 only when the build has a measurement ID (`NEXT_PUBLIC_GA_MEASUREMENT_ID`); local builds, pull request previews and forks load no analytics script.
 - [ ] WS-11.2 Consent Mode v2 starts with every storage type denied; nothing is stored or sent before the visitor accepts the banner, the choice is remembered and can be changed from the footer, and Do Not Track or Global Privacy Control count as a no.
@@ -231,7 +231,7 @@ Phase 5, screen by screen as each live mode lands in Stage B (owner feedback F17
 
 ## WS-12 Code examples on every page
 
-1.6.0 (planned as After 1.0; moved from 1.5.0 by owner decision 2026-11-23 so 1.5.0 ships A27 and A28), planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a16-code-examples-on-every-docs-page-for-every-task-ws-12) (A16).
+1.7.0 (planned as After 1.0; moved from 1.5.0 by owner decision 2026-11-23 so 1.5.0 ships A27 and A28, then from 1.6.0 by owner decision 2026-11-24, so 1.6.0 ships only the fixes from the report on 1.5.0), planned 2026-11-08 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a16-code-examples-on-every-docs-page-for-every-task-ws-12) (A16).
 
 - [ ] WS-12.1 Every docs page under a menu, sub-pages included, has a "From your code" section with an example for each task it explains, as tabs in CLI, PHP (Laravel), JavaScript (Node), Python, Go, Java, Rust, Ruby and C#; a test fails when a page has no such section or misses a language.
 - [ ] WS-12.2 Each example runs as written against a default SendMock, with its imports, and shows the answer it gets back; pages about a provider API use that provider's SDK where one exists.

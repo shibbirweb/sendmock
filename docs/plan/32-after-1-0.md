@@ -19,14 +19,14 @@ Smallest change with the most users first; items that need an outside party (a d
 | A9 | System tray app | #168 | to be written | 0.1.0-beta.1 |
 | A10 | Helm chart and Docker Desktop extension | #162 | to be written | 1.0.0 |
 | A11 | Official distribution repositories | #169 | needs maintainers ([09](09-distribution.md#package-channels-by-stage-decided-2026-10-27)) | Waiting on others |
-| A12 | Monitoring: Prometheus metrics, OpenTelemetry export, log files and readiness | #175, #176, #177 | PL-11, PL-12, PL-13 (new) | 1.6.0 |
+| A12 | Monitoring: Prometheus metrics, OpenTelemetry export, log files and readiness | #175, #176, #177 | PL-11, PL-12, PL-13 (new) | 1.7.0 (moved from 1.6.0, owner decision 2026-11-24) |
 | A13 | Accounts, login and roles (Admin, Developer, Viewer) | #178, #179 | PL-14, PL-15 (new) | 2.0.0 |
 | A14 | Real forwarding: provider connections and routing rules for email and SMS | #180, #181 | PL-16, PL-17 (new) | 2.0.0 |
-| A15 | Docs traffic analytics with Google Analytics | #186 | WS-11 (new) | 1.6.0 (moved from 1.5.0, owner decision 2026-11-23) |
-| A16 | Code examples on every docs page, for every task | #197 | WS-12 (new) | 1.6.0 (moved from 1.5.0, owner decision 2026-11-23) |
+| A15 | Docs traffic analytics with Google Analytics | #186 | WS-11 (new) | 1.7.0 (moved from 1.5.0 and 1.6.0, owner decisions 2026-11-23 and 2026-11-24) |
+| A16 | Code examples on every docs page, for every task | #197 | WS-12 (new) | 1.7.0 (moved from 1.5.0 and 1.6.0, owner decisions 2026-11-23 and 2026-11-24) |
 | A17 | List actions on every traffic screen: select, mark read or unread, delete, delete all | #277 | UI-14 (new) | 1.1.0 |
 | A18 | Share and move a setup: versioned export and import, from a file or a URL; saved scenarios (owner decision 2026-11-20) | #287 | PL-18, AI-07 (new) | 1.3.0 |
-| A19 | SendMock in CI/CD pipelines for webhook tests, set up from a JSON or YAML file at a URL | #286 | WH-15 (new) | 1.6.0 (WH-15.1 to WH-15.7 ship in 1.4.0; the GitHub Action, WH-15.8 and WH-15.9, moved from 1.5.0 to 1.6.0, owner decisions 2026-11-22 and 2026-11-23) |
+| A19 | SendMock in CI/CD pipelines for webhook tests, set up from a JSON or YAML file at a URL | #286 | WH-15 (new) | 1.7.0 (WH-15.1 to WH-15.7 ship in 1.4.0; the GitHub Action, WH-15.8 and WH-15.9, moved from 1.5.0 to 1.6.0 and then to 1.7.0, owner decisions 2026-11-22, 2026-11-23 and 2026-11-24) |
 | A20 | Search engines and link previews for the website | #293 | WS-13 (new) | 1.2.0 |
 | A21 | What's new and Upgrade guide links in the docs sidebar | #295 | WS-14 (new) | 1.2.0 |
 | A22 | Security and quality clean-up: every open alert and Dependabot pull request | #308 | PL-19 (new) | 1.3.1 |
@@ -1020,7 +1020,7 @@ The report's preset (section 6, `sendmock preset laravel-mailgun-twilio --app-ur
 
 ## A29. Fixes from the report on 1.5.0 (EM-17.6, EM-17.7, EM-25.7, SM-22.10, SM-22.11)
 
-**Why (owner request, 2026-11-24: fix them and release them with 1.6.0):** the team behind the 1.4.0 and 1.5.0 reports (Laravel 13 with Horizon, Mailgun, Twilio with a subaccount per customer and Messaging Services) checked the released 1.5.0 from Homebrew and listed three open bugs they cannot work around in their app. Their IDs SM-50 to SM-52 clash with ours, so they continue the R- list. Tracked in #379.
+**Why (owner request, 2026-11-24: fix them and release them as 1.6.0, which ships only these fixes; the items planned for 1.6.0 moved to 1.7.0):** the team behind the 1.4.0 and 1.5.0 reports (Laravel 13 with Horizon, Mailgun, Twilio with a subaccount per customer and Messaging Services) checked the released 1.5.0 from Homebrew and listed three open bugs they cannot work around in their app. Their IDs SM-50 to SM-52 clash with ours, so they continue the R- list. Tracked in #379.
 
 **Checked against the code (2026-11-24):**
 

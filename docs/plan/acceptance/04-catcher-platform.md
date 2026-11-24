@@ -146,7 +146,7 @@ Phase 5. Plan: [30-phase-5.md](../30-phase-5.md) (W8).
 
 ## PL-11 Prometheus metrics
 
-1.6.0 (planned as After 1.0), planned 2026-11-08 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a12-monitoring-prometheus-metrics-opentelemetry-and-log-files-pl-11-pl-12-pl-13) (A12a).
+1.7.0 (planned as After 1.0; moved from 1.6.0 by owner decision 2026-11-24, so 1.6.0 ships only the fixes from the report on 1.5.0), planned 2026-11-08 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a12-monitoring-prometheus-metrics-opentelemetry-and-log-files-pl-11-pl-12-pl-13) (A12a).
 
 - [ ] PL-11.1 Without `--metrics`, `GET /metrics` answers 404; `--metrics`, `SENDMOCK_METRICS=true` or `metrics = true` in `sendmock.toml` turn it on, with flags over the environment over the file.
 - [ ] PL-11.2 When on, `GET /metrics` answers the Prometheus text format (`text/plain; version=0.0.4`) with `# HELP` and `# TYPE` for every family, and `promtool check metrics` finds no problem in it.
@@ -161,7 +161,7 @@ Phase 5. Plan: [30-phase-5.md](../30-phase-5.md) (W8).
 
 ## PL-12 OpenTelemetry export
 
-1.6.0 (planned as After 1.0), planned 2026-11-08 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a12-monitoring-prometheus-metrics-opentelemetry-and-log-files-pl-11-pl-12-pl-13) (A12b).
+1.7.0 (planned as After 1.0; moved from 1.6.0 by owner decision 2026-11-24, so 1.6.0 ships only the fixes from the report on 1.5.0), planned 2026-11-08 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a12-monitoring-prometheus-metrics-opentelemetry-and-log-files-pl-11-pl-12-pl-13) (A12b).
 
 - [ ] PL-12.1 Without an OTLP endpoint variable, or with `OTEL_SDK_DISABLED=true`, nothing is exported and no exporter runs; `OTEL_EXPORTER_OTLP_ENDPOINT` (or a per-signal endpoint) turns export on over OTLP `http/protobuf`.
 - [ ] PL-12.2 `OTEL_SERVICE_NAME` (default `sendmock`), `OTEL_RESOURCE_ATTRIBUTES`, `OTEL_EXPORTER_OTLP_HEADERS` and `OTEL_METRIC_EXPORT_INTERVAL` work as the OpenTelemetry specification defines them, and header values are masked wherever SendMock shows its settings or logs.
@@ -173,7 +173,7 @@ Phase 5. Plan: [30-phase-5.md](../30-phase-5.md) (W8).
 
 ## PL-13 Log files and readiness
 
-1.6.0 (planned as After 1.0), planned 2026-11-08 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a12-monitoring-prometheus-metrics-opentelemetry-and-log-files-pl-11-pl-12-pl-13) (A12c).
+1.7.0 (planned as After 1.0; moved from 1.6.0 by owner decision 2026-11-24, so 1.6.0 ships only the fixes from the report on 1.5.0), planned 2026-11-08 by owner request. Plan: [32-after-1-0.md](../32-after-1-0.md#a12-monitoring-prometheus-metrics-opentelemetry-and-log-files-pl-11-pl-12-pl-13) (A12c).
 
 - [ ] PL-13.1 `--log-file <path>` (`SENDMOCK_LOG_FILE`, `log_file` in `sendmock.toml`) also writes the logs to that file in the chosen format, rotated daily or past `--log-file-max-size` (default 10 MB), keeping `--log-file-keep` files (default 7); stdout is unchanged.
 - [ ] PL-13.2 JSON log lines keep their fields and add `trace_id` and `span_id` while a span is active, and the docs list every field.
