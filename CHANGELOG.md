@@ -8,6 +8,8 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-11-24
+
 ### Added
 
 - **Edit who a reply goes to:** in Mail, the Reply and Reply all composers now show To and Cc as editable address chips, like a mail client: type or paste more addresses (Enter, a comma or Tab adds one), remove one with its button, or double-click one to change it. **Cc** adds copies to a plain reply. The reply API, `sendmock email reply --to ... --cc ...` and MCP take `to` and `cc` lists that replace the default recipients. See Mail, Replies and forwards.
