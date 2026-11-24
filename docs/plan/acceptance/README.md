@@ -57,7 +57,7 @@ On top of its own criteria, a feature is done only when:
 
 ## Status
 
-**Accepted: 148 / 168 features, 768 / 873 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
+**Accepted: 151 / 168 features, 773 / 873 criteria ticked.** `bun scripts/acceptance.ts` fails when this line disagrees with the acceptance files.
 
 | Feature | Name | Phase | Criteria | Status |
 |---------|------|-------|----------|--------|
@@ -77,7 +77,7 @@ On top of its own criteria, a feature is done only when:
 | [EM-14](01-email.md#em-14-release-and-auto-forward) | Release and auto-forward | Phase 4 | 4 | Accepted |
 | [EM-15](01-email.md#em-15-smtp-chaos) | SMTP chaos | Phase 4 | 3 | Accepted |
 | [EM-16](01-email.md#em-16-browser-notifications) | Browser notifications | UI in U1, live in Phase 1 | 2 | Accepted |
-| [EM-17](01-email.md#em-17-simulated-replies-and-inbound-email) | Simulated replies and inbound email | UI in U1, backend Phase 4 | 7 | In progress |
+| [EM-17](01-email.md#em-17-simulated-replies-and-inbound-email) | Simulated replies and inbound email | UI in U1, backend Phase 4 | 7 | Accepted |
 | [EM-18](01-email.md#em-18-configurable-email-providers) | Configurable email providers | UI in U3 (W16), runtime Phase 4 | 8 | Accepted |
 | [EM-19](01-email.md#em-19-mailpit-api-compatibility) | Mailpit API compatibility | 0.1.0-beta.1 (A1) | 6 | Accepted |
 | [EM-20](01-email.md#em-20-email-clicked-events) | Email clicked events | 0.1.0-beta.1 (A2) | 6 | Accepted |
@@ -85,7 +85,7 @@ On top of its own criteria, a feature is done only when:
 | [EM-22](01-email.md#em-22-where-a-simulated-reply-goes) | Where a simulated reply goes | Phase 5 (W20) | 5 | Accepted |
 | [EM-23](01-email.md#em-23-mailgun-events-and-complaints-apis) | Mailgun events and complaints APIs | 1.4.0 (A23) | 6 | Accepted |
 | [EM-24](01-email.md#em-24-mailgun-sends-and-ids) | Mailgun sends and ids | 1.5.0 (A28) | 6 | Accepted |
-| [EM-25](01-email.md#em-25-mailgun-webhooks-as-mailgun-sends-them) | Mailgun webhooks as Mailgun sends them | 1.5.0 (A28) | 7 | In progress |
+| [EM-25](01-email.md#em-25-mailgun-webhooks-as-mailgun-sends-them) | Mailgun webhooks as Mailgun sends them | 1.5.0 (A28) | 7 | Accepted |
 | [EM-26](01-email.md#em-26-stored-messages-and-local-email-templates) | Stored messages and local email templates | 1.5.0 (A28) | 6 | Accepted |
 | [EM-27](01-email.md#em-27-simulating-email-events-with-the-apps-data) | Simulating email events with the app's data | 1.5.0 (A28) | 3 | Accepted |
 | [SM-01](02-sms-verify.md#sm-01-native-sms-api) | Native SMS API | Phase 2 | 5 | Accepted |
@@ -109,7 +109,7 @@ On top of its own criteria, a feature is done only when:
 | [SM-19](02-sms-verify.md#sm-19-twilio-accounts-and-subaccounts) | Twilio accounts and subaccounts | 1.4.0 (A23) | 8 | Accepted |
 | [SM-20](02-sms-verify.md#sm-20-twilio-phone-numbers-api) | Twilio phone numbers API | 1.4.0 (A23) | 5 | Accepted |
 | [SM-21](02-sms-verify.md#sm-21-twilio-debugger-webhook) | Twilio Debugger webhook | 1.4.0 (A23) | 4 | Accepted |
-| [SM-22](02-sms-verify.md#sm-22-twilio-accounts-in-every-place) | Twilio accounts in every place | 1.5.0 (A28) | 11 | In progress |
+| [SM-22](02-sms-verify.md#sm-22-twilio-accounts-in-every-place) | Twilio accounts in every place | 1.5.0 (A28) | 11 | Accepted |
 | [SM-23](02-sms-verify.md#sm-23-opt-out-keywords) | Opt-out keywords | 1.5.0 (A28) | 4 | Accepted |
 | [SM-24](02-sms-verify.md#sm-24-statuses-set-by-hand) | Statuses set by hand | 1.5.0 (A28) | 2 | Accepted |
 | [VF-01](02-sms-verify.md#vf-01-verify-services) | Verify services | UI in U1, backend Phase 2 | 3 | Accepted |

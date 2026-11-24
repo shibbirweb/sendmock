@@ -8,7 +8,9 @@ mod support {
 use std::sync::Arc;
 use std::time::Duration;
 
-use sendmock_ops::{run_due_deliveries, run_webhook_rule_subscriber};
+use sendmock_ops::{
+    OperationContext, RecordedHttpRequest, run_due_deliveries, run_webhook_rule_subscriber,
+};
 use serde_json::{Value, json};
 use support::scripted_webhook_sender::ScriptedWebhookSender;
 use support::test_app::{build_test_app_with, call_api};
@@ -93,6 +95,31 @@ fn read_payload(body: &str, template_fixture: &Value) -> Value {
     }
 }
 
+/// Runs the due deliveries until each template's endpoint got its request, or a few seconds
+/// pass: the rule subscriber queues them in the background, slower under coverage.
+async fn wait_for_every_template(
+    operation_context: &OperationContext,
+    webhook_sender: &ScriptedWebhookSender,
+    template_ids: Vec<&str>,
+) -> Vec<RecordedHttpRequest> {
+    for _ in 0..100 {
+        run_due_deliveries(operation_context, 20)
+            .await
+            .unwrap_or_else(|error| panic!("the pass runs: {error}"));
+        let sent_requests = webhook_sender.received_requests();
+        let has_every_template = template_ids.iter().all(|template_id| {
+            sent_requests
+                .iter()
+                .any(|sent_request| sent_request.url.ends_with(&format!("/{template_id}")))
+        });
+        if has_every_template {
+            return sent_requests;
+        }
+        tokio::time::sleep(Duration::from_millis(100)).await;
+    }
+    webhook_sender.received_requests()
+}
+
 // AC: EM-20.5
 #[tokio::test]
 async fn each_providers_template_sends_a_click_in_its_documented_shape() {
@@ -119,13 +146,14 @@ async fn each_providers_template_sends_a_click_in_its_documented_shape() {
     }
 
     send_and_click(&app_router).await;
-    tokio::time::sleep(Duration::from_millis(200)).await;
+    let sent_requests = wait_for_every_template(
+        &operation_context,
+        &webhook_sender,
+        templates.keys().map(String::as_str).collect(),
+    )
+    .await;
     subscriber.abort();
-    run_due_deliveries(&operation_context, 20)
-        .await
-        .unwrap_or_else(|error| panic!("the pass runs: {error}"));
 
-    let sent_requests = webhook_sender.received_requests();
     for (template_id, template_fixture) in &templates {
         let sent_request = sent_requests
             .iter()

@@ -266,8 +266,8 @@ UI in U1, backend Phase 2.
 - [x] SM-22.7 A Messaging Service can be made with no numbers (`number_ids` left out, from the API, CLI and MCP); a send through a service with no usable sender goes from Twilio's test sender, and in strict Twilio test mode is refused with Twilio's 21704 (no numbers) or 21703 (no number for the recipient's channel) (R-45).
 - [x] SM-22.8 Saving the Twilio provider with an `account_sid` that is not `AC` and 32 letters or digits, an empty one included, is refused with the field named (R-47).
 - [x] SM-22.9 A Messaging Service can be made with only `friendly_name`: `inbound_mode` defaults to `defer_to_sender` and the inbound URLs to none, from the API, CLI and MCP (R-48).
-- [ ] SM-22.10 A Messaging Service belongs to an account: the one that created it through the provider API, else the `account_sid` given in REST, CLI (`--account-sid`), MCP, the UI and the setup file, else the main account. `/v1/Services` lists only the calling account's services, a request for another account's service or its numbers answers Twilio's 20404, and every answer reports the owner in `account_sid` (A29, R-52, #379).
-- [ ] SM-22.11 A send with `MessagingServiceSid` and no `From` answers `accepted` with `from` null and `num_segments` `"0"`, as Twilio's create response does; the stored message, its fetch and the status callbacks name the sender (A29, R-53, #379).
+- [x] SM-22.10 A Messaging Service belongs to an account: the one that created it through the provider API, else the `account_sid` given in REST, CLI (`--account-sid`), MCP, the UI and the setup file, else the main account. `/v1/Services` lists only the calling account's services, a request for another account's service or its numbers answers Twilio's 20404, and every answer reports the owner in `account_sid` (A29, R-52, #379).
+- [x] SM-22.11 A send with `MessagingServiceSid` and no `From` answers `accepted` with `from` null and `num_segments` `"0"`, as Twilio's create response does; the stored message, its fetch and the status callbacks name the sender (A29, R-53, #379).
 
 ## SM-23 Opt-out keywords
 
