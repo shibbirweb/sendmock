@@ -8,6 +8,7 @@ use serde_json::json;
 use crate::numbers::{
     VirtualNumberInput, build_virtual_number, field_error, is_messaging_service_sid,
 };
+use crate::twilio_accounts::TwilioAccountDirectory;
 use crate::{OperationContext, OperationError};
 
 const CSV_FIELD: &str = "numbers_csv";
@@ -137,7 +138,12 @@ pub async fn import_numbers_csv(
 ) -> Result<usize, OperationError> {
     for csv_row in csv_rows {
         if let Some(service_sid) = &csv_row.messaging_service_sid {
-            ensure_messaging_service(operation_context, service_sid).await?;
+            ensure_messaging_service(
+                operation_context,
+                service_sid,
+                csv_row.account_sid.as_deref(),
+            )
+            .await?;
         }
         let number_repository = &operation_context.virtual_number_repository;
         let existing_number = number_repository.find_by_number(&csv_row.number).await?;
@@ -154,10 +160,12 @@ pub async fn import_numbers_csv(
     Ok(csv_rows.len())
 }
 
-/// A service the CSV names, made empty when it does not exist; the number joins its pool.
+/// A service the CSV names, made empty for the row's account when it does not exist; the
+/// number joins its pool.
 async fn ensure_messaging_service(
     operation_context: &OperationContext,
     service_sid: &str,
+    account_sid: Option<&str>,
 ) -> Result<(), OperationError> {
     let service_repository = &operation_context.messaging_service_repository;
     if service_repository
@@ -176,6 +184,9 @@ async fn ensure_messaging_service(
             inbound_url: None,
             inbound_fallback_url: None,
             opt_out_keywords: true,
+            account_sid: TwilioAccountDirectory::load(operation_context)
+                .await?
+                .stored_owner_sid(account_sid),
             created_by: "api".to_owned(),
             created_at_unix_ms: operation_context.clock.now_unix_ms(),
         })

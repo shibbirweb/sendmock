@@ -105,6 +105,14 @@ export function MessagingServicesPanel() {
                           className="size-6"
                         />
                       </span>
+                      {messagingService.account_sid !== null && (
+                        <span
+                          className="font-mono text-[10px] text-muted-foreground"
+                          title="The Twilio subaccount the service belongs to"
+                        >
+                          {messagingService.account_sid}
+                        </span>
+                      )}
                     </span>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">

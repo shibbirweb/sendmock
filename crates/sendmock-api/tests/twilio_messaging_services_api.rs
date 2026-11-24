@@ -65,9 +65,15 @@ async fn register_pool(app_router: &axum::Router, e164_number: &str) -> String {
         .to_owned()
 }
 
-// AC: SM-03.1
+/// The sender the stored message went from, as the message list shows it.
+async fn read_stored_sender(app_router: &axum::Router) -> Value {
+    let (_, stored_messages) = call_api(app_router, "GET", "/api/v1/sms", None).await;
+    stored_messages["items"][0]["from_number"].clone()
+}
+
+// AC: SM-03.1 SM-22.11
 #[tokio::test]
-async fn a_send_through_a_service_picks_a_sender_from_its_pool() {
+async fn a_send_through_a_service_picks_a_sender_from_its_pool_after_answering() {
     let (app_router, _) = build_test_app();
     let service_sid = register_pool(&app_router, "+15557770001").await;
 
@@ -78,16 +84,26 @@ async fn a_send_through_a_service_picks_a_sender_from_its_pool() {
         &format!("To=%2B8801700000000&MessagingServiceSid={service_sid}&Body=Hi"),
     )
     .await;
-    let (_, stored_messages) = call_api(&app_router, "GET", "/api/v1/sms", None).await;
+    let message_path = MESSAGES_PATH.replace(
+        "Messages.json",
+        &format!(
+            "Messages/{}.json",
+            created_message["sid"].as_str().unwrap_or_default()
+        ),
+    );
+    let (_, fetched_message) = call_api(&app_router, "GET", &message_path, None).await;
 
-    assert_eq!(status, 201);
-    assert_eq!(created_message["from"], "+15557770001");
+    assert_eq!(status, 201, "{created_message}");
     assert_eq!(created_message["status"], "accepted");
+    assert_eq!(created_message["from"], Value::Null, "{created_message}");
+    assert_eq!(created_message["num_segments"], "0", "{created_message}");
     assert_eq!(
         created_message["messaging_service_sid"],
         service_sid.as_str()
     );
-    assert_eq!(stored_messages["items"][0]["from_number"], "+15557770001");
+    assert_eq!(fetched_message["from"], "+15557770001", "{fetched_message}");
+    assert_eq!(fetched_message["num_segments"], "1", "{fetched_message}");
+    assert_eq!(read_stored_sender(&app_router).await, "+15557770001");
 }
 
 // AC: SM-03.2
@@ -106,8 +122,8 @@ async fn an_unknown_service_is_created_leniently_and_refused_in_strict_mode() {
     let (strict_status, strict_error) =
         call_form(&app_router, "POST", MESSAGES_PATH, &other_form).await;
 
-    assert_eq!(lenient_status, 201);
-    assert_eq!(lenient_message["from"], "+15005550006");
+    assert_eq!(lenient_status, 201, "{lenient_message}");
+    assert_eq!(read_stored_sender(&app_router).await, "+15005550006");
     assert_eq!(services[0]["sid"], unknown_sid);
     assert_eq!(strict_status, 400);
     assert_eq!(strict_error["code"], 21701);
@@ -144,7 +160,7 @@ async fn a_service_made_without_numbers_sends_from_the_test_sender_and_gets_2170
     assert_eq!(create_status, 201, "{created_service}");
     assert_eq!(created_service["number_ids"], json!([]));
     assert_eq!(lenient_status, 201, "{lenient_message}");
-    assert_eq!(lenient_message["from"], "+15005550006");
+    assert_eq!(read_stored_sender(&app_router).await, "+15005550006");
     assert_eq!(strict_status, 400, "{strict_error}");
     assert_eq!(strict_error["code"], 21704);
     assert_eq!(

@@ -1,11 +1,12 @@
 import * as React from "react";
 
+import { EmailRecipientsInput } from "@/components/common/email-recipients-input";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   type EmailComposerMode,
   listOriginalRecipients,
-  readReplyRecipient,
 } from "@/features/mail/detail/response/email-composer-mode";
 import type { EmailResponseFormValues } from "@/features/mail/detail/response/use-email-response-form";
 import { useAppSettings } from "@/lib/api/hooks/use-system-queries";
@@ -19,10 +20,6 @@ type EmailResponseFieldsProps = {
   onChange: (changedValues: Partial<EmailResponseFormValues>) => void;
 };
 
-function ReadOnlyAddresses({ addressText }: { addressText: string }) {
-  return <span className="min-w-0 py-1.5 break-words">{addressText}</span>;
-}
-
 /** Suggested forward targets, one per inbound domain from Settings. */
 function useForwardSuggestions(): string[] {
   const settingsQuery = useAppSettings();
@@ -32,7 +29,10 @@ function useForwardSuggestions(): string[] {
   );
 }
 
-/** From, To, Cc and Subject rows of the reply / forward composer. */
+/**
+ * From, To, Cc and Subject rows of the reply / forward composer; a reply's To
+ * and Cc are editable recipient fields (EM-17.7).
+ */
 export function EmailResponseFields({
   email,
   composerMode,
@@ -42,10 +42,9 @@ export function EmailResponseFields({
   const fieldIdPrefix = React.useId();
   const forwardSuggestions = useForwardSuggestions();
   const isForward = composerMode === "forward";
-  const fromAddress = formValues.fromAddress.trim();
-  const ccAddresses = listOriginalRecipients(email)
-    .filter((recipient) => !fromAddress.includes(recipient.address))
-    .map(formatEmailAddress);
+  const [isCcShown, setIsCcShown] = React.useState(
+    formValues.ccRecipients.length > 0,
+  );
 
   return (
     <div className="grid grid-cols-[4rem_1fr] items-center gap-x-3 gap-y-2 text-sm">
@@ -89,17 +88,42 @@ export function EmailResponseFields({
         </>
       ) : (
         <>
-          <span className="text-muted-foreground">To</span>
-          <ReadOnlyAddresses
-            addressText={formatEmailAddress(readReplyRecipient(email))}
-          />
+          <Label htmlFor={`${fieldIdPrefix}-to`}>To</Label>
+          <div className="flex min-w-0 items-start gap-1">
+            <EmailRecipientsInput
+              inputId={`${fieldIdPrefix}-to`}
+              recipients={formValues.toRecipients}
+              placeholder="support@shop.test"
+              onChange={(toRecipients) => {
+                onChange({ toRecipients });
+              }}
+            />
+            {!isCcShown && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setIsCcShown(true);
+                }}
+              >
+                Cc
+              </Button>
+            )}
+          </div>
         </>
       )}
 
-      {composerMode === "reply_all" && ccAddresses.length > 0 && (
+      {!isForward && isCcShown && (
         <>
-          <span className="text-muted-foreground">Cc</span>
-          <ReadOnlyAddresses addressText={ccAddresses.join(", ")} />
+          <Label htmlFor={`${fieldIdPrefix}-cc`}>Cc</Label>
+          <EmailRecipientsInput
+            inputId={`${fieldIdPrefix}-cc`}
+            recipients={formValues.ccRecipients}
+            onChange={(ccRecipients) => {
+              onChange({ ccRecipients });
+            }}
+          />
         </>
       )}
 

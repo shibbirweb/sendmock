@@ -1,7 +1,9 @@
 import { delay, HttpResponse } from "msw";
 
-import type { ApiErrorBody, EmailAddress, PageOf } from "@/lib/api/types";
+import type { ApiErrorBody, PageOf } from "@/lib/api/types";
 import { readMockConditions } from "@/mocks/conditions/mock-conditions";
+
+export { parseEmailAddress } from "@/lib/email/email-address-text";
 
 const defaultPageSize = 50;
 const maximumPageSize = 500;
@@ -73,15 +75,6 @@ export function includesText(
   searchTerm: string,
 ): boolean {
   return (searchedText ?? "").toLowerCase().includes(searchTerm.toLowerCase());
-}
-
-/** `"Rahim <rahim@example.com>"` or `rahim@example.com` to an address object. */
-export function parseEmailAddress(addressText: string): EmailAddress {
-  const namedMatch = addressText.match(/^\s*"?([^"<]*)"?\s*<([^>]+)>\s*$/);
-
-  return namedMatch
-    ? { name: (namedMatch[1] ?? "").trim(), address: namedMatch[2] ?? "" }
-    : { name: "", address: addressText.trim() };
 }
 
 /** The items of the project a read asks for (`?project=`); every item when it names none (PL-10). */

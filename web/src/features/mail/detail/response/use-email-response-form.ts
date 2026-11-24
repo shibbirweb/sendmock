@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import {
   canSendResponse,
   type EmailComposerMode,
+  listDefaultReplyRecipients,
   listOriginalRecipients,
 } from "@/features/mail/detail/response/email-composer-mode";
 import { showResponseSentToast } from "@/features/mail/detail/response/show-response-sent-toast";
@@ -24,6 +25,10 @@ import {
 export type EmailResponseFormValues = {
   fromAddress: string;
   forwardToAddress: string;
+  /** Reply only: each address the reply goes to, editable (EM-17.7). */
+  toRecipients: string[];
+  /** Reply only: each copy, editable; Reply all starts with the others. */
+  ccRecipients: string[];
   subject: string;
   /** Starts with the original below an empty line, as Gmail does. */
   messageText: string;
@@ -53,6 +58,7 @@ function buildInitialValues(
     fromAddress:
       firstRecipient === undefined ? "" : formatEmailAddress(firstRecipient),
     forwardToAddress: "",
+    ...listDefaultReplyRecipients(email, composerMode),
     subject: buildResponseSubject(
       email.subject,
       composerMode === "forward" ? "forward" : "reply",
@@ -90,7 +96,7 @@ export function useEmailResponseForm({
   const isForward = composerMode === "forward";
   const isSending = replyToEmail.isPending || forwardEmail.isPending;
   const hasDraftChanges = formValues.messageText !== initialValues.messageText;
-  const canSend = canSendResponse(composerMode, formValues.forwardToAddress);
+  const canSend = canSendResponse(composerMode, formValues);
 
   const updateFormValues = (
     changedValues: Partial<EmailResponseFormValues>,
@@ -162,6 +168,8 @@ export function useEmailResponseForm({
         replyRequest: {
           body: formValues.messageText,
           from: formValues.fromAddress,
+          to: formValues.toRecipients,
+          cc: formValues.ccRecipients,
           subject: formValues.subject,
           reply_all: composerMode === "reply_all",
           include_original: false,

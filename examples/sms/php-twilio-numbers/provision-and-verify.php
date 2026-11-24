@@ -2,7 +2,7 @@
 
 // The official Twilio PHP SDK against SendMock's number APIs: buy a number, put it in a new
 // Messaging Service and send through the service, so SendMock picks the number.
-// AC: SM-20.5
+// AC: SM-20.5 SM-22.11
 
 declare(strict_types=1);
 
@@ -78,7 +78,12 @@ $message = $client->messages->create('+14155550121', [
     'messagingServiceSid' => $messagingService->sid,
     'body' => 'Your appointment is tomorrow at 10:00',
 ]);
-if ($message->from !== POOL_NUMBER) {
-    throw new RuntimeException("Sent from {$message->from}, not the pool's " . POOL_NUMBER);
+// As on Twilio, the service picks the sender after the request: the first answer names none.
+if ($message->status !== 'accepted' || $message->from !== null || $message->numSegments !== '0') {
+    throw new RuntimeException("First answer {$message->status} from {$message->from}, segments {$message->numSegments}");
 }
-echo "Number {$incomingNumber->sid} in {$messagingService->sid} sent {$message->sid} from {$message->from}\n";
+$fetchedMessage = $client->messages($message->sid)->fetch();
+if ($fetchedMessage->from !== POOL_NUMBER) {
+    throw new RuntimeException("Sent from {$fetchedMessage->from}, not the pool's " . POOL_NUMBER);
+}
+echo "Number {$incomingNumber->sid} in {$messagingService->sid} sent {$message->sid} from {$fetchedMessage->from}\n";

@@ -19,6 +19,8 @@ Open an email your app sent and press:
 
 - **Reply** (`R`): from one of the original recipients, to the original `Reply-To` (or `From`), with `Re:` and the original quoted below, like a mail client.
 - **Reply all** (`Shift+R`, only with more than one recipient): as Reply, with the other recipients in `Cc`.
+
+In a reply, **To** and **Cc** are editable, like a mail client's: each address is a chip. Type or paste more addresses (Enter, a comma, a semicolon or Tab adds one; a name with a comma goes in quotes, `"Lee, Pat" <pat@example.test>`), remove one with its button, double-click one to change it, or press Backspace in an empty field to take the last one back. **Cc** next to To adds copies to a plain reply. An entry that is not an address turns red and **Send reply** waits until it is fixed or removed. From the CLI, repeat `--to` and `--cc` (`sendmock email reply <emailId> --to support@shop.test --cc ops@shop.test`); in the API and MCP, `to` and `cc` are lists that replace the default recipients.
 - **Forward** (`F`): to an address you type (the inbound domains from Settings are suggested), with `Fwd:`, the forwarded-message block and, by default, the attachments.
 
 The composer opens under the header with the original already in the message box, so you can trim it like any text. **Send reply** works straight away: send it as prefilled, edited or with an empty message box. **Send forward** waits for a To address. `Ctrl+Enter` (`Cmd+Enter` on macOS) sends; `Esc` closes.

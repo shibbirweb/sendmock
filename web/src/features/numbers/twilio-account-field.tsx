@@ -6,27 +6,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mainTwilioAccount } from "@/features/numbers/virtual-numbers/use-virtual-number-form";
 import { useTwilioSubaccounts } from "@/lib/api/hooks/use-twilio-account-queries";
 
-/** The Twilio account that owns the number: the main account or a subaccount (SM-22.5). */
-export function VirtualNumberAccountField({
+/** Select value for the main Twilio account, which records store as no account. */
+export const mainTwilioAccount = "main";
+
+/** The stored owner from the select value: null for the main account. */
+export function toStoredAccountSid(accountSid: string): string | null {
+  return accountSid === mainTwilioAccount ? null : accountSid;
+}
+
+/**
+ * The Twilio account that owns a number or a Messaging Service: the main
+ * account or a subaccount (SM-22.5, SM-22.10).
+ */
+export function TwilioAccountField({
   fieldId,
   accountSid,
+  hint,
   onAccountChange,
 }: {
   fieldId: string;
   accountSid: string;
+  hint: string;
   onAccountChange: (accountSid: string) => void;
 }) {
   const subaccountsQuery = useTwilioSubaccounts();
 
   return (
-    <FormField
-      label="Twilio account"
-      fieldId={fieldId}
-      hint="Inbound messages to the number carry this account's SID and are signed with its token."
-    >
+    <FormField label="Twilio account" fieldId={fieldId} hint={hint}>
       <Select value={accountSid} onValueChange={onAccountChange}>
         <SelectTrigger id={fieldId} className="w-full">
           <SelectValue />

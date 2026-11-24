@@ -3588,6 +3588,41 @@
           "example": "user@example.test"
         },
         {
+          "flag": "--to",
+          "input": {
+            "name": "to",
+            "location": "body"
+          },
+          "type": "string[]",
+          "value_label": "<to>",
+          "is_required": false,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Who the reply goes to; replaces the default, the original `Reply-To` (or `From`).",
+          "example": [
+            "\"Support, Shop\" <support@shop.test>",
+            "billing@shop.test"
+          ]
+        },
+        {
+          "flag": "--cc",
+          "input": {
+            "name": "cc",
+            "location": "body"
+          },
+          "type": "string[]",
+          "value_label": "<cc>",
+          "is_required": false,
+          "is_repeatable": true,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "Copies; replaces the default, the other original recipients with `reply_all` and none without.",
+          "example": [
+            "ops@shop.test"
+          ]
+        },
+        {
           "flag": "--subject",
           "input": {
             "name": "subject",
@@ -18251,6 +18286,21 @@
           "example": "http://localhost:3000/sms/inbound-fallback"
         },
         {
+          "flag": "--account-sid",
+          "input": {
+            "name": "account_sid",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<account-sid>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The Twilio account that owns the service, the main account or a subaccount (`AC...`); left out or null, the main account. Twilio's Services API lists it only to that account.",
+          "example": null
+        },
+        {
           "flag": "--opt-out-keywords",
           "input": {
             "name": "opt_out_keywords",
@@ -18487,6 +18537,21 @@
           "allowed_values": null,
           "description": "Called when `inbound_url` fails; none when left out.",
           "example": "http://localhost:3000/sms/inbound-fallback"
+        },
+        {
+          "flag": "--account-sid",
+          "input": {
+            "name": "account_sid",
+            "location": "body"
+          },
+          "type": "string",
+          "value_label": "<account-sid>",
+          "is_required": false,
+          "is_repeatable": false,
+          "takes_json": false,
+          "allowed_values": null,
+          "description": "The Twilio account that owns the service, the main account or a subaccount (`AC...`); left out or null, the main account. Twilio's Services API lists it only to that account.",
+          "example": null
         },
         {
           "flag": "--opt-out-keywords",

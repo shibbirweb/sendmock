@@ -74,27 +74,46 @@ pub fn map_content_ids(attachment_data: &[Value]) -> Map<String, Value> {
         .collect()
 }
 
+/// The address that received an email, as Mailgun's `recipient` names it: the first envelope
+/// recipient with an address (else the first `To`), or empty when there is none, so a `To`
+/// entry without an address is never sent.
+pub fn find_receiving_address(stored_email: &EmailRecord) -> String {
+    pick_receiving_address(list_recipient_addresses(stored_email))
+        .unwrap_or_default()
+        .to_owned()
+}
+
 /// The domain that received an email, as Mailgun names it in an inbound message's
-/// `message-url`: the first envelope recipient's (else the first `To`), or `inbound` when
-/// there is none.
+/// `message-url`: the receiving address's, or `inbound` when there is none.
 pub fn find_receiving_domain(stored_email: &EmailRecord) -> String {
-    pick_receiving_domain(
-        stored_email.envelope_to.iter().map(String::as_str).chain(
-            stored_email
-                .to
-                .iter()
-                .map(|recipient| recipient.address.as_str()),
-        ),
+    pick_receiving_domain(list_recipient_addresses(stored_email))
+}
+
+fn list_recipient_addresses(stored_email: &EmailRecord) -> impl Iterator<Item = &str> {
+    stored_email.envelope_to.iter().map(String::as_str).chain(
+        stored_email
+            .to
+            .iter()
+            .map(|recipient| recipient.address.as_str()),
     )
+}
+
+fn pick_receiving_address<'address>(
+    recipient_addresses: impl Iterator<Item = &'address str>,
+) -> Option<&'address str> {
+    recipient_addresses.map(str::trim).find(|address| {
+        address
+            .rsplit_once('@')
+            .is_some_and(|(_, domain)| !domain.trim().is_empty())
+    })
 }
 
 fn pick_receiving_domain<'address>(
     recipient_addresses: impl Iterator<Item = &'address str>,
 ) -> String {
-    recipient_addresses
-        .filter_map(|address| address.rsplit_once('@').map(|(_, domain)| domain.trim()))
-        .find(|domain| !domain.is_empty())
-        .unwrap_or("inbound")
+    pick_receiving_address(recipient_addresses)
+        .and_then(|address| address.rsplit_once('@'))
+        .map_or("inbound", |(_, domain)| domain.trim())
         .to_owned()
 }
 
@@ -129,6 +148,19 @@ mod tests {
         );
         assert_eq!(pick_receiving_domain(["no-at-sign"].into_iter()), "inbound");
         assert_eq!(pick_receiving_domain(std::iter::empty()), "inbound");
+    }
+
+    // AC: EM-25.7
+    #[test]
+    fn the_receiving_address_skips_entries_without_an_address() {
+        assert_eq!(
+            pick_receiving_address(["", "[ABC] Pat Lee", " office@example.test "].into_iter()),
+            Some("office@example.test")
+        );
+        assert_eq!(
+            pick_receiving_address(["no-at-sign", "a@"].into_iter()),
+            None
+        );
     }
 
     // AC: EM-25.3

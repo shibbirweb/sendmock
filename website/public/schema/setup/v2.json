@@ -917,6 +917,13 @@
       "additionalProperties": false,
       "description": "`[[messaging_services]]`, matched by `sid`. Numbers join a service through their own\n`messaging_service` field, so the pool is not listed here.",
       "properties": {
+        "account_sid": {
+          "description": "The SID of the subaccount that owns the service; left out, the main account.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "inbound_fallback_url": {
           "type": [
             "string",

@@ -30,7 +30,7 @@ import {
   useVirtualNumberForm,
 } from "@/features/numbers/virtual-numbers/use-virtual-number-form";
 import { OptOutKeywordsSwitch } from "@/features/numbers/opt-out-keywords-switch";
-import { VirtualNumberAccountField } from "@/features/numbers/virtual-numbers/virtual-number-account-field";
+import { TwilioAccountField } from "@/features/numbers/twilio-account-field";
 import { VirtualNumberInboundFields } from "@/features/numbers/virtual-numbers/virtual-number-inbound-fields";
 import { useMessagingServices } from "@/lib/api/hooks/use-numbers-queries";
 import type { VirtualNumber } from "@/lib/api/types";
@@ -173,9 +173,10 @@ function VirtualNumberForm({
             </SelectContent>
           </Select>
         </FormField>
-        <VirtualNumberAccountField
+        <TwilioAccountField
           fieldId={`${fieldIdPrefix}-account`}
           accountSid={formValues.accountSid}
+          hint="Inbound messages to the number carry this account's SID and are signed with its token."
           onAccountChange={(selectedAccountSid) => {
             updateFormValues({ accountSid: selectedAccountSid });
           }}

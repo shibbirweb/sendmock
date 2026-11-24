@@ -9,8 +9,8 @@ use sendmock_store::EmailRecord;
 use serde_json::{Map, Value, json};
 
 use super::email_forward_fields::{
-    build_message_url, find_receiving_domain, list_header_pairs, map_content_ids,
-    read_first_header, split_reply_text,
+    build_message_url, find_receiving_address, find_receiving_domain, list_header_pairs,
+    map_content_ids, read_first_header, split_reply_text,
 };
 use crate::email::{EmailAddress, EmailSummary, build_bounce_data, read_stored_user_variables};
 use crate::{OperationContext, OperationError};
@@ -96,6 +96,10 @@ fn build_forward_fields(
         (
             "header_pairs".to_owned(),
             json!(list_header_pairs(&stored_email.headers)),
+        ),
+        (
+            "recipient".to_owned(),
+            json!(find_receiving_address(stored_email)),
         ),
         ("stripped_text".to_owned(), json!(stripped_text)),
         ("stripped_signature".to_owned(), json!(stripped_signature)),

@@ -3,6 +3,7 @@ import { describe, expect, test } from "vitest";
 import { buildEmailFixture } from "@/mocks/fixtures/email-fixture-builder";
 import {
   buildEmailForwardFields,
+  findReceivingAddress,
   findReceivingDomain,
 } from "@/mocks/webhooks/email-forward-fields";
 
@@ -36,5 +37,20 @@ describe("the mock inbound message-url", () => {
     const inboundEmail = buildInboundEmail([]);
 
     expect(findReceivingDomain(inboundEmail)).toBe("inbound");
+  });
+});
+
+describe("the mock inbound recipient", () => {
+  test("EM-25.7 skips a To entry without an address", () => {
+    const inboundEmail = buildInboundEmail(["", "office@example.test"]);
+
+    expect(findReceivingAddress(inboundEmail)).toBe("office@example.test");
+    expect(buildEmailForwardFields(inboundEmail).recipient).toBe(
+      "office@example.test",
+    );
+  });
+
+  test("EM-25.7 is empty when no recipient has an address", () => {
+    expect(findReceivingAddress(buildInboundEmail([]))).toBe("");
   });
 });

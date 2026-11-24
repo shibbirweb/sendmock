@@ -5,7 +5,7 @@ use rusqlite::{Connection, OptionalExtension, Row, params};
 use super::MessagingServiceRecord;
 use crate::{Database, StoreError};
 
-const SERVICE_COLUMNS: &str = "sid, friendly_name, inbound_mode, inbound_url, inbound_fallback_url, created_by, created_at, opt_out_keywords";
+const SERVICE_COLUMNS: &str = "sid, friendly_name, inbound_mode, inbound_url, inbound_fallback_url, created_by, created_at, opt_out_keywords, account_sid";
 
 /// Messaging Services; the sender pool is read from and written to the numbers, so a number
 /// is in at most one pool and moving it updates both services.
@@ -56,8 +56,8 @@ impl MessagingServiceRepository {
             .write(move |connection| {
                 let transaction = connection.transaction()?;
                 transaction.execute(
-                    &format!("INSERT INTO messaging_services ({SERVICE_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8) \
-                     ON CONFLICT (sid) DO UPDATE SET friendly_name = excluded.friendly_name, inbound_mode = excluded.inbound_mode, inbound_url = excluded.inbound_url, inbound_fallback_url = excluded.inbound_fallback_url, opt_out_keywords = excluded.opt_out_keywords"),
+                    &format!("INSERT INTO messaging_services ({SERVICE_COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9) \
+                     ON CONFLICT (sid) DO UPDATE SET friendly_name = excluded.friendly_name, inbound_mode = excluded.inbound_mode, inbound_url = excluded.inbound_url, inbound_fallback_url = excluded.inbound_fallback_url, opt_out_keywords = excluded.opt_out_keywords, account_sid = excluded.account_sid"),
                     params![
                         service.service_sid,
                         service.friendly_name,
@@ -67,6 +67,7 @@ impl MessagingServiceRepository {
                         service.created_by,
                         service.created_at_unix_ms,
                         service.opt_out_keywords,
+                        service.account_sid,
                     ],
                 )?;
                 transaction.execute(
@@ -140,5 +141,6 @@ fn read_service_row(row: &Row<'_>) -> rusqlite::Result<MessagingServiceRecord> {
         created_by: row.get(5)?,
         created_at_unix_ms: row.get(6)?,
         opt_out_keywords: row.get(7)?,
+        account_sid: row.get(8)?,
     })
 }

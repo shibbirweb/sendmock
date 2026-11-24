@@ -372,3 +372,41 @@ async fn sendgrid_inbound_parse_posts_multipart_with_each_file_fetched_from_send
     );
     assert!(body.contains("name=\"text\"\r\n\r\nSee the file"), "{body}");
 }
+
+// AC: EM-25.7
+#[tokio::test]
+async fn mailgun_inbound_forms_send_the_receiving_address_when_a_to_entry_has_none() {
+    let (app_router, _) = build_test_app();
+    add_secret_variable(&app_router, "mailgun_signing_key", MAILGUN_SIGNING_KEY).await;
+    // An unquoted comma splits the name into an entry without an address.
+    let (status, inbound) = call_api(
+        &app_router,
+        "POST",
+        "/api/v1/emails/inbound",
+        Some(&json!({
+            "from": "Sam <sam@example.test>",
+            "to": ["[ABC] Pat Lee, Jr <office@example.test>"],
+            "subject": "Re: Ticket",
+            "text": "Thanks",
+        })),
+    )
+    .await;
+    assert_eq!(status, 201, "{inbound}");
+    let email_id = inbound["id"].as_str().unwrap_or_default();
+
+    for template_id in ["mailgun.routes", "mailgun.store_notify"] {
+        let (_, body) = render_for_email(&app_router, template_id, email_id).await;
+        let form_fields = read_multipart_fields(&body, "MailgunForward");
+
+        assert_eq!(
+            form_fields.get("recipient").map(String::as_str),
+            Some("office@example.test"),
+            "{template_id}: {body}"
+        );
+        assert_eq!(
+            form_fields.get("To").map(String::as_str),
+            Some("office@example.test"),
+            "{template_id}: {body}"
+        );
+    }
+}

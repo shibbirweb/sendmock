@@ -22,6 +22,21 @@ describe("formatEmailAddress", () => {
     );
     expect(formatEmailAddress(originalEmail.to[0]!)).toBe("rahim@example.com");
   });
+
+  test("EM-17.6 quotes a name with a comma, brackets or a quote", () => {
+    expect(
+      formatEmailAddress({
+        name: "[ABC] Pat Lee, Jr",
+        address: "office@example.test",
+      }),
+    ).toBe('"[ABC] Pat Lee, Jr" <office@example.test>');
+    expect(
+      formatEmailAddress({
+        name: 'Pat "PL" Lee.',
+        address: "office@example.test",
+      }),
+    ).toBe('"Pat \\"PL\\" Lee." <office@example.test>');
+  });
 });
 
 describe("quoteOriginalEmail", () => {

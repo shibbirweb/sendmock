@@ -13,6 +13,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { OptOutKeywordsSwitch } from "@/features/numbers/opt-out-keywords-switch";
+import { TwilioAccountField } from "@/features/numbers/twilio-account-field";
 import { MessagingServicePoolField } from "@/features/numbers/messaging-services/messaging-service-pool-field";
 import { useMessagingServiceForm } from "@/features/numbers/messaging-services/use-messaging-service-form";
 import {
@@ -121,6 +122,14 @@ function MessagingServiceForm({
             </FormField>
           </div>
         )}
+        <TwilioAccountField
+          fieldId={`${fieldIdPrefix}-account`}
+          accountSid={formValues.accountSid}
+          hint="Twilio's Services API lists the service only to this account, as Twilio does."
+          onAccountChange={(selectedAccountSid) => {
+            updateFormValues({ accountSid: selectedAccountSid });
+          }}
+        />
         <OptOutKeywordsSwitch
           switchId={`${fieldIdPrefix}-opt-out-keywords`}
           hint="A text of STOP to one of its numbers opts the contact out of the whole service, with the provider's switch on."

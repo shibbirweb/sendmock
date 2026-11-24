@@ -43,6 +43,47 @@ test("EM-17.1 Reply creates an inbound reply linked to the original", async ({
   );
 });
 
+test("EM-17.7 Reply's To and Cc can be edited like a mail client's", async ({
+  page,
+}) => {
+  await openEmail(page, "Your verification code");
+
+  await page.getByRole("button", { name: "Reply", exact: true }).click();
+  const composer = page.getByRole("region", { name: "Reply as recipient" });
+  const toField = composer.getByLabel("To", { exact: true });
+  await toField.fill("billing@shop.test");
+  await toField.press("Enter");
+  await expect(composer.getByText("billing@shop.test")).toBeVisible();
+  await composer
+    .getByRole("button", { name: /^Remove / })
+    .first()
+    .click();
+  await expect(composer.getByRole("button", { name: /^Remove / })).toHaveCount(
+    1,
+  );
+
+  await composer.getByRole("button", { name: "Cc", exact: true }).click();
+  const ccField = composer.getByLabel("Cc", { exact: true });
+  await ccField.fill('"Ops, Team" <ops@shop.test>');
+  await ccField.press("Enter");
+  await expect(composer.getByText("Ops, Team")).toBeVisible();
+  await ccField.fill("not-an-address");
+  await ccField.press("Enter");
+  await expect(
+    composer.getByRole("button", { name: "Send reply" }),
+  ).toBeDisabled();
+  await composer.getByRole("button", { name: "Remove not-an-address" }).click();
+  await composer.getByRole("button", { name: "Send reply" }).click();
+
+  await clickToastAction(page, "Reply created", "Open");
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Re: Your verification code" }),
+  ).toBeVisible();
+  const detailHeader = page.getByRole("main");
+  await expect(detailHeader).toContainText("billing@shop.test");
+  await expect(detailHeader).toContainText("Ops, Team <ops@shop.test>");
+});
+
 test("EM-17.4 Forward sends the email on with its attachments", async ({
   page,
 }) => {

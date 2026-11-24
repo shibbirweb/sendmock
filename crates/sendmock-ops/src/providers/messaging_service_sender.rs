@@ -2,6 +2,7 @@ use sendmock_store::MessagingServiceRecord;
 
 use super::request_checks::ProviderFailure;
 use crate::numbers::generate_service_sid;
+use crate::twilio_accounts::TwilioAccountDirectory;
 use crate::{OperationContext, OperationError};
 
 /// Twilio's valid test sender, used when a service's pool is empty so the send still works.
@@ -22,6 +23,7 @@ pub async fn pick_pool_sender(
     operation_context: &OperationContext,
     service_sid: &str,
     to_number: &str,
+    sending_account_sid: Option<&str>,
 ) -> Result<Result<String, ProviderFailure>, OperationError> {
     let messaging_service = match operation_context
         .messaging_service_repository
@@ -33,7 +35,7 @@ pub async fn pick_pool_sender(
             if is_strict_twilio_test_mode(operation_context).await? {
                 return Ok(Err(unknown_service_failure(service_sid)));
             }
-            create_lenient_service(operation_context, service_sid).await?
+            create_lenient_service(operation_context, service_sid, sending_account_sid).await?
         }
     };
     let is_whatsapp = to_number.starts_with(WHATSAPP_PREFIX);
@@ -120,11 +122,14 @@ fn unknown_service_failure(service_sid: &str) -> ProviderFailure {
     }
 }
 
-/// A service with the SID the app sent, so a send with any SID just works.
+/// A service with the SID the app sent, owned by the account that sent, so a send with any
+/// SID just works.
 async fn create_lenient_service(
     operation_context: &OperationContext,
     service_sid: &str,
+    sending_account_sid: Option<&str>,
 ) -> Result<MessagingServiceRecord, OperationError> {
+    let account_directory = TwilioAccountDirectory::load(operation_context).await?;
     let service_sid = if service_sid.starts_with("MG") {
         service_sid.to_owned()
     } else {
@@ -140,6 +145,7 @@ async fn create_lenient_service(
             inbound_url: None,
             inbound_fallback_url: None,
             opt_out_keywords: true,
+            account_sid: account_directory.stored_owner_sid(sending_account_sid),
             created_by: "api".to_owned(),
             created_at_unix_ms: operation_context.clock.now_unix_ms(),
         })

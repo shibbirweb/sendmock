@@ -5,9 +5,27 @@ type OriginalEmailFields = Pick<
   "from" | "to" | "subject" | "received_at" | "text_body" | "snippet"
 >;
 
+/** The characters RFC 5322 allows in a display name only inside a quoted string. */
+const displayNameSpecials = /[()<>[\]:;@\\,."]/;
+
+function quoteDisplayName(displayName: string): string {
+  if (!displayNameSpecials.test(displayName)) {
+    return displayName;
+  }
+  const escapedName = displayName.replace(
+    /[\\"]/g,
+    (special) => `\\${special}`,
+  );
+  return `"${escapedName}"`;
+}
+
+/**
+ * `Name <address>`, with the name quoted when it needs it, so a comma in a name
+ * does not split the header into two addresses.
+ */
 export function formatEmailAddress(emailAddress: EmailAddress): string {
   return emailAddress.name
-    ? `${emailAddress.name} <${emailAddress.address}>`
+    ? `${quoteDisplayName(emailAddress.name)} <${emailAddress.address}>`
     : emailAddress.address;
 }
 

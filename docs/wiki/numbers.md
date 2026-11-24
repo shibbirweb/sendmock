@@ -62,6 +62,8 @@ A service can start with no numbers, as on Twilio (leave out `number_ids` in the
 | **Defer to sender's webhook** | go to each number's own inbound URL |
 | **Drop the message** | are stored but not sent anywhere |
 
+**Twilio account** picks the account the service belongs to: the main account or one of its [subaccounts](./sms/providers.md#twilio-subaccounts). Twilio's Services API lists the service only to that account, as Twilio does. In the CLI, `sendmock sms services create --account-sid AC...`; in a setup file, `account_sid` on the `[[messaging_services]]` item. Left out, the main account. A subaccount's own row shows its SID under the service's.
+
 To keep the SID your app is configured with, give it when you add the service: `sendmock sms services create --sid MG... --friendly-name Notifications --inbound-mode defer_to_sender` (or `sid` in the API body). Left out, SendMock makes one.
 
 Delete asks first and leaves the numbers unassigned.

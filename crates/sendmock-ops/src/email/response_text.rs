@@ -21,12 +21,31 @@ pub fn build_response_subject(original_subject: &str, is_forward: bool) -> Strin
     format!("{prefix} {original_subject}").trim().to_owned()
 }
 
+/// The characters RFC 5322 allows in a display name only inside a quoted string.
+const DISPLAY_NAME_SPECIALS: [char; 13] = [
+    '(', ')', '<', '>', '[', ']', ':', ';', '@', '\\', ',', '.', '"',
+];
+
+/// `Name <address>`, with the name quoted when it needs it, so a comma in a name does not
+/// split the header into two addresses.
 pub fn format_address(stored_address: &StoredEmailAddress) -> String {
     if stored_address.name.is_empty() {
         stored_address.address.clone()
     } else {
-        format!("{} <{}>", stored_address.name, stored_address.address)
+        format!(
+            "{} <{}>",
+            quote_display_name(&stored_address.name),
+            stored_address.address
+        )
     }
+}
+
+fn quote_display_name(display_name: &str) -> String {
+    if !display_name.contains(DISPLAY_NAME_SPECIALS) {
+        return display_name.to_owned();
+    }
+    let escaped_name = display_name.replace('\\', "\\\\").replace('"', "\\\"");
+    format!("\"{escaped_name}\"")
 }
 
 /// As JavaScript's `toUTCString()` writes it: `Thu, 05 Nov 2026 10:00:00 GMT`.
@@ -117,6 +136,36 @@ mod tests {
             mime_tree_json: String::new(),
             attachments: Vec::new(),
         }
+    }
+
+    fn build_address(display_name: &str) -> StoredEmailAddress {
+        StoredEmailAddress {
+            name: display_name.to_owned(),
+            address: "office@example.test".to_owned(),
+        }
+    }
+
+    // AC: EM-17.6
+    #[test]
+    fn a_display_name_with_a_comma_or_brackets_is_quoted() {
+        assert_eq!(
+            format_address(&build_address("[ABC] Pat Lee, Jr")),
+            "\"[ABC] Pat Lee, Jr\" <office@example.test>"
+        );
+        assert_eq!(
+            format_address(&build_address("Pat \"PL\" Lee.")),
+            "\"Pat \\\"PL\\\" Lee.\" <office@example.test>"
+        );
+    }
+
+    // AC: EM-17.6
+    #[test]
+    fn a_plain_display_name_or_none_is_written_as_it_is() {
+        assert_eq!(
+            format_address(&build_address("Pat Lee")),
+            "Pat Lee <office@example.test>"
+        );
+        assert_eq!(format_address(&build_address("")), "office@example.test");
     }
 
     // AC: EM-17.1 EM-17.4

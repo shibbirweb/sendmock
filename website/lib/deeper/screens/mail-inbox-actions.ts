@@ -24,6 +24,23 @@ export const mailInboxActionEntries: DeeperEntry[] = [
     does: "Which recipient of the original email the reply or forward comes from.",
   },
   {
+    control: "button: Remove Acme Newsletter <news@acme.test>",
+    does: "In a reply, each address in To and Cc is a chip with the name (or the address) and this button, which takes that address out. Double-click a chip to change it in the field.",
+    operationIds: ["postEmailsByEmailIdReply"],
+  },
+  {
+    control: "textbox: To",
+    does: 'Who the reply goes to, prefilled with the original `Reply-To` (or `From`). Type or paste more addresses: Enter, a comma, a semicolon or Tab adds one, and a name with a comma goes in quotes (`"Lee, Pat" <pat@example.test>`). Backspace in the empty field takes the last address back to edit. An entry that is not an address turns red and Send reply waits.',
+    changes: "Sent as `to` on the reply, replacing the default recipients.",
+    operationIds: ["postEmailsByEmailIdReply"],
+  },
+  {
+    control: "button: Cc",
+    does: "Adds a Cc field to the reply, which works like To. Reply all opens with it already filled with the other original recipients.",
+    changes: "Sent as `cc` on the reply.",
+    operationIds: ["postEmailsByEmailIdReply"],
+  },
+  {
     control: "combobox: To",
     does: "Where the forward goes: an address your app receives mail on (an inbound domain or route).",
   },
@@ -38,8 +55,9 @@ export const mailInboxActionEntries: DeeperEntry[] = [
   {
     control:
       "link: http://localhost:#/webhooks/mail/stored Route Keep everything else",
-    does: "One line of the Delivers to row: a URL or address that will receive the reply or forward, and the inbound route or webhook rule that sends it there, in the order they run. The row follows the Forward address as you type. When nothing would receive the email, it says \"Nothing receives this yet\" with Send replies to your app, which creates a route to your app's URL (only mail to this address, or every incoming email) in one step.",
-    changes: "Opens that route in Webhooks > Inbound routes, or the rule's endpoint in Webhooks > Rules.",
+    does: 'One line of the Delivers to row: a URL or address that will receive the reply or forward, and the inbound route or webhook rule that sends it there, in the order they run. The row follows the Forward address as you type. When nothing would receive the email, it says "Nothing receives this yet" with Send replies to your app, which creates a route to your app\'s URL (only mail to this address, or every incoming email) in one step.',
+    changes:
+      "Opens that route in Webhooks > Inbound routes, or the rule's endpoint in Webhooks > Rules.",
     operationIds: ["postInboundRoutesMatch", "postInboundRoutes"],
     links: "[Inbound routes](../../webhooks/inbound-routes.md).",
   },
@@ -79,7 +97,8 @@ export const mailInboxActionEntries: DeeperEntry[] = [
   {
     control: "menuitem: Click a link (email.clicked)",
     does: "Lists the email's links; choosing one records a click on it, as a provider's click tracking would. Shown when the email has links.",
-    changes: "Fires `email.clicked` with the link, `first_click` and the click count, and adds it to the Timeline. A link clicked in the HTML preview does the same with `source: \"ui\"`.",
+    changes:
+      'Fires `email.clicked` with the link, `first_click` and the click count, and adds it to the Timeline. A link clicked in the HTML preview does the same with `source: "ui"`.',
     operationIds: ["postEmailsByEmailIdClicks"],
   },
   {
