@@ -27,6 +27,11 @@ pub struct EmailReplyInput {
     pub body: Option<String>,
     /// Who replies; defaults to the original recipient.
     pub from: Option<String>,
+    /// Who the reply goes to; replaces the default, the original `Reply-To` (or `From`).
+    pub to: Option<Vec<String>>,
+    /// Copies; replaces the default, the other original recipients with `reply_all` and none
+    /// without.
+    pub cc: Option<Vec<String>>,
     /// Defaults to `Re: <original subject>`.
     pub subject: Option<String>,
     /// Also sends to the other original recipients, in Cc.
@@ -86,6 +91,26 @@ async fn find_original(
     Ok(original_email)
 }
 
+/// The original `Reply-To`, or its `From` when it has none.
+fn list_default_reply_recipients(original_email: &EmailRecord) -> Vec<String> {
+    let reply_recipient = original_email
+        .reply_to
+        .first()
+        .unwrap_or(&original_email.from);
+    vec![format_address(reply_recipient)]
+}
+
+/// The original's other `To` and `Cc` recipients, for Reply all.
+fn list_other_recipients(original_email: &EmailRecord, responder_address: &str) -> Vec<String> {
+    original_email
+        .to
+        .iter()
+        .chain(&original_email.cc)
+        .filter(|recipient| recipient.address != responder_address)
+        .map(format_address)
+        .collect()
+}
+
 pub struct ReplyToEmailOperation;
 
 impl Operation for ReplyToEmailOperation {
@@ -106,8 +131,8 @@ impl Operation for ReplyToEmailOperation {
         }
     }
 
-    /// To the original `Reply-To` (or `From`); Reply all copies the other recipients (EM-17.1,
-    /// EM-17.4).
+    /// To the original `Reply-To` (or `From`), Reply all copying the other recipients, unless
+    /// `to` or `cc` name the recipients instead.
     async fn execute(
         &self,
         operation_context: &OperationContext,
@@ -116,27 +141,21 @@ impl Operation for ReplyToEmailOperation {
         let operation_context = &input.webhook_choice.apply_to(operation_context).await?;
         let original_email = find_original(operation_context, &input.email_id).await?;
         let responder = read_responder(&original_email, input.from.as_deref());
-        let responder_address = read_bare_address(&responder);
-        let reply_recipient = original_email
-            .reply_to
-            .first()
-            .unwrap_or(&original_email.from);
-        let other_recipients = if input.reply_all == Some(true) {
-            original_email
-                .to
-                .iter()
-                .chain(&original_email.cc)
-                .filter(|recipient| recipient.address != responder_address)
-                .map(format_address)
-                .collect()
-        } else {
-            Vec::new()
-        };
+        let reply_recipients = input
+            .to
+            .unwrap_or_else(|| list_default_reply_recipients(&original_email));
+        let copy_recipients = input.cc.unwrap_or_else(|| {
+            if input.reply_all == Some(true) {
+                list_other_recipients(&original_email, &read_bare_address(&responder))
+            } else {
+                Vec::new()
+            }
+        });
         let response_spec = EmailResponseSpec {
             is_forward: false,
             from: responder,
-            to: vec![format_address(reply_recipient)],
-            cc: other_recipients,
+            to: reply_recipients,
+            cc: copy_recipients,
             subject: input.subject,
             body: input.body.unwrap_or_default(),
             includes_original_text: input.include_original.unwrap_or(true),

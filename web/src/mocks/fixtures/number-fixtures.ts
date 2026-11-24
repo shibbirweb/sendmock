@@ -77,6 +77,7 @@ export function buildMessagingServiceFixtures(
       inbound_url: null,
       inbound_fallback_url: null,
       opt_out_keywords: true,
+      account_sid: null,
       created_by: "seed",
     },
     {
@@ -88,6 +89,7 @@ export function buildMessagingServiceFixtures(
       inbound_url: "http://app.internal:8000/whatsapp/inbound",
       inbound_fallback_url: "http://localhost:8000/whatsapp/fallback",
       opt_out_keywords: true,
+      account_sid: null,
       created_by: "ui",
     },
   ];

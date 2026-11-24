@@ -62,6 +62,9 @@ pub struct MessagingService {
     pub inbound_fallback_url: Option<String>,
     /// Whether a text of STOP to one of its numbers opts the contact out of the service.
     pub opt_out_keywords: bool,
+    /// The Twilio account the service belongs to; null for the main account.
+    #[schemars(required, schema_with = "crate::nullable_schema::<String>")]
+    pub account_sid: Option<String>,
     pub created_by: String,
 }
 
@@ -75,6 +78,7 @@ impl From<MessagingServiceRecord> for MessagingService {
             inbound_url: stored_service.inbound_url,
             inbound_fallback_url: stored_service.inbound_fallback_url,
             opt_out_keywords: stored_service.opt_out_keywords,
+            account_sid: stored_service.account_sid,
             created_by: stored_service.created_by,
         }
     }

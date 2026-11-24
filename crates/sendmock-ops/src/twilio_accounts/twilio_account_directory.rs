@@ -122,6 +122,13 @@ impl TwilioAccountDirectory {
             })
             .unwrap_or(&self.main_account)
     }
+
+    /// How a record stores the account that owns it: a known subaccount's SID, or `None` for
+    /// the main account and for a SID this setup does not know, as `account_for` reads it.
+    pub fn stored_owner_sid(&self, account_sid: Option<&str>) -> Option<String> {
+        let owning_account = self.account_for(account_sid);
+        (!owning_account.is_main).then(|| owning_account.account_sid.clone())
+    }
 }
 
 #[cfg(test)]

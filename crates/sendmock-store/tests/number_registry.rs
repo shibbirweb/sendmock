@@ -48,6 +48,7 @@ fn messaging_service(service_sid: &str, number_ids: &[&str]) -> MessagingService
         inbound_url: None,
         inbound_fallback_url: None,
         opt_out_keywords: true,
+        account_sid: None,
         created_by: "api".to_owned(),
         created_at_unix_ms: 2_000,
     }

@@ -18,6 +18,7 @@ import {
   createNotFoundResponse,
   parseEmailAddress,
 } from "@/mocks/handlers/handler-utils";
+import { isEmailAddressText } from "@/lib/email/email-address-text";
 import { runInboundRoutes } from "@/mocks/inbound-routes/run-inbound-routes";
 import { publishMockEvent } from "@/mocks/realtime/mock-event-bus";
 import { toEmailSummary } from "@/mocks/fixtures/email-summary";
@@ -69,6 +70,36 @@ function listOtherRecipients(
   );
 }
 
+/**
+ * The first refusal for a reply's `to` or `cc`, worded as the binary words it:
+ * an empty `to`, or an entry that is not an address.
+ */
+function findRecipientRefusal(
+  replyRequest: EmailReplyRequest,
+): Response | null {
+  if (replyRequest.to?.length === 0) {
+    return createErrorResponse(
+      400,
+      "validation_failed",
+      "`to` needs at least one recipient",
+    );
+  }
+  for (const fieldName of ["to", "cc"] as const) {
+    const invalidRecipient = (replyRequest[fieldName] ?? []).find(
+      (recipientText) => !isEmailAddressText(recipientText),
+    );
+    if (invalidRecipient !== undefined) {
+      return createErrorResponse(
+        400,
+        "validation_failed",
+        `${invalidRecipient} in \`${fieldName}\` is not an email address`,
+      );
+    }
+  }
+
+  return null;
+}
+
 function storeEmailResponse(
   originalEmail: EmailDetail,
   responseSpec: EmailResponseSpec,
@@ -103,17 +134,24 @@ export const emailResponseHandlers = [
     if (choiceRefusal) {
       return choiceRefusal;
     }
+    const recipientRefusal = findRecipientRefusal(replyRequest);
+    if (recipientRefusal) {
+      return recipientRefusal;
+    }
     const responder = readResponder(originalEmail, replyRequest.from);
+    const defaultCopies =
+      replyRequest.reply_all === true
+        ? listOtherRecipients(originalEmail, responder)
+        : [];
 
     return runWithWebhookChoice(replyRequest, () =>
       storeEmailResponse(originalEmail, {
         kind: "reply",
         from: responder,
-        to: [originalEmail.reply_to[0] ?? originalEmail.from],
-        cc:
-          replyRequest.reply_all === true
-            ? listOtherRecipients(originalEmail, responder)
-            : [],
+        to: replyRequest.to?.map(parseEmailAddress) ?? [
+          originalEmail.reply_to[0] ?? originalEmail.from,
+        ],
+        cc: replyRequest.cc?.map(parseEmailAddress) ?? defaultCopies,
         subject: replyRequest.subject,
         body: replyRequest.body ?? "",
         includeOriginalText: replyRequest.include_original ?? true,

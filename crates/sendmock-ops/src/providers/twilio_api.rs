@@ -1,6 +1,7 @@
 use super::message_provider_definition::MessageProviderDefinition;
 use super::provider_http::{ProviderHttpRequest, ProviderHttpResponse};
 use super::twilio_accounts_api::answer_twilio_accounts_request;
+use super::twilio_answers::read_account_sid;
 use super::twilio_incoming_numbers_api::answer_incoming_numbers_request;
 use super::twilio_messaging_services::answer_messaging_services_request;
 use super::twilio_service_numbers_api::answer_service_numbers_request;
@@ -49,12 +50,21 @@ pub async fn answer_twilio_api_request(
     {
         return Ok(with_provider_secrets(numbers_response));
     }
+    let caller_account_sid = Some(read_account_sid(twilio_provider, request))
+        .filter(|account_sid| !account_sid.is_empty())
+        .unwrap_or_else(|| directory.main_account.account_sid.clone());
     if let Some(pool_response) =
-        answer_service_numbers_request(operation_context, &directory, request).await?
+        answer_service_numbers_request(operation_context, &directory, &caller_account_sid, request)
+            .await?
     {
         return Ok(with_provider_secrets(pool_response));
     }
-    let services_response =
-        answer_messaging_services_request(operation_context, twilio_provider, request).await?;
+    let services_response = answer_messaging_services_request(
+        operation_context,
+        &directory,
+        &caller_account_sid,
+        request,
+    )
+    .await?;
     Ok(services_response.and_then(with_provider_secrets))
 }

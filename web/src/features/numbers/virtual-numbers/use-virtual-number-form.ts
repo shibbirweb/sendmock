@@ -1,6 +1,10 @@
 import * as React from "react";
 import { toast } from "sonner";
 
+import {
+  mainTwilioAccount,
+  toStoredAccountSid,
+} from "@/features/numbers/twilio-account-field";
 import { ApiError } from "@/lib/api/api-client";
 import { useSaveVirtualNumber } from "@/lib/api/hooks/use-numbers-queries";
 import type {
@@ -31,8 +35,6 @@ export type VirtualNumberFormValues = {
 
 /** Select value for "no Messaging Service" (Select items cannot be empty). */
 export const noMessagingService = "none";
-/** Select value for the main Twilio account, which numbers store as no account. */
-export const mainTwilioAccount = "main";
 const defaultInboundTemplateId = "twilio.inbound_sms";
 
 function toFormValues(
@@ -77,10 +79,7 @@ function toNumberInput(
       formValues.messagingServiceSid === noMessagingService
         ? null
         : formValues.messagingServiceSid,
-    account_sid:
-      formValues.accountSid === mainTwilioAccount
-        ? null
-        : formValues.accountSid,
+    account_sid: toStoredAccountSid(formValues.accountSid),
     opt_out_keywords: formValues.hasOptOutKeywords,
   };
 }

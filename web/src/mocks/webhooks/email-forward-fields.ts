@@ -39,19 +39,33 @@ function splitReplyText(textBody: string): [string, string] {
   return [keptLines.join("\n").trim(), signature];
 }
 
-/**
- * The domain that received an email, as Mailgun names it in an inbound message's
- * `message-url`: the first envelope recipient's (else the first `To`), or `inbound`.
- */
-export function findReceivingDomain(email: EmailDetail): string {
-  const recipientAddresses = [
+/** The first envelope recipient with an address, else the first `To`'s. */
+function findFirstReceivingAddress(email: EmailDetail): string | undefined {
+  return [
     ...email.envelope_to,
     ...email.to.map((recipient) => recipient.address),
-  ];
-  const receivingDomain = recipientAddresses
-    .map((address) => address.split("@").slice(1).join("@").trim())
-    .find((domain) => domain !== "");
-  return receivingDomain ?? "inbound";
+  ]
+    .map((address) => address.trim())
+    .find((address) => address.split("@").slice(1).join("@").trim() !== "");
+}
+
+/**
+ * The address that received an email, as Mailgun's `recipient` names it, or
+ * empty when there is none, so a `To` entry without an address is never sent.
+ */
+export function findReceivingAddress(email: EmailDetail): string {
+  return findFirstReceivingAddress(email) ?? "";
+}
+
+/**
+ * The domain that received an email, as Mailgun names it in an inbound message's
+ * `message-url`: the receiving address's, or `inbound`.
+ */
+export function findReceivingDomain(email: EmailDetail): string {
+  const receivingAddress = findFirstReceivingAddress(email);
+  return receivingAddress === undefined
+    ? "inbound"
+    : receivingAddress.split("@").slice(1).join("@").trim();
 }
 
 /**
@@ -71,6 +85,7 @@ export function buildEmailForwardFields(
       ([headerName, headerValues]) =>
         headerValues.map((headerValue) => [headerName, headerValue]),
     ),
+    recipient: findReceivingAddress(email),
     stripped_text: strippedText,
     stripped_signature: strippedSignature,
     content_id_map: Object.fromEntries(

@@ -137,6 +137,36 @@ test("SM-22.5 a number is given to a Twilio subaccount and keeps it when edited"
   );
 });
 
+test("SM-22.10 a service is given to a Twilio subaccount and keeps it when edited", async ({
+  page,
+}) => {
+  await page.goto("/numbers?tab=services");
+  await page.getByRole("button", { name: "New service" }).click();
+  const serviceSheet = page.getByRole("dialog", {
+    name: "New Messaging Service",
+  });
+
+  await serviceSheet.getByLabel("Name").fill("Clinic reminders");
+  await expect(serviceSheet.getByLabel("Twilio account")).toHaveText(
+    "Main account",
+  );
+  await serviceSheet.getByLabel("Twilio account").click();
+  await page.getByRole("option", { name: "Acme Clinic" }).click();
+  await serviceSheet.getByRole("button", { name: "Create service" }).click();
+
+  const serviceRow = page
+    .getByRole("row")
+    .filter({ hasText: "Clinic reminders" });
+  await expect(serviceRow).toContainText("AC33333333333333333333333333333333");
+  await page.getByRole("button", { name: "Edit Clinic reminders" }).click();
+  const editSheet = page.getByRole("dialog", {
+    name: "Edit Messaging Service",
+  });
+  await expect(editSheet.getByLabel("Twilio account")).toHaveText(
+    "Acme Clinic",
+  );
+});
+
 test("SM-23.3 the Opt-outs tab lists contacts who texted STOP and lifts them", async ({
   page,
 }) => {

@@ -168,6 +168,8 @@ UI in U1, backend Phase 4. Docs: [Email replies and inbound routes](../05-webhoo
 - [x] EM-17.3 Inbound emails fire `email.inbound`, never `email.received`, and show an Inbound badge and a "Reply to" or "Forward of" link to the original. (#48)
 - [x] EM-17.4 "Forward" and `POST /api/v1/emails/{emailId}/forward` create an inbound email to the given address with a `Fwd:` subject, the original below a forwarded-message block, and the original attachments unless turned off; "Reply all" adds the other original recipients in `Cc`. (#48)
 - [x] EM-17.5 The original email lists its replies and forwards as links and its timeline shows them; replying to or forwarding an incoming email is not offered in the UI and returns `409` from the API. (#48)
+- [ ] EM-17.6 A reply, Reply all or forward writes each address with its display name quoted when the name has a comma, brackets or another RFC 5322 special (`"[ABC] Pat Lee, Jr" <office@example.test>`), so the stored email lists that recipient once, with its name and address (A29, R-51, #379).
+- [ ] EM-17.7 In a reply, To and Cc are editable recipient fields like a mail client's: each address a chip that can be removed or double-clicked to change, more typed or pasted (Enter, a comma, a semicolon or Tab adds one, a comma inside a quoted name does not), Cc added to a plain reply, Send waiting while an entry is not an address; `POST /api/v1/emails/{emailId}/reply`, CLI `--to` and `--cc` and MCP take `to` and `cc` lists that replace the defaults, refusing an empty `to` or an entry that is not an address with the field named (A29, owner request 2026-11-24, #379).
 
 ## EM-18 Configurable email providers
 
@@ -257,6 +259,7 @@ Phase 5 (W20), for the next beta (0.1.0-beta.4), added 2026-11-13 (owner request
 - [x] EM-25.4 Each built-in template lists only the events its provider sends: inbound templates list `email.inbound`, event templates do not, and a rule built from the rule tool's inbound example fires for simulated inbound mail and replies (R-04, R-24).
 - [x] EM-25.5 Simulate warns before sending when a chosen endpoint's template does not list the event (R-24).
 - [x] EM-25.6 A built-in `mailgun.store_notify` template sends Mailgun's store-and-notify form, with `attachments` as a JSON list of each file's `url`, `content-type`, `name` and `size` and no file parts, and `mailgun.routes` is described as Mailgun's forward form (R-43).
+- [ ] EM-25.7 `mailgun.routes` and `mailgun.store_notify` send `recipient` and `To` from `data.recipient` (the first envelope recipient, else the first `To` with an address), never an empty string (A29, R-51, #379).
 
 ## EM-26 Stored messages and local email templates
 

@@ -35,6 +35,8 @@ pub struct MessagingServiceRecord {
     pub inbound_fallback_url: Option<String>,
     /// Whether texts of STOP to its numbers opt the contact out of the whole service.
     pub opt_out_keywords: bool,
+    /// The Twilio subaccount that owns the service; `None` for the main account.
+    pub account_sid: Option<String>,
     pub created_by: String,
     pub created_at_unix_ms: i64,
 }

@@ -14,6 +14,7 @@ pub fn build_sample_email_data() -> Value {
         "subject": "Your Acme sign-in code",
         "snippet": "Your code is 482913. It expires in 10 minutes.",
         "message_id": "<01JB7T9Q2R5W8X3Y6Z1A4B7C9D@acme.test>",
+        "recipient": "ann@example.com",
         "in_reply_to": "",
         "references": "",
         "text_body": "Your code is 482913. It expires in 10 minutes.\n\n-- \nAcme",

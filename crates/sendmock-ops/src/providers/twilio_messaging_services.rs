@@ -2,24 +2,33 @@ use sendmock_core::format_rfc3339;
 use sendmock_store::MessagingServiceRecord;
 use serde_json::{Value, json};
 
-use super::message_provider_definition::MessageProviderDefinition;
 use super::provider_http::{ProviderHttpRequest, ProviderHttpResponse};
 use super::request_reader::read_request_fields;
 use super::twilio_answers::{
-    answer_json, answer_no_content, answer_twilio_error, describe_page_meta, read_account_sid,
-    read_form_field,
+    answer_json, answer_no_content, answer_twilio_error, describe_page_meta, read_form_field,
 };
 use crate::numbers::generate_service_sid;
+use crate::twilio_accounts::TwilioAccountDirectory;
 use crate::{OperationContext, OperationError};
 
 const SERVICES_PATH: &str = "/v1/Services";
 const SERVICES_URL: &str = "https://messaging.twilio.com/v1/Services";
 
+/// The account a service belongs to: its own, or the main account's.
+pub fn service_owner<'service>(
+    service: &'service MessagingServiceRecord,
+    main_account_sid: &'service str,
+) -> &'service str {
+    service.account_sid.as_deref().unwrap_or(main_account_sid)
+}
+
 /// Twilio's Messaging Services API (`messaging.twilio.com/v1/Services`): create, list, fetch,
-/// update and delete, over the same services as the Numbers screen. `None` for other paths.
+/// update and delete, over the same services as the Numbers screen. Each account sees only
+/// its own services, as on Twilio; another account's answers 20404. `None` for other paths.
 pub async fn answer_messaging_services_request(
     operation_context: &OperationContext,
-    twilio_provider: &MessageProviderDefinition,
+    directory: &TwilioAccountDirectory,
+    caller_account_sid: &str,
     request: &ProviderHttpRequest,
 ) -> Result<Option<ProviderHttpResponse>, OperationError> {
     let Some(rest_of_path) = request.path.strip_prefix(SERVICES_PATH) else {
@@ -31,35 +40,39 @@ pub async fn answer_messaging_services_request(
     if !rest_of_path.is_empty() && service_sid.is_none() {
         return Ok(None);
     }
-    let account_sid = read_account_sid(twilio_provider, request);
+    let main_account_sid = directory.main_account.account_sid.as_str();
     let fields = read_request_fields(request, "form").unwrap_or_default();
     let repository = &operation_context.messaging_service_repository;
-    let response = match (request.method.as_str(), service_sid) {
-        ("POST", None) => create_service(operation_context, &fields, &account_sid).await?,
-        ("GET", None) => {
+    let owned_service = match service_sid {
+        Some(service_sid) => repository
+            .find_service(service_sid)
+            .await?
+            .filter(|service| service_owner(service, main_account_sid) == caller_account_sid),
+        None => None,
+    };
+    let response = match (request.method.as_str(), service_sid, owned_service) {
+        ("POST", None, _) => {
+            let owner_sid = directory.stored_owner_sid(Some(caller_account_sid));
+            create_service(operation_context, &fields, owner_sid, main_account_sid).await?
+        }
+        ("GET", None, _) => {
             let services = repository.list_services().await?;
-            answer_service_page(&services, &account_sid)
+            answer_service_page(&services, caller_account_sid, main_account_sid)
         }
-        ("GET", Some(service_sid)) => match repository.find_service(service_sid).await? {
-            Some(service) => answer_json(200, describe_service(&service, &account_sid)),
-            None => answer_not_found(service_sid),
-        },
-        ("POST", Some(service_sid)) => match repository.find_service(service_sid).await? {
-            Some(service) => {
-                let changed_service = repository
-                    .save_service(apply_fields(service, &fields))
-                    .await?;
-                answer_json(200, describe_service(&changed_service, &account_sid))
-            }
-            None => answer_not_found(service_sid),
-        },
-        ("DELETE", Some(service_sid)) => {
-            if repository.delete_service(service_sid).await? {
-                answer_no_content()
-            } else {
-                answer_not_found(service_sid)
-            }
+        ("GET", Some(_), Some(service)) => {
+            answer_json(200, describe_service(&service, main_account_sid))
         }
+        ("POST", Some(_), Some(service)) => {
+            let changed_service = repository
+                .save_service(apply_fields(service, &fields))
+                .await?;
+            answer_json(200, describe_service(&changed_service, main_account_sid))
+        }
+        ("DELETE", Some(service_sid), Some(_)) => {
+            repository.delete_service(service_sid).await?;
+            answer_no_content()
+        }
+        ("GET" | "POST" | "DELETE", Some(service_sid), None) => answer_not_found(service_sid),
         _ => return Ok(None),
     };
     Ok(Some(response))
@@ -68,7 +81,8 @@ pub async fn answer_messaging_services_request(
 async fn create_service(
     operation_context: &OperationContext,
     fields: &Value,
-    account_sid: &str,
+    owner_sid: Option<String>,
+    main_account_sid: &str,
 ) -> Result<ProviderHttpResponse, OperationError> {
     if read_form_field(fields, "FriendlyName").is_none() {
         return Ok(answer_twilio_error(
@@ -86,6 +100,7 @@ async fn create_service(
             inbound_url: None,
             inbound_fallback_url: None,
             opt_out_keywords: true,
+            account_sid: owner_sid,
             created_by: "api".to_owned(),
             created_at_unix_ms: operation_context.clock.now_unix_ms(),
         },
@@ -97,7 +112,7 @@ async fn create_service(
         .await?;
     Ok(answer_json(
         201,
-        describe_service(&stored_service, account_sid),
+        describe_service(&stored_service, main_account_sid),
     ))
 }
 
@@ -121,8 +136,9 @@ fn apply_fields(mut service: MessagingServiceRecord, fields: &Value) -> Messagin
     service
 }
 
-/// A service as Twilio's Messaging Services API answers it.
-fn describe_service(service: &MessagingServiceRecord, account_sid: &str) -> Value {
+/// A service as Twilio's Messaging Services API answers it, with its owner's account.
+fn describe_service(service: &MessagingServiceRecord, main_account_sid: &str) -> Value {
+    let account_sid = service_owner(service, main_account_sid);
     let service_url = format!("{SERVICES_URL}/{}", service.service_sid);
     let created_at = format_rfc3339(service.created_at_unix_ms);
     json!({
@@ -158,11 +174,13 @@ fn describe_service(service: &MessagingServiceRecord, account_sid: &str) -> Valu
 
 fn answer_service_page(
     services: &[MessagingServiceRecord],
-    account_sid: &str,
+    caller_account_sid: &str,
+    main_account_sid: &str,
 ) -> ProviderHttpResponse {
     let described_services: Vec<Value> = services
         .iter()
-        .map(|service| describe_service(service, account_sid))
+        .filter(|service| service_owner(service, main_account_sid) == caller_account_sid)
+        .map(|service| describe_service(service, main_account_sid))
         .collect();
     answer_json(
         200,

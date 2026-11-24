@@ -268,6 +268,11 @@ export type MessagingService = {
    * @example true
    */
   opt_out_keywords: boolean;
+  /**
+   * The Twilio account the service belongs to; null for the main account.
+   * @example null
+   */
+  account_sid: string | null;
   created_by: CreatedBy;
 };
 
@@ -298,6 +303,11 @@ export type MessagingServiceInput = {
    * @example "http://localhost:3000/sms/inbound-fallback"
    */
   inbound_fallback_url?: string | null;
+  /**
+   * The Twilio account that owns the service, the main account or a subaccount (`AC...`); left out or null, the main account. Twilio's Services API lists it only to that account.
+   * @example null
+   */
+  account_sid?: string | null;
   /**
    * Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.
    * @example true

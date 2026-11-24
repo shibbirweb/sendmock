@@ -8,6 +8,7 @@ use super::request_reader::read_request_fields;
 use super::twilio_answers::{
     answer_json, answer_no_content, answer_twilio_error, describe_page_meta, read_form_field,
 };
+use super::twilio_messaging_services::service_owner;
 use crate::twilio_accounts::TwilioAccountDirectory;
 use crate::{OperationContext, OperationError};
 
@@ -44,19 +45,21 @@ fn read_service_numbers_target(request_path: &str) -> Option<ServiceNumbersTarge
 pub async fn answer_service_numbers_request(
     operation_context: &OperationContext,
     directory: &TwilioAccountDirectory,
+    caller_account_sid: &str,
     request: &ProviderHttpRequest,
 ) -> Result<Option<ProviderHttpResponse>, OperationError> {
     let Some(target) = read_service_numbers_target(&request.path) else {
         return Ok(None);
     };
+    let main_account_sid = directory.main_account.account_sid.as_str();
     let Some(service) = operation_context
         .messaging_service_repository
         .find_service(target.service_sid)
         .await?
+        .filter(|service| service_owner(service, main_account_sid) == caller_account_sid)
     else {
         return Ok(Some(answer_not_found(&request.path)));
     };
-    let main_account_sid = directory.main_account.account_sid.as_str();
     let pool_numbers = list_pool_numbers(operation_context, &service).await?;
     let response = match (request.method.as_str(), target.phone_number_sid) {
         ("GET", None) => answer_pool_page(&pool_numbers, &service, main_account_sid),

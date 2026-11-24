@@ -274,6 +274,18 @@ export type EmailReplyRequest = WebhookChoice & {
    */
   from?: string;
   /**
+   * Who the reply goes to; replaces the default, the original `Reply-To` (or
+   * `From`).
+   * @example ["\"Support, Shop\" <support@shop.test>", "billing@shop.test"]
+   */
+  to?: string[];
+  /**
+   * Copies; replaces the default, the other original recipients with
+   * `reply_all` and none without.
+   * @example ["ops@shop.test"]
+   */
+  cc?: string[];
+  /**
    * Defaults to `Re: <original subject>`.
    * @example "Re: Ticket #318 updated"
    */
