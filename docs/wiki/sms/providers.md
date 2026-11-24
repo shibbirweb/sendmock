@@ -84,7 +84,9 @@ The provider port answers Twilio's number APIs over the same numbers and pools a
 | `GET`, `POST /v1/Services/{ServiceSid}/PhoneNumbers` | lists a Messaging Service's numbers and adds one by `PhoneNumberSid` |
 | `GET`, `DELETE /v1/Services/{ServiceSid}/PhoneNumbers/{PhoneNumberSid}` | fetches one and takes it out of the pool |
 
-Each number has a `PN` SID, shown under it on the Numbers screen. A number belongs to the account it was created under (numbers made on the Numbers screen belong to the main account) and lists only under that account. An invalid number answers Twilio's `21421`, one already registered `21422`, and adding a number that is in another Messaging Service answers `21712`.
+Each number has a `PN` SID, shown under it on the Numbers screen. A number belongs to the account it was created under (numbers made on the Numbers screen belong to the main account) and lists only under that account. Messaging Services work the same way: `/v1/Services` takes the account from the request's credentials, lists only that account's services, answers Twilio's `20404` for another account's service or its `PhoneNumbers`, and a service created there belongs to the account that created it (a send through a Messaging Service SID SendMock does not know yet makes it for the sending account).
+
+A send with `MessagingServiceSid` and no `From` answers `accepted` with `from` null and `num_segments` `"0"`, as Twilio does: the service picks the sender after the request. Fetch the message, or read its status callbacks, to see which number sent it. An invalid number answers Twilio's `21421`, one already registered `21422`, and adding a number that is in another Messaging Service answers `21712`.
 
 ## Twilio Debugger
 

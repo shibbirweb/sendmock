@@ -45,7 +45,7 @@ pub async fn build_virtual_number(
 }
 
 /// The owning account as stored: a known subaccount's SID, or none for the main account.
-async fn read_known_account_sid(
+pub(super) async fn read_known_account_sid(
     operation_context: &OperationContext,
     account_sid: Option<String>,
 ) -> Result<Option<String>, OperationError> {

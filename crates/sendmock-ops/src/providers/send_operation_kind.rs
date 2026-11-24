@@ -14,6 +14,8 @@ use crate::{OperationContext, OperationError};
 
 /// Twilio answers a send through a Messaging Service as `accepted` until it picks a sender.
 const SERVICE_ACCEPTED_STATUS: &str = "accepted";
+/// Twilio's `num_segments` before a Messaging Service has picked a sender.
+const UNASSIGNED_SEGMENT_COUNT: &str = "0";
 /// Twilio's code for a media link that cannot be fetched; the message is stored `failed`.
 const MEDIA_UNFETCHABLE_ERROR_CODE: &str = "11200";
 
@@ -74,7 +76,13 @@ pub async fn answer_send(
         Err(failure) => return refuse(failure),
     };
     let is_pool_send = send_parts.from.is_empty();
-    if let Err(failure) = resolve_pool_sender(operation_context, &mut send_parts).await? {
+    let sending_account_sid = provider_call
+        .path_params
+        .get("AccountSid")
+        .map(String::as_str);
+    if let Err(failure) =
+        resolve_pool_sender(operation_context, &mut send_parts, sending_account_sid).await?
+    {
         return refuse(failure);
     }
     let delivery_steps =
@@ -85,7 +93,11 @@ pub async fn answer_send(
     let sms = store_provider_sms(operation_context, provider_call, send_parts).await?;
     let mut answered_message = describe_message(provider_call.provider, &sms);
     if is_pool_send && sms.status == "queued" {
+        // Twilio picks the sender after the request, so its first answer names none yet and
+        // counts no segments; the stored message and its callbacks name the sender.
         answered_message["status"] = serde_json::Value::from(SERVICE_ACCEPTED_STATUS);
+        answered_message["from"] = serde_json::Value::Null;
+        answered_message["segments"] = serde_json::Value::from(UNASSIGNED_SEGMENT_COUNT);
     }
     let response = provider_call.render_success(&answered_message);
     let created_message = Some(CreatedMessage::sms(sms.sms_id.clone()));
@@ -187,6 +199,7 @@ fn read_send_parts(provider_call: &ProviderCall<'_>) -> Result<SendParts, Provid
 async fn resolve_pool_sender(
     operation_context: &OperationContext,
     send_parts: &mut SendParts,
+    sending_account_sid: Option<&str>,
 ) -> Result<Result<(), ProviderFailure>, OperationError> {
     let Some(service_sid) = send_parts
         .messaging_service_sid
@@ -195,11 +208,14 @@ async fn resolve_pool_sender(
     else {
         return Ok(Ok(()));
     };
-    Ok(
-        pick_pool_sender(operation_context, service_sid, &send_parts.to)
-            .await?
-            .map(|pool_sender| send_parts.from = pool_sender),
+    Ok(pick_pool_sender(
+        operation_context,
+        service_sid,
+        &send_parts.to,
+        sending_account_sid,
     )
+    .await?
+    .map(|pool_sender| send_parts.from = pool_sender))
 }
 
 fn missing_part(

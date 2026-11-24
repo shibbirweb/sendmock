@@ -2,6 +2,7 @@ use sendmock_store::MessagingServiceRecord;
 
 use super::number_inputs::{MessagingServiceInboundMode, MessagingServiceInput};
 use super::registry_fields::{field_error, read_optional_url};
+use super::virtual_number_builder::read_known_account_sid;
 use crate::{OperationContext, OperationError};
 
 /// The service as it will be stored: a name, a request URL when inbound messages go to a
@@ -20,6 +21,7 @@ pub async fn build_messaging_service(
         return Err(field_error("inbound_url", "Enter the request URL"));
     }
     let number_ids = read_registered_pool(operation_context, input.number_ids).await?;
+    let account_sid = read_known_account_sid(operation_context, input.account_sid).await?;
     let (service_sid, created_by, created_at_unix_ms) = match existing_service {
         Some(existing_service) => (
             existing_service.service_sid,
@@ -43,6 +45,7 @@ pub async fn build_messaging_service(
             input.inbound_fallback_url,
         )?,
         opt_out_keywords: input.opt_out_keywords,
+        account_sid,
         created_by,
         created_at_unix_ms,
     })

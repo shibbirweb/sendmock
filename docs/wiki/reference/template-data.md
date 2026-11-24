@@ -75,6 +75,7 @@ Besides `data`, a template reads `event` (`id`, `type`, `created_at`), `vars`, `
 | `data.project` | text |
 | `data.provider_message_id` | null in this sample |
 | `data.received_at` | text |
+| `data.recipient` | text |
 | `data.references` | text |
 | `data.response_kind` | null in this sample |
 | `data.size_bytes` | number |

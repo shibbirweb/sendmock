@@ -6,7 +6,6 @@ import type { EmailResponseFormValues } from "@/features/mail/detail/response/us
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useInboundRouteMatch } from "@/lib/api/hooks/use-inbound-route-queries";
 import type {
-  EmailDetail,
   InboundRouteMatchRequest,
   InboundRouteMatchResult,
 } from "@/lib/api/types";
@@ -27,17 +26,15 @@ export type InboundDestinations = {
 
 /** What will receive the reply or forward, before it is sent (EM-22.3). */
 export function useInboundDestinations({
-  email,
   composerMode,
   formValues,
 }: {
-  email: EmailDetail;
   composerMode: EmailComposerMode;
   formValues: EmailResponseFormValues;
 }): InboundDestinations {
   // Compared as text, since a fresh object each render would never settle.
   const matchRequestText = useDebouncedValue(
-    JSON.stringify(buildIncomingEmailPreview(email, composerMode, formValues)),
+    JSON.stringify(buildIncomingEmailPreview(composerMode, formValues)),
     matchDebounceMs,
   );
   const matchRequest = React.useMemo(

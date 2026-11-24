@@ -8,6 +8,16 @@ Write every user-visible change under **Unreleased** in the same pull request th
 
 ## [Unreleased]
 
+### Added
+
+- **Edit who a reply goes to:** in Mail, the Reply and Reply all composers now show To and Cc as editable address chips, like a mail client: type or paste more addresses (Enter, a comma or Tab adds one), remove one with its button, or double-click one to change it. **Cc** adds copies to a plain reply. The reply API, `sendmock email reply --to ... --cc ...` and MCP take `to` and `cc` lists that replace the default recipients. See Mail, Replies and forwards.
+- **Messaging Services per Twilio account:** a Messaging Service now belongs to the main Twilio account or one of its subaccounts, as on Twilio. Twilio's Services API (`/v1/Services` and its `PhoneNumbers`) lists and answers only the calling account's services, with Twilio's `20404` for another account's. A service made through the API belongs to the account that made it; pick the account with **Twilio account** in the Messaging Service sheet, `sendmock sms services create --account-sid`, `account_sid` in the API and MCP, or `account_sid` on `[[messaging_services]]` in a setup file. See Numbers.
+
+### Fixed
+
+- **Replies to a name with a comma:** replying to an email from `"[ABC] Pat Lee, Jr" <office@example.test>` wrote the name without its quotes, so the reply's To header held two addresses and the first had none. Reply, Reply all and forward now quote display names that need it, and the Mailgun inbound webhooks (`mailgun.routes`, `mailgun.store_notify`) take `recipient` and `To` from the address that received the email (`data.recipient`), never an empty one.
+- **The first answer of a Messaging Service send:** a Twilio send with `MessagingServiceSid` and no `From` answers `accepted` with `from` null and `num_segments` `0`, as Twilio does, since the service picks the sender after the request. Fetch the message, or read the status callbacks, for the sender.
+
 ## [1.5.0] - 2026-11-23
 
 ### Added

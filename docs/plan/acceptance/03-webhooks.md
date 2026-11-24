@@ -162,7 +162,7 @@ Phase 5 (W23, after W22), for the next beta (0.1.0-beta.4), added 2026-11-13 (ow
 
 ## WH-15 Webhook tests in CI/CD pipelines
 
-1.6.0 (planned as After 1.0; WH-15.1 to WH-15.7 ship in 1.4.0, the feature moved to 1.5.0 with the GitHub Action by owner decision 2026-11-22, then to 1.6.0 by owner decision 2026-11-23 so 1.5.0 ships A27 and A28), planned 2026-11-16 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a19-sendmock-in-cicd-pipelines-for-webhook-tests-wh-15) (A19).
+1.7.0 (planned as After 1.0; WH-15.1 to WH-15.7 ship in 1.4.0, the feature moved to 1.5.0 with the GitHub Action by owner decision 2026-11-22, to 1.6.0 by owner decision 2026-11-23 so 1.5.0 ships A27 and A28, then to 1.7.0 by owner decision 2026-11-24, so 1.6.0 ships only the fixes from the report on 1.5.0), planned 2026-11-16 by owner request, for later. Plan: [32-after-1-0.md](../32-after-1-0.md#a19-sendmock-in-cicd-pipelines-for-webhook-tests-wh-15) (A19).
 
 - [x] WH-15.1 `sendmock serve --setup <path|url>` and `SENDMOCK_SETUP` (with `SENDMOCK_SETUP_SHA256` and `SENDMOCK_SETUP_HEADERS`) load a setup file in TOML, JSON or YAML at startup with PL-18's version rules and fetch limits; SendMock reports ready only once it is applied, and a setup that cannot be loaded or validated stops startup with the reason.
 - [x] WH-15.2 `sendmock ci run <path|url>` reads a versioned CI file (JSON or YAML) naming the setup, the app URL and the scenarios (inline, files or URLs), runs them against an in-process SendMock on free ports or `--server`, and exits `0` when all pass, `5` when a scenario fails and `2` when a file is invalid.

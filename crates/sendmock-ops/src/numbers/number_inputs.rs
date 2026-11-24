@@ -132,6 +132,12 @@ pub struct MessagingServiceInput {
     #[serde(default)]
     #[schemars(schema_with = "crate::nullable_schema::<String>")]
     pub inbound_fallback_url: Option<String>,
+    /// The Twilio account that owns the service: the main account or a subaccount, `AC...`;
+    /// left out or null, the main account. Twilio's Services API lists it only to that
+    /// account.
+    #[serde(default)]
+    #[schemars(schema_with = "crate::nullable_schema::<String>")]
+    pub account_sid: Option<String>,
     /// Whether a text of STOP to one of its numbers opts the contact out of the whole
     /// service (Twilio's Advanced Opt-Out, with the provider's switch on); on when left out.
     #[serde(default = "crate::numbers::number_inputs::default_opt_out_keywords")]

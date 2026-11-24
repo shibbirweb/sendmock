@@ -1,10 +1,7 @@
-import {
-  type EmailComposerMode,
-  listOriginalRecipients,
-  readReplyRecipient,
-} from "@/features/mail/detail/response/email-composer-mode";
+import type { EmailComposerMode } from "@/features/mail/detail/response/email-composer-mode";
 import type { EmailResponseFormValues } from "@/features/mail/detail/response/use-email-response-form";
-import type { EmailDetail, InboundRouteMatchRequest } from "@/lib/api/types";
+import type { InboundRouteMatchRequest } from "@/lib/api/types";
+import { isEmailAddressText } from "@/lib/email/email-address-text";
 
 /**
  * `sam@example.test` out of `Sam <sam@example.test>`, as the server reads it;
@@ -16,21 +13,27 @@ export function readBareAddress(addressText: string): string {
   return (bracketMatch?.[1] ?? addressText).trim();
 }
 
+/** The bare addresses of the entries that are addresses. */
+function listBareAddresses(recipientTexts: string[]): string[] {
+  return recipientTexts.filter(isEmailAddressText).map(readBareAddress);
+}
+
 /**
  * The recipients and headers the incoming email will have once sent, as the
- * reply and forward operations build it (EM-22.3).
+ * reply and forward operations build it (EM-22.3), from the composer's
+ * current To and Cc (EM-17.7).
  */
 export function buildIncomingEmailPreview(
-  email: EmailDetail,
   composerMode: EmailComposerMode,
   formValues: Pick<
     EmailResponseFormValues,
-    "fromAddress" | "forwardToAddress" | "subject"
+    | "fromAddress"
+    | "forwardToAddress"
+    | "toRecipients"
+    | "ccRecipients"
+    | "subject"
   >,
 ): InboundRouteMatchRequest {
-  const responderAddress = readBareAddress(
-    formValues.fromAddress,
-  ).toLowerCase();
   const forwardAddress = readBareAddress(formValues.forwardToAddress);
   const headers = {
     subject: formValues.subject,
@@ -44,13 +47,8 @@ export function buildIncomingEmailPreview(
   }
 
   return {
-    to: [readReplyRecipient(email).address],
-    cc:
-      composerMode === "reply_all"
-        ? listOriginalRecipients(email)
-            .map((recipient) => recipient.address)
-            .filter((address) => address.toLowerCase() !== responderAddress)
-        : [],
+    to: listBareAddresses(formValues.toRecipients),
+    cc: listBareAddresses(formValues.ccRecipients),
     headers,
   };
 }

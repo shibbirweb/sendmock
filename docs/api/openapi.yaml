@@ -10933,6 +10933,21 @@ components:
           description: Who replies; defaults to the original recipient.
           examples:
             - user@example.test
+        to:
+          type: array
+          items:
+            type: string
+          description: Who the reply goes to; replaces the default, the original `Reply-To` (or `From`).
+          examples:
+            - - '"Support, Shop" <support@shop.test>'
+              - billing@shop.test
+        cc:
+          type: array
+          items:
+            type: string
+          description: Copies; replaces the default, the other original recipients with `reply_all` and none without.
+          examples:
+            - - ops@shop.test
         subject:
           type: string
           description: "Defaults to `Re: <original subject>`."
@@ -13138,6 +13153,13 @@ components:
           description: Whether a text of STOP to one of its numbers opts the contact out of the whole service.
           examples:
             - true
+        account_sid:
+          type:
+            - string
+            - "null"
+          description: The Twilio account the service belongs to; null for the main account.
+          examples:
+            - null
         created_by:
           $ref: "#/components/schemas/CreatedBy"
       required:
@@ -13148,6 +13170,7 @@ components:
         - inbound_url
         - inbound_fallback_url
         - opt_out_keywords
+        - account_sid
         - created_by
     MessagingServiceCreateInput:
       type: object
@@ -13190,6 +13213,13 @@ components:
           description: Called when `inbound_url` fails; none when left out.
           examples:
             - http://localhost:3000/sms/inbound-fallback
+        account_sid:
+          type:
+            - string
+            - "null"
+          description: The Twilio account that owns the service, the main account or a subaccount (`AC...`); left out or null, the main account. Twilio's Services API lists it only to that account.
+          examples:
+            - null
         opt_out_keywords:
           type: boolean
           description: Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.
@@ -13239,6 +13269,13 @@ components:
           description: Called when `inbound_url` fails; none when left out.
           examples:
             - http://localhost:3000/sms/inbound-fallback
+        account_sid:
+          type:
+            - string
+            - "null"
+          description: The Twilio account that owns the service, the main account or a subaccount (`AC...`); left out or null, the main account. Twilio's Services API lists it only to that account.
+          examples:
+            - null
         opt_out_keywords:
           type: boolean
           description: Whether a text of STOP to one of its numbers opts the contact out of the whole service; on when left out.

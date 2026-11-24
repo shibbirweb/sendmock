@@ -1,6 +1,10 @@
 import * as React from "react";
 import { toast } from "sonner";
 
+import {
+  mainTwilioAccount,
+  toStoredAccountSid,
+} from "@/features/numbers/twilio-account-field";
 import { ApiError } from "@/lib/api/api-client";
 import { useSaveMessagingService } from "@/lib/api/hooks/use-numbers-queries";
 import type {
@@ -20,6 +24,7 @@ export type MessagingServiceFormValues = {
   inboundUrl: string;
   inboundFallbackUrl: string;
   hasOptOutKeywords: boolean;
+  accountSid: string;
 };
 
 function toFormValues(
@@ -32,6 +37,7 @@ function toFormValues(
     inboundUrl: messagingService?.inbound_url ?? "",
     inboundFallbackUrl: messagingService?.inbound_fallback_url ?? "",
     hasOptOutKeywords: messagingService?.opt_out_keywords ?? true,
+    accountSid: messagingService?.account_sid ?? mainTwilioAccount,
   };
 }
 
@@ -56,6 +62,7 @@ function toServiceInput(
       ? toNullableText(formValues.inboundFallbackUrl)
       : null,
     opt_out_keywords: formValues.hasOptOutKeywords,
+    account_sid: toStoredAccountSid(formValues.accountSid),
   };
 }
 

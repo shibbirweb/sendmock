@@ -48,9 +48,22 @@ const message = await client.messages.create({
   to: "+14155550120",
   body: "Your appointment is tomorrow at 10:00",
 });
-if (message.from !== poolNumber) {
-  throw new Error(`Sent from ${message.from}, not the pool's ${poolNumber}`);
+// As on Twilio, the service picks the sender after the request: the first answer names none.
+if (
+  message.status !== "accepted" ||
+  message.from !== null ||
+  message.numSegments !== "0"
+) {
+  throw new Error(
+    `First answer ${message.status} from ${message.from}, segments ${message.numSegments}`,
+  );
+}
+const fetchedMessage = await client.messages(message.sid).fetch();
+if (fetchedMessage.from !== poolNumber) {
+  throw new Error(
+    `Sent from ${fetchedMessage.from}, not the pool's ${poolNumber}`,
+  );
 }
 console.log(
-  `Number ${incomingNumber.sid} in ${messagingService.sid} sent ${message.sid} from ${message.from}`,
+  `Number ${incomingNumber.sid} in ${messagingService.sid} sent ${message.sid} from ${fetchedMessage.from}`,
 );

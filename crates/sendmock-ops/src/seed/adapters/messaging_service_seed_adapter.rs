@@ -27,6 +27,9 @@ struct SeedMessagingService {
     /// `false` turns opt-out keywords off for the service's numbers.
     #[serde(default = "is_on", skip_serializing_if = "is_on_value")]
     opt_out_keywords: bool,
+    /// The SID of the subaccount that owns the service; left out, the main account.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    account_sid: Option<String>,
 }
 
 fn is_on() -> bool {
@@ -67,6 +70,7 @@ impl MessagingServiceSeedAdapter {
                 inbound_url: None,
                 inbound_fallback_url: None,
                 opt_out_keywords: true,
+                account_sid: None,
                 created_by: CREATED_BY_SEED.to_owned(),
                 created_at_unix_ms: operation_context.clock.now_unix_ms(),
             });
@@ -77,6 +81,7 @@ impl MessagingServiceSeedAdapter {
             "inbound_url": seed_service.inbound_url,
             "inbound_fallback_url": seed_service.inbound_fallback_url,
             "opt_out_keywords": seed_service.opt_out_keywords,
+            "account_sid": seed_service.account_sid,
         }))?;
         let mut seeded_service =
             build_messaging_service(operation_context, service_input, Some(existing_service))
@@ -107,6 +112,7 @@ impl MessagingServiceSeedAdapter {
                         inbound_url: stored_service.inbound_url,
                         inbound_fallback_url: stored_service.inbound_fallback_url,
                         opt_out_keywords: stored_service.opt_out_keywords,
+                        account_sid: stored_service.account_sid,
                     })?,
                 })
             })

@@ -18,10 +18,13 @@ function forwardField(fieldName: string, valueTemplate: string): string[] {
 
 /** The parsed message's fields, which both route actions send. */
 const messageFormFields: string[] = [
-  ...forwardField("recipient", "{{ data.to[0].address }}"),
+  ...forwardField(
+    "recipient",
+    "{{ data.recipient | default(data.to[0].address) }}",
+  ),
   ...forwardField("sender", "{{ data.from.address }}"),
   ...forwardField("from", "{{ data.from.address }}"),
-  ...forwardField("To", "{{ data.to[0].address }}"),
+  ...forwardField("To", "{{ data.recipient | default(data.to[0].address) }}"),
   ...forwardField("subject", "{{ data.subject }}"),
   ...forwardField(
     "Message-Id",

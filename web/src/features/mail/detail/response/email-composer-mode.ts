@@ -1,4 +1,6 @@
 import type { EmailAddress, EmailDetail } from "@/lib/api/types";
+import { formatEmailAddress } from "@/lib/email/build-response-text";
+import { isEmailAddressText } from "@/lib/email/email-address-text";
 
 /** Which composer is open under the email header. */
 export type EmailComposerMode = "reply" | "reply_all" | "forward";
@@ -32,13 +34,45 @@ export function readReplyRecipient(
   return email.reply_to[0] ?? email.from;
 }
 
+/** The To and Cc a reply starts with, each one an editable address line. */
+export function listDefaultReplyRecipients(
+  email: Pick<EmailDetail, "reply_to" | "from" | "to" | "cc">,
+  composerMode: EmailComposerMode,
+): { toRecipients: string[]; ccRecipients: string[] } {
+  const responder = listOriginalRecipients(email)[0];
+  const ccRecipients =
+    composerMode === "reply_all"
+      ? listOriginalRecipients(email)
+          .filter((recipient) => recipient.address !== responder?.address)
+          .map(formatEmailAddress)
+      : [];
+
+  return {
+    toRecipients: [formatEmailAddress(readReplyRecipient(email))],
+    ccRecipients,
+  };
+}
+
 /**
- * A reply can go as prefilled, edited or empty; a forward needs an address
- * to go to (EM-22.1).
+ * A reply needs at least one To and only real addresses in To and Cc; a
+ * forward needs an address to go to (EM-22.1, EM-17.7).
  */
 export function canSendResponse(
   composerMode: EmailComposerMode,
-  forwardToAddress: string,
+  recipients: {
+    forwardToAddress: string;
+    toRecipients: string[];
+    ccRecipients: string[];
+  },
 ): boolean {
-  return composerMode === "forward" ? forwardToAddress.includes("@") : true;
+  if (composerMode === "forward") {
+    return recipients.forwardToAddress.includes("@");
+  }
+
+  return (
+    recipients.toRecipients.length > 0 &&
+    [...recipients.toRecipients, ...recipients.ccRecipients].every(
+      isEmailAddressText,
+    )
+  );
 }

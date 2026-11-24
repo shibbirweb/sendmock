@@ -91,7 +91,6 @@ export function EmailResponseComposer({
     sendResponse,
   } = useEmailResponseForm({ email, composerMode, onSent: onClose });
   const { inboundDestinations, webhookTargets } = useEmailResponseTargets({
-    email,
     composerMode,
     formValues,
   });

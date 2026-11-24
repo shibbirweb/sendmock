@@ -298,3 +298,78 @@ async fn incoming_email_from_fields_or_raw_mime_fires_email_inbound_only() {
     assert_eq!(count_events(&operation_context, "email.inbound"), 2);
     assert_eq!(count_events(&operation_context, "email.received"), 0);
 }
+
+// AC: EM-17.6
+#[tokio::test]
+async fn a_reply_quotes_a_display_name_with_a_comma_so_the_recipient_keeps_its_address() {
+    let (app_router, _) = build_test_app();
+    let (status, sent) = call_api(
+        &app_router,
+        "POST",
+        "/api/v1/send",
+        Some(&json!({
+            "from": "\"[ABC] Pat Lee, Jr\" <office@example.test>",
+            "to": ["sam@example.test"],
+            "subject": "Your quote",
+            "text": "Here it is",
+        })),
+    )
+    .await;
+    assert_eq!(status, 201, "{sent}");
+
+    let (status, reply) = respond(&app_router, &sent["id"], "reply", json!({})).await;
+
+    assert_eq!(status, 201, "{reply}");
+    assert_eq!(
+        reply["to"],
+        json!([{ "name": "[ABC] Pat Lee, Jr", "address": "office@example.test" }])
+    );
+    assert_eq!(
+        reply["headers"]["To"][0],
+        "\"[ABC] Pat Lee, Jr\" <office@example.test>"
+    );
+}
+
+// AC: EM-17.7
+#[tokio::test]
+async fn a_reply_goes_to_the_to_and_cc_it_names_and_refuses_what_is_not_an_address() {
+    let (app_router, _) = build_test_app();
+    let original = send_original(&app_router).await;
+
+    let (status, reply) = respond(
+        &app_router,
+        &original["id"],
+        "reply",
+        json!({
+            "to": ["\"Support, Shop\" <support@shop.test>", "billing@shop.test"],
+            "cc": ["ops@shop.test"],
+        }),
+    )
+    .await;
+    let (empty_status, empty_answer) =
+        respond(&app_router, &original["id"], "reply", json!({ "to": [] })).await;
+    let (invalid_status, invalid_answer) = respond(
+        &app_router,
+        &original["id"],
+        "reply",
+        json!({ "cc": ["Ops team"] }),
+    )
+    .await;
+
+    assert_eq!(status, 201, "{reply}");
+    assert_eq!(
+        reply["to"],
+        json!([
+            { "name": "Support, Shop", "address": "support@shop.test" },
+            { "name": "", "address": "billing@shop.test" },
+        ])
+    );
+    assert_eq!(
+        reply["cc"],
+        json!([{ "name": "", "address": "ops@shop.test" }])
+    );
+    assert_eq!(empty_status, 400, "{empty_answer}");
+    assert_eq!(empty_answer["error"]["field"], "to", "{empty_answer}");
+    assert_eq!(invalid_status, 400, "{invalid_answer}");
+    assert_eq!(invalid_answer["error"]["field"], "cc", "{invalid_answer}");
+}

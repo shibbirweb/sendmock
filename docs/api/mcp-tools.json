@@ -5294,6 +5294,35 @@
           "example": "user@example.test"
         },
         {
+          "name": "to",
+          "input": {
+            "name": "to",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Who the reply goes to; replaces the default, the original `Reply-To` (or `From`).",
+          "example": [
+            "\"Support, Shop\" <support@shop.test>",
+            "billing@shop.test"
+          ]
+        },
+        {
+          "name": "cc",
+          "input": {
+            "name": "cc",
+            "location": "body"
+          },
+          "type": "string[]",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "Copies; replaces the default, the other original recipients with `reply_all` and none without.",
+          "example": [
+            "ops@shop.test"
+          ]
+        },
+        {
           "name": "subject",
           "input": {
             "name": "subject",
@@ -5401,6 +5430,31 @@
             "description": "Who replies; defaults to the original recipient.",
             "examples": [
               "user@example.test"
+            ]
+          },
+          "to": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Who the reply goes to; replaces the default, the original `Reply-To` (or `From`).",
+            "examples": [
+              [
+                "\"Support, Shop\" <support@shop.test>",
+                "billing@shop.test"
+              ]
+            ]
+          },
+          "cc": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Copies; replaces the default, the other original recipients with `reply_all` and none without.",
+            "examples": [
+              [
+                "ops@shop.test"
+              ]
             ]
           },
           "subject": {
@@ -11589,6 +11643,18 @@
           "example": "http://localhost:3000/sms/inbound-fallback"
         },
         {
+          "name": "account_sid",
+          "input": {
+            "name": "account_sid",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The Twilio account that owns the service, the main account or a subaccount (`AC...`); left out or null, the main account. Twilio's Services API lists it only to that account.",
+          "example": null
+        },
+        {
           "name": "opt_out_keywords",
           "input": {
             "name": "opt_out_keywords",
@@ -11658,6 +11724,16 @@
             "description": "Called when `inbound_url` fails; none when left out.",
             "examples": [
               "http://localhost:3000/sms/inbound-fallback"
+            ]
+          },
+          "account_sid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The Twilio account that owns the service, the main account or a subaccount (`AC...`); left out or null, the main account. Twilio's Services API lists it only to that account.",
+            "examples": [
+              null
             ]
           },
           "opt_out_keywords": {
@@ -11902,6 +11978,18 @@
           "example": "http://localhost:3000/sms/inbound-fallback"
         },
         {
+          "name": "account_sid",
+          "input": {
+            "name": "account_sid",
+            "location": "body"
+          },
+          "type": "string",
+          "is_required": false,
+          "allowed_values": null,
+          "description": "The Twilio account that owns the service, the main account or a subaccount (`AC...`); left out or null, the main account. Twilio's Services API lists it only to that account.",
+          "example": null
+        },
+        {
           "name": "opt_out_keywords",
           "input": {
             "name": "opt_out_keywords",
@@ -11968,6 +12056,16 @@
             "description": "Called when `inbound_url` fails; none when left out.",
             "examples": [
               "http://localhost:3000/sms/inbound-fallback"
+            ]
+          },
+          "account_sid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The Twilio account that owns the service, the main account or a subaccount (`AC...`); left out or null, the main account. Twilio's Services API lists it only to that account.",
+            "examples": [
+              null
             ]
           },
           "opt_out_keywords": {

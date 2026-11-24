@@ -19,14 +19,14 @@ Smallest change with the most users first; items that need an outside party (a d
 | A9 | System tray app | #168 | to be written | 0.1.0-beta.1 |
 | A10 | Helm chart and Docker Desktop extension | #162 | to be written | 1.0.0 |
 | A11 | Official distribution repositories | #169 | needs maintainers ([09](09-distribution.md#package-channels-by-stage-decided-2026-10-27)) | Waiting on others |
-| A12 | Monitoring: Prometheus metrics, OpenTelemetry export, log files and readiness | #175, #176, #177 | PL-11, PL-12, PL-13 (new) | 1.6.0 |
+| A12 | Monitoring: Prometheus metrics, OpenTelemetry export, log files and readiness | #175, #176, #177 | PL-11, PL-12, PL-13 (new) | 1.7.0 (moved from 1.6.0, owner decision 2026-11-24) |
 | A13 | Accounts, login and roles (Admin, Developer, Viewer) | #178, #179 | PL-14, PL-15 (new) | 2.0.0 |
 | A14 | Real forwarding: provider connections and routing rules for email and SMS | #180, #181 | PL-16, PL-17 (new) | 2.0.0 |
-| A15 | Docs traffic analytics with Google Analytics | #186 | WS-11 (new) | 1.6.0 (moved from 1.5.0, owner decision 2026-11-23) |
-| A16 | Code examples on every docs page, for every task | #197 | WS-12 (new) | 1.6.0 (moved from 1.5.0, owner decision 2026-11-23) |
+| A15 | Docs traffic analytics with Google Analytics | #186 | WS-11 (new) | 1.7.0 (moved from 1.5.0 and 1.6.0, owner decisions 2026-11-23 and 2026-11-24) |
+| A16 | Code examples on every docs page, for every task | #197 | WS-12 (new) | 1.7.0 (moved from 1.5.0 and 1.6.0, owner decisions 2026-11-23 and 2026-11-24) |
 | A17 | List actions on every traffic screen: select, mark read or unread, delete, delete all | #277 | UI-14 (new) | 1.1.0 |
 | A18 | Share and move a setup: versioned export and import, from a file or a URL; saved scenarios (owner decision 2026-11-20) | #287 | PL-18, AI-07 (new) | 1.3.0 |
-| A19 | SendMock in CI/CD pipelines for webhook tests, set up from a JSON or YAML file at a URL | #286 | WH-15 (new) | 1.6.0 (WH-15.1 to WH-15.7 ship in 1.4.0; the GitHub Action, WH-15.8 and WH-15.9, moved from 1.5.0 to 1.6.0, owner decisions 2026-11-22 and 2026-11-23) |
+| A19 | SendMock in CI/CD pipelines for webhook tests, set up from a JSON or YAML file at a URL | #286 | WH-15 (new) | 1.7.0 (WH-15.1 to WH-15.7 ship in 1.4.0; the GitHub Action, WH-15.8 and WH-15.9, moved from 1.5.0 to 1.6.0 and then to 1.7.0, owner decisions 2026-11-22, 2026-11-23 and 2026-11-24) |
 | A20 | Search engines and link previews for the website | #293 | WS-13 (new) | 1.2.0 |
 | A21 | What's new and Upgrade guide links in the docs sidebar | #295 | WS-14 (new) | 1.2.0 |
 | A22 | Security and quality clean-up: every open alert and Dependabot pull request | #308 | PL-19 (new) | 1.3.1 |
@@ -36,6 +36,7 @@ Smallest change with the most users first; items that need an outside party (a d
 | A26 | Download activity in the website's footer wordmark: the letters as a pixel graph of the last 7 days' downloads, lit by a pointer spotlight (owner decision 2026-11-21: ships with 1.3.1) | #338 | WS-15 (new) | 1.3.1 |
 | A27 | Startup banner: the footer's SendMock wordmark in braille dots, with the version, when SendMock starts in a terminal (owner request 2026-11-22) | #350 | PL-23 (new) | 1.5.0 |
 | A28 | Plug and play for Mailgun and Twilio apps: a user's 1.4.0 report (Laravel, Mailgun, Twilio subaccounts), 35 findings checked on 1.4.0 | #356 to #367 | EM-24 to EM-27, SM-22 to SM-24, PL-24 to PL-27, AI-08 (new) | 1.5.0 |
+| A29 | Fixes from the same team's report on the released 1.5.0: a reply to a display name with a comma, Messaging Services per account, and the first answer of a Messaging Service send; with them, editable To and Cc in the reply composer (owner request) | #379 (bug) | EM-17.6, EM-17.7, EM-25.7, SM-22.10, SM-22.11 (fix) | 1.6.0 |
 
 ## A1. Mailpit API compatibility (EM-19)
 
@@ -1017,3 +1018,18 @@ The report's preset (section 6, `sendmock preset laravel-mailgun-twilio --app-ur
 
 **Proof:** API tests for each reproduction (template values from `X-Mailgun-Variables`, an empty Messaging Service, an endpoint made from three fields, an empty `account_sid` refused, a preset with a bad CSV leaving nothing behind, a CSV that names a new service), a fixture test of `mailgun.store_notify` against Mailgun's store-and-notify fields, unit tests of the PHP and CA checks with the fake command runner, and the snippet command check.
 
+## A29. Fixes from the report on 1.5.0 (EM-17.6, EM-17.7, EM-25.7, SM-22.10, SM-22.11)
+
+**Why (owner request, 2026-11-24: fix them and release them as 1.6.0, which ships only these fixes; the items planned for 1.6.0 moved to 1.7.0):** the team behind the 1.4.0 and 1.5.0 reports (Laravel 13 with Horizon, Mailgun, Twilio with a subaccount per customer and Messaging Services) checked the released 1.5.0 from Homebrew and listed three open bugs they cannot work around in their app. Their IDs SM-50 to SM-52 clash with ours, so they continue the R- list. Tracked in #379.
+
+**Checked against the code (2026-11-24):**
+
+| # | Finding | Checked | Fix | Feature |
+|---|---------|---------|-----|---------|
+| R-51 | Reply in the inbox drops the quotes around a display name with a comma, so the reply's recipient is empty | Confirmed: `format_address` (`email/response_text.rs`) writes `name <address>` unquoted and `native_message.rs` joins the list into `To`, so `"[ABC] Pat Lee, Jr" <office@example.test>` comes back as `[ABC] Pat Lee` with no address and `Jr <office@example.test>`; `mailgun.routes` and `mailgun.store_notify` send `recipient` and `To` from `data.to[0].address`, an empty string here | Address headers SendMock writes quote a display name that has an RFC 5322 special (`( ) < > [ ] : ; @ \ , . "`), escaping `\` and `"`; template data gets `data.recipient`, the first envelope recipient, else the first `To` with an address, and the two Mailgun inbound templates send it as `recipient` and `To` | EM-17, EM-25 |
+| R-52 | Messaging Services are not scoped to an account | Confirmed: `messaging_services` has no account column, `GET /v1/Services` lists every service, and `describe_service` stamps each with the caller's `account_sid` | A service stores its account: the account that created it through the provider API (or sent through an unknown SID in lenient mode), else the `account_sid` given in REST, CLI (`--account-sid`), MCP, the UI and setup files, else the main account (existing services). `/v1/Services` and every `/v1/Services/{sid}/...` request answer only the calling account's services, with Twilio's 20404 for another account's, and report the owner in `account_sid` | SM-22 |
+| R-53 | A send through a Messaging Service names a sender in its first response | Confirmed: the pool sender is picked during the request and `describe_message` answers it; only `status` is changed to `accepted` | The create response of a send with `MessagingServiceSid` and no `From` has `from` null and `num_segments` `"0"`, as Twilio's does (Twilio picks the sender after the request); the stored message, its fetch and the status callbacks keep the sender | SM-22 |
+
+**Editable To and Cc (owner request, 2026-11-24, with the R-51 fix):** the reply composer showed To as plain text, so a reply could only go to the original `Reply-To` (or `From`). To and Cc become recipient fields like a mail client's: each address a chip (the name, or the address), removed with its button and double-clicked to edit; typing or pasting adds addresses on Enter, a comma, a semicolon, Tab or leaving the field, a comma inside a quoted name excepted; Backspace in an empty field takes the last chip back to edit; a **Cc** button adds copies to a plain reply; an entry that is not an address shows red and Send waits. The reply operation takes `to` and `cc` lists (REST, CLI `--to` and `--cc`, MCP) that replace the defaults, checked as a send checks them. Forward keeps its single To, since the forward operation takes one address. The chips are a shared `EmailRecipientsInput`, separate from the settings `ChipListInput`, which keeps its chips above a field with an Add button (EM-17.7).
+
+**Proof:** a unit test of the address quoting and API tests of each reproduction (a reply to `"[ABC] Pat Lee, Jr" <office@example.test>` stored with one recipient and its webhook's `recipient`, two subaccounts each listing only their own service and getting 20404 for the other's, a service send's create response), a fixture test of the two Mailgun inbound templates with a recipient whose name has a comma, and the Twilio PHP and Node SDK jobs in CI reading `from` from a service send's create response and the fetched message, and for EM-17.7 API tests of `to` and `cc`, unit tests of the address list parsing, and a Playwright test of the chips.

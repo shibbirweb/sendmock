@@ -224,6 +224,14 @@ export const numbersHandlers = [
         "sid must be MG and 32 hex digits",
       );
     }
+    const accountSid = readKnownAccountSid(serviceInput.account_sid);
+    if (accountSid === undefined) {
+      return createErrorResponse(
+        400,
+        "validation_failed",
+        "No Twilio account or subaccount with this SID",
+      );
+    }
     if (findMessagingService(trimmedSid) !== undefined) {
       return createErrorResponse(
         409,
@@ -238,6 +246,7 @@ export const numbersHandlers = [
       inbound_url: serviceInput.inbound_url ?? null,
       inbound_fallback_url: serviceInput.inbound_fallback_url ?? null,
       opt_out_keywords: serviceInput.opt_out_keywords ?? true,
+      account_sid: accountSid,
       friendly_name: serviceInput.friendly_name.trim(),
       number_ids: [],
       sid: trimmedSid === "" ? createProviderId("MG") : trimmedSid,
@@ -266,9 +275,23 @@ export const numbersHandlers = [
         return createErrorResponse(400, "validation_failed", firstError);
       }
 
+      const accountSid = readKnownAccountSid(
+        serviceInput.account_sid === undefined
+          ? messagingService.account_sid
+          : serviceInput.account_sid,
+      );
+      if (accountSid === undefined) {
+        return createErrorResponse(
+          400,
+          "validation_failed",
+          "No Twilio account or subaccount with this SID",
+        );
+      }
+
       Object.assign(messagingService, serviceInput, {
         friendly_name: serviceInput.friendly_name.trim(),
         number_ids: messagingService.number_ids,
+        account_sid: accountSid,
       });
       setServicePool(
         messagingService,
